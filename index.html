@@ -22,6 +22,12 @@
 html,body{height:100%;overflow-x:hidden;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
 
+/* ── PERIOD TABS ── */
+.period-tabs{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;}
+.ptab{flex:1;text-align:center;padding:6px 10px;font-size:12px;font-weight:500;font-family:var(--font);color:var(--text2);cursor:pointer;border-radius:7px;border:none;background:transparent;transition:all .15s;white-space:nowrap;}
+.ptab:hover{color:var(--text);}
+.ptab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3);}
+
 /* ── LOGIN SCREEN ── */
 #login-screen{
   position:fixed;inset:0;background:rgba(0,0,0,.82);
@@ -298,7 +304,8 @@ select.fi option{background:var(--bg3);}
       <div><div class="pt">Dashboard</div><div class="ps" id="dash-date"></div></div>
       <button class="btn" id="dash-log-btn">+ Log Trade</button>
     </div>
-    <!-- Guest banner - shown when not logged in -->
+
+    <!-- Guest banner -->
     <div id="guest-banner" style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
       <div>
         <div style="font-size:13px;font-weight:600;margin-bottom:3px">👋 Selamat datang di TradeLog</div>
@@ -307,23 +314,43 @@ select.fi option{background:var(--bg3);}
       <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">Masuk Sekarang</button>
     </div>
 
+    <!-- Balance banner -->
     <div class="bbal" id="bbal-wrap">
       <div><h3>Starting Balance</h3><p>Modal awal akun trading kamu</p></div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <div class="bval" id="bal-banner-btn">$<span id="bdisp">—</span><span class="bedit">✎ ubah</span></div>
       </div>
     </div>
+
+    <!-- Period Filter Tabs -->
+    <div style="margin-bottom:16px">
+      <div class="period-tabs" id="period-tabs">
+        <button class="ptab active" data-period="all">Overview</button>
+        <button class="ptab" data-period="7">7 Hari</button>
+        <button class="ptab" data-period="30">30 Hari</button>
+        <button class="ptab" data-period="180">180 Hari</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
     <div class="stats">
-      <div class="sc"><div class="sl">Balance</div><div class="sv" id="st-bal">—</div><div class="sch" id="st-pnl">—</div></div>
+      <div class="sc"><div class="sl">P&amp;L <span id="period-label" style="color:var(--accent);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-left:2px"></span></div><div class="sv" id="st-bal">—</div><div class="sch" id="st-pnl">—</div></div>
       <div class="sc"><div class="sl">Win Rate</div><div class="sv" id="st-wr">—</div><div class="sch" id="st-wrs">no trades yet</div></div>
       <div class="sc"><div class="sl">Profit Factor</div><div class="sv" id="st-pf">—</div><div class="sch neu">gross W ÷ gross L</div></div>
       <div class="sc"><div class="sl">Avg R:R</div><div class="sv" id="st-rr">—</div><div class="sch neu">realized ratio</div></div>
       <div class="sc"><div class="sl">Trades</div><div class="sv" id="st-n">0</div><div class="sch" id="st-sk">—</div></div>
     </div>
+
+    <!-- Equity Curve -->
     <div class="cc">
-      <div class="ch"><div class="ct">Equity Curve</div><div class="cm"><span id="eqs">—</span><span id="eqn">—</span></div></div>
+      <div class="ch">
+        <div class="ct">Equity Curve</div>
+        <div class="cm"><span id="eqs">—</span><span id="eqn">—</span></div>
+      </div>
       <div style="position:relative;height:200px"><canvas id="eqC"></canvas></div>
     </div>
+
+    <!-- Bottom Charts -->
     <div class="g2">
       <div class="cc" style="margin-bottom:0"><div class="ch"><div class="ct">P&amp;L per Trade</div></div><div style="position:relative;height:148px"><canvas id="pnlC"></canvas></div></div>
       <div class="cc" style="margin-bottom:0"><div class="ch"><div class="ct">Win vs Loss</div></div><div style="position:relative;height:148px"><canvas id="dnC"></canvas></div></div>
@@ -563,6 +590,23 @@ let ftmo = {size:10000,pp:10,dp:5,ddp:10};
 let currentUser = null, unsubTrades = null;
 let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
 let pendingAction = null; // track what user wanted to do before login
+let currentPeriod = 'all'; // 'all' | '7' | '30' | '180'
+
+// Get trades filtered by current period
+function getFilteredTrades() {
+  if (currentPeriod === 'all') return trades;
+  const days = parseInt(currentPeriod);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffStr = cutoff.toISOString().slice(0,10);
+  return trades.filter(t => t.date >= cutoffStr);
+}
+
+// Period display label
+function getPeriodLabel() {
+  if (currentPeriod === 'all') return '';
+  return currentPeriod + 'd';
+}
 
 // ── SYNC INDICATOR ────────────────────────────────────
 function setSyncState(state) {
@@ -689,6 +733,13 @@ function openLoginScreen(reason) {
 }
 
 function updateGuestUI() {
+  // ── Reset period filter to Overview ──
+  currentPeriod = 'all';
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  const firstTab = document.querySelector('.ptab[data-period="all"]');
+  if (firstTab) firstTab.classList.add('active');
+  $('period-label').textContent = '';
+
   // ── Dashboard stats ──
   $('st-bal').textContent = '—'; $('st-bal').className = 'sv';
   $('st-pnl').textContent = '—'; $('st-pnl').className = 'sch';
@@ -974,6 +1025,16 @@ $('ftmo-save').addEventListener('click', async () => {
   await saveProfile();
 });
 
+// ── PERIOD TABS ───────────────────────────────────────
+document.querySelectorAll('.ptab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentPeriod = btn.dataset.period;
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateAll();
+  });
+});
+
 // ── CALENDAR BUTTONS ──────────────────────────────────
 $('cal-prev').addEventListener('click', () => { calOff--; renderCal(); });
 $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
@@ -989,31 +1050,69 @@ function updateAll() {
 
 // ── STATS ─────────────────────────────────────────────
 function updateStats() {
-  const n=trades.length, W=trades.filter(t=>t.result==='Win'), L=trades.filter(t=>t.result==='Loss');
-  const tot=trades.reduce((s,t)=>s+t.pnl,0), b=bal+tot;
-  const wr=n>0?(W.length/n*100).toFixed(1):null;
-  const gw=W.reduce((s,t)=>s+t.pnl,0), gl=Math.abs(L.reduce((s,t)=>s+t.pnl,0));
-  const pf=gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
-  const rr=n>0?(trades.reduce((s,t)=>s+t.r,0)/n).toFixed(2):'—';
-  $('st-bal').textContent='$'+f2(b); $('st-bal').className='sv '+(tot>=0?'pos':'neg');
-  $('st-pnl').textContent=n>0?((tot>=0?'+$':'-$')+f2(Math.abs(tot))):'—';
-  $('st-pnl').className='sch '+(tot>0?'pos':tot<0?'neg':'neu');
-  $('st-wr').textContent=wr?wr+'%':'—'; $('st-wr').className='sv '+(wr>=50?'pos':wr?'neg':'');
-  $('st-wrs').textContent=n>0?W.length+' wins / '+n+' trades':'no trades yet';
-  $('st-pf').textContent=pf; $('st-pf').className='sv '+(parseFloat(pf)>=1?'pos':pf==='—'?'':'neg');
-  $('st-rr').textContent=rr; $('st-rr').className='sv '+(parseFloat(rr)>0?'pos':rr==='—'?'':'neg');
-  $('st-n').textContent=n;
-  if(n>0){let s=0,type=trades[n-1].result;for(let i=n-1;i>=0&&trades[i].result===type;i--)s++;
+  const ft = getFilteredTrades(); // filtered by period
+  const allTot = trades.reduce((s,t)=>s+t.pnl,0); // total P&L always from all trades (for balance)
+  const b = bal + allTot; // current account balance always uses all trades
+
+  const n  = ft.length;
+  const W  = ft.filter(t=>t.result==='Win');
+  const L  = ft.filter(t=>t.result==='Loss');
+  const tot= ft.reduce((s,t)=>s+t.pnl,0); // P&L for selected period
+  const wr = n>0?(W.length/n*100).toFixed(1):null;
+  const gw = W.reduce((s,t)=>s+t.pnl,0);
+  const gl = Math.abs(L.reduce((s,t)=>s+t.pnl,0));
+  const pf = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
+  const rr = n>0?(ft.reduce((s,t)=>s+t.r,0)/n).toFixed(2):'—';
+
+  // Update period label badge
+  $('period-label').textContent = getPeriodLabel();
+
+  // Balance card — always shows current total balance + period P&L
+  $('st-bal').textContent = '$'+f2(b);
+  $('st-bal').className   = 'sv '+(allTot>=0?'pos':'neg');
+  $('st-pnl').textContent = n>0?((tot>=0?'+$':'-$')+f2(Math.abs(tot))):'—';
+  $('st-pnl').className   = 'sch '+(tot>0?'pos':tot<0?'neg':'neu');
+
+  $('st-wr').textContent  = wr?wr+'%':'—';
+  $('st-wr').className    = 'sv '+(wr>=50?'pos':wr?'neg':'');
+  $('st-wrs').textContent = n>0?W.length+' wins / '+n+' trades':'no trades yet';
+
+  $('st-pf').textContent  = pf;
+  $('st-pf').className    = 'sv '+(parseFloat(pf)>=1?'pos':pf==='—'?'':'neg');
+
+  $('st-rr').textContent  = rr;
+  $('st-rr').className    = 'sv '+(parseFloat(rr)>0?'pos':rr==='—'?'':'neg');
+
+  $('st-n').textContent   = n;
+
+  // Streak always from all trades (not period-filtered)
+  const allN = trades.length;
+  if(allN>0){
+    let s=0,type=trades[allN-1].result;
+    for(let i=allN-1;i>=0&&trades[i].result===type;i--)s++;
     $('st-sk').textContent=s+' '+type.toLowerCase()+(s>1?'s':'')+' streak';
-    $('st-sk').className='sch '+(type==='Win'?'pos':type==='Loss'?'neg':'neu');}
-  else{$('st-sk').textContent='—';$('st-sk').className='sch';}
+    $('st-sk').className='sch '+(type==='Win'?'pos':type==='Loss'?'neg':'neu');
+  } else {
+    $('st-sk').textContent='—';$('st-sk').className='sch';
+  }
+
   $('eqs').textContent='Start $'+bal.toLocaleString();
   $('eqn').textContent='Now $'+f2(b);
   $('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 }
 
 // ── CHARTS ────────────────────────────────────────────
-function getEq(){let b=bal;const L=['Start'],D=[b];trades.forEach(t=>{b+=t.pnl;L.push(t.date?t.date.slice(5):'');D.push(Math.round(b*100)/100);});return{L,D};}
+function getEq(){
+  const ft=getFilteredTrades();
+  // For equity: start from balance BEFORE the filtered period
+  const allTot=trades.reduce((s,t)=>s+t.pnl,0);
+  const ftTot=ft.reduce((s,t)=>s+t.pnl,0);
+  const startBal = (bal+allTot) - ftTot; // balance at start of period
+  let b=startBal;
+  const L=['Start'],D=[b];
+  ft.forEach(t=>{b+=t.pnl;L.push(t.date?t.date.slice(5):'');D.push(Math.round(b*100)/100);});
+  return{L,D};
+}
 
 function renderEq(){
   const{L,D}=getEq(),up=D.length<2||D[D.length-1]>=D[0],col=up?'#00d97e':'#ff4d4d';
@@ -1023,13 +1122,15 @@ function renderEq(){
   eqCh=new Chart(ctx,{type:'line',data:{labels:L,datasets:[{data:D,borderColor:col,backgroundColor:g,borderWidth:2,pointRadius:D.length<20?3:0,pointBackgroundColor:col,fill:true,tension:.35}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#555',bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+f2(c.raw)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},maxTicksLimit:8,maxRotation:0}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v.toLocaleString()}}}}});
 }
 function renderPnl(){
-  const L=trades.map((_,i)=>'#'+(i+1)),D=trades.map(t=>t.pnl);
+  const ft=getFilteredTrades();
+  const L=ft.map((_,i)=>'#'+(i+1)),D=ft.map(t=>t.pnl);
   if(pnlCh)pnlCh.destroy();
   pnlCh=new Chart($('pnlC').getContext('2d'),{type:'bar',data:{labels:L,datasets:[{data:D,backgroundColor:D.map(v=>v>=0?'#00d97e':'#ff4d4d'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+c.raw.toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:'#444',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v}}}}});
 }
 function renderDonut(){
-  const w=trades.filter(t=>t.result==='Win').length,l=trades.filter(t=>t.result==='Loss').length,be=trades.filter(t=>t.result==='Breakeven').length;
-  if(w+l+be===0)return;
+  const ft=getFilteredTrades();
+  const w=ft.filter(t=>t.result==='Win').length,l=ft.filter(t=>t.result==='Loss').length,be=ft.filter(t=>t.result==='Breakeven').length;
+  if(w+l+be===0){if(dnCh){dnCh.destroy();dnCh=null;}return;}
   if(dnCh)dnCh.destroy();
   dnCh=new Chart($('dnC').getContext('2d'),{type:'doughnut',data:{labels:['Wins','Losses','Breakeven'],datasets:[{data:[w,l,be],backgroundColor:['#00d97e','#ff4d4d','#555'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#f0f0f0'}}}});
 }
