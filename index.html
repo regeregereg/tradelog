@@ -648,6 +648,7 @@ function openLoginScreen(reason) {
 }
 
 function updateGuestUI() {
+  // ── Dashboard stats ──
   $('st-bal').textContent = '—'; $('st-bal').className = 'sv';
   $('st-pnl').textContent = '—'; $('st-pnl').className = 'sch';
   $('st-wr').textContent = '—'; $('st-wrs').textContent = 'login untuk mulai';
@@ -656,19 +657,49 @@ function updateGuestUI() {
   $('eqs').textContent = '—'; $('eqn').textContent = '—';
   $('sbf-bal').textContent = 'Belum login';
   $('bdisp').textContent = '—';
+  $('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // ── Journal table ──
   $('ttb').innerHTML = '';
   $('es').style.display = 'block';
+
+  // ── Analytics bars — reset to no-data state ──
+  const noData = '<span style="font-size:12px;color:var(--text3)">No data yet</span>';
+  $('pb').innerHTML  = noData;
+  $('sb2').innerHTML = noData;
+  $('stb').innerHTML = noData;
+
+  // ── FTMO tracker ──
+  $('ftp').textContent = '$0.00'; $('ftp').className = 'ftv';
+  $('ftpt').textContent = '—';
+  $('ftpb').style.width = '0%';
+  $('ftd').textContent = '$0.00'; $('ftd').className = 'ftv';
+  $('ftdl').textContent = '—';
+  $('ftdb').style.width = '0%';
+  $('ftdd').textContent = '$0.00'; $('ftdd').className = 'ftv';
+  $('ftddl').textContent = '—';
+  $('ftddb').style.width = '0%';
+  $('ftdy').textContent = '0';
+  $('ftdyb').style.width = '0%';
+  $('fttr').textContent = '0';
+  $('ftst').textContent = '🔄 In Progress';
+  $('ftstsb').textContent = 'Login untuk mulai';
+
+  // ── User info ──
   $('user-name').textContent = 'Guest';
   $('user-email').textContent = 'Belum login';
   $('user-avatar').textContent = '?';
-  $('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // ── Destroy all charts ──
   if (eqCh)  { eqCh.destroy();  eqCh  = null; }
   if (pnlCh) { pnlCh.destroy(); pnlCh = null; }
   if (dnCh)  { dnCh.destroy();  dnCh  = null; }
   if (ddCh)  { ddCh.destroy();  ddCh  = null; }
   if (rCh)   { rCh.destroy();   rCh   = null; }
   if (ftCh)  { ftCh.destroy();  ftCh  = null; }
-  renderCal(); // calendar still works for guests
+
+  // ── Calendar still works for guests ──
+  renderCal();
 }
 
 function showApp() {
