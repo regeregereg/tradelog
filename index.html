@@ -24,14 +24,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 
 /* ── LOGIN SCREEN ── */
 #login-screen{
-  position:fixed;inset:0;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  z-index:1000;padding:20px;
+  position:fixed;inset:0;background:rgba(0,0,0,.82);
+  display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:20px;backdrop-filter:blur(4px);
 }
+#login-screen.open{display:flex;}
 .login-card{
   background:var(--bg2);border:1px solid var(--border2);
   border-radius:20px;padding:48px 40px;width:100%;max-width:400px;
-  text-align:center;
+  text-align:center;position:relative;
 }
 .login-icon{font-size:48px;margin-bottom:20px;}
 .login-title{font-size:26px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px;}
@@ -176,7 +177,7 @@ select.fi option{background:var(--bg3);}
 .bvl{font-size:11px;font-family:var(--mono);width:44px;text-align:right;flex-shrink:0;}
 .calg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
 .caldl{font-size:9px;color:var(--text3);text-align:center;padding:3px 0;}
-.calc{aspect-ratio:1;border-radius:4px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);flex-direction:column;gap:1px;}
+.calc{border-radius:4px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);flex-direction:column;gap:1px;padding:6px 2px;min-height:44px;}
 .calc.win{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.25);color:#00d97e;}
 .calc.loss{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.2);color:#ff4d4d;}
 .calc.empty{background:transparent;border-color:transparent;}
@@ -231,15 +232,17 @@ select.fi option{background:var(--bg3);}
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
   <div class="login-card">
+    <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
     <div class="login-icon">📊</div>
-    <div class="login-title">TradeLog</div>
-    <div class="login-sub">Masuk dengan akun Google kamu untuk mengakses journal trading dari device manapun.</div>
+    <div class="login-title">Masuk ke TradeLog</div>
+    <div class="login-sub" id="login-sub-text">Login untuk mulai mencatat trade dan menyimpan data kamu ke cloud — bisa diakses dari device manapun.</div>
     <button class="login-btn" id="google-login-btn">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Masuk dengan Google
     </button>
     <div class="login-err" id="login-err">Gagal masuk. Coba lagi.</div>
     <div class="login-loading" id="login-loading">⏳ Sedang masuk…</div>
+    <button id="login-skip-btn" style="margin-top:14px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
   </div>
 </div>
 
@@ -279,6 +282,11 @@ select.fi option{background:var(--bg3);}
     <span class="sync-dot" id="sync-dot"></span>
     <span id="sbf-bal">Balance: —</span>
   </div>
+  <div style="padding:10px 12px 0">
+    <button id="sb-login-btn" style="display:none;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      Masuk / Login
+    </button>
+  </div>
 </nav>
 
 <!-- ══ MAIN ══ -->
@@ -290,7 +298,16 @@ select.fi option{background:var(--bg3);}
       <div><div class="pt">Dashboard</div><div class="ps" id="dash-date"></div></div>
       <button class="btn" id="dash-log-btn">+ Log Trade</button>
     </div>
-    <div class="bbal">
+    <!-- Guest banner - shown when not logged in -->
+    <div id="guest-banner" style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">👋 Selamat datang di TradeLog</div>
+        <div style="font-size:12px;color:var(--text2)">Kamu sedang melihat sebagai guest. Login untuk mulai mencatat trade dan menyimpan journal kamu.</div>
+      </div>
+      <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">Masuk Sekarang</button>
+    </div>
+
+    <div class="bbal" id="bbal-wrap">
       <div><h3>Starting Balance</h3><p>Modal awal akun trading kamu</p></div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <div class="bval" id="bal-banner-btn">$<span id="bdisp">—</span><span class="bedit">✎ ubah</span></div>
@@ -437,6 +454,28 @@ select.fi option{background:var(--bg3);}
   </div>
 </div>
 
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="mo" id="md-logout">
+  <div class="md" style="max-width:320px">
+    <div style="text-align:center;padding:8px 0 4px">
+      <div style="font-size:36px;margin-bottom:14px">👋</div>
+      <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;margin-bottom:8px">Keluar dari TradeLog?</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px">Data kamu tersimpan aman di cloud.<br>Bisa masuk lagi kapan saja dengan akun yang sama.</p>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px;text-align:left">
+        <div id="logout-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;overflow:hidden"></div>
+        <div style="min-width:0">
+          <div id="logout-name" style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          <div id="logout-email" style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btng" id="logout-cancel" style="flex:1">Batal</button>
+        <button class="btn" id="logout-confirm" style="flex:1;background:#ff4d4d">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FTMO SETTINGS -->
 <div class="mo" id="md-ftmo">
   <div class="md" style="max-width:360px">
@@ -482,6 +521,7 @@ let trades = [], bal = 0, calOff = 0, sbOpen = false;
 let ftmo = {size:10000,pp:10,dp:5,ddp:10};
 let currentUser = null, unsubTrades = null;
 let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
+let pendingAction = null; // track what user wanted to do before login
 
 // ── SYNC INDICATOR ────────────────────────────────────
 function setSyncState(state) {
@@ -496,6 +536,7 @@ $('google-login-btn').addEventListener('click', async () => {
   try {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
+    // onAuthStateChanged will handle the rest
   } catch(e) {
     $('login-loading').style.display = 'none';
     $('login-err').style.display = 'block';
@@ -504,31 +545,131 @@ $('google-login-btn').addEventListener('click', async () => {
   }
 });
 
-$('signout-btn').addEventListener('click', async () => {
-  if (!confirm('Keluar dari TradeLog?')) return;
-  if (unsubTrades) unsubTrades();
+// Close login screen buttons
+$('login-close-btn').addEventListener('click', closeLoginScreen);
+$('login-skip-btn').addEventListener('click', closeLoginScreen);
+$('login-screen').addEventListener('click', e => {
+  if (e.target === $('login-screen')) closeLoginScreen();
+});
+
+// Sidebar login button (shown when guest)
+$('sb-login-btn').addEventListener('click', () => openLoginScreen('general'));
+
+// Guest banner login button
+$('guest-banner-login').addEventListener('click', () => openLoginScreen('general'));
+
+// Toggle login/logout UI based on auth state
+function setAuthUI(loggedIn) {
+  $('sb-login-btn').style.display      = loggedIn ? 'none'         : 'block';
+  $('signout-btn').style.display       = loggedIn ? 'block'        : 'none';
+  $('sync-dot').style.display          = loggedIn ? 'inline-block' : 'none';
+  $('guest-banner').style.display      = loggedIn ? 'none'         : 'flex';
+  $('bbal-wrap').style.display         = loggedIn ? 'flex'         : 'none';
+  $('dash-log-btn').style.opacity      = loggedIn ? '1'            : '0.45';
+  $('dash-log-btn').title              = loggedIn ? ''             : 'Login untuk mencatat trade';
+}
+setAuthUI(false); // start as guest
+
+$('signout-btn').addEventListener('click', () => {
+  // Populate logout modal with current user info
+  if (currentUser) {
+    $('logout-name').textContent = currentUser.displayName || 'Trader';
+    $('logout-email').textContent = currentUser.email || '';
+    if (currentUser.photoURL) {
+      $('logout-avatar').innerHTML = '<img src="' + currentUser.photoURL + '" style="width:100%;height:100%;object-fit:cover" alt="">';
+    } else {
+      $('logout-avatar').textContent = (currentUser.displayName || 'T')[0].toUpperCase();
+    }
+  }
+  $('md-logout').classList.add('open');
+});
+
+// Logout modal events
+$('logout-cancel').addEventListener('click', () => $('md-logout').classList.remove('open'));
+$('md-logout').addEventListener('click', e => { if(e.target===$('md-logout')) $('md-logout').classList.remove('open'); });
+$('logout-confirm').addEventListener('click', async () => {
+  $('md-logout').classList.remove('open');
+  if (unsubTrades) { unsubTrades(); unsubTrades = null; }
   await signOut(auth);
+  // onAuthStateChanged handles reset — app stays visible in guest mode
+});
+
+// Add login button in user-pill for guest state
+$('user-avatar').addEventListener('click', () => {
+  if (!currentUser) openLoginScreen('general');
 });
 
 // ── AUTH STATE CHANGE ─────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (user) {
     currentUser = user;
-    $('login-screen').style.display = 'none';
-    showApp();
+    closeLoginScreen();
+    setAuthUI(true);
     await loadUserProfile(user);
     listenTrades(user.uid);
+    // Execute pending action if user was trying to do something before login
+    if (pendingAction === 'openTrade') {
+      pendingAction = null;
+      setTimeout(() => openTrade(), 600); // slight delay for data to load
+    } else {
+      pendingAction = null;
+    }
   } else {
+    // User signed out — reset to guest mode, keep app visible
+    const wasLoggedIn = currentUser !== null;
     currentUser = null;
-    $('login-screen').style.display = 'flex';
-    $('sb').classList.add('off');
-    $('main').classList.add('off');
-    $('sb-btn').classList.add('off');
     $('login-loading').style.display = 'none';
     if (unsubTrades) { unsubTrades(); unsubTrades = null; }
-    trades = [];
+    setAuthUI(false);
+    if (wasLoggedIn) {
+      trades = []; bal = 0;
+      updateGuestUI();
+    }
+    closeLoginScreen();
   }
 });
+
+function closeLoginScreen() {
+  $('login-screen').classList.remove('open');
+  $('login-err').style.display = 'none';
+  $('login-loading').style.display = 'none';
+}
+
+function openLoginScreen(reason) {
+  // reason: 'log' = trying to log trade, 'general' = clicked login
+  const sub = $('login-sub-text');
+  if (reason === 'log') {
+    sub.textContent = 'Login dulu untuk mulai mencatat trade. Data kamu tersimpan aman di cloud.';
+  } else {
+    sub.textContent = 'Login untuk mulai mencatat trade dan menyimpan data kamu ke cloud — bisa diakses dari device manapun.';
+  }
+  $('login-screen').classList.add('open');
+  $('login-err').style.display = 'none';
+}
+
+function updateGuestUI() {
+  $('st-bal').textContent = '—'; $('st-bal').className = 'sv';
+  $('st-pnl').textContent = '—'; $('st-pnl').className = 'sch';
+  $('st-wr').textContent = '—'; $('st-wrs').textContent = 'login untuk mulai';
+  $('st-pf').textContent = '—'; $('st-rr').textContent = '—';
+  $('st-n').textContent = '0'; $('st-sk').textContent = '—';
+  $('eqs').textContent = '—'; $('eqn').textContent = '—';
+  $('sbf-bal').textContent = 'Belum login';
+  $('bdisp').textContent = '—';
+  $('ttb').innerHTML = '';
+  $('es').style.display = 'block';
+  $('user-name').textContent = 'Guest';
+  $('user-email').textContent = 'Belum login';
+  $('user-avatar').textContent = '?';
+  $('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if (eqCh)  { eqCh.destroy();  eqCh  = null; }
+  if (pnlCh) { pnlCh.destroy(); pnlCh = null; }
+  if (dnCh)  { dnCh.destroy();  dnCh  = null; }
+  if (ddCh)  { ddCh.destroy();  ddCh  = null; }
+  if (rCh)   { rCh.destroy();   rCh   = null; }
+  if (ftCh)  { ftCh.destroy();  ftCh  = null; }
+  renderCal(); // calendar still works for guests
+}
 
 function showApp() {
   $('sb').classList.remove('off');
@@ -540,7 +681,12 @@ function showApp() {
     $('main').style.marginLeft = '0';
     sbOpen = false;
   }
+  setTimeout(() => renderCal(), 200);
 }
+
+// Show app immediately — no login required to browse
+showApp();
+updateGuestUI();
 
 // ── LOAD USER PROFILE ─────────────────────────────────
 async function loadUserProfile(user) {
@@ -668,6 +814,11 @@ $('welcome-bal').addEventListener('keydown', e => { if(e.key==='Enter') $('welco
 
 // ── TRADE MODAL ───────────────────────────────────────
 function openTrade() {
+  if (!currentUser) {
+    pendingAction = 'openTrade';
+    openLoginScreen('log');
+    return;
+  }
   $('f-dt').value = new Date().toISOString().slice(0,10);
   $('md-trade').classList.add('open');
   setTimeout(() => $('f-pair').focus(), 80);
@@ -709,6 +860,7 @@ window.delTrade = async (firestoreId) => {
 
 // ── BALANCE MODAL ─────────────────────────────────────
 $('bal-banner-btn').addEventListener('click', () => {
+  if (!currentUser) { openLoginScreen('general'); return; }
   $('bal-in').value = bal;
   $('md-bal').classList.add('open');
   setTimeout(() => $('bal-in').select(), 80);
