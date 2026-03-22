@@ -183,10 +183,29 @@ select.fi option{background:var(--bg3);}
 .bvl{font-size:11px;font-family:var(--mono);width:44px;text-align:right;flex-shrink:0;}
 .calg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
 .caldl{font-size:9px;color:var(--text3);text-align:center;padding:3px 0;}
-.calc{border-radius:4px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);flex-direction:column;gap:1px;padding:6px 2px;min-height:44px;}
+.calc{
+  border-radius:4px;background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-family:var(--mono);flex-direction:column;gap:1px;
+  padding:4px 2px;overflow:hidden;
+  /* Fixed height — never grows regardless of content */
+  height:0;padding-bottom:calc(100% - 2px);
+  position:relative;
+}
+/* Trick: use a wrapper inside each cell to position content */
+.calc-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1px;overflow:hidden;padding:3px 2px;
+}
 .calc.win{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.25);color:#00d97e;}
 .calc.loss{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.2);color:#ff4d4d;}
 .calc.empty{background:transparent;border-color:transparent;}
+.calc-pnl{
+  font-size:8.5px;font-family:var(--mono);font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;text-align:center;
+}
 .dn{font-size:8px;color:var(--text3);}
 .ftg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 .ftc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
@@ -353,7 +372,32 @@ select.fi option{background:var(--bg3);}
     <!-- Bottom Charts -->
     <div class="g2">
       <div class="cc" style="margin-bottom:0"><div class="ch"><div class="ct">P&amp;L per Trade</div></div><div style="position:relative;height:148px"><canvas id="pnlC"></canvas></div></div>
-      <div class="cc" style="margin-bottom:0"><div class="ch"><div class="ct">Win vs Loss</div></div><div style="position:relative;height:148px"><canvas id="dnC"></canvas></div></div>
+      <div class="cc" style="margin-bottom:0">
+        <div class="ch"><div class="ct">Win vs Loss</div></div>
+        <div style="position:relative;height:148px"><canvas id="dnC"></canvas></div>
+        <!-- Donut legend -->
+        <div id="donut-legend" style="display:flex;justify-content:center;gap:16px;margin-top:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#00d97e;flex-shrink:0;display:inline-block"></span>
+            <span style="font-size:12px;color:var(--text2)">Win</span>
+            <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:#00d97e" id="dn-wins">0</span>
+            <span style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="dn-wins-pct"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ff4d4d;flex-shrink:0;display:inline-block"></span>
+            <span style="font-size:12px;color:var(--text2)">Loss</span>
+            <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:#ff4d4d" id="dn-losses">0</span>
+            <span style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="dn-losses-pct"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#555;flex-shrink:0;display:inline-block"></span>
+            <span style="font-size:12px;color:var(--text2)">Breakeven</span>
+            <span style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--text2)" id="dn-be">0</span>
+            <span style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="dn-be-pct"></span>
+          </div>
+        </div>
+        <div id="donut-empty" style="display:none;text-align:center;padding:8px 0 4px;font-size:12px;color:var(--text3)">Belum ada trade di periode ini</div>
+      </div>
     </div>
   </div>
 
@@ -786,6 +830,11 @@ function updateGuestUI() {
   if (eqCh)  { eqCh.destroy();  eqCh  = null; }
   if (pnlCh) { pnlCh.destroy(); pnlCh = null; }
   if (dnCh)  { dnCh.destroy();  dnCh  = null; }
+  // Reset donut legend
+  ['dn-wins','dn-losses','dn-be'].forEach(id => { $(id).textContent='0'; });
+  ['dn-wins-pct','dn-losses-pct','dn-be-pct'].forEach(id => { $(id).textContent=''; });
+  $('donut-legend').style.display='none';
+  $('donut-empty').style.display='none';
   if (ddCh)  { ddCh.destroy();  ddCh  = null; }
   if (rCh)   { rCh.destroy();   rCh   = null; }
   if (ftCh)  { ftCh.destroy();  ftCh  = null; }
@@ -1129,10 +1178,53 @@ function renderPnl(){
 }
 function renderDonut(){
   const ft=getFilteredTrades();
-  const w=ft.filter(t=>t.result==='Win').length,l=ft.filter(t=>t.result==='Loss').length,be=ft.filter(t=>t.result==='Breakeven').length;
-  if(w+l+be===0){if(dnCh){dnCh.destroy();dnCh=null;}return;}
+  const w=ft.filter(t=>t.result==='Win').length;
+  const l=ft.filter(t=>t.result==='Loss').length;
+  const be=ft.filter(t=>t.result==='Breakeven').length;
+  const total=w+l+be;
+
+  // Update legend counts and percentages
+  const pct=(n)=> total>0 ? '('+Math.round(n/total*100)+'%)' : '';
+  $('dn-wins').textContent    = w;
+  $('dn-losses').textContent  = l;
+  $('dn-be').textContent      = be;
+  $('dn-wins-pct').textContent   = pct(w);
+  $('dn-losses-pct').textContent = pct(l);
+  $('dn-be-pct').textContent     = pct(be);
+
+  if(total===0){
+    if(dnCh){dnCh.destroy();dnCh=null;}
+    $('donut-legend').style.display='none';
+    $('donut-empty').style.display='block';
+    return;
+  }
+  $('donut-legend').style.display='flex';
+  $('donut-empty').style.display='none';
+
   if(dnCh)dnCh.destroy();
-  dnCh=new Chart($('dnC').getContext('2d'),{type:'doughnut',data:{labels:['Wins','Losses','Breakeven'],datasets:[{data:[w,l,be],backgroundColor:['#00d97e','#ff4d4d','#555'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#f0f0f0'}}}});
+  dnCh=new Chart($('dnC').getContext('2d'),{
+    type:'doughnut',
+    data:{
+      labels:['Wins','Losses','Breakeven'],
+      datasets:[{data:[w,l,be],backgroundColor:['#00d97e','#ff4d4d','#555'],borderWidth:0,hoverOffset:4}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'70%',
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
+          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},
+          callbacks:{
+            label: c => {
+              const pct = total>0 ? Math.round(c.raw/total*100) : 0;
+              return ` ${c.label}: ${c.raw} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 // ── TABLE ─────────────────────────────────────────────
@@ -1246,17 +1338,24 @@ function renderCal(){
   // ── Build calendar grid ─────────────────────────────
   let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="caldl">${x}</div>`).join('');
   const first=new Date(yr,mo,1).getDay();
-  for(let i=0;i<first;i++) html+='<div class="calc empty"></div>';
+  for(let i=0;i<first;i++) html+='<div class="calc empty"><div class="calc-inner"></div></div>';
   const dim=new Date(yr,mo+1,0).getDate();
   for(let day=1;day<=dim;day++){
     const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const pnl=dm[ds];
-    let cls='', lbl=`<span class="dn">${day}</span>`;
+    let cls='', inner='';
     if(pnl!==undefined){
       cls=pnl>=0?'win':'loss';
-      lbl=`<span>${pnl>=0?'+':''}$${Math.abs(pnl).toFixed(0)}</span><span class="dn">${day}</span>`;
+      // Shorten label: $1.2k style for large numbers to prevent overflow
+      const absVal=Math.abs(pnl);
+      const label=absVal>=1000
+        ? (pnl>=0?'+':'-')+'$'+(absVal/1000).toFixed(1)+'k'
+        : (pnl>=0?'+':'-')+'$'+absVal.toFixed(0);
+      inner=`<span class="calc-pnl">${label}</span><span class="dn">${day}</span>`;
+    } else {
+      inner=`<span class="dn">${day}</span>`;
     }
-    html+=`<div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${lbl}</div>`;
+    html+=`<div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}"><div class="calc-inner">${inner}</div></div>`;
   }
   $('calcon').innerHTML=`<div class="calg">${html}</div>`;
 }
