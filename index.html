@@ -185,28 +185,22 @@ select.fi option{background:var(--bg3);}
 .caldl{font-size:9px;color:var(--text3);text-align:center;padding:3px 0;}
 .calc{
   border-radius:4px;background:var(--bg3);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-family:var(--mono);flex-direction:column;gap:1px;
-  padding:4px 2px;overflow:hidden;
-  /* Fixed height — never grows regardless of content */
-  height:0;padding-bottom:calc(100% - 2px);
-  position:relative;
-}
-/* Trick: use a wrapper inside each cell to position content */
-.calc-inner{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:1px;overflow:hidden;padding:3px 2px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;overflow:hidden;
+  /* JS will set explicit height after first render */
+  min-height:38px;
 }
 .calc.win{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.25);color:#00d97e;}
 .calc.loss{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.2);color:#ff4d4d;}
-.calc.empty{background:transparent;border-color:transparent;}
+.calc.empty{background:transparent;border-color:transparent;pointer-events:none;}
+.calc-inner{display:contents;}
 .calc-pnl{
-  font-size:8.5px;font-family:var(--mono);font-weight:500;
+  font-size:8px;font-family:var(--mono);font-weight:500;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:100%;text-align:center;
+  max-width:90%;text-align:center;line-height:1.2;
 }
-.dn{font-size:8px;color:var(--text3);}
+.dn{font-size:8px;color:var(--text3);line-height:1.2;}
+.calc.win .dn,.calc.loss .dn{color:inherit;opacity:.7;}
 .ftg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 .ftc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
 .ftl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
@@ -1088,6 +1082,25 @@ document.querySelectorAll('.ptab').forEach(btn => {
 $('cal-prev').addEventListener('click', () => { calOff--; renderCal(); });
 $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
 
+// Re-apply square sizing on resize (e.g. rotate phone, resize desktop)
+let calResizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(calResizeTimer);
+  calResizeTimer = setTimeout(() => {
+    const cells = document.querySelectorAll('#calcon .calc');
+    if (!cells.length) return;
+    // Clear existing heights first so offsetWidth recalculates correctly
+    cells.forEach(c => c.style.height = '');
+    requestAnimationFrame(() => {
+      const nonEmpty = document.querySelector('#calcon .calc:not(.empty)');
+      if (!nonEmpty) return;
+      const size = nonEmpty.offsetWidth;
+      if (!size) return;
+      cells.forEach(c => c.style.height = size + 'px');
+    });
+  }, 100);
+});
+
 // ── UPDATE ALL ────────────────────────────────────────
 function updateAll() {
   if (!bal) return;
@@ -1338,7 +1351,7 @@ function renderCal(){
   // ── Build calendar grid ─────────────────────────────
   let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="caldl">${x}</div>`).join('');
   const first=new Date(yr,mo,1).getDay();
-  for(let i=0;i<first;i++) html+='<div class="calc empty"><div class="calc-inner"></div></div>';
+  for(let i=0;i<first;i++) html+='<div class="calc empty"></div>';
   const dim=new Date(yr,mo+1,0).getDate();
   for(let day=1;day<=dim;day++){
     const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -1355,9 +1368,25 @@ function renderCal(){
     } else {
       inner=`<span class="dn">${day}</span>`;
     }
-    html+=`<div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}"><div class="calc-inner">${inner}</div></div>`;
+    html+=`<div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div>`;
   }
   $('calcon').innerHTML=`<div class="calg">${html}</div>`;
+
+  // ── Enforce uniform square cells via JS ──────────────
+  // After DOM is painted, get the actual column width and
+  // set every cell's height equal to its own width so all
+  // cells are exactly square — regardless of content.
+  requestAnimationFrame(() => {
+    const cells = $('calcon').querySelectorAll('.calc:not(.empty)');
+    if (!cells.length) return;
+    // Use the width of the first cell as the reference size
+    const size = cells[0].offsetWidth;
+    if (!size) return;
+    // Apply to ALL cells including empty ones so grid stays uniform
+    $('calcon').querySelectorAll('.calc').forEach(c => {
+      c.style.height = size + 'px';
+    });
+  });
 }
 
 // ── FTMO ──────────────────────────────────────────────
