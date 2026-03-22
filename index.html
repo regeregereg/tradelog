@@ -181,31 +181,46 @@ select.fi option{background:var(--bg3);}
 .btr{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
 .bfl{height:100%;border-radius:2px;transition:width .6s ease;}
 .bvl{font-size:11px;font-family:var(--mono);width:44px;text-align:right;flex-shrink:0;}
-.calg{
+/* ── DAY LABELS ROW (separate from date grid) ── */
+.cal-labels{
   display:grid;
   grid-template-columns:repeat(7,1fr);
   gap:3px;
-  /* grid-auto-rows set via JS after render to match column width */
+  margin-bottom:3px;
 }
 .caldl{
   font-size:10px;color:var(--text3);
-  text-align:center;padding:4px 0;font-weight:500;
+  text-align:center;padding:3px 0;font-weight:500;
+}
+/* ── DATE GRID ── */
+.calg{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  /* Each row height = column width = 1/7 of container
+     We use vw units as a proxy. The calendar sits inside a
+     card that's roughly full width minus sidebar minus padding.
+     Using padding-bottom trick on a per-cell wrapper is the
+     only CSS-only way to guarantee square cells regardless of content. */
+  gap:3px;
+}
+/* Wrapper inside each cell — this is what makes it square */
+.calc-wrap{
+  position:relative;
+  width:100%;
+  padding-bottom:100%; /* = width → always square */
 }
 .calc{
+  position:absolute;
+  inset:0;
   border-radius:5px;
   background:var(--bg3);
   border:1px solid var(--border);
   overflow:hidden;
-  /* NO aspect-ratio, NO min-height — height fully controlled by grid-auto-rows */
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:2px;
-  cursor:default;
-  /* prevent any content from stretching the cell */
-  min-height:0;
-  min-width:0;
 }
 .calc.win{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.3);color:#00d97e;}
 .calc.loss{background:rgba(255,77,77,.13);border-color:rgba(255,77,77,.25);color:#ff4d4d;}
@@ -214,23 +229,24 @@ select.fi option{background:var(--bg3);}
   font-size:11px;
   font-family:var(--mono);
   font-weight:600;
-  line-height:1;
+  line-height:1.1;
   text-align:center;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  /* Shrink font dynamically so text always fits */
-  max-width:100%;
-  display:block;
+  max-width:90%;
 }
 .dn{
   font-size:10px;
   color:var(--text3);
-  line-height:1;
+  line-height:1.1;
   font-family:var(--mono);
-  display:block;
 }
 .calc.win .dn,.calc.loss .dn{color:inherit;opacity:.7;}
+@media(max-width:480px){
+  .calc-pnl{font-size:9px;}
+  .dn{font-size:9px;}
+}
 .ftg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 .ftc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
 .ftl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
@@ -1362,9 +1378,16 @@ function renderCal(){
   }
 
   // ── Build calendar grid ─────────────────────────────
-  let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="caldl">${x}</div>`).join('');
+  // Day labels row (separate from date grid so they don't affect row height)
+  const labels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="caldl">${x}</div>`).join('');
+
+  // Date cells — each cell wrapped in .calc-wrap (padding-bottom:100%)
+  // so the cell is always square regardless of content
+  let cells='';
   const first=new Date(yr,mo,1).getDay();
-  for(let i=0;i<first;i++) html+='<div class="calc empty"></div>';
+  for(let i=0;i<first;i++){
+    cells+=`<div class="calc-wrap"><div class="calc empty"></div></div>`;
+  }
   const dim=new Date(yr,mo+1,0).getDate();
   for(let day=1;day<=dim;day++){
     const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -1372,7 +1395,6 @@ function renderCal(){
     let cls='', inner='';
     if(pnl!==undefined){
       cls=pnl>=0?'win':'loss';
-      // Abbreviate large numbers so they fit in small cells
       const absVal=Math.abs(pnl);
       const label=absVal>=10000
         ? (pnl>=0?'+':'-')+'$'+(absVal/1000).toFixed(0)+'k'
@@ -1383,41 +1405,10 @@ function renderCal(){
     } else {
       inner=`<span class="dn">${day}</span>`;
     }
-    html+=`<div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div>`;
+    cells+=`<div class="calc-wrap"><div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div></div>`;
   }
-  $('calcon').innerHTML=`<div class="calg">${html}</div>`;
 
-  // ── Set grid-auto-rows = column width so every cell is square ──
-  // We measure ONE cell's offsetWidth (which equals the column width
-  // because all 7 columns are 1fr), then set grid-auto-rows on the
-  // parent to that exact pixel value. This is the only reliable way
-  // to get square cells in a 7-column grid on all devices.
-  function fixCalHeight(){
-    const grid = $('calcon').querySelector('.calg');
-    const cell = $('calcon').querySelector('.calc');
-    if(!grid || !cell) return;
-    const w = cell.offsetWidth;
-    if(!w) return;
-    grid.style.gridAutoRows = w + 'px';
-    // Scale fonts to fit: 30% of cell width is a good ratio
-    const pnlSize = Math.max(8, Math.min(13, Math.floor(w * 0.28)));
-    const dnSize  = Math.max(7, Math.min(11, Math.floor(w * 0.22)));
-    $('calcon').querySelectorAll('.calc-pnl').forEach(el => el.style.fontSize = pnlSize+'px');
-    $('calcon').querySelectorAll('.dn').forEach(el => el.style.fontSize = dnSize+'px');
-  }
-  // Run after paint so offsetWidth is accurate
-  requestAnimationFrame(() => {
-    fixCalHeight();
-    // Also fix on resize (phone rotation etc)
-    clearTimeout(window._calRT);
-    const onResize = () => {
-      clearTimeout(window._calRT);
-      window._calRT = setTimeout(fixCalHeight, 80);
-    };
-    window.removeEventListener('resize', window._calResizeFn);
-    window._calResizeFn = onResize;
-    window.addEventListener('resize', onResize);
-  });
+  $('calcon').innerHTML=`<div class="cal-labels">${labels}</div><div class="calg">${cells}</div>`;
 }
 
 // ── FTMO ──────────────────────────────────────────────
