@@ -370,6 +370,34 @@ select.fi option{background:var(--bg3);}
       <div><div class="pt">Trading Calendar</div><div class="ps">Daily P&amp;L heatmap</div></div>
       <div style="display:flex;gap:8px"><button class="btng bsm" id="cal-prev">‹ Prev</button><button class="btng bsm" id="cal-next">Next ›</button></div>
     </div>
+
+    <!-- Monthly Summary Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))" id="cal-stats-row">
+      <div class="sc">
+        <div class="sl">Monthly P&amp;L</div>
+        <div class="sv" id="cal-pnl">—</div>
+        <div class="sch" id="cal-pnl-sub">bulan ini</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Win Rate</div>
+        <div class="sv" id="cal-wr">—</div>
+        <div class="sch" id="cal-wr-sub">dari total trade</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Trades Bulan Ini</div>
+        <div class="sv" id="cal-trades">0</div>
+        <div class="sch" id="cal-trades-sub" style="display:flex;gap:6px">
+          <span class="pos" id="cal-wins">0W</span>
+          <span class="neg" id="cal-losses">0L</span>
+        </div>
+      </div>
+      <div class="sc">
+        <div class="sl">Avg P&amp;L / Trade</div>
+        <div class="sv" id="cal-avg">—</div>
+        <div class="sch neu">per trade bulan ini</div>
+      </div>
+    </div>
+
     <div class="cc">
       <div class="ch">
         <div class="ct" id="callbl"></div>
@@ -379,6 +407,19 @@ select.fi option{background:var(--bg3);}
         </div>
       </div>
       <div id="calcon"></div>
+      <!-- Win rate progress bar -->
+      <div id="cal-wr-bar-wrap" style="margin-top:16px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Win Rate Progress</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--text2)" id="cal-wr-pct-lbl">0%</span>
+        </div>
+        <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden">
+          <div id="cal-wr-bar" style="height:100%;border-radius:3px;transition:width .6s ease;background:var(--green);width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text3);font-family:var(--mono)">
+          <span>0%</span><span style="color:var(--text2)">Target 50%</span><span>100%</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -697,6 +738,15 @@ function updateGuestUI() {
   if (ddCh)  { ddCh.destroy();  ddCh  = null; }
   if (rCh)   { rCh.destroy();   rCh   = null; }
   if (ftCh)  { ftCh.destroy();  ftCh  = null; }
+
+  // ── Reset calendar monthly stats ──
+  $('cal-pnl').textContent='—'; $('cal-pnl').className='sv';
+  $('cal-wr').textContent='—';  $('cal-wr').className='sv';
+  $('cal-wr-sub').textContent='belum ada trade';
+  $('cal-trades').textContent='0';
+  $('cal-wins').textContent='0W'; $('cal-losses').textContent='0L';
+  $('cal-avg').textContent='—';  $('cal-avg').className='sv';
+  $('cal-wr-bar-wrap').style.display='none';
 
   // ── Calendar still works for guests ──
   renderCal();
@@ -1042,17 +1092,69 @@ function renderAna(){
 
 // ── CALENDAR ──────────────────────────────────────────
 function renderCal(){
-  const now=new Date(),d=new Date(now.getFullYear(),now.getMonth()+calOff,1);
+  const now=new Date(), d=new Date(now.getFullYear(), now.getMonth()+calOff, 1);
+  const yr=d.getFullYear(), mo=d.getMonth();
+  const monthStr=`${yr}-${String(mo+1).padStart(2,'0')}`;
+
   $('callbl').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const dm={};trades.forEach(t=>{if(!dm[t.date])dm[t.date]=0;dm[t.date]+=t.pnl;});
+
+  // Build daily P&L map
+  const dm={};
+  trades.forEach(t=>{if(!dm[t.date])dm[t.date]=0; dm[t.date]+=t.pnl;});
+
+  // ── Monthly stats ──────────────────────────────────
+  const monthTrades = trades.filter(t => t.date && t.date.startsWith(monthStr));
+  const wins   = monthTrades.filter(t => t.result==='Win').length;
+  const losses = monthTrades.filter(t => t.result==='Loss').length;
+  const total  = monthTrades.length;
+  const monthPnl = monthTrades.reduce((s,t) => s+t.pnl, 0);
+  const wr = total > 0 ? (wins/total*100) : null;
+  const avgPnl = total > 0 ? monthPnl/total : null;
+
+  // Update stat cards
+  $('cal-pnl').textContent = total > 0
+    ? (monthPnl>=0?'+$':'-$') + f2(Math.abs(monthPnl))
+    : '—';
+  $('cal-pnl').className = 'sv ' + (monthPnl>0?'pos':monthPnl<0?'neg':'');
+
+  $('cal-wr').textContent = wr !== null ? wr.toFixed(1)+'%' : '—';
+  $('cal-wr').className   = 'sv ' + (wr>=50?'pos':wr!==null?'neg':'');
+  $('cal-wr-sub').textContent = total>0 ? `${wins} win dari ${total} trade` : 'belum ada trade';
+
+  $('cal-trades').textContent = total;
+  $('cal-wins').textContent   = wins+'W';
+  $('cal-losses').textContent = losses+'L';
+
+  $('cal-avg').textContent = avgPnl !== null
+    ? (avgPnl>=0?'+$':'-$') + f2(Math.abs(avgPnl))
+    : '—';
+  $('cal-avg').className = 'sv ' + (avgPnl>0?'pos':avgPnl<0?'neg':'');
+
+  // Win rate progress bar
+  const barWrap = $('cal-wr-bar-wrap');
+  if (total > 0) {
+    barWrap.style.display = 'block';
+    const pct = Math.round(wr);
+    $('cal-wr-bar').style.width = pct+'%';
+    $('cal-wr-bar').style.background = pct>=50 ? '#00d97e' : '#ff4d4d';
+    $('cal-wr-pct-lbl').textContent = pct+'%';
+  } else {
+    barWrap.style.display = 'none';
+  }
+
+  // ── Build calendar grid ─────────────────────────────
   let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="caldl">${x}</div>`).join('');
-  const first=new Date(d.getFullYear(),d.getMonth(),1).getDay();
-  for(let i=0;i<first;i++)html+='<div class="calc empty"></div>';
-  const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  const first=new Date(yr,mo,1).getDay();
+  for(let i=0;i<first;i++) html+='<div class="calc empty"></div>';
+  const dim=new Date(yr,mo+1,0).getDate();
   for(let day=1;day<=dim;day++){
-    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    const pnl=dm[ds];let cls='',lbl=`<span class="dn">${day}</span>`;
-    if(pnl!==undefined){cls=pnl>=0?'win':'loss';lbl=`<span>${pnl>=0?'+':''}$${Math.abs(pnl).toFixed(0)}</span><span class="dn">${day}</span>`;}
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const pnl=dm[ds];
+    let cls='', lbl=`<span class="dn">${day}</span>`;
+    if(pnl!==undefined){
+      cls=pnl>=0?'win':'loss';
+      lbl=`<span>${pnl>=0?'+':''}$${Math.abs(pnl).toFixed(0)}</span><span class="dn">${day}</span>`;
+    }
     html+=`<div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${lbl}</div>`;
   }
   $('calcon').innerHTML=`<div class="calg">${html}</div>`;
