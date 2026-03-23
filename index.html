@@ -378,7 +378,24 @@ select.fi option{background:var(--bg3);}
       <button id="change-email-btn" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px">← Ganti email</button>
     </div>
 
-    <button id="login-skip-btn" style="margin-top:16px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
+    <!-- Divider -->
+    <div style="display:flex;align-items:center;gap:10px;margin-top:16px;margin-bottom:12px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:11px;color:var(--text3)">atau</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+
+    <!-- Anonymous login button -->
+    <button id="anon-btn" style="width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;margin-bottom:10px"
+      onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
+      onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
+      👻 Coba Tanpa Daftar
+    </button>
+    <div style="font-size:10px;color:var(--text3);text-align:center;line-height:1.5;margin-bottom:4px">
+      Data tersimpan sementara — bisa simpan permanen kapan saja
+    </div>
+
+    <button id="login-skip-btn" style="margin-top:8px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu (tanpa login) →</button>
   </div>
 
   <!-- Panel B: not invited -->
@@ -709,7 +726,59 @@ select.fi option{background:var(--bg3);}
     <div class="cc"><div class="ch"><div class="ct" id="prop-chart-title">Equity vs PropFirm Limits</div></div><div style="position:relative;height:200px"><canvas id="ftC"></canvas></div></div>
   </div>
 
+  <!-- ANON UPGRADE BANNER — shown inside main for anonymous users -->
+  <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:480px">
+    <div style="background:linear-gradient(135deg,#1a1040,#0f0f1a);border:1px solid rgba(124,106,247,.4);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">👻 Mode Anonim Aktif</div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.4">Data tersimpan sementara di akun ini. Simpan sekarang supaya tidak hilang.</div>
+      </div>
+      <button id="upgrade-btn" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        💾 Simpan Akun
+      </button>
+    </div>
+  </div>
+
 </main>
+
+<!-- UPGRADE ANON MODAL -->
+<div class="mo" id="md-upgrade">
+  <div class="md" style="max-width:380px">
+
+    <!-- Step 1: Enter email -->
+    <div id="upgrade-step-email">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:36px;margin-bottom:10px">💾</div>
+        <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;margin-bottom:6px">Simpan Akun Kamu</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6">Masukkan email untuk menyimpan semua data trading kamu secara permanen. Data yang sudah ada ikut terbawa.</p>
+      </div>
+      <div style="margin-bottom:10px">
+        <input id="upgrade-email-input" type="email" placeholder="emailkamu@gmail.com"
+          style="width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+      </div>
+      <div id="upgrade-err" style="display:none;font-size:12px;color:var(--red);background:var(--rd);border-radius:8px;padding:8px 12px;margin-bottom:10px"></div>
+      <div id="upgrade-loading" style="display:none;font-size:12px;color:var(--text2);margin-bottom:10px;text-align:center">⏳ Mengirim link…</div>
+      <div style="display:flex;gap:10px">
+        <button class="btng" id="upgrade-cancel" style="flex:1">Nanti</button>
+        <button class="btn" id="upgrade-send-btn" style="flex:1">Kirim Link Simpan →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Sent confirmation -->
+    <div id="upgrade-step-sent" style="display:none;text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">📬</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:8px">Cek Email Kamu!</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">Link simpan akun sudah dikirim ke:</p>
+      <div style="background:var(--bg3);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:10px 16px;margin-bottom:16px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);text-align:center" id="upgrade-sent-email">—</div>
+      <p style="font-size:12px;color:var(--text3);line-height:1.7;margin-bottom:16px">
+        Klik link di email → akun tersimpan + data tetap ada.<br>
+        Link berlaku <strong style="color:var(--text)">15 menit</strong>.
+      </p>
+      <button class="btng" id="upgrade-done-btn" style="width:100%">Tutup</button>
+    </div>
+  </div>
+</div>
 
 <!-- WELCOME MODAL (first login) -->
 <div class="mo" id="md-welcome">
@@ -888,7 +957,8 @@ select.fi option{background:var(--bg3);}
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signOut, onAuthStateChanged,
-         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
+         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
+         signInAnonymously, EmailAuthProvider, linkWithCredential }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
@@ -1024,23 +1094,48 @@ const EMAIL_KEY  = 'rpt_pending_email';        // localStorage key
 if (isSignInWithEmailLink(auth, window.location.href)) {
   let emailForSignIn = localStorage.getItem(EMAIL_KEY);
   if (!emailForSignIn) {
-    // Fallback: ask user to re-enter email (different device)
     emailForSignIn = window.prompt(
       'Masukkan email yang kamu gunakan untuk request link masuk:'
     );
   }
   if (emailForSignIn) {
-    signInWithEmailLink(auth, emailForSignIn, window.location.href)
-      .then(() => {
-        localStorage.removeItem(EMAIL_KEY);
-        // Clean URL so link can't be reused
-        window.history.replaceState(null, '', window.location.pathname);
-      })
-      .catch(err => {
-        localStorage.removeItem(EMAIL_KEY);
-        window.history.replaceState(null, '', window.location.pathname);
-        alert('Link sudah kedaluwarsa atau tidak valid. Silakan request link baru.');
-      });
+    const cleanUp = () => {
+      localStorage.removeItem(EMAIL_KEY);
+      localStorage.removeItem('rpt_anon_uid');
+      window.history.replaceState(null, '', window.location.pathname);
+    };
+
+    // Check if this is an upgrade from anonymous account
+    const anonUID = localStorage.getItem('rpt_anon_uid');
+    const currentAnon = auth.currentUser;
+
+    if (anonUID && currentAnon && currentAnon.isAnonymous) {
+      // Link anonymous account to email — data stays intact
+      const credential = EmailAuthProvider.credentialWithLink(
+        emailForSignIn, window.location.href
+      );
+      linkWithCredential(currentAnon, credential)
+        .then(() => { cleanUp(); })
+        .catch(err => {
+          // If already linked (user opened link on different device),
+          // just do a normal sign-in — Firestore data migration handled separately
+          if (err.code === 'auth/email-already-in-use' ||
+              err.code === 'auth/credential-already-in-use') {
+            return signInWithEmailLink(auth, emailForSignIn, window.location.href)
+              .then(cleanUp);
+          }
+          cleanUp();
+          alert('Gagal menghubungkan akun. Silakan coba lagi.');
+        });
+    } else {
+      // Normal sign-in (not upgrading from anon)
+      signInWithEmailLink(auth, emailForSignIn, window.location.href)
+        .then(cleanUp)
+        .catch(() => {
+          cleanUp();
+          alert('Link sudah kedaluwarsa atau tidak valid. Silakan request link baru.');
+        });
+    }
   }
 }
 
@@ -1137,6 +1232,87 @@ $('try-other-btn').addEventListener('click', () => {
 });
 $('notinvited-skip').addEventListener('click', closeLoginScreen);
 
+// ── ANONYMOUS LOGIN ────────────────────────────────────
+$('anon-btn').addEventListener('click', async () => {
+  $('login-loading').style.display = 'block';
+  $('anon-btn').disabled = true;
+  try {
+    await signInAnonymously(auth);
+    // onAuthStateChanged handles the rest
+  } catch(e) {
+    $('login-loading').style.display = 'none';
+    $('anon-btn').disabled = false;
+    $('login-err').style.display = 'block';
+    $('login-err').textContent = 'Gagal masuk anonim. Coba lagi.';
+  }
+});
+
+// ── UPGRADE BANNER BUTTON ──────────────────────────────
+$('upgrade-btn').addEventListener('click', () => {
+  $('upgrade-step-email').style.display = 'block';
+  $('upgrade-step-sent').style.display  = 'none';
+  $('upgrade-err').style.display        = 'none';
+  $('upgrade-email-input').value        = '';
+  $('md-upgrade').classList.add('open');
+  setTimeout(() => $('upgrade-email-input').focus(), 100);
+});
+
+// ── UPGRADE MODAL — cancel / done ─────────────────────
+$('upgrade-cancel').addEventListener('click', () => $('md-upgrade').classList.remove('open'));
+$('upgrade-done-btn').addEventListener('click', () => $('md-upgrade').classList.remove('open'));
+$('md-upgrade').addEventListener('click', e => {
+  if (e.target === $('md-upgrade')) $('md-upgrade').classList.remove('open');
+});
+
+// ── UPGRADE MODAL — send magic link (linked to anon account) ──
+async function handleUpgradeSend() {
+  const email = $('upgrade-email-input').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    $('upgrade-err').style.display = 'block';
+    $('upgrade-err').textContent = 'Masukkan email yang valid.';
+    return;
+  }
+  $('upgrade-err').style.display    = 'none';
+  $('upgrade-loading').style.display = 'block';
+  $('upgrade-send-btn').disabled     = true;
+
+  // Check invite — anonymous upgrading still needs to be invited
+  const invited = await isEmailInvited(email, null);
+  if (!invited) {
+    $('upgrade-loading').style.display = 'none';
+    $('upgrade-send-btn').disabled     = false;
+    $('upgrade-err').style.display     = 'block';
+    $('upgrade-err').textContent       = 'Email ini belum terdaftar. Hubungi admin untuk akses.';
+    return;
+  }
+
+  try {
+    // Store email + anon UID so we can link after redirect
+    localStorage.setItem(EMAIL_KEY, email);
+    localStorage.setItem('rpt_anon_uid', currentUser?.uid || '');
+
+    await sendSignInLinkToEmail(auth, email, {
+      url: ACTION_URL,
+      handleCodeInApp: true,
+    });
+
+    $('upgrade-loading').style.display = 'none';
+    $('upgrade-send-btn').disabled     = false;
+    $('upgrade-sent-email').textContent = email;
+    $('upgrade-step-email').style.display = 'none';
+    $('upgrade-step-sent').style.display  = 'block';
+  } catch(e) {
+    $('upgrade-loading').style.display = 'none';
+    $('upgrade-send-btn').disabled     = false;
+    $('upgrade-err').style.display     = 'block';
+    $('upgrade-err').textContent       = 'Gagal mengirim. Coba lagi.';
+  }
+}
+$('upgrade-send-btn').addEventListener('click', handleUpgradeSend);
+$('upgrade-email-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleUpgradeSend();
+});
+
 // Sidebar login button (shown when guest)
 $('sb-login-btn').addEventListener('click', () => openLoginScreen('general'));
 
@@ -1153,6 +1329,17 @@ function setAuthUI(loggedIn) {
   $('dash-log-btn').style.opacity      = loggedIn ? '1'            : '0.45';
   $('dash-log-btn').title              = loggedIn ? ''             : 'Login untuk mencatat trade';
   $('trader-card').style.display       = loggedIn ? 'block'        : 'none';
+}
+
+// Show/hide anonymous upgrade banner
+function setAnonUI(isAnon) {
+  $('anon-banner').style.display = isAnon ? 'block' : 'none';
+  // Update user pill to show anon indicator
+  if (isAnon) {
+    $('user-name').textContent  = '👻 Anonim';
+    $('user-email').textContent = 'Belum tersimpan — klik Simpan Akun';
+    $('signout-btn').title      = 'Keluar (data akan hilang)';
+  }
 }
 
 // Update trader card with user info
@@ -1222,22 +1409,39 @@ $('user-avatar').addEventListener('click', () => {
 // ── AUTH STATE CHANGE ─────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (user) {
-    // ── Invite check ───────────────────────────────────
+    // ── Anonymous user — skip invite check ─────────────
+    if (user.isAnonymous) {
+      currentUser = user;
+      closeLoginScreen();
+      showLoginPanel();
+      setAuthUI(true);
+      setAnonUI(true);
+      await loadUserProfile(user);
+      listenTrades(user.uid);
+      if (pendingAction === 'openTrade') {
+        pendingAction = null;
+        setTimeout(() => openTrade(), 600);
+      } else {
+        pendingAction = null;
+      }
+      return;
+    }
+    // ── Invite check (email users only) ────────────────
     $('login-loading').style.display = 'block';
     const invited = await isEmailInvited(user.email, user.uid);
     if (!invited) {
-      // Not invited — sign out silently and show rejection screen
       const rejectedEmail = user.email;
       await signOut(auth);
       $('login-loading').style.display = 'none';
       showNotInvited(rejectedEmail);
       return;
     }
-    // ── Invited — proceed normally ──────────────────────
+    // ── Invited email user — proceed ───────────────────
     currentUser = user;
     closeLoginScreen();
-    showLoginPanel(); // reset panel for next time
+    showLoginPanel();
     setAuthUI(true);
+    setAnonUI(false); // hide anon banner
     await loadUserProfile(user);
     listenTrades(user.uid);
     if (pendingAction === 'openTrade') {
@@ -1256,6 +1460,7 @@ onAuthStateChanged(auth, async user => {
     if (wasLoggedIn) {
       trades = []; bal = 0;
       updateGuestUI();
+      setAnonUI(false);
     }
     closeLoginScreen();
   }
@@ -1315,6 +1520,7 @@ function updateGuestUI() {
   $('sbf-bal').textContent = 'Belum login';
   const mb = $('mob-balance');
   if (mb) { mb.textContent = '—'; mb.style.display = 'none'; mb.style.color = 'var(--text2)'; }
+  $('anon-banner').style.display = 'none';
   $('bdisp').textContent = '—';
   $('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
