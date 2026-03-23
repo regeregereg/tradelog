@@ -509,13 +509,36 @@ select.fi option{background:var(--bg3);}
   <!-- JOURNAL -->
   <div class="page" id="page-journal">
     <div class="ph">
-      <div><div class="pt">Trade Journal</div><div class="ps">Full history</div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div><div class="pt">Trade Journal</div><div class="ps" id="journal-ps">Full history</div></div>
+      <button class="btn" id="journal-log-btn">+ Log Trade</button>
+    </div>
+
+    <!-- Journal filter bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <!-- Period tabs (left) -->
+      <div class="period-tabs" id="journal-period-tabs" style="flex-shrink:0">
+        <button class="ptab active" data-jperiod="all">Semua</button>
+        <button class="ptab" data-jperiod="7">7 Hari</button>
+        <button class="ptab" data-jperiod="30">30 Hari</button>
+        <button class="ptab" data-jperiod="365">1 Tahun</button>
+      </div>
+      <!-- Pair & result filter (right) -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <select class="fsel" id="fp"><option value="">All Pairs</option></select>
-        <select class="fsel" id="fr"><option value="">All</option><option>Win</option><option>Loss</option><option>Breakeven</option></select>
-        <button class="btn" id="journal-log-btn">+ Log Trade</button>
+        <select class="fsel" id="fr"><option value="">All Result</option><option>Win</option><option>Loss</option><option>Breakeven</option></select>
       </div>
     </div>
+
+    <!-- Journal summary strip -->
+    <div id="journal-summary" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:12px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:12px">
+        <span style="color:var(--text3)">Menampilkan <strong id="js-count" style="color:var(--text)">0</strong> trade</span>
+        <span>P&amp;L: <strong id="js-pnl" class="pos">—</strong></span>
+        <span>Win Rate: <strong id="js-wr" style="color:var(--text)">—</strong></span>
+        <span>Trades: <span id="js-wl" style="color:var(--text2)">—</span></span>
+      </div>
+    </div>
+
     <div class="tc"><div class="tw">
       <table>
         <thead><tr><th>#</th><th>Date</th><th>Pair</th><th>Dir</th><th>Session</th><th>Entry</th><th>Exit</th><th>Risk</th><th>P&amp;L</th><th>R</th><th>Result</th><th>Setup</th><th>Notes</th><th></th></tr></thead>
@@ -824,6 +847,16 @@ let currentUser = null, unsubTrades = null;
 let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
 let pendingAction = null; // track what user wanted to do before login
 let currentPeriod = 'all'; // 'all' | '7' | '30' | '180'
+let journalPeriod = 'all'; // journal page period filter
+
+function getJournalFilteredTrades() {
+  if (journalPeriod === 'all') return trades;
+  const days = parseInt(journalPeriod);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffStr = cutoff.toISOString().slice(0,10);
+  return trades.filter(t => t.date >= cutoffStr);
+}
 
 // Get trades filtered by current period
 function getFilteredTrades() {
@@ -1007,6 +1040,12 @@ function updateGuestUI() {
   const firstTab = document.querySelector('.ptab[data-period="all"]');
   if (firstTab) firstTab.classList.add('active');
   $('period-label').textContent = '';
+  // Reset journal period too
+  journalPeriod = 'all';
+  document.querySelectorAll('[data-jperiod]').forEach(b => b.classList.remove('active'));
+  const firstJTab = document.querySelector('[data-jperiod="all"]');
+  if(firstJTab) firstJTab.classList.add('active');
+  $('journal-summary').style.display = 'none';
 
   // ── Dashboard stats ──
   $('st-bal').textContent = '—'; $('st-bal').className = 'sv';
@@ -1451,6 +1490,18 @@ document.querySelectorAll('.ptab').forEach(btn => {
 $('fp').addEventListener('change', renderTable);
 $('fr').addEventListener('change', renderTable);
 
+// Journal period tabs
+document.querySelectorAll('[data-jperiod]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    journalPeriod = btn.dataset.jperiod;
+    document.querySelectorAll('[data-jperiod]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Reset pair filter options to match new period
+    updatePairFil();
+    renderTable();
+  });
+});
+
 // ── CALENDAR BUTTONS ──────────────────────────────────
 $('cal-prev').addEventListener('click', () => { calOff--; renderCal(); });
 $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
@@ -1673,11 +1724,46 @@ function renderDonut(){
 
 // ── TABLE ─────────────────────────────────────────────
 function renderTable(){
-  const fp=$('fp').value,fr=$('fr').value;
-  const rows=[...trades].reverse().filter(t=>{if(fp&&t.pair!==fp)return false;if(fr&&t.result!==fr)return false;return true;});
-  $('es').style.display=trades.length===0?'block':'none';
-  $('ttb').innerHTML=rows.map((t,i)=>{
-    const idx=trades.length-i,pc=t.pnl>0?'pos':t.pnl<0?'neg':'neu',rc=t.r>0?'pos':t.r<0?'neg':'neu';
+  const fp=$('fp').value, fr=$('fr').value;
+
+  // Apply period filter first, then pair/result filters
+  const periodBase = getJournalFilteredTrades();
+  const rows = [...periodBase].reverse().filter(t=>{
+    if(fp && t.pair!==fp) return false;
+    if(fr && t.result!==fr) return false;
+    return true;
+  });
+
+  // Show empty state only when NO trades at all
+  $('es').style.display = trades.length===0 ? 'block' : 'none';
+
+  // Update summary strip
+  const summary = $('journal-summary');
+  const hasFilter = journalPeriod!=='all' || fp || fr;
+  if(rows.length > 0 || hasFilter) {
+    summary.style.display = 'block';
+    const W = rows.filter(t=>t.result==='Win');
+    const L = rows.filter(t=>t.result==='Loss');
+    const tot = rows.reduce((s,t)=>s+t.pnl,0);
+    const wr = rows.length>0?(W.length/rows.length*100).toFixed(1)+'%':'—';
+    $('js-count').textContent = rows.length;
+    $('js-pnl').textContent = rows.length>0?((tot>=0?'+$':'-$')+f2(Math.abs(tot))):'—';
+    $('js-pnl').className = tot>=0?'pos':'neg';
+    $('js-wr').textContent = wr;
+    $('js-wr').style.color = parseFloat(wr)>=50?'#00d97e':rows.length?'#ff4d4d':'var(--text)';
+    $('js-wl').textContent = `${W.length}W / ${L.length}L`;
+  } else {
+    summary.style.display = 'none';
+  }
+
+  // Update subtitle
+  const periodLabels = {all:'Full history','7':'7 hari terakhir','30':'30 hari terakhir','365':'1 tahun terakhir'};
+  $('journal-ps').textContent = periodLabels[journalPeriod] || 'Full history';
+
+  $('ttb').innerHTML = rows.map((t,i)=>{
+    const idx = rows.length - i;
+    const pc=t.pnl>0?'pos':t.pnl<0?'neg':'neu';
+    const rc=t.r>0?'pos':t.r<0?'neg':'neu';
     const rb=t.result==='Win'?'bw':t.result==='Loss'?'bo':'bbe';
     const fid=t.firestoreId||'';
     return`<tr>
@@ -1697,7 +1783,9 @@ function renderTable(){
   }).join('');
 }
 function updatePairFil(){
-  const p=[...new Set(trades.map(t=>t.pair))],s=$('fp'),c=s.value;
+  // Show pairs relevant to current journal period
+  const base = getJournalFilteredTrades();
+  const p=[...new Set(base.map(t=>t.pair))],s=$('fp'),c=s.value;
   s.innerHTML='<option value="">All Pairs</option>'+p.map(x=>`<option ${x===c?'selected':''}>${x}</option>`).join('');
 }
 
