@@ -98,7 +98,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
   font-family:var(--font);transition:opacity .15s;
 }
 .login-btn:hover{opacity:.9;}
-.login-btn img{width:20px;height:20px;}
+/* .login-btn img removed — no Google button */
 .login-err{
   margin-top:16px;font-size:12px;color:var(--red);
   background:var(--rd);border-radius:8px;padding:8px 12px;display:none;
@@ -340,19 +340,45 @@ select.fi option{background:var(--bg3);}
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
-  <!-- Panel A: normal login -->
+  <!-- Panel A: Email Magic Link login -->
   <div class="login-card" id="login-panel">
     <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
-    <div class="login-icon">📊</div>
-    <div class="login-title">Masuk ke RiskPerTrade</div>
-    <div class="login-sub" id="login-sub-text">Login untuk mulai mencatat trade dan menyimpan data kamu ke cloud — bisa diakses dari device manapun.</div>
-    <button class="login-btn" id="google-login-btn">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-      Masuk dengan Google
-    </button>
-    <div class="login-err" id="login-err">Gagal masuk. Coba lagi.</div>
-    <div class="login-loading" id="login-loading">⏳ Sedang masuk…</div>
-    <button id="login-skip-btn" style="margin-top:14px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
+
+    <!-- State 1: Input email -->
+    <div id="login-step-email">
+      <div class="login-icon">📊</div>
+      <div class="login-title">Masuk ke RiskPerTrade</div>
+      <div class="login-sub" id="login-sub-text">Masukkan email kamu. Kami akan kirimkan link masuk — tidak perlu password.</div>
+      <div style="position:relative;margin-bottom:10px">
+        <input id="magic-email-input" type="email" placeholder="emailkamu@gmail.com"
+          style="width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+      </div>
+      <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff">
+        Kirim Link Masuk →
+      </button>
+      <div class="login-err" id="login-err" style="margin-top:10px">Gagal mengirim. Coba lagi.</div>
+      <div class="login-loading" id="login-loading" style="margin-top:10px">⏳ Mengirim link…</div>
+    </div>
+
+    <!-- State 2: Email sent confirmation -->
+    <div id="login-step-sent" style="display:none">
+      <div class="login-icon">📬</div>
+      <div class="login-title" style="font-size:20px">Cek Email Kamu!</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+        Link masuk sudah dikirim ke:
+      </p>
+      <div style="background:var(--bg3);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);text-align:center" id="sent-email-display">—</div>
+      <p style="font-size:12px;color:var(--text3);line-height:1.7;margin-bottom:20px">
+        Klik link di email tersebut untuk masuk otomatis.<br>
+        Link berlaku selama <strong style="color:var(--text)">15 menit</strong>.<br>
+        Cek folder spam kalau tidak muncul.
+      </p>
+      <button class="btng" id="resend-btn" style="width:100%;justify-content:center;margin-bottom:8px">Kirim Ulang</button>
+      <button id="change-email-btn" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px">← Ganti email</button>
+    </div>
+
+    <button id="login-skip-btn" style="margin-top:16px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
   </div>
 
   <!-- Panel B: not invited -->
@@ -371,7 +397,7 @@ select.fi option{background:var(--bg3);}
     <p style="font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.6">
       Hubungi admin untuk mendapatkan akses, atau coba dengan email lain.
     </p>
-    <button class="login-btn" id="try-other-btn" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);margin-bottom:10px">
+    <button class="login-btn" id="try-other-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:10px">
       Coba Email Lain
     </button>
     <button id="notinvited-skip" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
@@ -861,7 +887,8 @@ select.fi option{background:var(--bg3);}
 <!-- ══ FIREBASE SDK ══ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, signOut, onAuthStateChanged,
+         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
@@ -910,7 +937,8 @@ function showNotInvited(email) {
 
 function showLoginPanel() {
   $('notinvited-panel').style.display = 'none';
-  $('login-panel').style.display = 'block';
+  $('login-panel').style.display      = 'block';
+  showEmailStep();
 }
 
 // ── FIREBASE INIT ──────────────────────────────────────
@@ -986,19 +1014,111 @@ function setSyncState(state) {
 }
 
 // ── AUTH ──────────────────────────────────────────────
-$('google-login-btn').addEventListener('click', async () => {
-  $('login-err').style.display = 'none';
-  $('login-loading').style.display = 'block';
+// ── MAGIC LINK CONFIG ─────────────────────────────────
+const ACTION_URL = 'https://riskpertrade.me'; // domain produksi
+const EMAIL_KEY  = 'rpt_pending_email';        // localStorage key
+
+// ── CHECK IF PAGE OPENED VIA MAGIC LINK ───────────────
+// Runs immediately on page load — if URL contains sign-in link,
+// complete the sign-in automatically before anything else renders.
+if (isSignInWithEmailLink(auth, window.location.href)) {
+  let emailForSignIn = localStorage.getItem(EMAIL_KEY);
+  if (!emailForSignIn) {
+    // Fallback: ask user to re-enter email (different device)
+    emailForSignIn = window.prompt(
+      'Masukkan email yang kamu gunakan untuk request link masuk:'
+    );
+  }
+  if (emailForSignIn) {
+    signInWithEmailLink(auth, emailForSignIn, window.location.href)
+      .then(() => {
+        localStorage.removeItem(EMAIL_KEY);
+        // Clean URL so link can't be reused
+        window.history.replaceState(null, '', window.location.pathname);
+      })
+      .catch(err => {
+        localStorage.removeItem(EMAIL_KEY);
+        window.history.replaceState(null, '', window.location.pathname);
+        alert('Link sudah kedaluwarsa atau tidak valid. Silakan request link baru.');
+      });
+  }
+}
+
+// ── SEND MAGIC LINK ────────────────────────────────────
+async function sendMagicLink(email) {
+  const actionSettings = {
+    url: ACTION_URL,
+    handleCodeInApp: true,
+  };
+  await sendSignInLinkToEmail(auth, email, actionSettings);
+  localStorage.setItem(EMAIL_KEY, email); // save for auto-complete on return
+}
+
+// ── UI HELPERS ─────────────────────────────────────────
+function showEmailStep() {
+  $('login-step-email').style.display = 'block';
+  $('login-step-sent').style.display  = 'none';
+  $('login-err').style.display        = 'none';
+  $('login-loading').style.display    = 'none';
+}
+function showSentStep(email) {
+  $('login-step-email').style.display = 'none';
+  $('login-step-sent').style.display  = 'block';
+  $('sent-email-display').textContent = email;
+}
+
+// ── SEND BUTTON ────────────────────────────────────────
+async function handleSendMagic() {
+  const email = $('magic-email-input').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    $('login-err').style.display  = 'block';
+    $('login-err').textContent    = 'Masukkan alamat email yang valid.';
+    return;
+  }
+  $('login-err').style.display    = 'none';
+  $('login-loading').style.display= 'block';
+  $('send-magic-btn').disabled    = true;
+
+  // Check invite first before sending
+  const invited = await isEmailInvited(email, null);
+  if (!invited) {
+    $('login-loading').style.display = 'none';
+    $('send-magic-btn').disabled     = false;
+    showNotInvited(email);
+    return;
+  }
+
   try {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    // onAuthStateChanged will handle the rest
+    await sendMagicLink(email);
+    $('login-loading').style.display = 'none';
+    $('send-magic-btn').disabled     = false;
+    showSentStep(email);
   } catch(e) {
     $('login-loading').style.display = 'none';
-    $('login-err').style.display = 'block';
-    $('login-err').textContent = e.code === 'auth/popup-closed-by-user'
-      ? 'Login dibatalkan.' : 'Gagal masuk: ' + e.message;
+    $('send-magic-btn').disabled     = false;
+    $('login-err').style.display     = 'block';
+    $('login-err').textContent       = 'Gagal mengirim link. Coba lagi.';
   }
+}
+
+$('send-magic-btn').addEventListener('click', handleSendMagic);
+$('magic-email-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSendMagic();
+});
+
+// Resend & change email buttons
+$('resend-btn').addEventListener('click', () => {
+  const email = $('sent-email-display').textContent;
+  if (email && email !== '—') {
+    sendMagicLink(email).then(() => {
+      $('resend-btn').textContent = '✓ Terkirim!';
+      setTimeout(() => { $('resend-btn').textContent = 'Kirim Ulang'; }, 3000);
+    }).catch(() => {});
+  }
+});
+$('change-email-btn').addEventListener('click', () => {
+  showEmailStep();
+  $('magic-email-input').focus();
 });
 
 // Close login screen buttons
@@ -1007,13 +1127,13 @@ $('login-skip-btn').addEventListener('click', closeLoginScreen);
 $('login-screen').addEventListener('click', e => {
   if (e.target === $('login-screen')) closeLoginScreen();
 });
-// Not-invited panel buttons
+
+// Not-invited: try other email
 $('try-other-btn').addEventListener('click', () => {
   showLoginPanel();
-  // Trigger Google sign-in again so user can pick different account
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  signInWithPopup(auth, provider).catch(() => {});
+  showEmailStep();
+  $('magic-email-input').value = '';
+  setTimeout(() => $('magic-email-input').focus(), 100);
 });
 $('notinvited-skip').addEventListener('click', closeLoginScreen);
 
@@ -1148,15 +1268,16 @@ function closeLoginScreen() {
 }
 
 function openLoginScreen(reason) {
-  // reason: 'log' = trying to log trade, 'general' = clicked login
+  showLoginPanel();
+  showEmailStep();
   const sub = $('login-sub-text');
   if (reason === 'log') {
-    sub.textContent = 'Login dulu untuk mulai mencatat trade. Data kamu tersimpan aman di cloud.';
+    sub.textContent = 'Masukkan email kamu untuk mulai mencatat trade.';
   } else {
-    sub.textContent = 'Login untuk mulai mencatat trade dan menyimpan data kamu ke cloud — bisa diakses dari device manapun.';
+    sub.textContent = 'Masukkan email kamu. Kami kirimkan link masuk — tidak perlu password.';
   }
   $('login-screen').classList.add('open');
-  $('login-err').style.display = 'none';
+  setTimeout(() => $('magic-email-input').focus(), 100);
 }
 
 function updateGuestUI() {
