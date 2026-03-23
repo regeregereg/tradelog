@@ -7,6 +7,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── Crosshair Plugin (draws vertical line at cursor position) ──
+const CrosshairPlugin = {
+  id: 'crosshair',
+  afterDraw(chart) {
+    if (!chart._crosshairX) return;
+    const { ctx, chartArea: { top, bottom } } = chart;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(chart._crosshairX, top);
+    ctx.lineTo(chart._crosshairX, bottom);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+Chart.register(CrosshairPlugin);
+
+// Helper: crosshair options to add to any line chart
+function crosshairOpts() {
+  return {
+    onHover(e, items, chart) {
+      if (e.x !== null && e.x !== undefined) {
+        // Snap to nearest data point x position
+        const meta = chart.getDatasetMeta(0);
+        if (meta && meta.data.length) {
+          // Find closest point
+          let closest = meta.data[0];
+          let minDist = Math.abs(meta.data[0].x - e.x);
+          meta.data.forEach(pt => {
+            const d = Math.abs(pt.x - e.x);
+            if (d < minDist) { minDist = d; closest = pt; }
+          });
+          chart._crosshairX = closest.x;
+        } else {
+          chart._crosshairX = e.x;
+        }
+      } else {
+        chart._crosshairX = null;
+      }
+      chart.draw();
+    }
+  };
+}
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -1379,6 +1426,46 @@ function updateStats() {
 }
 
 // ── CHARTS ────────────────────────────────────────────
+// Shared tooltip + crosshair config for all line charts
+function lineChartBase(yFmt, labelFmt) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',       // snap tooltip to nearest x-axis point
+      intersect: false,    // show tooltip even when not directly on dot
+    },
+    onHover: crosshairOpts().onHover,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1a1e',
+        borderColor: 'rgba(255,255,255,0.12)',
+        borderWidth: 1,
+        titleColor: '#666',
+        titleFont: { family: 'DM Mono', size: 10 },
+        bodyColor: '#f0f0f0',
+        bodyFont: { family: 'DM Mono', size: 12 },
+        padding: 10,
+        cornerRadius: 8,
+        displayColors: false,
+        callbacks: {
+          label: c => ' ' + labelFmt(c.raw)
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,.04)' },
+        ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8, maxRotation: 0 }
+      },
+      y: {
+        grid: { color: 'rgba(255,255,255,.04)' },
+        ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, callback: yFmt }
+      }
+    }
+  };
+}
 function getEq(){
   const ft=getFilteredTrades();
   // For equity: start from balance BEFORE the filtered period
@@ -1396,7 +1483,32 @@ function renderEq(){
   const ctx=$('eqC').getContext('2d'),g=ctx.createLinearGradient(0,0,0,200);
   g.addColorStop(0,up?'rgba(0,217,126,.18)':'rgba(255,77,77,.18)');g.addColorStop(1,'rgba(0,0,0,0)');
   if(eqCh)eqCh.destroy();
-  eqCh=new Chart(ctx,{type:'line',data:{labels:L,datasets:[{data:D,borderColor:col,backgroundColor:g,borderWidth:2,pointRadius:D.length<20?3:0,pointBackgroundColor:col,fill:true,tension:.35}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#555',bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+f2(c.raw)}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},maxTicksLimit:8,maxRotation:0}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v.toLocaleString()}}}}});
+  const eqOpts = lineChartBase(
+    v => '$' + v.toLocaleString(),
+    v => '$' + f2(v)
+  );
+  eqOpts.plugins.tooltip.callbacks.title = items => items[0]?.label || '';
+  eqCh = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: L,
+      datasets: [{
+        data: D,
+        borderColor: col,
+        backgroundColor: g,
+        borderWidth: 2,
+        pointRadius: D.length < 20 ? 4 : 0,
+        pointHoverRadius: 6,
+        pointBackgroundColor: col,
+        pointHoverBackgroundColor: col,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2,
+        fill: true,
+        tension: .35
+      }]
+    },
+    options: eqOpts
+  });
 }
 function renderPnl(){
   const ft=getFilteredTrades();
@@ -1504,11 +1616,21 @@ function renderAna(){
   const{L:eL,D:eD}=getEq();let peak=eD[0];const ddA=[0];
   eD.slice(1).forEach(v=>{if(v>peak)peak=v;ddA.push(Math.round((v-peak)/peak*10000)/100);});
   if(ddCh)ddCh.destroy();
-  ddCh=new Chart($('ddC').getContext('2d'),{type:'line',data:{labels:eL,datasets:[{data:ddA,borderColor:'#ff4d4d',backgroundColor:'rgba(255,77,77,.08)',borderWidth:1.5,fill:true,tension:.3,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>c.raw+'%'}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{size:10},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>v+'%'}}}}});
+  const ddOpts = lineChartBase(v => v+'%', v => v.toFixed(2)+'%');
+  ddCh = new Chart($('ddC').getContext('2d'), {
+    type: 'line',
+    data: { labels: eL, datasets: [{ data: ddA, borderColor: '#ff4d4d', backgroundColor: 'rgba(255,77,77,.08)', borderWidth: 1.5, fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#ff4d4d', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 }] },
+    options: ddOpts
+  });
   let cumR=0;const rL=['Start'],rD=[0];
   trades.forEach((t,i)=>{cumR+=t.r;rL.push('#'+(i+1));rD.push(Math.round(cumR*100)/100);});
   if(rCh)rCh.destroy();
-  rCh=new Chart($('rC').getContext('2d'),{type:'line',data:{labels:rL,datasets:[{data:rD,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>c.raw+'R'}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{size:10},maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>v+'R'}}}}});
+  const rOpts = lineChartBase(v => v+'R', v => (v>=0?'+':'')+v+'R');
+  rCh = new Chart($('rC').getContext('2d'), {
+    type: 'line',
+    data: { labels: rL, datasets: [{ data: rD, borderColor: '#7c6af7', backgroundColor: 'rgba(124,106,247,.08)', borderWidth: 2, fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#7c6af7', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 }] },
+    options: rOpts
+  });
 }
 
 // ── CALENDAR ──────────────────────────────────────────
@@ -1618,11 +1740,20 @@ function renderFtmo(){
   $('ftstsb').textContent=ps?'Challenge complete!':br?'Limit breached — stop trading':'Keep executing your plan';
   const{L:eL,D:eFull}=getEq();
   if(ftCh)ftCh.destroy();
-  ftCh=new Chart($('ftC').getContext('2d'),{type:'line',data:{labels:eL,datasets:[
-    {label:'Equity',data:eFull,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.35,pointRadius:0},
-    {label:'Max DD',data:eFull.map(()=>bal-ddl),borderColor:'rgba(255,77,77,.5)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0},
-    {label:'Target',data:eFull.map(()=>bal+pt),borderColor:'rgba(0,217,126,.5)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>c.dataset.label+': $'+c.raw.toLocaleString()}}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v.toLocaleString()}}}}});
+  const ftOpts = lineChartBase(
+    v => '$'+v.toLocaleString(),
+    v => '$'+v.toLocaleString()
+  );
+  ftOpts.plugins.tooltip.callbacks.label = c => ` ${c.dataset.label}: $${c.raw.toLocaleString()}`;
+  ftCh = new Chart($('ftC').getContext('2d'), {
+    type: 'line',
+    data: { labels: eL, datasets: [
+      {label:'Equity', data:eFull, borderColor:'#7c6af7', backgroundColor:'rgba(124,106,247,.08)', borderWidth:2, fill:true, tension:.35, pointRadius:0, pointHoverRadius:5, pointHoverBackgroundColor:'#7c6af7', pointHoverBorderColor:'#fff', pointHoverBorderWidth:2},
+      {label:'Max DD', data:eFull.map(()=>bal-ddl), borderColor:'rgba(255,77,77,.5)', borderWidth:1, borderDash:[4,4], fill:false, pointRadius:0, pointHoverRadius:4, pointHoverBackgroundColor:'#ff4d4d'},
+      {label:'Target', data:eFull.map(()=>bal+pt), borderColor:'rgba(0,217,126,.5)', borderWidth:1, borderDash:[4,4], fill:false, pointRadius:0, pointHoverRadius:4, pointHoverBackgroundColor:'#00d97e'},
+    ]},
+    options: ftOpts
+  });
 }
 </script>
 </body>
