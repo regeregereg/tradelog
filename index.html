@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>TradeLog</title>
+<title>RiskPerTrade</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 // ── Crosshair Plugin (draws vertical line at cursor position) ──
 const CrosshairPlugin = {
@@ -342,7 +343,7 @@ select.fi option{background:var(--bg3);}
   <div class="login-card">
     <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
     <div class="login-icon">📊</div>
-    <div class="login-title">Masuk ke TradeLog</div>
+    <div class="login-title">Masuk ke RiskPerTrade</div>
     <div class="login-sub" id="login-sub-text">Login untuk mulai mencatat trade dan menyimpan data kamu ke cloud — bisa diakses dari device manapun.</div>
     <button class="login-btn" id="google-login-btn">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
@@ -357,7 +358,7 @@ select.fi option{background:var(--bg3);}
 <!-- ══ MOBILE TOPBAR ══ -->
 <div class="topbar">
   <button class="hbg" id="mob-hbg">☰</button>
-  <div class="tlogo"><div class="tdot"></div>TradeLog</div>
+  <div class="tlogo"><div class="tdot"></div>RiskPerTrade</div>
   <div style="flex:1"></div>
   <div id="mob-balance" style="font-family:var(--mono);font-size:11px;color:var(--text2);display:none;white-space:nowrap">—</div>
   <button class="btn bsm" id="mob-log-btn">+ Log</button>
@@ -368,7 +369,7 @@ select.fi option{background:var(--bg3);}
 
 <!-- ══ SIDEBAR ══ -->
 <nav class="sidebar off" id="sb">
-  <div class="logo"><div class="ldot"></div>TradeLog</div>
+  <div class="logo"><div class="ldot"></div>RiskPerTrade</div>
 
   <!-- USER PILL -->
   <div class="user-pill" id="user-pill">
@@ -431,7 +432,7 @@ select.fi option{background:var(--bg3);}
     <!-- Guest banner -->
     <div id="guest-banner" style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
       <div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:3px">👋 Selamat datang di TradeLog</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">👋 Selamat datang di RiskPerTrade</div>
         <div style="font-size:12px;color:var(--text2)">Kamu sedang melihat sebagai guest. Login untuk mulai mencatat trade dan menyimpan journal kamu.</div>
       </div>
       <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">Masuk Sekarang</button>
@@ -675,7 +676,7 @@ select.fi option{background:var(--bg3);}
   <div class="md" style="max-width:320px">
     <div style="text-align:center;padding:8px 0 4px">
       <div style="font-size:36px;margin-bottom:14px">👋</div>
-      <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;margin-bottom:8px">Keluar dari TradeLog?</div>
+      <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;margin-bottom:8px">Keluar dari RiskPerTrade?</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px">Data kamu tersimpan aman di cloud.<br>Bisa masuk lagi kapan saja dengan akun yang sama.</p>
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px;text-align:left">
         <div id="logout-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;overflow:hidden"></div>
@@ -694,46 +695,84 @@ select.fi option{background:var(--bg3);}
 
 <!-- SHARE STATS MODAL -->
 <div class="mo" id="md-share">
-  <div class="md" style="max-width:400px">
-    <div style="text-align:center;padding:4px 0 0">
-      <div style="font-size:36px;margin-bottom:12px">📤</div>
-      <div style="font-size:16px;font-weight:600;margin-bottom:6px;letter-spacing:-.3px">Share Trading Stats</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">Tunjukkan ke dunia bahwa kamu serius trading!</p>
-      <!-- Share card preview -->
-      <div id="share-preview" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(124,106,247,.3);border-radius:14px;padding:20px;margin-bottom:18px;text-align:left">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          <div id="sp-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden"></div>
-          <div>
-            <div id="sp-name" style="font-size:13px;font-weight:600;color:#f0f0f0"></div>
-            <div style="font-size:10px;color:#7c6af7;font-family:var(--mono)">TradeLog · tradelog.vercel.app</div>
+  <div class="md" style="max-width:420px">
+    <div style="padding:4px 0 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:600;letter-spacing:-.3px">Share Trading Stats</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Unduh sebagai gambar atau copy teks</div>
+        </div>
+        <button id="share-cancel" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;line-height:1">✕</button>
+      </div>
+
+      <!-- ─── Share Card (this div gets captured as image) ─── -->
+      <div id="share-preview" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1040 50%,#0a1628 100%);border-radius:16px;padding:24px;margin-bottom:16px;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden">
+        <!-- Background decoration -->
+        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(124,106,247,.08);pointer-events:none"></div>
+        <div style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(0,217,126,.05);pointer-events:none"></div>
+
+        <!-- Header: avatar + name + brand -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div id="sp-avatar" style="width:44px;height:44px;border-radius:50%;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(124,106,247,.5)"></div>
+            <div>
+              <div id="sp-name" style="font-size:15px;font-weight:700;color:#f0f0f0;line-height:1.2"></div>
+              <div style="font-size:10px;color:#7c6af7;font-family:'DM Mono',monospace;margin-top:2px">Trading Journal</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;font-weight:700;color:#7c6af7;letter-spacing:.5px">RISKPERTRADE</div>
+            <div style="font-size:9px;color:#444;font-family:'DM Mono',monospace;margin-top:1px">riskpertrade.vercel.app</div>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Total P&L</div>
-            <div id="sp-pnl" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#00d97e">$0</div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:rgba(255,255,255,.07);margin-bottom:16px"></div>
+
+        <!-- Stats grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.15);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Total P&amp;L</div>
+            <div id="sp-pnl" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#00d97e;line-height:1">$0</div>
           </div>
-          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Win Rate</div>
-            <div id="sp-wr" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f0f0f0">—</div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Win Rate</div>
+            <div id="sp-wr" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">—</div>
           </div>
-          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Total Trades</div>
-            <div id="sp-trades" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f0f0f0">0</div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Trades</div>
+            <div id="sp-trades" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">0</div>
           </div>
-          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
-            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Profit Factor</div>
-            <div id="sp-pf" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f0f0f0">—</div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Profit Factor</div>
+            <div id="sp-pf" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">—</div>
           </div>
         </div>
-        <div id="sp-tagline" style="font-size:11px;color:#7c6af7;font-family:var(--mono);text-align:center">📈 Konsisten adalah kunci</div>
+
+        <!-- Streak bar -->
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:11px;color:#888">Avg R:R</div>
+          <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#7c6af7">—</div>
+          <div style="width:1px;height:16px;background:rgba(255,255,255,.1)"></div>
+          <div style="font-size:11px;color:#888">Best Streak</div>
+          <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#00d97e">—</div>
+        </div>
+
+        <!-- Tagline -->
+        <div id="sp-tagline" style="font-size:11px;color:rgba(124,106,247,.8);font-family:'DM Mono',monospace;text-align:center;letter-spacing:.3px">📈 Konsisten adalah kunci</div>
       </div>
-      <!-- Copy link button -->
-      <div style="display:flex;gap:10px">
-        <button class="btng" id="share-cancel" style="flex:1">Tutup</button>
-        <button class="btn" id="copy-link-btn" style="flex:1">📋 Copy Teks</button>
+
+      <!-- Action buttons -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btng" id="copy-link-btn" style="display:flex;align-items:center;justify-content:center;gap:6px">
+          📋 Copy Teks
+        </button>
+        <button class="btn" id="download-img-btn" style="display:flex;align-items:center;justify-content:center;gap:6px">
+          ⬇️ Unduh Gambar
+        </button>
       </div>
-      <div id="copy-success" style="display:none;font-size:12px;color:var(--green);margin-top:10px">✓ Teks berhasil dicopy! Paste ke Instagram/Twitter/WA</div>
+      <div id="copy-success" style="display:none;font-size:12px;color:var(--green);margin-top:10px;text-align:center">✓ Teks berhasil dicopy! Paste ke Instagram / Twitter / WA</div>
+      <div id="download-loading" style="display:none;font-size:12px;color:var(--text2);margin-top:10px;text-align:center">⏳ Membuat gambar...</div>
     </div>
   </div>
 </div>
@@ -1271,53 +1310,118 @@ $('ftmo-set-btn').addEventListener('click', () => $('md-ftmo').classList.add('op
 // ── SHARE STATS ────────────────────────────────────────
 $('share-btn').addEventListener('click', () => {
   if (!currentUser) return;
-  // Populate share card
-  const n = trades.length;
-  const W = trades.filter(t=>t.result==='Win');
+
+  // Populate share card stats
+  const n   = trades.length;
+  const W   = trades.filter(t=>t.result==='Win');
+  const L   = trades.filter(t=>t.result==='Loss');
   const tot = trades.reduce((s,t)=>s+t.pnl,0);
-  const wr = n>0?(W.length/n*100).toFixed(1)+'%':'—';
-  const gl = Math.abs(trades.filter(t=>t.result==='Loss').reduce((s,t)=>s+t.pnl,0));
-  const gw = W.reduce((s,t)=>s+t.pnl,0);
-  const pf = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
-  $('sp-pnl').textContent = (tot>=0?'+$':'-$')+f2(Math.abs(tot));
-  $('sp-pnl').style.color = tot>=0?'#00d97e':'#ff4d4d';
-  $('sp-wr').textContent  = wr;
-  $('sp-trades').textContent = n;
-  $('sp-pf').textContent  = pf;
-  $('copy-success').style.display = 'none';
+  const wr  = n>0?(W.length/n*100).toFixed(1)+'%':'—';
+  const gw  = W.reduce((s,t)=>s+t.pnl,0);
+  const gl  = Math.abs(L.reduce((s,t)=>s+t.pnl,0));
+  const pf  = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
+  const rr  = n>0?(trades.reduce((s,t)=>s+t.r,0)/n).toFixed(2)+'R':'—';
+
+  // Best streak
+  let bestStreak=0, curStreak=0, curType='';
+  trades.forEach(t=>{
+    if(t.result===curType){ curStreak++; } else { curType=t.result; curStreak=1; }
+    if(t.result==='Win' && curStreak>bestStreak) bestStreak=curStreak;
+  });
+
+  $('sp-pnl').textContent   = (tot>=0?'+$':'-$')+f2(Math.abs(tot));
+  $('sp-pnl').style.color   = tot>=0?'#00d97e':'#ff4d4d';
+  $('sp-wr').textContent    = wr;
+  $('sp-trades').textContent= n;
+  $('sp-pf').textContent    = pf;
+  $('sp-rr').textContent    = rr;
+  $('sp-streak').textContent= bestStreak>0?bestStreak+'W':'—';
+
+  // Tagline
+  let tagline = '📈 Konsisten adalah kunci';
+  if(n===0) tagline='🚀 Perjalanan trading dimulai';
+  else if(tot>0 && W.length/n>=0.6) tagline=`🔥 ${(W.length/n*100).toFixed(0)}% win rate — On fire!`;
+  else if(tot>0) tagline=`💪 +$${tot.toFixed(0)} total profit — Keep going!`;
+  else if(tot<0) tagline='📚 Setiap loss = pelajaran berharga';
+  $('sp-tagline').textContent = tagline;
+
+  $('copy-success').style.display='none';
+  $('download-loading').style.display='none';
   $('md-share').classList.add('open');
 });
+
 $('share-cancel').addEventListener('click', () => $('md-share').classList.remove('open'));
 $('md-share').addEventListener('click', e => { if(e.target===$('md-share')) $('md-share').classList.remove('open'); });
 
+// ── Copy text ──────────────────────────────────────────
 $('copy-link-btn').addEventListener('click', () => {
-  const name = currentUser?.displayName || 'Saya';
-  const n = trades.length;
-  const W = trades.filter(t=>t.result==='Win');
-  const tot = trades.reduce((s,t)=>s+t.pnl,0);
-  const wr = n>0?(W.length/n*100).toFixed(1):0;
-  const text = `📊 Trading Journal Update - ${name}
+  const name = currentUser?.displayName||'Saya';
+  const n    = trades.length;
+  const W    = trades.filter(t=>t.result==='Win');
+  const tot  = trades.reduce((s,t)=>s+t.pnl,0);
+  const wr   = n>0?(W.length/n*100).toFixed(1):0;
+  const text =
+`📊 Trading Journal Update — ${name}
 
-💰 Total P&L: ${tot>=0?'+$':'-$'}${f2(Math.abs(tot))}
-🎯 Win Rate: ${wr}% (${W.length}/${n} trades)
+💰 Total P&L  : ${tot>=0?'+':''}$${f2(Math.abs(tot))}
+🎯 Win Rate   : ${wr}% (${W.length}/${n} trades)
 📈 Konsisten adalah kunci!
 
-Tracked via TradeLog 🚀`;
-  navigator.clipboard.writeText(text).then(()=>{
-    $('copy-success').style.display = 'block';
-    $('copy-link-btn').textContent = '✓ Copied!';
+Tracked via RiskPerTrade 🚀
+riskpertrade.vercel.app`;
+
+  const doFeedback = () => {
+    $('copy-success').style.display='block';
+    $('copy-link-btn').innerHTML='✓ Copied!';
     setTimeout(()=>{
-      $('copy-link-btn').textContent = '📋 Copy Teks';
-      $('copy-success').style.display = 'none';
-    }, 3000);
-  }).catch(()=>{
-    // Fallback for browsers that don't support clipboard API
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    $('copy-success').style.display = 'block';
+      $('copy-link-btn').innerHTML='📋 Copy Teks';
+      $('copy-success').style.display='none';
+    },3000);
+  };
+  navigator.clipboard?.writeText(text).then(doFeedback).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    doFeedback();
   });
+});
+
+// ── Download as image ──────────────────────────────────
+$('download-img-btn').addEventListener('click', async () => {
+  const preview = $('share-preview');
+  const btn     = $('download-img-btn');
+  const loading = $('download-loading');
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Proses...';
+  loading.style.display = 'block';
+
+  try {
+    const canvas = await html2canvas(preview, {
+      backgroundColor: null,
+      scale: 2,            // 2x resolution for crisp result
+      useCORS: true,       // allow cross-origin images (avatar)
+      logging: false,
+      width: preview.offsetWidth,
+      height: preview.offsetHeight,
+    });
+
+    // Convert to PNG and trigger download
+    const link = document.createElement('a');
+    const name = (currentUser?.displayName||'trader').replace(/\s+/g,'-').toLowerCase();
+    link.download = `riskpertrade-${name}-stats.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    btn.innerHTML = '✓ Tersimpan!';
+    setTimeout(()=>{ btn.innerHTML='⬇️ Unduh Gambar'; btn.disabled=false; loading.style.display='none'; },2000);
+  } catch(err) {
+    console.error('Download error:', err);
+    btn.innerHTML = '⬇️ Unduh Gambar';
+    btn.disabled = false;
+    loading.style.display='none';
+    alert('Gagal membuat gambar. Coba screenshot manual ya!');
+  }
 });
 $('ftmo-cancel').addEventListener('click', () => $('md-ftmo').classList.remove('open'));
 $('md-ftmo').addEventListener('click', e => { if(e.target===$('md-ftmo')) $('md-ftmo').classList.remove('open'); });
