@@ -417,6 +417,13 @@ select.fi option{background:var(--bg3);}
     <button class="login-btn" id="try-other-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:10px">
       Coba Email Lain
     </button>
+    <a href="https://instagram.com/anelkazone" target="_blank"
+      style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:8px;transition:all .15s"
+      onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
+      onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      Hubungi Admin — @anelkazone
+    </a>
     <button id="notinvited-skip" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
   </div>
 </div>
@@ -458,10 +465,17 @@ select.fi option{background:var(--bg3);}
     <span class="sync-dot" id="sync-dot"></span>
     <span id="sbf-bal">Balance: —</span>
   </div>
-  <div style="padding:10px 12px 0">
+  <div style="padding:10px 12px 0;display:flex;flex-direction:column;gap:6px">
     <button id="sb-login-btn" style="display:none;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       Masuk / Login
     </button>
+    <a href="https://instagram.com/anelkazone" target="_blank"
+      style="display:flex;align-items:center;justify-content:center;gap:6px;padding:7px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-size:11px;text-decoration:none;transition:all .15s"
+      onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--border2)'"
+      onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      @anelkazone
+    </a>
   </div>
 </nav>
 
@@ -727,11 +741,19 @@ select.fi option{background:var(--bg3);}
   </div>
 
   <!-- ANON UPGRADE BANNER — shown inside main for anonymous users -->
-  <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:480px">
+  <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:500px">
     <div style="background:linear-gradient(135deg,#1a1040,#0f0f1a);border:1px solid rgba(124,106,247,.4);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);flex-wrap:wrap">
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">👻 Mode Anonim Aktif</div>
-        <div style="font-size:11px;color:var(--text3);line-height:1.4">Data tersimpan sementara di akun ini. Simpan sekarang supaya tidak hilang.</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">👻 Mode Anonim</div>
+          <!-- Trade counter pill -->
+          <div id="anon-trade-counter" style="font-size:10px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(124,106,247,.2);color:var(--accent);border:1px solid rgba(124,106,247,.3)">
+            0 / 10 trade
+          </div>
+        </div>
+        <div id="anon-banner-sub" style="font-size:11px;color:var(--text3);line-height:1.4">
+          Data tersimpan sementara. Simpan akun supaya tidak hilang.
+        </div>
       </div>
       <button id="upgrade-btn" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
         💾 Simpan Akun
@@ -740,6 +762,45 @@ select.fi option{background:var(--bg3);}
   </div>
 
 </main>
+
+<!-- ANON LIMIT MODAL -->
+<div class="mo" id="md-anon-limit">
+  <div class="md" style="max-width:380px;text-align:center">
+    <div style="font-size:44px;margin-bottom:14px">🔓</div>
+    <div style="font-size:17px;font-weight:600;letter-spacing:-.3px;margin-bottom:8px">Batas Trade Tercapai</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">
+      Kamu sudah mencatat <strong style="color:var(--text)">10 trade</strong> sebagai pengguna anonim.<br>
+      Simpan akun dengan email untuk melanjutkan tanpa batas.
+    </p>
+    <!-- Progress bar -->
+    <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--mono)">
+        <span>Trade anonim</span><span style="color:var(--red)">10 / 10 ✕</span>
+      </div>
+      <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden">
+        <div style="width:100%;height:100%;background:#ff4d4d;border-radius:3px"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">Simpan akun → unlimited trades</div>
+    </div>
+    <!-- Contact -->
+    <p style="font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.6">
+      Belum punya akses? Hubungi admin untuk request invite.
+    </p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn" id="limit-upgrade-btn" style="width:100%;padding:12px;font-size:14px">
+        💾 Simpan Akun Sekarang
+      </button>
+      <a href="https://instagram.com/anelkazone" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:13px;font-weight:500;text-decoration:none;transition:all .15s"
+        onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
+        onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        Request Akses — @anelkazone
+      </a>
+      <button class="btng" id="limit-close-btn" style="width:100%">Nanti saja</button>
+    </div>
+  </div>
+</div>
 
 <!-- UPGRADE ANON MODAL -->
 <div class="mo" id="md-upgrade">
@@ -1034,6 +1095,7 @@ let ftmo = {size:10000,pp:10,dp:5,ddp:10};
 let currentUser = null, unsubTrades = null;
 let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
 let pendingAction = null; // track what user wanted to do before login
+const ANON_LIMIT = 10;  // max trades for anonymous users
 let currentPeriod = 'all'; // 'all' | '7' | '30' | '180'
 let journalPeriod = 'all'; // journal page period filter
 let anaPeriod    = 'all'; // analytics page period filter
@@ -1248,6 +1310,27 @@ $('anon-btn').addEventListener('click', async () => {
 });
 
 // ── UPGRADE BANNER BUTTON ──────────────────────────────
+// ── ANON LIMIT MODAL ──────────────────────────────────
+function openAnonLimitModal() {
+  $('md-anon-limit').classList.add('open');
+}
+$('limit-close-btn').addEventListener('click', () => {
+  $('md-anon-limit').classList.remove('open');
+});
+$('md-anon-limit').addEventListener('click', e => {
+  if (e.target === $('md-anon-limit')) $('md-anon-limit').classList.remove('open');
+});
+$('limit-upgrade-btn').addEventListener('click', () => {
+  $('md-anon-limit').classList.remove('open');
+  // Open upgrade modal
+  $('upgrade-step-email').style.display = 'block';
+  $('upgrade-step-sent').style.display  = 'none';
+  $('upgrade-err').style.display        = 'none';
+  $('upgrade-email-input').value        = '';
+  $('md-upgrade').classList.add('open');
+  setTimeout(() => $('upgrade-email-input').focus(), 100);
+});
+
 $('upgrade-btn').addEventListener('click', () => {
   $('upgrade-step-email').style.display = 'block';
   $('upgrade-step-sent').style.display  = 'none';
@@ -1334,11 +1417,53 @@ function setAuthUI(loggedIn) {
 // Show/hide anonymous upgrade banner
 function setAnonUI(isAnon) {
   $('anon-banner').style.display = isAnon ? 'block' : 'none';
-  // Update user pill to show anon indicator
   if (isAnon) {
     $('user-name').textContent  = '👻 Anonim';
     $('user-email').textContent = 'Belum tersimpan — klik Simpan Akun';
     $('signout-btn').title      = 'Keluar (data akan hilang)';
+    updateAnonCounter();
+  }
+}
+
+function updateAnonCounter() {
+  if (!currentUser || !currentUser.isAnonymous) return;
+  const n   = trades.length;
+  const rem = Math.max(0, ANON_LIMIT - n);
+  const pct = Math.min(n / ANON_LIMIT * 100, 100);
+
+  // Update counter pill
+  const counter = $('anon-trade-counter');
+  if (counter) {
+    counter.textContent = n + ' / ' + ANON_LIMIT + ' trade';
+    // Color: green → yellow → red as limit approaches
+    if (n >= ANON_LIMIT) {
+      counter.style.background = 'rgba(255,77,77,.2)';
+      counter.style.color      = '#ff4d4d';
+      counter.style.border     = '1px solid rgba(255,77,77,.3)';
+    } else if (rem <= 3) {
+      counter.style.background = 'rgba(245,200,66,.15)';
+      counter.style.color      = '#f5c842';
+      counter.style.border     = '1px solid rgba(245,200,66,.3)';
+    } else {
+      counter.style.background = 'rgba(124,106,247,.2)';
+      counter.style.color      = 'var(--accent)';
+      counter.style.border     = '1px solid rgba(124,106,247,.3)';
+    }
+  }
+
+  // Update subtitle
+  const sub = $('anon-banner-sub');
+  if (sub) {
+    if (n >= ANON_LIMIT) {
+      sub.textContent = '🚫 Batas tercapai! Simpan akun untuk lanjut mencatat.';
+      sub.style.color = '#ff4d4d';
+    } else if (rem <= 3) {
+      sub.textContent = '⚠️ Sisa ' + rem + ' trade lagi — segera simpan akun!';
+      sub.style.color = '#f5c842';
+    } else {
+      sub.textContent = 'Data tersimpan sementara. Simpan akun supaya tidak hilang.';
+      sub.style.color = 'var(--text3)';
+    }
   }
 }
 
@@ -1749,6 +1874,11 @@ function openTrade() {
     openLoginScreen('log');
     return;
   }
+  // Check anon trade limit
+  if (currentUser.isAnonymous && trades.length >= ANON_LIMIT) {
+    openAnonLimitModal();
+    return;
+  }
   $('f-dt').value = new Date().toISOString().slice(0,10);
   $('md-trade').classList.add('open');
   setTimeout(() => $('f-pair').focus(), 80);
@@ -2008,6 +2138,8 @@ function updateAll() {
   }
   // Update trader card tagline dynamically
   if (currentUser) updateTraderCard(currentUser);
+  // Update anon counter if applicable
+  if (currentUser && currentUser.isAnonymous) updateAnonCounter();
 }
 
 // ── STATS ─────────────────────────────────────────────
