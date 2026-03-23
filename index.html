@@ -226,27 +226,23 @@ select.fi option{background:var(--bg3);}
 .calc.loss{background:rgba(255,77,77,.13);border-color:rgba(255,77,77,.25);color:#ff4d4d;}
 .calc.empty{background:transparent;border-color:transparent;pointer-events:none;}
 .calc-pnl{
-  font-size:11px;
+  /* Use vw so font scales with screen width automatically */
+  font-size:clamp(8px,2.2vw,13px);
   font-family:var(--mono);
-  font-weight:600;
-  line-height:1.1;
+  font-weight:700;
+  line-height:1.15;
   text-align:center;
   white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:90%;
+  max-width:92%;
+  /* Do NOT clip — let parent's overflow:hidden handle it */
 }
 .dn{
-  font-size:10px;
+  font-size:clamp(7px,1.8vw,11px);
   color:var(--text3);
-  line-height:1.1;
+  line-height:1.15;
   font-family:var(--mono);
 }
-.calc.win .dn,.calc.loss .dn{color:inherit;opacity:.7;}
-@media(max-width:480px){
-  .calc-pnl{font-size:9px;}
-  .dn{font-size:9px;}
-}
+.calc.win .dn,.calc.loss .dn{color:inherit;opacity:.75;}
 .ftg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 .ftc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
 .ftl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
@@ -446,8 +442,8 @@ select.fi option{background:var(--bg3);}
     <div class="ph">
       <div><div class="pt">Trade Journal</div><div class="ps">Full history</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <select class="fsel" id="fp" onchange="renderTable()"><option value="">All Pairs</option></select>
-        <select class="fsel" id="fr" onchange="renderTable()"><option value="">All</option><option>Win</option><option>Loss</option><option>Breakeven</option></select>
+        <select class="fsel" id="fp"><option value="">All Pairs</option></select>
+        <select class="fsel" id="fr"><option value="">All</option><option>Win</option><option>Loss</option><option>Breakeven</option></select>
         <button class="btn" id="journal-log-btn">+ Log Trade</button>
       </div>
     </div>
@@ -954,11 +950,17 @@ async function saveProfile() {
 // ── LISTEN TRADES (realtime) ──────────────────────────
 function listenTrades(uid) {
   setSyncState('syncing');
+  let firstLoad = true;
   const q = query(collection(db, 'users', uid, 'trades'), orderBy('date', 'asc'));
   unsubTrades = onSnapshot(q, snap => {
     trades = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
     updateAll();
     setSyncState('ok');
+    // On first data load, restore the page user was on before refresh
+    if (firstLoad) {
+      firstLoad = false;
+      if (!pendingAction) restorePage();
+    }
   }, () => setSyncState('error'));
 }
 
@@ -1013,6 +1015,8 @@ function goPage(name) {
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
   $('page-' + name).classList.add('active');
   $('nav-' + name).classList.add('active');
+  // Save active page so refresh restores same tab
+  try { sessionStorage.setItem('tl_page', name); } catch(e) {}
   if (name === 'analytics') renderAna();
   if (name === 'calendar')  renderCal();
   if (name === 'ftmo')      renderFtmo();
@@ -1021,6 +1025,16 @@ function goPage(name) {
 ['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
   $('nav-' + name).addEventListener('click', () => goPage(name));
 });
+
+// Restore last active page on load
+function restorePage() {
+  try {
+    const saved = sessionStorage.getItem('tl_page');
+    if (saved && ['dashboard','journal','analytics','calendar','ftmo'].includes(saved)) {
+      goPage(saved);
+    }
+  } catch(e) {}
+}
 
 // ── WELCOME ───────────────────────────────────────────
 $('welcome-btn').addEventListener('click', async () => {
@@ -1123,6 +1137,10 @@ document.querySelectorAll('.ptab').forEach(btn => {
     updateAll();
   });
 });
+
+// ── JOURNAL FILTERS ───────────────────────────────────
+$('fp').addEventListener('change', renderTable);
+$('fr').addEventListener('change', renderTable);
 
 // ── CALENDAR BUTTONS ──────────────────────────────────
 $('cal-prev').addEventListener('click', () => { calOff--; renderCal(); });
