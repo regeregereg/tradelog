@@ -386,7 +386,7 @@ select.fi option{background:var(--bg3);}
   <div class="ni" id="nav-journal"><span class="nic">≡</span>Journal</div>
   <div class="ni" id="nav-analytics"><span class="nic">◎</span>Analytics</div>
   <div class="ni" id="nav-calendar"><span class="nic">▦</span>Calendar</div>
-  <div class="ni" id="nav-ftmo"><span class="nic">🎯</span>FTMO</div>
+  <div class="ni" id="nav-ftmo"><span class="nic">🏢</span>PropFirm</div>
 
   <div class="sbf" id="sbf">
     <span class="sync-dot" id="sync-dot"></span>
@@ -551,7 +551,19 @@ select.fi option{background:var(--bg3);}
 
   <!-- ANALYTICS -->
   <div class="page" id="page-analytics">
-    <div class="ph"><div><div class="pt">Analytics</div><div class="ps">Performance breakdown</div></div></div>
+    <div class="ph">
+      <div><div class="pt">Analytics</div><div class="ps" id="ana-ps">Performance breakdown</div></div>
+    </div>
+    <!-- Period tabs -->
+    <div style="margin-bottom:16px">
+      <div class="period-tabs" id="ana-period-tabs">
+        <button class="ptab active" data-aperiod="all">Semua</button>
+        <button class="ptab" data-aperiod="7">7 Hari</button>
+        <button class="ptab" data-aperiod="30">30 Hari</button>
+        <button class="ptab" data-aperiod="180">6 Bulan</button>
+        <button class="ptab" data-aperiod="365">1 Tahun</button>
+      </div>
+    </div>
     <div class="g3">
       <div class="smc"><div class="smt">P&amp;L by Pair</div><div id="pb"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
       <div class="smc"><div class="smt">P&amp;L by Session</div><div id="sb2"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
@@ -622,21 +634,30 @@ select.fi option{background:var(--bg3);}
     </div>
   </div>
 
-  <!-- FTMO -->
+  <!-- PROPFIRM -->
   <div class="page" id="page-ftmo">
     <div class="ph">
-      <div><div class="pt">FTMO Tracker</div><div class="ps">Challenge progress</div></div>
+      <div><div class="pt">PropFirm Tracker</div><div class="ps" id="prop-ps">Challenge progress</div></div>
       <button class="btng bsm" id="ftmo-set-btn">⚙ Settings</button>
     </div>
+    <!-- Period tabs -->
+    <div style="margin-bottom:16px">
+      <div class="period-tabs" id="prop-period-tabs">
+        <button class="ptab active" data-pperiod="all">Semua</button>
+        <button class="ptab" data-pperiod="7">7 Hari</button>
+        <button class="ptab" data-pperiod="30">30 Hari</button>
+        <button class="ptab" data-pperiod="90">3 Bulan</button>
+      </div>
+    </div>
     <div class="ftg">
-      <div class="ftc"><div class="ftl">Profit Target</div><div class="ftv pos" id="ftp">$0.00</div><div class="ftli" id="ftpt">—</div><div class="ftbw"><div class="ftb" id="ftpb" style="background:#00d97e;width:0%"></div></div></div>
+      <div class="ftc"><div class="ftl">Profit</div><div class="ftv pos" id="ftp">$0.00</div><div class="ftli" id="ftpt">—</div><div class="ftbw"><div class="ftb" id="ftpb" style="background:#00d97e;width:0%"></div></div></div>
       <div class="ftc"><div class="ftl">Daily Loss Used</div><div class="ftv" id="ftd">$0.00</div><div class="ftli" id="ftdl">—</div><div class="ftbw"><div class="ftb" id="ftdb" style="background:#ff4d4d;width:0%"></div></div></div>
       <div class="ftc"><div class="ftl">Max Drawdown</div><div class="ftv" id="ftdd">$0.00</div><div class="ftli" id="ftddl">—</div><div class="ftbw"><div class="ftb" id="ftddb" style="background:#ff4d4d;width:0%"></div></div></div>
       <div class="ftc"><div class="ftl">Trading Days</div><div class="ftv neu" id="ftdy">0</div><div class="ftli">Min. 4 days</div><div class="ftbw"><div class="ftb" id="ftdyb" style="background:var(--accent);width:0%"></div></div></div>
       <div class="ftc"><div class="ftl">Total Trades</div><div class="ftv neu" id="fttr">0</div><div class="ftli">Logged</div></div>
       <div class="ftc"><div class="ftl">Status</div><div class="ftv" id="ftst" style="font-size:14px">🔄 In Progress</div><div class="ftli" id="ftstsb">Keep going</div></div>
     </div>
-    <div class="cc"><div class="ch"><div class="ct">Equity vs FTMO Limits</div></div><div style="position:relative;height:200px"><canvas id="ftC"></canvas></div></div>
+    <div class="cc"><div class="ch"><div class="ct" id="prop-chart-title">Equity vs PropFirm Limits</div></div><div style="position:relative;height:200px"><canvas id="ftC"></canvas></div></div>
   </div>
 
 </main>
@@ -652,7 +673,7 @@ select.fi option{background:var(--bg3);}
         <span class="wpfx">$</span>
         <input class="win" type="number" id="welcome-bal" placeholder="10000" step="any" min="1">
       </div>
-      <div class="whint">Contoh: 10000 → $10K &nbsp;·&nbsp; 100000 → FTMO $100K</div>
+      <div class="whint">Contoh: 10000 → $10K &nbsp;·&nbsp; 100000 → PropFirm $100K</div>
       <button class="btn" style="width:100%;padding:12px;font-size:14px" id="welcome-btn">Mulai Trading →</button>
     </div>
   </div>
@@ -803,7 +824,7 @@ select.fi option{background:var(--bg3);}
 <!-- FTMO SETTINGS -->
 <div class="mo" id="md-ftmo">
   <div class="md" style="max-width:360px">
-    <div class="mdt">FTMO Settings</div>
+    <div class="mdt">PropFirm Settings</div>
     <div class="fg">
       <div class="fgg full"><label class="fl">Account Size ($)</label><input class="fi" type="number" id="ft-sz" value="10000"></div>
       <div class="fgg"><label class="fl">Profit Target (%)</label><input class="fi" type="number" id="ft-pp" value="10"></div>
@@ -848,6 +869,21 @@ let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
 let pendingAction = null; // track what user wanted to do before login
 let currentPeriod = 'all'; // 'all' | '7' | '30' | '180'
 let journalPeriod = 'all'; // journal page period filter
+let anaPeriod    = 'all'; // analytics page period filter
+let propPeriod   = 'all'; // propfirm page period filter
+
+function getAnaTrades() {
+  if (anaPeriod === 'all') return trades;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - parseInt(anaPeriod));
+  return trades.filter(t => t.date >= cutoff.toISOString().slice(0,10));
+}
+function getPropTrades() {
+  if (propPeriod === 'all') return trades;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - parseInt(propPeriod));
+  return trades.filter(t => t.date >= cutoff.toISOString().slice(0,10));
+}
 
 function getJournalFilteredTrades() {
   if (journalPeriod === 'all') return trades;
@@ -1040,12 +1076,23 @@ function updateGuestUI() {
   const firstTab = document.querySelector('.ptab[data-period="all"]');
   if (firstTab) firstTab.classList.add('active');
   $('period-label').textContent = '';
-  // Reset journal period too
+  // Reset journal period
   journalPeriod = 'all';
   document.querySelectorAll('[data-jperiod]').forEach(b => b.classList.remove('active'));
   const firstJTab = document.querySelector('[data-jperiod="all"]');
   if(firstJTab) firstJTab.classList.add('active');
   $('journal-summary').style.display = 'none';
+  // Reset analytics period
+  anaPeriod = 'all';
+  document.querySelectorAll('[data-aperiod]').forEach(b => b.classList.remove('active'));
+  const firstATab = document.querySelector('[data-aperiod="all"]');
+  if(firstATab) firstATab.classList.add('active');
+  if($('ana-ps')) $('ana-ps').textContent = 'Performance breakdown';
+  // Reset propfirm period
+  propPeriod = 'all';
+  document.querySelectorAll('[data-pperiod]').forEach(b => b.classList.remove('active'));
+  const firstPTab = document.querySelector('[data-pperiod="all"]');
+  if(firstPTab) firstPTab.classList.add('active');
 
   // ── Dashboard stats ──
   $('st-bal').textContent = '—'; $('st-bal').className = 'sv';
@@ -1496,9 +1543,28 @@ document.querySelectorAll('[data-jperiod]').forEach(btn => {
     journalPeriod = btn.dataset.jperiod;
     document.querySelectorAll('[data-jperiod]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    // Reset pair filter options to match new period
     updatePairFil();
     renderTable();
+  });
+});
+
+// Analytics period tabs
+document.querySelectorAll('[data-aperiod]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    anaPeriod = btn.dataset.aperiod;
+    document.querySelectorAll('[data-aperiod]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAna();
+  });
+});
+
+// PropFirm period tabs
+document.querySelectorAll('[data-pperiod]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    propPeriod = btn.dataset.pperiod;
+    document.querySelectorAll('[data-pperiod]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFtmo();
   });
 });
 
@@ -1791,38 +1857,51 @@ function updatePairFil(){
 
 // ── ANALYTICS ─────────────────────────────────────────
 function renderAna(){
-  if(!trades.length)return;
+  const ft = getAnaTrades();
+  if(!ft.length){
+    const nd='<span style="font-size:12px;color:var(--text3)">No data yet</span>';
+    $('pb').innerHTML=$('sb2').innerHTML=$('stb').innerHTML=nd;
+    if(ddCh){ddCh.destroy();ddCh=null;}
+    if(rCh){rCh.destroy();rCh=null;}
+    return;
+  }
+
+  // Update subtitle
+  const aLabels={all:'Performance breakdown','7':'7 hari terakhir','30':'30 hari terakhir','180':'6 bulan terakhir','365':'1 tahun terakhir'};
+  $('ana-ps').textContent = aLabels[anaPeriod]||'Performance breakdown';
+
   const pm={},sm={},stm={};
-  trades.forEach(t=>{
-    if(!pm[t.pair])pm[t.pair]=0;pm[t.pair]+=t.pnl;
-    if(!sm[t.session])sm[t.session]=0;sm[t.session]+=t.pnl;
+  ft.forEach(t=>{
+    if(!pm[t.pair])pm[t.pair]=0; pm[t.pair]+=t.pnl;
+    if(!sm[t.session])sm[t.session]=0; sm[t.session]+=t.pnl;
     (t.setup||'Other').split(',').forEach(s=>{const tg=s.trim();if(!stm[tg])stm[tg]=0;stm[tg]++;});
   });
   const mkB=(arr,mx)=>arr.map(([lbl,v])=>`<div class="brow"><div class="blbl">${lbl}</div><div class="btr"><div class="bfl" style="width:${Math.abs(v)/mx*100}%;background:${v>=0?'#00d97e':'#ff4d4d'}"></div></div><div class="bvl ${v>=0?'pos':'neg'}">${v>=0?'+':''}$${Math.abs(v).toFixed(0)}</div></div>`).join('');
   const pA=Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  $('pb').innerHTML=mkB(pA,Math.max(...pA.map(p=>Math.abs(p[1])),1));
+  $('pb').innerHTML=pA.length?mkB(pA,Math.max(...pA.map(p=>Math.abs(p[1])),1)):'<span style="font-size:12px;color:var(--text3)">No data</span>';
   const sA=Object.entries(sm).sort((a,b)=>b[1]-a[1]);
-  $('sb2').innerHTML=mkB(sA,Math.max(...sA.map(s=>Math.abs(s[1])),1));
+  $('sb2').innerHTML=sA.length?mkB(sA,Math.max(...sA.map(s=>Math.abs(s[1])),1)):'<span style="font-size:12px;color:var(--text3)">No data</span>';
   const stA=Object.entries(stm).sort((a,b)=>b[1]-a[1]).slice(0,6),mSt=Math.max(...stA.map(s=>s[1]),1);
-  $('stb').innerHTML=stA.map(([tag,n])=>`<div class="brow"><div class="blbl">${tag}</div><div class="btr"><div class="bfl" style="width:${n/mSt*100}%;background:var(--accent)"></div></div><div class="bvl neu">${n}</div></div>`).join('');
-  const{L:eL,D:eD}=getEq();let peak=eD[0];const ddA=[0];
-  eD.slice(1).forEach(v=>{if(v>peak)peak=v;ddA.push(Math.round((v-peak)/peak*10000)/100);});
+  $('stb').innerHTML=stA.length?stA.map(([tag,n])=>`<div class="brow"><div class="blbl">${tag}</div><div class="btr"><div class="bfl" style="width:${n/mSt*100}%;background:var(--accent)"></div></div><div class="bvl neu">${n}</div></div>`).join(''):'<span style="font-size:12px;color:var(--text3)">No data</span>';
+
+  // Drawdown chart using filtered trades equity
+  const allTot=trades.reduce((s,t)=>s+t.pnl,0);
+  const ftTot=ft.reduce((s,t)=>s+t.pnl,0);
+  const startBal=(bal+allTot)-ftTot;
+  let b=startBal; const eL=['Start'],eD=[b];
+  ft.forEach(t=>{b+=t.pnl;eL.push(t.date?t.date.slice(5):'');eD.push(Math.round(b*100)/100);});
+  let peak=eD[0]; const ddA=[0];
+  eD.slice(1).forEach(v=>{if(v>peak)peak=v;ddA.push(peak>0?Math.round((v-peak)/peak*10000)/100:0);});
   if(ddCh)ddCh.destroy();
-  const ddOpts = lineChartBase(v => v+'%', v => v.toFixed(2)+'%');
-  ddCh = new Chart($('ddC').getContext('2d'), {
-    type: 'line',
-    data: { labels: eL, datasets: [{ data: ddA, borderColor: '#ff4d4d', backgroundColor: 'rgba(255,77,77,.08)', borderWidth: 1.5, fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#ff4d4d', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 }] },
-    options: ddOpts
-  });
-  let cumR=0;const rL=['Start'],rD=[0];
-  trades.forEach((t,i)=>{cumR+=t.r;rL.push('#'+(i+1));rD.push(Math.round(cumR*100)/100);});
+  const ddOpts=lineChartBase(v=>v+'%',v=>v.toFixed(2)+'%');
+  ddCh=new Chart($('ddC').getContext('2d'),{type:'line',data:{labels:eL,datasets:[{data:ddA,borderColor:'#ff4d4d',backgroundColor:'rgba(255,77,77,.08)',borderWidth:1.5,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#ff4d4d',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}]},options:ddOpts});
+
+  // Cumulative R chart
+  let cumR=0; const rL=['Start'],rD=[0];
+  ft.forEach((t,i)=>{cumR+=t.r;rL.push('#'+(i+1));rD.push(Math.round(cumR*100)/100);});
   if(rCh)rCh.destroy();
-  const rOpts = lineChartBase(v => v+'R', v => (v>=0?'+':'')+v+'R');
-  rCh = new Chart($('rC').getContext('2d'), {
-    type: 'line',
-    data: { labels: rL, datasets: [{ data: rD, borderColor: '#7c6af7', backgroundColor: 'rgba(124,106,247,.08)', borderWidth: 2, fill: true, tension: .3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: '#7c6af7', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 }] },
-    options: rOpts
-  });
+  const rOpts=lineChartBase(v=>v+'R',v=>(v>=0?'+':'')+v+'R');
+  rCh=new Chart($('rC').getContext('2d'),{type:'line',data:{labels:rL,datasets:[{data:rD,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#7c6af7',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}]},options:rOpts});
 }
 
 // ── CALENDAR ──────────────────────────────────────────
@@ -1913,39 +1992,54 @@ function renderCal(){
 
 // ── FTMO ──────────────────────────────────────────────
 function renderFtmo(){
-  const tot=trades.reduce((s,t)=>s+t.pnl,0),pt=ftmo.size*ftmo.pp/100,dl=ftmo.size*ftmo.dp/100,ddl=ftmo.size*ftmo.ddp/100;
-  const today=new Date().toISOString().slice(0,10);
-  const tl=Math.min(trades.filter(t=>t.date===today).reduce((s,t)=>s+t.pnl,0),0);
-  const{D:eD}=getEq();let peak=eD[0],maxDd=0;
-  eD.forEach(v=>{if(v>peak)peak=v;const dd=peak-v;if(dd>maxDd)maxDd=dd;});
-  const td=new Set(trades.map(t=>t.date)).size;
+  const ft  = getPropTrades();
+  const pt  = ftmo.size*ftmo.pp/100;
+  const dl  = ftmo.size*ftmo.dp/100;
+  const ddl = ftmo.size*ftmo.ddp/100;
+
+  // Period subtitle
+  const pLabels={all:'Challenge progress','7':'7 hari terakhir','30':'30 hari terakhir','90':'3 bulan terakhir'};
+  $('prop-ps').textContent = pLabels[propPeriod]||'Challenge progress';
+  $('prop-chart-title').textContent = 'Equity vs PropFirm Limits' + (propPeriod!=='all'?' ('+pLabels[propPeriod]+')':'');
+
+  const tot = ft.reduce((s,t)=>s+t.pnl,0);
+  const today = new Date().toISOString().slice(0,10);
+  const tl  = Math.min(ft.filter(t=>t.date===today).reduce((s,t)=>s+t.pnl,0),0);
+  const td  = new Set(ft.map(t=>t.date)).size;
+
+  // Drawdown from filtered equity
+  const allTot=trades.reduce((s,t)=>s+t.pnl,0);
+  const ftTot=ft.reduce((s,t)=>s+t.pnl,0);
+  const startBal=(bal+allTot)-ftTot;
+  let bx=startBal; const eDx=[bx];
+  ft.forEach(t=>{bx+=t.pnl;eDx.push(Math.round(bx*100)/100);});
+  let peak=eDx[0],maxDd=0;
+  eDx.forEach(v=>{if(v>peak)peak=v;const dd=peak-v;if(dd>maxDd)maxDd=dd;});
+
   const pct=(v,m)=>Math.min(Math.round(Math.abs(v)/m*100),100);
-  $('ftp').textContent=(tot>=0?'+ ':'')+' $'+f2(Math.abs(tot));$('ftp').className='ftv '+(tot>=0?'pos':'neg');
+  $('ftp').textContent=(tot>=0?'+$':'-$')+f2(Math.abs(tot));$('ftp').className='ftv '+(tot>=0?'pos':'neg');
   $('ftpt').textContent=`Target: +$${f2(pt)} (${ftmo.pp}%)`;$('ftpb').style.width=pct(tot,pt)+'%';$('ftpb').style.background=tot>=0?'#00d97e':'var(--text3)';
   $('ftd').textContent='$'+f2(Math.abs(tl));$('ftd').className='ftv '+(tl<0?'neg':'neu');
   $('ftdl').textContent=`Limit: -$${f2(dl)} (${ftmo.dp}%)`;$('ftdb').style.width=pct(tl,dl)+'%';
   $('ftdd').textContent='-$'+f2(maxDd);$('ftdd').className='ftv '+(maxDd>0?'neg':'neu');
   $('ftddl').textContent=`Limit: -$${f2(ddl)} (${ftmo.ddp}%)`;$('ftddb').style.width=pct(maxDd,ddl)+'%';
-  $('ftdy').textContent=td;$('ftdyb').style.width=Math.min(td/4*100,100)+'%';$('fttr').textContent=trades.length;
-  const br=Math.abs(tl)>=dl||maxDd>=ddl,ps=tot>=pt&&td>=4;
+  $('ftdy').textContent=td;$('ftdyb').style.width=Math.min(td/4*100,100)+'%';$('fttr').textContent=ft.length;
+
+  const br=Math.abs(tl)>=dl||maxDd>=ddl, ps=tot>=pt&&td>=4;
   $('ftst').textContent=ps?'✅ Passed':br?'❌ Breached':'🔄 In Progress';
-  $('ftstsb').textContent=ps?'Challenge complete!':br?'Limit breached — stop trading':'Keep executing your plan';
-  const{L:eL,D:eFull}=getEq();
+  $('ftstsb').textContent=ps?'Challenge selesai! 🎉':br?'Limit breached — stop trading':'Keep executing your plan';
+
+  // Chart using filtered trades
+  let bq=startBal; const eL=['Start'],eFull=[bq];
+  ft.forEach(t=>{bq+=t.pnl;eL.push(t.date?t.date.slice(5):'');eFull.push(Math.round(bq*100)/100);});
   if(ftCh)ftCh.destroy();
-  const ftOpts = lineChartBase(
-    v => '$'+v.toLocaleString(),
-    v => '$'+v.toLocaleString()
-  );
-  ftOpts.plugins.tooltip.callbacks.label = c => ` ${c.dataset.label}: $${c.raw.toLocaleString()}`;
-  ftCh = new Chart($('ftC').getContext('2d'), {
-    type: 'line',
-    data: { labels: eL, datasets: [
-      {label:'Equity', data:eFull, borderColor:'#7c6af7', backgroundColor:'rgba(124,106,247,.08)', borderWidth:2, fill:true, tension:.35, pointRadius:0, pointHoverRadius:5, pointHoverBackgroundColor:'#7c6af7', pointHoverBorderColor:'#fff', pointHoverBorderWidth:2},
-      {label:'Max DD', data:eFull.map(()=>bal-ddl), borderColor:'rgba(255,77,77,.5)', borderWidth:1, borderDash:[4,4], fill:false, pointRadius:0, pointHoverRadius:4, pointHoverBackgroundColor:'#ff4d4d'},
-      {label:'Target', data:eFull.map(()=>bal+pt), borderColor:'rgba(0,217,126,.5)', borderWidth:1, borderDash:[4,4], fill:false, pointRadius:0, pointHoverRadius:4, pointHoverBackgroundColor:'#00d97e'},
-    ]},
-    options: ftOpts
-  });
+  const ftOpts=lineChartBase(v=>'$'+v.toLocaleString(),v=>'$'+v.toLocaleString());
+  ftOpts.plugins.tooltip.callbacks.label=c=>` ${c.dataset.label}: $${c.raw.toLocaleString()}`;
+  ftCh=new Chart($('ftC').getContext('2d'),{type:'line',data:{labels:eL,datasets:[
+    {label:'Equity',data:eFull,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.35,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#7c6af7',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2},
+    {label:'Max DD',data:eFull.map(()=>bal-ddl),borderColor:'rgba(255,77,77,.5)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#ff4d4d'},
+    {label:'Target',data:eFull.map(()=>bal+pt),borderColor:'rgba(0,217,126,.5)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#00d97e'},
+  ]},options:ftOpts});
 }
 </script>
 </body>
