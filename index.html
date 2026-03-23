@@ -312,6 +312,7 @@ select.fi option{background:var(--bg3);}
   <button class="hbg" id="mob-hbg">☰</button>
   <div class="tlogo"><div class="tdot"></div>TradeLog</div>
   <div style="flex:1"></div>
+  <div id="mob-balance" style="font-family:var(--mono);font-size:11px;color:var(--text2);display:none;white-space:nowrap">—</div>
   <button class="btn bsm" id="mob-log-btn">+ Log</button>
 </div>
 
@@ -358,6 +359,26 @@ select.fi option{background:var(--bg3);}
     <div class="ph">
       <div><div class="pt">Dashboard</div><div class="ps" id="dash-date"></div></div>
       <button class="btn" id="dash-log-btn">+ Log Trade</button>
+    </div>
+
+    <!-- Trader Identity Card (shown when logged in) -->
+    <div id="trader-card" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <!-- Avatar -->
+        <div id="tc-avatar" style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(124,106,247,.4)"></div>
+        <!-- Info -->
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div id="tc-greeting" style="font-size:13px;color:var(--text2)">Selamat datang,</div>
+            <div id="tc-name" style="font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          </div>
+          <div id="tc-tagline" style="font-size:12px;color:var(--text3);margin-top:2px;font-family:var(--mono)">📈 Konsisten adalah kunci</div>
+        </div>
+        <!-- Share button -->
+        <button id="share-btn" style="background:var(--accent-d);color:var(--accent);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;flex-shrink:0" title="Bagikan statistik trading kamu">
+          📤 Share Stats
+        </button>
+      </div>
     </div>
 
     <!-- Guest banner -->
@@ -624,6 +645,52 @@ select.fi option{background:var(--bg3);}
   </div>
 </div>
 
+<!-- SHARE STATS MODAL -->
+<div class="mo" id="md-share">
+  <div class="md" style="max-width:400px">
+    <div style="text-align:center;padding:4px 0 0">
+      <div style="font-size:36px;margin-bottom:12px">📤</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:6px;letter-spacing:-.3px">Share Trading Stats</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">Tunjukkan ke dunia bahwa kamu serius trading!</p>
+      <!-- Share card preview -->
+      <div id="share-preview" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(124,106,247,.3);border-radius:14px;padding:20px;margin-bottom:18px;text-align:left">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div id="sp-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden"></div>
+          <div>
+            <div id="sp-name" style="font-size:13px;font-weight:600;color:#f0f0f0"></div>
+            <div style="font-size:10px;color:#7c6af7;font-family:var(--mono)">TradeLog · tradelog.vercel.app</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Total P&L</div>
+            <div id="sp-pnl" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#00d97e">$0</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Win Rate</div>
+            <div id="sp-wr" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f0f0f0">—</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Total Trades</div>
+            <div id="sp-trades" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f0f0f0">0</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border-radius:8px;padding:10px">
+            <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Profit Factor</div>
+            <div id="sp-pf" style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f0f0f0">—</div>
+          </div>
+        </div>
+        <div id="sp-tagline" style="font-size:11px;color:#7c6af7;font-family:var(--mono);text-align:center">📈 Konsisten adalah kunci</div>
+      </div>
+      <!-- Copy link button -->
+      <div style="display:flex;gap:10px">
+        <button class="btng" id="share-cancel" style="flex:1">Tutup</button>
+        <button class="btn" id="copy-link-btn" style="flex:1">📋 Copy Teks</button>
+      </div>
+      <div id="copy-success" style="display:none;font-size:12px;color:var(--green);margin-top:10px">✓ Teks berhasil dicopy! Paste ke Instagram/Twitter/WA</div>
+    </div>
+  </div>
+</div>
+
 <!-- FTMO SETTINGS -->
 <div class="mo" id="md-ftmo">
   <div class="md" style="max-width:360px">
@@ -732,6 +799,41 @@ function setAuthUI(loggedIn) {
   $('bbal-wrap').style.display         = loggedIn ? 'flex'         : 'none';
   $('dash-log-btn').style.opacity      = loggedIn ? '1'            : '0.45';
   $('dash-log-btn').title              = loggedIn ? ''             : 'Login untuk mencatat trade';
+  $('trader-card').style.display       = loggedIn ? 'block'        : 'none';
+}
+
+// Update trader card with user info
+function updateTraderCard(user) {
+  if (!user) return;
+  const name = user.displayName || user.email?.split('@')[0] || 'Trader';
+  $('tc-name').textContent = name;
+  // Greeting based on time
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Selamat pagi,' : h < 15 ? 'Selamat siang,' : h < 18 ? 'Selamat sore,' : 'Selamat malam,';
+  $('tc-greeting').textContent = greet;
+  // Avatar
+  if (user.photoURL) {
+    $('tc-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+  } else {
+    $('tc-avatar').textContent = name[0].toUpperCase();
+  }
+  // Dynamic tagline based on stats
+  const n = trades.length;
+  const wins = trades.filter(t => t.result === 'Win').length;
+  const tot = trades.reduce((s,t) => s+t.pnl, 0);
+  let tagline = '📈 Konsisten adalah kunci';
+  if (n === 0) tagline = '🚀 Mulai perjalanan trading kamu';
+  else if (tot > 0 && wins/n >= 0.6) tagline = `🔥 ${(wins/n*100).toFixed(0)}% win rate · On fire!`;
+  else if (tot > 0) tagline = `💪 +$${tot.toFixed(0)} total profit · Keep grinding`;
+  else if (tot < 0) tagline = `📚 Setiap loss adalah pelajaran berharga`;
+  $('tc-tagline').textContent = tagline;
+  // Also populate share preview
+  $('sp-name').textContent = name;
+  if (user.photoURL) {
+    $('sp-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+  } else {
+    $('sp-avatar').textContent = name[0].toUpperCase();
+  }
 }
 setAuthUI(false); // start as guest
 
@@ -828,6 +930,8 @@ function updateGuestUI() {
   $('st-n').textContent = '0'; $('st-sk').textContent = '—';
   $('eqs').textContent = '—'; $('eqn').textContent = '—';
   $('sbf-bal').textContent = 'Belum login';
+  const mb = $('mob-balance');
+  if (mb) { mb.textContent = '—'; mb.style.display = 'none'; mb.style.color = 'var(--text2)'; }
   $('bdisp').textContent = '—';
   $('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
@@ -915,6 +1019,8 @@ async function loadUserProfile(user) {
   } else {
     $('user-avatar').textContent = (user.displayName || 'T')[0].toUpperCase();
   }
+  // Populate trader card
+  updateTraderCard(user);
 
   // Load profile from Firestore
   const ref = doc(db, 'users', user.uid);
@@ -1114,6 +1220,58 @@ $('bal-in').addEventListener('keydown', e => { if(e.key==='Enter') $('bal-save')
 
 // ── FTMO MODAL ────────────────────────────────────────
 $('ftmo-set-btn').addEventListener('click', () => $('md-ftmo').classList.add('open'));
+
+// ── SHARE STATS ────────────────────────────────────────
+$('share-btn').addEventListener('click', () => {
+  if (!currentUser) return;
+  // Populate share card
+  const n = trades.length;
+  const W = trades.filter(t=>t.result==='Win');
+  const tot = trades.reduce((s,t)=>s+t.pnl,0);
+  const wr = n>0?(W.length/n*100).toFixed(1)+'%':'—';
+  const gl = Math.abs(trades.filter(t=>t.result==='Loss').reduce((s,t)=>s+t.pnl,0));
+  const gw = W.reduce((s,t)=>s+t.pnl,0);
+  const pf = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
+  $('sp-pnl').textContent = (tot>=0?'+$':'-$')+f2(Math.abs(tot));
+  $('sp-pnl').style.color = tot>=0?'#00d97e':'#ff4d4d';
+  $('sp-wr').textContent  = wr;
+  $('sp-trades').textContent = n;
+  $('sp-pf').textContent  = pf;
+  $('copy-success').style.display = 'none';
+  $('md-share').classList.add('open');
+});
+$('share-cancel').addEventListener('click', () => $('md-share').classList.remove('open'));
+$('md-share').addEventListener('click', e => { if(e.target===$('md-share')) $('md-share').classList.remove('open'); });
+
+$('copy-link-btn').addEventListener('click', () => {
+  const name = currentUser?.displayName || 'Saya';
+  const n = trades.length;
+  const W = trades.filter(t=>t.result==='Win');
+  const tot = trades.reduce((s,t)=>s+t.pnl,0);
+  const wr = n>0?(W.length/n*100).toFixed(1):0;
+  const text = `📊 Trading Journal Update - ${name}
+
+💰 Total P&L: ${tot>=0?'+$':'-$'}${f2(Math.abs(tot))}
+🎯 Win Rate: ${wr}% (${W.length}/${n} trades)
+📈 Konsisten adalah kunci!
+
+Tracked via TradeLog 🚀`;
+  navigator.clipboard.writeText(text).then(()=>{
+    $('copy-success').style.display = 'block';
+    $('copy-link-btn').textContent = '✓ Copied!';
+    setTimeout(()=>{
+      $('copy-link-btn').textContent = '📋 Copy Teks';
+      $('copy-success').style.display = 'none';
+    }, 3000);
+  }).catch(()=>{
+    // Fallback for browsers that don't support clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    $('copy-success').style.display = 'block';
+  });
+});
 $('ftmo-cancel').addEventListener('click', () => $('md-ftmo').classList.remove('open'));
 $('md-ftmo').addEventListener('click', e => { if(e.target===$('md-ftmo')) $('md-ftmo').classList.remove('open'); });
 $('ftmo-save').addEventListener('click', async () => {
@@ -1153,8 +1311,18 @@ function updateAll() {
   if (!bal) return;
   updateStats(); renderEq(); renderPnl(); renderDonut(); renderTable(); updatePairFil();
   const total = trades.reduce((s,t) => s+t.pnl, 0);
-  $('sbf-bal').textContent = 'Balance: $' + f2(bal + total);
+  const currentBal = bal + total;
+  $('sbf-bal').textContent = 'Balance: $' + f2(currentBal);
   $('bdisp').textContent = bal.toLocaleString();
+  // Mobile topbar balance
+  const mobBal = $('mob-balance');
+  if (mobBal) {
+    mobBal.textContent = '$' + f2(currentBal);
+    mobBal.style.color = total >= 0 ? '#00d97e' : '#ff4d4d';
+    mobBal.style.display = currentUser ? 'block' : 'none';
+  }
+  // Update trader card tagline dynamically
+  if (currentUser) updateTraderCard(currentUser);
 }
 
 // ── STATS ─────────────────────────────────────────────
