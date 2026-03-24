@@ -1041,8 +1041,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, signOut, onAuthStateChanged,
          signInAnonymously, linkWithCredential,
          GoogleAuthProvider, signInWithPopup,
-         EmailAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-         sendPasswordResetEmail }
+         EmailAuthProvider,
+         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
