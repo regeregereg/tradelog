@@ -1647,10 +1647,12 @@ function openLoginScreen(reason) {
   showLoginPanel();
   showEmailStep();
   const sub = $('login-sub-text');
-  if (reason === 'log') {
-    sub.textContent = 'Masukkan email kamu untuk mulai mencatat trade.';
-  } else {
-    sub.textContent = 'Masukkan email kamu. Kami kirimkan link masuk — tidak perlu password.';
+  if (sub) {
+    if (reason === 'log') {
+      sub.textContent = 'Masukkan email kamu untuk mulai mencatat trade.';
+    } else {
+      sub.textContent = 'Masukkan email kamu. Kami kirimkan link masuk — tidak perlu password.';
+    }
   }
   $('login-screen').classList.add('open');
   setTimeout(() => $('magic-email-input').focus(), 100);
