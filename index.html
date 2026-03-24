@@ -344,14 +344,37 @@ select.fi option{background:var(--bg3);}
   <div class="login-card" id="login-panel">
     <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
 
-    <!-- State 1: Input email (magic link) -->
+    <!-- State 1: Login options -->
     <div id="login-step-email">
       <div class="login-icon">📊</div>
       <div class="login-title">Masuk ke RiskPerTrade</div>
-      <div class="login-sub" id="login-sub-text">Masukkan email — kami kirimkan link masuk, tidak perlu password.</div>
 
-      <!-- Email input -->
-      <div style="margin-bottom:10px">
+      <!-- Early access notice -->
+      <div style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:left">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px">🔒 Early Access</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5">Pastikan Google atau email kamu sudah terdaftar. Belum punya akses? Hubungi kami di Instagram.</div>
+        <a href="https://instagram.com/anelkazone" target="_blank"
+          style="display:inline-flex;align-items:center;gap:5px;margin-top:7px;font-size:11px;font-weight:600;color:var(--accent);text-decoration:none">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          @anelkazone →
+        </a>
+      </div>
+
+      <!-- 1. Google (paling atas, paling simple) -->
+      <button id="google-login-btn" class="login-btn" style="background:#fff;color:#1a1a1a;border:none;margin-bottom:10px;gap:10px;font-size:14px">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="G">
+        Masuk dengan Google
+      </button>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--text3)">atau dengan email</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- 2. Email magic link -->
+      <div style="margin-bottom:8px">
         <input id="magic-email-input" type="email" placeholder="emailkamu@gmail.com"
           style="width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
           onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
@@ -363,25 +386,19 @@ select.fi option{background:var(--bg3);}
       <div class="login-loading" id="login-loading" style="margin-top:8px">⏳ Mengirim link…</div>
 
       <!-- Divider -->
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0">
+      <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px">
         <div style="flex:1;height:1px;background:var(--border)"></div>
         <span style="font-size:11px;color:var(--text3)">atau</span>
         <div style="flex:1;height:1px;background:var(--border)"></div>
       </div>
 
-      <!-- Google login -->
-      <button id="google-login-btn" class="login-btn" style="background:#fff;color:#1a1a1a;border:none;margin-bottom:8px;gap:10px">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="G">
-        Masuk dengan Google
-      </button>
-
-      <!-- Anonymous -->
+      <!-- 3. Anonymous -->
       <button id="anon-btn" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s"
         onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
         onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
         👻 Coba Tanpa Daftar
       </button>
-      <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:5px">Data tersimpan sementara — bisa simpan permanen kapan saja</div>
+      <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">Maks 10 trade — bisa upgrade ke akun penuh kapan saja</div>
     </div>
 
     <!-- State 2: Email sent confirmation -->
@@ -1022,9 +1039,10 @@ select.fi option{background:var(--bg3);}
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signOut, onAuthStateChanged,
-         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
-         signInAnonymously, EmailAuthProvider, linkWithCredential,
-         GoogleAuthProvider, signInWithPopup }
+         signInAnonymously, linkWithCredential,
+         GoogleAuthProvider, signInWithPopup,
+         EmailAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+         sendPasswordResetEmail }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
