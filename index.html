@@ -344,58 +344,62 @@ select.fi option{background:var(--bg3);}
   <div class="login-card" id="login-panel">
     <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
 
-    <!-- State 1: Input email -->
+    <!-- State 1: Input email (magic link) -->
     <div id="login-step-email">
       <div class="login-icon">📊</div>
       <div class="login-title">Masuk ke RiskPerTrade</div>
-      <div class="login-sub" id="login-sub-text">Masukkan email kamu. Kami akan kirimkan link masuk — tidak perlu password.</div>
-      <div style="position:relative;margin-bottom:10px">
+      <div class="login-sub" id="login-sub-text">Masukkan email — kami kirimkan link masuk, tidak perlu password.</div>
+
+      <!-- Email input -->
+      <div style="margin-bottom:10px">
         <input id="magic-email-input" type="email" placeholder="emailkamu@gmail.com"
-          style="width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
+          style="width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
           onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
       </div>
-      <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff">
-        Kirim Link Masuk →
+      <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:4px">
+        ✉️ Kirim Link Masuk
       </button>
-      <div class="login-err" id="login-err" style="margin-top:10px">Gagal mengirim. Coba lagi.</div>
-      <div class="login-loading" id="login-loading" style="margin-top:10px">⏳ Mengirim link…</div>
+      <div class="login-err" id="login-err" style="margin-top:8px">Gagal mengirim. Coba lagi.</div>
+      <div class="login-loading" id="login-loading" style="margin-top:8px">⏳ Mengirim link…</div>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--text3)">atau</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- Google login -->
+      <button id="google-login-btn" class="login-btn" style="background:#fff;color:#1a1a1a;border:none;margin-bottom:8px;gap:10px">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="G">
+        Masuk dengan Google
+      </button>
+
+      <!-- Anonymous -->
+      <button id="anon-btn" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s"
+        onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
+        onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
+        👻 Coba Tanpa Daftar
+      </button>
+      <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:5px">Data tersimpan sementara — bisa simpan permanen kapan saja</div>
     </div>
 
     <!-- State 2: Email sent confirmation -->
     <div id="login-step-sent" style="display:none">
       <div class="login-icon">📬</div>
       <div class="login-title" style="font-size:20px">Cek Email Kamu!</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">
-        Link masuk sudah dikirim ke:
-      </p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">Link masuk sudah dikirim ke:</p>
       <div style="background:var(--bg3);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);text-align:center" id="sent-email-display">—</div>
       <p style="font-size:12px;color:var(--text3);line-height:1.7;margin-bottom:20px">
         Klik link di email tersebut untuk masuk otomatis.<br>
         Link berlaku selama <strong style="color:var(--text)">15 menit</strong>.<br>
-        Cek folder spam kalau tidak muncul.
+        Cek folder <strong style="color:var(--text)">spam</strong> kalau tidak muncul.
       </p>
       <button class="btng" id="resend-btn" style="width:100%;justify-content:center;margin-bottom:8px">Kirim Ulang</button>
       <button id="change-email-btn" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px">← Ganti email</button>
     </div>
 
-    <!-- Divider -->
-    <div style="display:flex;align-items:center;gap:10px;margin-top:16px;margin-bottom:12px">
-      <div style="flex:1;height:1px;background:var(--border)"></div>
-      <span style="font-size:11px;color:var(--text3)">atau</span>
-      <div style="flex:1;height:1px;background:var(--border)"></div>
-    </div>
-
-    <!-- Anonymous login button -->
-    <button id="anon-btn" style="width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;margin-bottom:10px"
-      onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
-      onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
-      👻 Coba Tanpa Daftar
-    </button>
-    <div style="font-size:10px;color:var(--text3);text-align:center;line-height:1.5;margin-bottom:4px">
-      Data tersimpan sementara — bisa simpan permanen kapan saja
-    </div>
-
-    <button id="login-skip-btn" style="margin-top:8px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu (tanpa login) →</button>
+    <button id="login-skip-btn" style="margin-top:12px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
   </div>
 
   <!-- Panel B: not invited -->
@@ -1019,7 +1023,8 @@ select.fi option{background:var(--bg3);}
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signOut, onAuthStateChanged,
          sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
-         signInAnonymously, EmailAuthProvider, linkWithCredential }
+         signInAnonymously, EmailAuthProvider, linkWithCredential,
+         GoogleAuthProvider, signInWithPopup }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
@@ -1217,6 +1222,10 @@ function showEmailStep() {
   $('login-step-sent').style.display  = 'none';
   $('login-err').style.display        = 'none';
   $('login-loading').style.display    = 'none';
+  // Re-enable buttons
+  if ($('send-magic-btn'))  $('send-magic-btn').disabled  = false;
+  if ($('google-login-btn')) $('google-login-btn').disabled = false;
+  if ($('anon-btn'))        $('anon-btn').disabled        = false;
 }
 function showSentStep(email) {
   $('login-step-email').style.display = 'none';
@@ -1290,9 +1299,28 @@ $('try-other-btn').addEventListener('click', () => {
   showLoginPanel();
   showEmailStep();
   $('magic-email-input').value = '';
-  setTimeout(() => $('magic-email-input').focus(), 100);
+  setTimeout(() => $('magic-email-input').focus(), 80);
 });
 $('notinvited-skip').addEventListener('click', closeLoginScreen);
+
+// ── GOOGLE LOGIN ──────────────────────────────────────
+$('google-login-btn').addEventListener('click', async () => {
+  $('login-err').style.display = 'none';
+  $('login-loading').style.display = 'block';
+  $('google-login-btn').disabled = true;
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged handles invite check + rest
+  } catch(e) {
+    $('login-loading').style.display = 'none';
+    $('google-login-btn').disabled = false;
+    if (e.code !== 'auth/popup-closed-by-user') {
+      $('login-err').style.display = 'block';
+      $('login-err').textContent = 'Gagal masuk dengan Google. Coba lagi.';
+    }
+  }
+});
 
 // ── ANONYMOUS LOGIN ────────────────────────────────────
 $('anon-btn').addEventListener('click', async () => {
