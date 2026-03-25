@@ -321,6 +321,53 @@ select.fi option{background:var(--bg3);}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 
+/* ── ONBOARDING TOUR ── */
+#onboard-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  z-index:2000;display:none;align-items:center;justify-content:center;
+  padding:20px;backdrop-filter:blur(4px);
+}
+#onboard-overlay.open{display:flex;}
+.ob-card{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:20px;width:100%;max-width:440px;
+  overflow:hidden;position:relative;
+}
+.ob-slides{display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.ob-slide{
+  min-width:100%;padding:36px 32px 28px;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+}
+.ob-icon{font-size:52px;margin-bottom:16px;line-height:1;}
+.ob-title{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:10px;}
+.ob-body{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px;max-width:340px;}
+.ob-body strong{color:var(--text);}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px;}
+.ob-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--bg4);transition:all .2s;cursor:pointer;
+}
+.ob-dot.active{background:var(--accent);width:18px;border-radius:3px;}
+.ob-actions{display:flex;gap:10px;width:100%;}
+.ob-close{
+  position:absolute;top:14px;right:16px;
+  background:none;border:none;color:var(--text3);
+  font-size:18px;cursor:pointer;padding:4px;line-height:1;
+  transition:color .15s;z-index:1;
+}
+.ob-close:hover{color:var(--text);}
+.ob-tag{
+  display:inline-block;font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:4px;margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:.6px;
+}
+@media(max-width:480px){
+  .ob-slide{padding:28px 20px 22px;}
+  .ob-icon{font-size:44px;}
+  .ob-title{font-size:18px;}
+}
+
 @media(max-width:768px){
   .topbar{display:flex;}
   .sb-btn{display:none;}
@@ -337,6 +384,94 @@ select.fi option{background:var(--bg3);}
 </style>
 </head>
 <body>
+
+<!-- ══ ONBOARDING TOUR ══ -->
+<div id="onboard-overlay">
+  <div class="ob-card">
+    <button class="ob-close" id="ob-close">✕</button>
+
+    <!-- Slides wrapper -->
+    <div class="ob-slides" id="ob-slides">
+
+      <!-- Slide 1: Welcome -->
+      <div class="ob-slide">
+        <div class="ob-icon">📊</div>
+        <div class="ob-tag" style="background:rgba(124,106,247,.15);color:var(--accent)">Trading Journal</div>
+        <div class="ob-title">Selamat datang di RiskPerTrade</div>
+        <div class="ob-body">
+          Platform pencatatan trading yang dirancang untuk trader serius.<br><br>
+          <strong>Catat trade, analisis performa, dan pantau progress</strong> menuju prop firm — semua dalam satu tempat.
+        </div>
+      </div>
+
+      <!-- Slide 2: Journal -->
+      <div class="ob-slide">
+        <div class="ob-icon">📝</div>
+        <div class="ob-tag" style="background:rgba(0,217,126,.1);color:#00d97e">Journal</div>
+        <div class="ob-title">Catat Setiap Trade</div>
+        <div class="ob-body">
+          Log trade dengan detail lengkap — pair, direction, session, entry/exit, risk, P&L, dan R-multiple.<br><br>
+          Setiap trade otomatis masuk ke <strong>equity curve</strong> dan <strong>analytics</strong> kamu.
+        </div>
+      </div>
+
+      <!-- Slide 3: Analytics -->
+      <div class="ob-slide">
+        <div class="ob-icon">📈</div>
+        <div class="ob-tag" style="background:rgba(124,106,247,.15);color:var(--accent)">Analytics</div>
+        <div class="ob-title">Analisis Performa Kamu</div>
+        <div class="ob-body">
+          Lihat <strong>win rate, profit factor, avg R:R</strong>, dan breakdown performa per pair, session, serta setup.<br><br>
+          Filter berdasarkan periode: 7 hari, 30 hari, 6 bulan, atau semua waktu.
+        </div>
+      </div>
+
+      <!-- Slide 4: PropFirm -->
+      <div class="ob-slide">
+        <div class="ob-icon">🏢</div>
+        <div class="ob-tag" style="background:rgba(255,77,77,.1);color:#ff4d4d">PropFirm</div>
+        <div class="ob-title">Track Challenge PropFirm</div>
+        <div class="ob-body">
+          Monitor progress challenge prop firm kamu secara real-time — <strong>profit target, daily loss limit, max drawdown,</strong> dan trading days.<br><br>
+          Grafik equity vs limit langsung terlihat kapan kamu terlalu agresif.
+        </div>
+      </div>
+
+      <!-- Slide 5: Get Started -->
+      <div class="ob-slide">
+        <div class="ob-icon">🚀</div>
+        <div class="ob-tag" style="background:rgba(0,217,126,.1);color:#00d97e">Mulai</div>
+        <div class="ob-title">Siap Mulai?</div>
+        <div class="ob-body">
+          Kamu bisa <strong>coba langsung tanpa daftar</strong> (maks 10 trade), atau login dengan Google untuk akses penuh tanpa batas.<br><br>
+          Butuh akses penuh? Hubungi <strong>@anelkazone</strong> di Instagram.
+        </div>
+        <a href="https://instagram.com/anelkazone" target="_blank"
+          style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);text-decoration:none;margin-bottom:4px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          @anelkazone →
+        </a>
+      </div>
+
+    </div><!-- /ob-slides -->
+
+    <!-- Dots indicator -->
+    <div style="padding:0 32px 24px">
+      <div class="ob-dots" id="ob-dots">
+        <div class="ob-dot active" data-slide="0"></div>
+        <div class="ob-dot" data-slide="1"></div>
+        <div class="ob-dot" data-slide="2"></div>
+        <div class="ob-dot" data-slide="3"></div>
+        <div class="ob-dot" data-slide="4"></div>
+      </div>
+      <div class="ob-actions">
+        <button class="btng" id="ob-prev" style="flex:1;display:none">← Sebelumnya</button>
+        <button class="btn" id="ob-next" style="flex:1">Selanjutnya →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
@@ -498,6 +633,12 @@ select.fi option{background:var(--bg3);}
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
       @anelkazone
     </a>
+    <button id="sb-tour-btn"
+      style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;border-radius:7px;background:none;border:1px solid var(--border);color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s"
+      onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--border2)'"
+      onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
+      ❓ Cara Penggunaan
+    </button>
   </div>
 </nav>
 
@@ -3005,6 +3146,81 @@ $('fin-filter-kat').addEventListener('change', renderFinance);
 
 // ── WIRE NAV ──────────────────────────────────────────
 $('nav-finance').addEventListener('click', () => goPage('finance'));
+
+// ══════════════════════════════════════════════════════
+// ── ONBOARDING TOUR ────────────────────────────────────
+// ══════════════════════════════════════════════════════
+const OB_KEY    = 'rpt_tour_seen';
+const OB_TOTAL  = 5;
+let   obCurrent = 0;
+
+function obGoTo(idx) {
+  obCurrent = Math.max(0, Math.min(OB_TOTAL - 1, idx));
+  // Slide
+  $('ob-slides').style.transform = `translateX(-${obCurrent * 100}%)`;
+  // Dots
+  document.querySelectorAll('.ob-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === obCurrent);
+  });
+  // Buttons
+  $('ob-prev').style.display = obCurrent === 0 ? 'none' : 'block';
+  $('ob-next').textContent   = obCurrent === OB_TOTAL - 1 ? 'Mulai Sekarang ✓' : 'Selanjutnya →';
+}
+
+function openTour(fromStart = true) {
+  if (fromStart) obGoTo(0);
+  $('onboard-overlay').classList.add('open');
+}
+
+function closeTour() {
+  $('onboard-overlay').classList.remove('open');
+  try { localStorage.setItem(OB_KEY, '1'); } catch(e) {}
+}
+
+// Auto-show on first visit
+try {
+  if (!localStorage.getItem(OB_KEY)) {
+    // Slight delay so app renders first
+    setTimeout(() => openTour(true), 600);
+  }
+} catch(e) {}
+
+// Dot clicks
+document.querySelectorAll('.ob-dot').forEach(d => {
+  d.addEventListener('click', () => obGoTo(parseInt(d.dataset.slide)));
+});
+
+// Prev / Next
+$('ob-prev').addEventListener('click', () => obGoTo(obCurrent - 1));
+$('ob-next').addEventListener('click', () => {
+  if (obCurrent === OB_TOTAL - 1) {
+    closeTour();
+  } else {
+    obGoTo(obCurrent + 1);
+  }
+});
+
+// Close button
+$('ob-close').addEventListener('click', closeTour);
+
+// Close on overlay click
+$('onboard-overlay').addEventListener('click', e => {
+  if (e.target === $('onboard-overlay')) closeTour();
+});
+
+// "Cara Penggunaan" button in sidebar
+$('sb-tour-btn').addEventListener('click', () => {
+  openTour(true);
+  if (typeof isMob === 'function' && isMob()) closeSB();
+});
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (!$('onboard-overlay').classList.contains('open')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') obGoTo(obCurrent + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   obGoTo(obCurrent - 1);
+  if (e.key === 'Escape') closeTour();
+});
 </script>
 </body>
 </html>
