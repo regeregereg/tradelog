@@ -481,6 +481,7 @@ select.fi option{background:var(--bg3);}
   <div class="ni" id="nav-analytics"><span class="nic">◎</span>Analytics</div>
   <div class="ni" id="nav-calendar"><span class="nic">▦</span>Calendar</div>
   <div class="ni" id="nav-ftmo"><span class="nic">🏢</span>PropFirm</div>
+  <div class="ni" id="nav-finance" style="display:none"><span class="nic">💰</span>Finance</div>
 
   <div class="sbf" id="sbf">
     <span class="sync-dot" id="sync-dot"></span>
@@ -761,6 +762,112 @@ select.fi option{background:var(--bg3);}
     <div class="cc"><div class="ch"><div class="ct" id="prop-chart-title">Equity vs PropFirm Limits</div></div><div style="position:relative;height:200px"><canvas id="ftC"></canvas></div></div>
   </div>
 
+  <!-- ══ FINANCE PAGE ══ -->
+  <div class="page" id="page-finance">
+    <div class="ph">
+      <div>
+        <div class="pt">💰 Business Finance</div>
+        <div class="ps" id="fin-ps">Keuangan bisnis pribadi</div>
+      </div>
+      <button class="btn" id="fin-add-btn">+ Tambah Transaksi</button>
+    </div>
+
+    <!-- Period tabs -->
+    <div style="margin-bottom:16px">
+      <div class="period-tabs" id="fin-period-tabs">
+        <button class="ptab active" data-fperiod="all">Semua</button>
+        <button class="ptab" data-fperiod="7">7 Hari</button>
+        <button class="ptab" data-fperiod="30">30 Hari</button>
+        <button class="ptab" data-fperiod="180">6 Bulan</button>
+        <button class="ptab" data-fperiod="365">1 Tahun</button>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px">
+      <div class="sc">
+        <div class="sl">Total Pemasukan</div>
+        <div class="sv pos" id="fin-income">Rp 0</div>
+        <div class="sch" id="fin-income-sub">0 transaksi</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Total Pengeluaran</div>
+        <div class="sv neg" id="fin-expense">Rp 0</div>
+        <div class="sch" id="fin-expense-sub">0 transaksi</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Profit Bersih</div>
+        <div class="sv" id="fin-profit">Rp 0</div>
+        <div class="sch neu" id="fin-profit-sub">pemasukan - pengeluaran</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Avg / Bulan</div>
+        <div class="sv neu" id="fin-avg">Rp 0</div>
+        <div class="sch neu">rata-rata pemasukan</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="cc" style="margin-bottom:16px">
+      <div class="ch">
+        <div class="ct">Trend Pemasukan & Pengeluaran</div>
+        <div class="cm" id="fin-line-meta">–</div>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="finLineC"></canvas></div>
+    </div>
+    <div class="g2" style="margin-bottom:16px">
+      <div class="cc" style="margin-bottom:0">
+        <div class="ch"><div class="ct">Pemasukan per Kategori</div></div>
+        <div style="position:relative;height:160px"><canvas id="finBarC"></canvas></div>
+      </div>
+      <div class="cc" style="margin-bottom:0">
+        <div class="ch"><div class="ct">Komposisi</div></div>
+        <div style="position:relative;height:160px"><canvas id="finDonutC"></canvas></div>
+        <div id="fin-donut-legend" style="display:flex;justify-content:center;gap:16px;margin-top:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#00d97e;display:inline-block"></span>
+            <span style="font-size:12px;color:var(--text2)">Pemasukan</span>
+            <span id="fin-donut-in" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#00d97e">0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ff4d4d;display:inline-block"></span>
+            <span style="font-size:12px;color:var(--text2)">Pengeluaran</span>
+            <span id="fin-donut-out" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#ff4d4d">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction table -->
+    <div class="tc">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div style="font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Riwayat Transaksi</div>
+        <div style="display:flex;gap:8px">
+          <select class="fsel" id="fin-filter-jenis">
+            <option value="">Semua Jenis</option>
+            <option value="Pemasukan">Pemasukan</option>
+            <option value="Pengeluaran">Pengeluaran</option>
+          </select>
+          <select class="fsel" id="fin-filter-kat">
+            <option value="">Semua Kategori</option>
+            <option>Produk</option><option>Jasa</option>
+            <option>Operasional</option><option>Marketing</option><option>Lainnya</option>
+          </select>
+        </div>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Tanggal</th><th>Nama</th><th>Jenis</th><th>Kategori</th>
+            <th>Nominal</th><th>Status</th><th>Keterangan</th><th></th>
+          </tr></thead>
+          <tbody id="fin-tbody"></tbody>
+        </table>
+      </div>
+      <div class="es" id="fin-empty" style="display:block">Belum ada transaksi — klik <strong style="color:var(--accent)">+ Tambah Transaksi</strong> untuk mulai.</div>
+    </div>
+  </div>
+
   <!-- ANON UPGRADE BANNER — shown inside main for anonymous users -->
   <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:500px">
     <div style="background:linear-gradient(135deg,#1a1040,#0f0f1a);border:1px solid rgba(124,106,247,.4);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);flex-wrap:wrap">
@@ -1017,6 +1124,44 @@ select.fi option{background:var(--bg3);}
       </div>
       <div id="copy-success" style="display:none;font-size:12px;color:var(--green);margin-top:10px;text-align:center">✓ Teks berhasil dicopy! Paste ke Instagram / Twitter / WA</div>
       <div id="download-loading" style="display:none;font-size:12px;color:var(--text2);margin-top:10px;text-align:center">⏳ Membuat gambar...</div>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCE ADD MODAL -->
+<div class="mo" id="md-finance">
+  <div class="md">
+    <div class="mdt" id="fin-modal-title">Tambah Transaksi</div>
+    <div class="fg">
+      <div class="fgg"><label class="fl">Tanggal</label><input class="fi" type="date" id="fin-f-tgl"></div>
+      <div class="fgg"><label class="fl">Jenis</label>
+        <select class="fi" id="fin-f-jenis">
+          <option value="Pemasukan">Pemasukan</option>
+          <option value="Pengeluaran">Pengeluaran</option>
+        </select>
+      </div>
+      <div class="fgg full"><label class="fl">Nama Transaksi</label><input class="fi" type="text" id="fin-f-nama" placeholder="Contoh: Penjualan produk A"></div>
+      <div class="fgg"><label class="fl">Kategori</label>
+        <select class="fi" id="fin-f-kat">
+          <option>Produk</option><option>Jasa</option>
+          <option>Operasional</option><option>Marketing</option><option>Lainnya</option>
+        </select>
+      </div>
+      <div class="fgg"><label class="fl">Status</label>
+        <select class="fi" id="fin-f-status">
+          <option>Confirmed</option><option>Pending</option><option>Cancelled</option>
+        </select>
+      </div>
+      <div class="fgg full"><label class="fl">Nominal (Rp)</label>
+        <input class="fi" type="number" id="fin-f-nominal" placeholder="500000" step="1000" min="0">
+      </div>
+      <div class="fgg full"><label class="fl">Keterangan</label>
+        <textarea class="ta" id="fin-f-ket" placeholder="Catatan tambahan..."></textarea>
+      </div>
+    </div>
+    <div class="fa">
+      <button class="btng" id="fin-cancel">Batal</button>
+      <button class="btn" id="fin-save">Simpan</button>
     </div>
   </div>
 </div>
@@ -1615,6 +1760,8 @@ onAuthStateChanged(auth, async user => {
     setAnonUI(false); // hide anon banner
     await loadUserProfile(user);
     listenTrades(user.uid);
+    updateFinanceNav();
+    if (isOwner()) listenFinance();
     if (pendingAction === 'openTrade') {
       pendingAction = null;
       setTimeout(() => openTrade(), 600);
@@ -1632,6 +1779,8 @@ onAuthStateChanged(auth, async user => {
       trades = []; bal = 0;
       updateGuestUI();
       setAnonUI(false);
+      $('nav-finance').style.display = 'none';
+      finTrades = [];
     }
     closeLoginScreen();
   }
@@ -1882,12 +2031,12 @@ function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
   $('page-' + name).classList.add('active');
-  $('nav-' + name).classList.add('active');
-  // Save active page so refresh restores same tab
+  if ($('nav-' + name)) $('nav-' + name).classList.add('active');
   try { sessionStorage.setItem('tl_page', name); } catch(e) {}
   if (name === 'analytics') renderAna();
   if (name === 'calendar')  renderCal();
   if (name === 'ftmo')      renderFtmo();
+  if (name === 'finance')   renderFinance();
   if (isMob()) closeSB();
 }
 ['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
@@ -1898,7 +2047,7 @@ function goPage(name) {
 function restorePage() {
   try {
     const saved = sessionStorage.getItem('tl_page');
-    if (saved && ['dashboard','journal','analytics','calendar','ftmo'].includes(saved)) {
+    if (saved && ['dashboard','journal','analytics','calendar','ftmo','finance'].includes(saved)) {
       goPage(saved);
     }
   } catch(e) {}
@@ -2638,6 +2787,224 @@ function renderFtmo(){
     {label:'Target',data:eFull.map(()=>bal+pt),borderColor:'rgba(0,217,126,.5)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#00d97e'},
   ]},options:ftOpts});
 }
+
+// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// ── FINANCE MODULE — Manual Input ──────────────────────
+// ══════════════════════════════════════════════════════
+
+// ── CONFIG ────────────────────────────────────────────
+const OWNER_UID = 'PASTE_YOUR_UID_HERE'; // ← Ganti dengan UID di Firebase Console → Auth → Users
+
+// ── STATE ─────────────────────────────────────────────
+let finTrades = [];
+let finPeriod = 'all';
+let finLineC, finBarC, finDonutC;
+let finEditId  = null; // null = tambah baru, string = edit existing
+
+// ── IS OWNER ──────────────────────────────────────────
+function isOwner() {
+  if (!currentUser) return false;
+  if (OWNER_UID !== 'PASTE_YOUR_UID_HERE') return currentUser.uid === OWNER_UID;
+  return currentUser.email === 'aneregy09@gmail.com'; // fallback sementara
+}
+
+function updateFinanceNav() {
+  $('nav-finance').style.display = isOwner() ? 'flex' : 'none';
+}
+
+// ── FORMAT RUPIAH ─────────────────────────────────────
+function fRp(n) {
+  return 'Rp ' + Math.round(n||0).toLocaleString('id-ID');
+}
+
+// ── PERIOD FILTER ─────────────────────────────────────
+function getFinTrades() {
+  if (finPeriod === 'all') return finTrades;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - parseInt(finPeriod));
+  return finTrades.filter(t => (t.tanggal||'') >= cutoff.toISOString().slice(0,10));
+}
+
+// ── LISTEN REALTIME ───────────────────────────────────
+function listenFinance() {
+  if (!isOwner()) return;
+  const uid = currentUser.uid;
+  const q = query(
+    collection(db, 'finance', uid, 'transactions'),
+    orderBy('tanggal', 'desc')
+  );
+  onSnapshot(q, snap => {
+    finTrades = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
+    renderFinance();
+  }, err => console.error('Finance listen error:', err));
+}
+
+// ── SAVE TRANSACTION ──────────────────────────────────
+async function saveFinTransaction(data) {
+  if (!isOwner()) return;
+  const uid = currentUser.uid;
+  if (finEditId) {
+    await updateDoc(doc(db, 'finance', uid, 'transactions', finEditId), data);
+  } else {
+    await addDoc(collection(db, 'finance', uid, 'transactions'), data);
+  }
+}
+
+// ── DELETE TRANSACTION ────────────────────────────────
+window.delFinTx = async (firestoreId) => {
+  if (!confirm('Hapus transaksi ini?')) return;
+  const uid = currentUser.uid;
+  await deleteDoc(doc(db, 'finance', uid, 'transactions', firestoreId));
+};
+
+// ── OPEN MODAL ────────────────────────────────────────
+function openFinModal(tx = null) {
+  finEditId = tx ? tx.firestoreId : null;
+  $('fin-modal-title').textContent = tx ? 'Edit Transaksi' : 'Tambah Transaksi';
+  $('fin-f-tgl').value     = tx?.tanggal  || new Date().toISOString().slice(0,10);
+  $('fin-f-jenis').value   = tx?.jenis    || 'Pemasukan';
+  $('fin-f-nama').value    = tx?.nama     || '';
+  $('fin-f-kat').value     = tx?.kategori || 'Produk';
+  $('fin-f-status').value  = tx?.status   || 'Confirmed';
+  $('fin-f-nominal').value = tx?.nominal  || '';
+  $('fin-f-ket').value     = tx?.keterangan || '';
+  $('md-finance').classList.add('open');
+  setTimeout(() => $('fin-f-nama').focus(), 80);
+}
+
+// ── RENDER ────────────────────────────────────────────
+function renderFinance() {
+  if (!isOwner()) return;
+  const ft = getFinTrades();
+  const jFilter = $('fin-filter-jenis').value;
+  const kFilter = $('fin-filter-kat').value;
+  const rows = ft.filter(t => {
+    if (jFilter && t.jenis !== jFilter) return false;
+    if (kFilter && t.kategori !== kFilter) return false;
+    return true;
+  });
+
+  // ── Stats ──────────────────────────────────────────
+  const income  = ft.filter(t=>t.jenis==='Pemasukan').reduce((s,t)=>s+(t.nominal||0),0);
+  const expense = ft.filter(t=>t.jenis==='Pengeluaran').reduce((s,t)=>s+(t.nominal||0),0);
+  const profit  = income - expense;
+  const months  = Math.max(1, new Set(ft.map(t=>t.tanggal?.slice(0,7))).size);
+
+  $('fin-income').textContent     = fRp(income);
+  $('fin-income-sub').textContent = ft.filter(t=>t.jenis==='Pemasukan').length + ' transaksi';
+  $('fin-expense').textContent    = fRp(expense);
+  $('fin-expense-sub').textContent= ft.filter(t=>t.jenis==='Pengeluaran').length + ' transaksi';
+  $('fin-profit').textContent     = fRp(profit);
+  $('fin-profit').className       = 'sv ' + (profit>=0?'pos':'neg');
+  $('fin-avg').textContent        = fRp(income / months);
+
+  const pLabels = {all:'Semua data','7':'7 hari terakhir','30':'30 hari terakhir','180':'6 bulan terakhir','365':'1 tahun terakhir'};
+  $('fin-ps').textContent = pLabels[finPeriod] || 'Keuangan bisnis';
+
+  // ── Line chart: pemasukan & pengeluaran per bulan ──
+  const inMap={}, outMap={};
+  ft.forEach(t=>{
+    const m=t.tanggal?.slice(0,7)||'?';
+    if(t.jenis==='Pemasukan') inMap[m]=(inMap[m]||0)+(t.nominal||0);
+    else outMap[m]=(outMap[m]||0)+(t.nominal||0);
+  });
+  const allM=[...new Set([...Object.keys(inMap),...Object.keys(outMap)])].sort();
+  const mNames=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const lineLabels=allM.map(m=>{const[y,mo]=m.split('-');return mNames[parseInt(mo)-1]+' '+y.slice(2);});
+
+  $('fin-line-meta').textContent = allM.length + ' bulan';
+  if(finLineC)finLineC.destroy();
+  const lineOpts=lineChartBase(v=>fRp(v),v=>fRp(v));
+  lineOpts.plugins.tooltip.callbacks.label=c=>`${c.dataset.label}: ${fRp(c.raw)}`;
+  finLineC=new Chart($('finLineC').getContext('2d'),{
+    type:'line',
+    data:{labels:lineLabels,datasets:[
+      {label:'Pemasukan',data:allM.map(m=>inMap[m]||0),borderColor:'#00d97e',backgroundColor:'rgba(0,217,126,.07)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointHoverBorderColor:'#fff',pointHoverBorderWidth:2},
+      {label:'Pengeluaran',data:allM.map(m=>outMap[m]||0),borderColor:'#ff4d4d',backgroundColor:'rgba(255,77,77,.05)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}
+    ]},
+    options:lineOpts
+  });
+
+  // ── Bar chart: pemasukan per kategori ─────────────
+  const katMap={};
+  ft.filter(t=>t.jenis==='Pemasukan').forEach(t=>{const k=t.kategori||'Lainnya';katMap[k]=(katMap[k]||0)+(t.nominal||0);});
+  const katKeys=Object.keys(katMap).sort((a,b)=>katMap[b]-katMap[a]);
+  const katColors={'Produk':'#7c6af7','Jasa':'#00d97e','Operasional':'#f5c842','Marketing':'#ff9f43','Lainnya':'#555'};
+  if(finBarC)finBarC.destroy();
+  finBarC=new Chart($('finBarC').getContext('2d'),{
+    type:'bar',
+    data:{labels:katKeys.length?katKeys:['–'],datasets:[{data:katKeys.length?katKeys.map(k=>katMap[k]):[0],backgroundColor:katKeys.map(k=>katColors[k]||'#7c6af7'),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(255,255,255,.12)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#444',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>fRp(v)}}}}
+  });
+
+  // ── Donut: income vs expense ───────────────────────
+  if(finDonutC)finDonutC.destroy();
+  if(income>0||expense>0){
+    finDonutC=new Chart($('finDonutC').getContext('2d'),{
+      type:'doughnut',
+      data:{labels:['Pemasukan','Pengeluaran'],datasets:[{data:[income,expense],backgroundColor:['#00d97e','#ff4d4d'],borderWidth:0,hoverOffset:4}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(255,255,255,.12)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,displayColors:false,callbacks:{label:c=>`${c.label}: ${fRp(c.raw)}`}}}}
+    });
+  }
+  $('fin-donut-in').textContent  = fRp(income);
+  $('fin-donut-out').textContent = fRp(expense);
+
+  // ── Table ─────────────────────────────────────────
+  $('fin-empty').style.display = rows.length===0?'block':'none';
+  $('fin-tbody').innerHTML = rows.map(t=>{
+    const isIn=t.jenis==='Pemasukan';
+    const rb=t.status==='Confirmed'?'bw':t.status==='Cancelled'?'bo':'bbe';
+    const fid=t.firestoreId||'';
+    return `<tr>
+      <td>${t.tanggal||'–'}</td>
+      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="openFinModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">${t.nama||'–'}</td>
+      <td><span class="b ${isIn?'bw':'bo'}">${t.jenis||'–'}</span></td>
+      <td style="color:var(--text2)">${t.kategori||'–'}</td>
+      <td class="${isIn?'pos':'neg'}" style="font-family:var(--mono)">${fRp(t.nominal)}</td>
+      <td><span class="b ${rb}">${t.status||'–'}</span></td>
+      <td style="color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${t.keterangan||''}">${t.keterangan||'–'}</td>
+      <td><button class="bdel" onclick="delFinTx('${fid}')">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── WIRE MODAL ────────────────────────────────────────
+$('fin-add-btn').addEventListener('click', () => openFinModal());
+$('fin-cancel').addEventListener('click', () => $('md-finance').classList.remove('open'));
+$('md-finance').addEventListener('click', e => { if(e.target===$('md-finance')) $('md-finance').classList.remove('open'); });
+
+$('fin-save').addEventListener('click', async () => {
+  const nama = $('fin-f-nama').value.trim();
+  if (!nama) { $('fin-f-nama').style.borderColor='#ff4d4d'; $('fin-f-nama').focus(); return; }
+  const data = {
+    tanggal:    $('fin-f-tgl').value,
+    jenis:      $('fin-f-jenis').value,
+    nama,
+    kategori:   $('fin-f-kat').value,
+    status:     $('fin-f-status').value,
+    nominal:    parseFloat($('fin-f-nominal').value) || 0,
+    keterangan: $('fin-f-ket').value.trim(),
+  };
+  $('md-finance').classList.remove('open');
+  await saveFinTransaction(data);
+  finEditId = null;
+});
+
+// ── WIRE PERIOD TABS & FILTERS ────────────────────────
+document.querySelectorAll('[data-fperiod]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    finPeriod = btn.dataset.fperiod;
+    document.querySelectorAll('[data-fperiod]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFinance();
+  });
+});
+$('fin-filter-jenis').addEventListener('change', renderFinance);
+$('fin-filter-kat').addEventListener('change', renderFinance);
+
+// ── WIRE NAV ──────────────────────────────────────────
+$('nav-finance').addEventListener('click', () => goPage('finance'));
 </script>
 </body>
 </html>
