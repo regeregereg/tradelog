@@ -671,6 +671,9 @@ select.fi option{background:var(--bg3);}
   <div class="ni" id="nav-calendar"><span class="nic">▦</span>Calendar</div>
   <div class="ni" id="nav-ftmo"><span class="nic">🏢</span>PropFirm</div>
   <div class="ni" id="nav-finance" style="display:none"><span class="nic">💰</span>Finance</div>
+  <div class="nlbl" style="margin-top:6px">Tools</div>
+  <div class="ni" id="nav-daily"><span class="nic">📔</span>Daily Journal</div>
+  <div class="ni" id="nav-riskcalc"><span class="nic">🧮</span>Risk Calculator</div>
 
   <div class="sbf" id="sbf">
     <span class="sync-dot" id="sync-dot"></span>
@@ -1060,6 +1063,248 @@ select.fi option{background:var(--bg3);}
         </table>
       </div>
       <div class="es" id="fin-empty" style="display:block">Belum ada transaksi — klik <strong style="color:var(--accent)">+ Tambah Transaksi</strong> untuk mulai.</div>
+    </div>
+  </div>
+
+  <!-- ══ DAILY JOURNAL PAGE ══ -->
+  <div class="page" id="page-daily">
+    <div class="ph">
+      <div>
+        <div class="pt">📔 Daily Journal</div>
+        <div class="ps" id="daily-ps">Refleksi harian trading kamu</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="date" class="fi" id="daily-date" style="width:auto;padding:6px 12px;font-size:12px">
+        <button class="btn bsm" id="daily-save-btn">💾 Simpan</button>
+      </div>
+    </div>
+
+    <!-- Quick nav: prev / next day -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
+      <button class="btng bsm" id="daily-prev-btn">‹ Kemarin</button>
+      <button class="btng bsm" id="daily-next-btn">Besok ›</button>
+      <button class="btng bsm" id="daily-today-btn">Hari Ini</button>
+      <div id="daily-status" style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-left:4px"></div>
+    </div>
+
+    <!-- Journal form -->
+    <div class="g2" style="margin-bottom:14px">
+      <!-- Left column -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- Market bias -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">📊 Market Bias</div></div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <button class="bias-btn" data-bias="Bullish" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s">🟢 Bullish</button>
+            <button class="bias-btn" data-bias="Bearish" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s">🔴 Bearish</button>
+            <button class="bias-btn" data-bias="Neutral" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s">⚪ Neutral</button>
+          </div>
+          <input class="fi" type="text" id="daily-pairs" placeholder="Pair yang mau diwatch: XAUUSD, EURUSD..." style="font-size:12px">
+        </div>
+
+        <!-- Pre-market plan -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">🎯 Pre-Market Plan</div></div>
+          <textarea class="ta" id="daily-preplan" placeholder="Rencana trading hari ini...&#10;- Key level yang diperhatikan&#10;- Setup yang dicari&#10;- Kondisi yang harus ada sebelum entry" style="min-height:100px"></textarea>
+        </div>
+
+        <!-- Mood & energy -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">🧠 Kondisi Mental</div></div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <button class="mood-btn" data-mood="Fokus" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ Fokus</button>
+            <button class="mood-btn" data-mood="Tenang" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Tenang</button>
+            <button class="mood-btn" data-mood="Cemas" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Cemas</button>
+            <button class="mood-btn" data-mood="Greed" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">🤑 Greed</button>
+          </div>
+          <textarea class="ta" id="daily-mental" placeholder="Catatan kondisi mental hari ini..." style="min-height:60px"></textarea>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- Post-market review -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">📝 Post-Market Review</div></div>
+          <textarea class="ta" id="daily-review" placeholder="Review setelah market tutup...&#10;- Apa yang terjadi hari ini?&#10;- Trade mana yang dieksekusi?&#10;- Apakah mengikuti plan?" style="min-height:100px"></textarea>
+        </div>
+
+        <!-- Lessons learned -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">💡 Pelajaran Hari Ini</div></div>
+          <textarea class="ta" id="daily-lessons" placeholder="Apa yang kamu pelajari hari ini?&#10;Satu lesson spesifik yang akan kamu ingat..." style="min-height:80px"></textarea>
+        </div>
+
+        <!-- Rules followed -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">✅ Checklist Hari Ini</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="daily-checklist">
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+              <input type="checkbox" id="chk-plan" style="accent-color:var(--accent)"> Mengikuti trading plan
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+              <input type="checkbox" id="chk-risk" style="accent-color:var(--accent)"> Menjaga risk management
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+              <input type="checkbox" id="chk-emotion" style="accent-color:var(--accent)"> Tidak trading karena emosi
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+              <input type="checkbox" id="chk-patience" style="accent-color:var(--accent)"> Bersabar menunggu setup
+            </label>
+          </div>
+        </div>
+
+        <!-- Daily rating -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px">
+            <div class="ct">⭐ Rating Hari Ini</div>
+            <div id="daily-rating-val" style="font-size:14px;font-weight:600;color:var(--accent)">—</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input type="range" id="daily-rating" min="1" max="10" value="5"
+              style="flex:1;accent-color:var(--accent)">
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px">
+            <span>1 — Sangat Buruk</span><span>10 — Luar Biasa</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Past journal entries list -->
+    <div class="cc">
+      <div class="ch">
+        <div class="ct">📅 Riwayat Journal</div>
+        <div class="cm" id="daily-count">0 entri</div>
+      </div>
+      <div id="daily-history" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Belum ada journal — isi form di atas dan klik Simpan.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RISK CALCULATOR PAGE ══ -->
+  <div class="page" id="page-riskcalc">
+    <div class="ph">
+      <div>
+        <div class="pt">🧮 Risk Calculator</div>
+        <div class="ps">Hitung lot size & risk sebelum entry</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <!-- Calculator inputs -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="cc" style="margin-bottom:0;padding:20px">
+          <div class="ch" style="margin-bottom:16px"><div class="ct">📊 Parameter Akun</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="fgg">
+              <label class="fl">Account Balance ($)</label>
+              <input class="fi" type="number" id="rc-balance" placeholder="10000" step="any">
+            </div>
+            <div class="fgg">
+              <label class="fl">Risk Per Trade (%)</label>
+              <div style="position:relative">
+                <input class="fi" type="number" id="rc-risk-pct" placeholder="1" step="0.1" min="0.1" max="10">
+                <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);font-family:var(--mono)" id="rc-risk-dollar">= $0</div>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+                <button class="btng bsm rc-pct-btn" data-pct="0.5">0.5%</button>
+                <button class="btng bsm rc-pct-btn" data-pct="1">1%</button>
+                <button class="btng bsm rc-pct-btn" data-pct="2">2%</button>
+                <button class="btng bsm rc-pct-btn" data-pct="3">3%</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc" style="margin-bottom:0;padding:20px">
+          <div class="ch" style="margin-bottom:16px"><div class="ct">📍 Parameter Trade</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="fgg">
+              <label class="fl">Instrumen</label>
+              <select class="fi" id="rc-instrument">
+                <optgroup label="Forex">
+                  <option value="forex_major">Forex Major (EURUSD, GBPUSD, dll)</option>
+                  <option value="forex_jpy">Forex JPY (USDJPY, dll)</option>
+                </optgroup>
+                <optgroup label="Komoditas">
+                  <option value="gold" selected>Gold / XAUUSD</option>
+                  <option value="silver">Silver / XAGUSD</option>
+                  <option value="oil">Oil / WTI</option>
+                </optgroup>
+                <optgroup label="Crypto">
+                  <option value="btc">Bitcoin (BTC)</option>
+                  <option value="other_crypto">Crypto lainnya</option>
+                </optgroup>
+                <optgroup label="Indices">
+                  <option value="indices">Indices (NAS100, SPX500)</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="fgg">
+              <label class="fl">Entry Price</label>
+              <input class="fi" type="number" id="rc-entry" placeholder="2350.00" step="any">
+            </div>
+            <div class="fgg">
+              <label class="fl">Stop Loss Price</label>
+              <input class="fi" type="number" id="rc-sl" placeholder="2340.00" step="any">
+            </div>
+            <div class="fgg">
+              <label class="fl">Take Profit Price (opsional)</label>
+              <input class="fi" type="number" id="rc-tp" placeholder="2380.00" step="any">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- Main result -->
+        <div style="background:linear-gradient(135deg,rgba(124,106,247,.12),rgba(0,217,126,.06));border:1px solid rgba(124,106,247,.3);border-radius:14px;padding:24px;text-align:center">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Lot Size yang Disarankan</div>
+          <div id="rc-lot" style="font-size:44px;font-weight:800;font-family:var(--mono);color:var(--accent);line-height:1">0.00</div>
+          <div id="rc-lot-label" style="font-size:12px;color:var(--text2);margin-top:6px">lots</div>
+        </div>
+
+        <!-- Breakdown cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="sc">
+            <div class="sl">Risk ($)</div>
+            <div class="sv neg" id="rc-risk-val">$0</div>
+            <div class="sch neu" id="rc-risk-pct-val">0% dari balance</div>
+          </div>
+          <div class="sc">
+            <div class="sl">SL (pips/points)</div>
+            <div class="sv neu" id="rc-sl-pips">0</div>
+            <div class="sch neu">jarak stop loss</div>
+          </div>
+          <div class="sc">
+            <div class="sl">Potential Profit</div>
+            <div class="sv pos" id="rc-profit">$0</div>
+            <div class="sch neu" id="rc-rr">R:R —</div>
+          </div>
+          <div class="sc">
+            <div class="sl">Value per Pip</div>
+            <div class="sv neu" id="rc-pip-val">$0</div>
+            <div class="sch neu" id="rc-pip-label">per pip/point</div>
+          </div>
+        </div>
+
+        <!-- Warning / tips -->
+        <div id="rc-warning" style="display:none;background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);border-radius:10px;padding:12px 16px;font-size:12px;color:#f5c842;line-height:1.5"></div>
+
+        <!-- Log to journal button -->
+        <button class="btn" id="rc-log-btn" style="width:100%;padding:12px;font-size:14px">
+          📝 Log Trade dengan setup ini
+        </button>
+
+        <!-- Pip reference table -->
+        <div class="cc" style="margin-bottom:0;padding:16px">
+          <div class="ch" style="margin-bottom:10px"><div class="ct">📚 Referensi Pip Value</div></div>
+          <div id="rc-pip-ref" style="font-size:11px;color:var(--text3);font-family:var(--mono);line-height:1.8"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1957,6 +2202,7 @@ onAuthStateChanged(auth, async user => {
     listenTrades(user.uid);
     updateFinanceNav();
     if (isOwner()) listenFinance();
+    listenDaily();
     if (pendingAction === 'openTrade') {
       pendingAction = null;
       setTimeout(() => openTrade(), 600);
@@ -2232,6 +2478,8 @@ function goPage(name) {
   if (name === 'calendar')  renderCal();
   if (name === 'ftmo')      renderFtmo();
   if (name === 'finance')   renderFinance();
+  if (name === 'daily')     renderDailyPage();
+  if (name === 'riskcalc')  calcRisk();
   if (isMob()) closeSB();
 }
 ['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
@@ -2242,7 +2490,7 @@ function goPage(name) {
 function restorePage() {
   try {
     const saved = sessionStorage.getItem('tl_page');
-    if (saved && ['dashboard','journal','analytics','calendar','ftmo','finance'].includes(saved)) {
+    if (saved && ['dashboard','journal','analytics','calendar','ftmo','finance','daily','riskcalc'].includes(saved)) {
       goPage(saved);
     }
   } catch(e) {}
@@ -3200,6 +3448,388 @@ $('fin-filter-kat').addEventListener('change', renderFinance);
 
 // ── WIRE NAV ──────────────────────────────────────────
 $('nav-finance').addEventListener('click', () => goPage('finance'));
+
+// ══════════════════════════════════════════════════════
+// ── DAILY JOURNAL MODULE ───────────────────────────────
+// ══════════════════════════════════════════════════════
+
+let dailyData   = {};  // { 'YYYY-MM-DD': { bias, pairs, preplan, review, lessons, mood, mental, rating, checklist } }
+let dailyDate   = new Date().toISOString().slice(0,10);
+let unsubDaily  = null;
+
+// ── Listen realtime ──────────────────────────────────
+function listenDaily() {
+  if (!currentUser || currentUser.isAnonymous) return;
+  const ref = doc(db, 'users', currentUser.uid, 'meta', 'dailyJournal');
+  onSnapshot(ref, snap => {
+    dailyData = snap.exists() ? (snap.data().entries || {}) : {};
+    loadDailyEntry(dailyDate);
+    renderDailyHistory();
+  });
+}
+
+// ── Save entry to Firestore ───────────────────────────
+async function saveDailyEntry() {
+  if (!currentUser || currentUser.isAnonymous) {
+    alert('Login dengan email untuk menyimpan Daily Journal.'); return;
+  }
+  const entry = {
+    bias:     document.querySelector('.bias-btn.active')?.dataset.bias || '',
+    mood:     document.querySelector('.mood-btn.active')?.dataset.mood || '',
+    pairs:    $('daily-pairs').value.trim(),
+    preplan:  $('daily-preplan').value.trim(),
+    review:   $('daily-review').value.trim(),
+    lessons:  $('daily-lessons').value.trim(),
+    mental:   $('daily-mental').value.trim(),
+    rating:   parseInt($('daily-rating').value),
+    checklist: {
+      plan:     $('chk-plan').checked,
+      risk:     $('chk-risk').checked,
+      emotion:  $('chk-emotion').checked,
+      patience: $('chk-patience').checked,
+    },
+    savedAt: new Date().toISOString(),
+  };
+  dailyData[dailyDate] = entry;
+  const ref = doc(db, 'users', currentUser.uid, 'meta', 'dailyJournal');
+  await setDoc(ref, { entries: dailyData }, { merge: true });
+  $('daily-status').textContent = '✓ Tersimpan ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  $('daily-status').style.color = '#00d97e';
+  renderDailyHistory();
+}
+
+// ── Load entry to form ────────────────────────────────
+function loadDailyEntry(dateStr) {
+  dailyDate = dateStr;
+  $('daily-date').value = dateStr;
+  $('daily-ps').textContent = new Date(dateStr + 'T12:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const e = dailyData[dateStr] || {};
+
+  // Bias buttons
+  document.querySelectorAll('.bias-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.bias === e.bias);
+    b.style.background  = b.dataset.bias === e.bias ? 'rgba(124,106,247,.2)' : 'var(--bg3)';
+    b.style.borderColor = b.dataset.bias === e.bias ? 'var(--accent)' : 'var(--border)';
+    b.style.color       = b.dataset.bias === e.bias ? 'var(--text)' : 'var(--text2)';
+  });
+
+  // Mood buttons
+  document.querySelectorAll('.mood-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mood === e.mood);
+    b.style.background  = b.dataset.mood === e.mood ? 'rgba(124,106,247,.15)' : 'var(--bg3)';
+    b.style.borderColor = b.dataset.mood === e.mood ? 'var(--accent)' : 'var(--border)';
+    b.style.color       = b.dataset.mood === e.mood ? 'var(--text)' : 'var(--text2)';
+  });
+
+  $('daily-pairs').value    = e.pairs   || '';
+  $('daily-preplan').value  = e.preplan || '';
+  $('daily-review').value   = e.review  || '';
+  $('daily-lessons').value  = e.lessons || '';
+  $('daily-mental').value   = e.mental  || '';
+  $('daily-rating').value   = e.rating  || 5;
+  $('daily-rating-val').textContent = (e.rating || 5) + '/10';
+
+  // Checklist
+  const chk = e.checklist || {};
+  $('chk-plan').checked     = chk.plan     || false;
+  $('chk-risk').checked     = chk.risk     || false;
+  $('chk-emotion').checked  = chk.emotion  || false;
+  $('chk-patience').checked = chk.patience || false;
+
+  $('daily-status').textContent = e.savedAt
+    ? '💾 Tersimpan ' + new Date(e.savedAt).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})
+    : '● Belum disimpan';
+  $('daily-status').style.color = e.savedAt ? 'var(--text3)' : '#f5c842';
+}
+
+// ── Render history list ───────────────────────────────
+function renderDailyHistory() {
+  const entries = Object.entries(dailyData).sort((a,b) => b[0].localeCompare(a[0])).slice(0,30);
+  $('daily-count').textContent = Object.keys(dailyData).length + ' entri';
+  if (!entries.length) {
+    $('daily-history').innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Belum ada journal — isi form di atas dan klik Simpan.</div>';
+    return;
+  }
+  const starColor = r => r>=8?'#00d97e':r>=5?'#f5c842':'#ff4d4d';
+  $('daily-history').innerHTML = entries.map(([date, e]) => {
+    const d = new Date(date + 'T12:00:00');
+    const label = d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short'});
+    const biasIcon = {Bullish:'🟢',Bearish:'🔴',Neutral:'⚪'}[e.bias]||'—';
+    const moodIcon = {Fokus:'⚡',Tenang:'😌',Cemas:'😰',Greed:'🤑'}[e.mood]||'—';
+    const chkCount = Object.values(e.checklist||{}).filter(Boolean).length;
+    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:border-color .15s"
+      onclick="loadDailyEntry('${date}')"
+      onmouseover="this.style.borderColor='var(--border2)'"
+      onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${label}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px">${biasIcon} ${e.bias||'—'}</span>
+          <span style="font-size:12px">${moodIcon}</span>
+          <span style="font-size:12px;font-weight:700;font-family:var(--mono);color:${starColor(e.rating||5)}">${e.rating||5}/10</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${chkCount}/4 ✓</span>
+        </div>
+      </div>
+      ${e.lessons ? `<div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💡 ${e.lessons}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Render daily page ────────────────────────────────
+function renderDailyPage() {
+  loadDailyEntry(dailyDate);
+}
+
+// ── Wire Daily Journal buttons ─────────────────────
+$('daily-save-btn').addEventListener('click', saveDailyEntry);
+$('daily-date').addEventListener('change', e => loadDailyEntry(e.target.value));
+$('daily-today-btn').addEventListener('click', () => loadDailyEntry(new Date().toISOString().slice(0,10)));
+$('daily-prev-btn').addEventListener('click', () => {
+  const d = new Date(dailyDate + 'T12:00:00');
+  d.setDate(d.getDate() - 1);
+  loadDailyEntry(d.toISOString().slice(0,10));
+});
+$('daily-next-btn').addEventListener('click', () => {
+  const d = new Date(dailyDate + 'T12:00:00');
+  d.setDate(d.getDate() + 1);
+  const next = d.toISOString().slice(0,10);
+  if (next <= new Date().toISOString().slice(0,10)) loadDailyEntry(next);
+});
+$('daily-rating').addEventListener('input', e => {
+  $('daily-rating-val').textContent = e.target.value + '/10';
+});
+document.querySelectorAll('.bias-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bias-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text2)';
+    });
+    btn.classList.add('active');
+    btn.style.background='rgba(124,106,247,.2)';btn.style.borderColor='var(--accent)';btn.style.color='var(--text)';
+  });
+});
+document.querySelectorAll('.mood-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mood-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background='var(--bg3)';b.style.borderColor='var(--border)';b.style.color='var(--text2)';
+    });
+    btn.classList.add('active');
+    btn.style.background='rgba(124,106,247,.15)';btn.style.borderColor='var(--accent)';btn.style.color='var(--text)';
+  });
+});
+$('nav-daily').addEventListener('click', () => goPage('daily'));
+
+// ══════════════════════════════════════════════════════
+// ── RISK CALCULATOR MODULE ─────────────────────────────
+// ══════════════════════════════════════════════════════
+
+// Pip value config per instrument (value per 1 lot per 1 pip/point in USD)
+const PIP_CONFIG = {
+  forex_major:  { pipVal: 10,    pipSize: 0.0001, unit: 'lots',   label: 'Forex Major',  ref: '1 lot = $10/pip' },
+  forex_jpy:    { pipVal: 9.09,  pipSize: 0.01,   unit: 'lots',   label: 'Forex JPY',    ref: '1 lot ≈ $9.09/pip (varies)' },
+  gold:         { pipVal: 10,    pipSize: 0.01,   unit: 'lots',   label: 'Gold (XAUUSD)',ref: '1 lot = $10/point ($0.01 move)' },
+  silver:       { pipVal: 50,    pipSize: 0.001,  unit: 'lots',   label: 'Silver (XAG)', ref: '1 lot = $50/point' },
+  oil:          { pipVal: 10,    pipSize: 0.01,   unit: 'lots',   label: 'Oil (WTI)',    ref: '1 lot = $10/point' },
+  btc:          { pipVal: 1,     pipSize: 1,      unit: 'units',  label: 'Bitcoin',      ref: 'Value = $1/unit per $1 move' },
+  other_crypto: { pipVal: 1,     pipSize: 1,      unit: 'units',  label: 'Crypto',       ref: 'Value = size × price move' },
+  indices:      { pipVal: 1,     pipSize: 0.1,    unit: 'lots',   label: 'Indices',      ref: '1 lot ≈ $1-10/point (varies)' },
+};
+
+function calcRisk() {
+  const balance    = parseFloat($('rc-balance').value) || 0;
+  const riskPct    = parseFloat($('rc-risk-pct').value) || 1;
+  const entry      = parseFloat($('rc-entry').value) || 0;
+  const sl         = parseFloat($('rc-sl').value) || 0;
+  const tp         = parseFloat($('rc-tp').value) || 0;
+  const instrument = $('rc-instrument').value;
+  const cfg        = PIP_CONFIG[instrument] || PIP_CONFIG.forex_major;
+
+  // Risk in dollars
+  const riskDollar = balance * riskPct / 100;
+  $('rc-risk-dollar').textContent = '= $' + riskDollar.toFixed(2);
+  $('rc-risk-val').textContent = '$' + riskDollar.toFixed(2);
+  $('rc-risk-pct-val').textContent = riskPct + '% dari balance';
+
+  if (!entry || !sl) {
+    $('rc-lot').textContent = '—';
+    $('rc-sl-pips').textContent = '—';
+    return;
+  }
+
+  // SL distance in pips/points
+  const slDist     = Math.abs(entry - sl);
+  const slPips     = slDist / cfg.pipSize;
+  $('rc-sl-pips').textContent = slPips.toFixed(1);
+
+  // Lot size
+  const pipValuePerLot = cfg.pipVal;
+  const lotSize = riskDollar / (slPips * pipValuePerLot);
+
+  // Round to sensible precision
+  let lotDisplay, lotRounded;
+  if (cfg.unit === 'units') {
+    lotRounded = Math.floor(lotSize * 100) / 100;
+    lotDisplay = lotRounded.toFixed(2);
+  } else {
+    if (lotSize >= 1)      { lotRounded = Math.floor(lotSize * 100)/100; lotDisplay = lotRounded.toFixed(2); }
+    else if (lotSize >= 0.1) { lotRounded = Math.floor(lotSize * 100)/100; lotDisplay = lotRounded.toFixed(2); }
+    else                   { lotRounded = Math.floor(lotSize * 1000)/1000; lotDisplay = lotRounded.toFixed(3); }
+  }
+
+  $('rc-lot').textContent = lotDisplay;
+  $('rc-lot-label').textContent = cfg.unit + ' — ' + cfg.label;
+  $('rc-pip-val').textContent = '$' + (lotRounded * pipValuePerLot).toFixed(2);
+  $('rc-pip-label').textContent = 'per pip/point (' + cfg.unit + ')';
+
+  // TP & R:R
+  if (tp && entry) {
+    const tpDist   = Math.abs(tp - entry);
+    const tpPips   = tpDist / cfg.pipSize;
+    const tpProfit = tpPips * pipValuePerLot * lotRounded;
+    const rr       = (tpDist / slDist).toFixed(2);
+    $('rc-profit').textContent = '$' + tpProfit.toFixed(2);
+    $('rc-rr').textContent     = 'R:R 1:' + rr;
+    $('rc-rr').style.color     = parseFloat(rr) >= 2 ? '#00d97e' : parseFloat(rr) >= 1 ? '#f5c842' : '#ff4d4d';
+  } else {
+    $('rc-profit').textContent = '—';
+    $('rc-rr').textContent     = 'masukkan TP untuk hitung R:R';
+    $('rc-rr').style.color     = 'var(--text3)';
+  }
+
+  // Warnings
+  const warn = [];
+  if (riskPct > 2) warn.push('⚠️ Risk ' + riskPct + '% tergolong tinggi. Sebagian besar prop firm membatasi max 1-2% per trade.');
+  if (lotRounded < 0.01 && cfg.unit === 'lots') warn.push('ℹ️ Lot size sangat kecil. Pertimbangkan broker yang support micro lot (0.001).');
+  if (slPips < 5 && instrument.includes('forex')) warn.push('⚠️ SL terlalu ketat. Bisa kena spread + slippage.');
+  const warnEl = $('rc-warning');
+  warnEl.style.display = warn.length ? 'block' : 'none';
+  warnEl.innerHTML = warn.join('<br>');
+
+  // Pip reference
+  $('rc-pip-ref').innerHTML = Object.values(PIP_CONFIG).map(c =>
+    `<div>${c.label}: ${c.ref}</div>`
+  ).join('');
+}
+
+// ── Wire Risk Calculator ──────────────────────────────
+['rc-balance','rc-risk-pct','rc-entry','rc-sl','rc-tp'].forEach(id => {
+  $(id).addEventListener('input', calcRisk);
+});
+$('rc-instrument').addEventListener('change', calcRisk);
+document.querySelectorAll('.rc-pct-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('rc-risk-pct').value = btn.dataset.pct;
+    calcRisk();
+  });
+});
+// Auto-fill balance from trading account balance
+$('nav-riskcalc').addEventListener('click', () => {
+  goPage('riskcalc');
+  if (bal && !$('rc-balance').value) {
+    $('rc-balance').value = bal;
+    calcRisk();
+  }
+});
+$('rc-log-btn').addEventListener('click', () => {
+  // Pre-fill trade modal with risk calc data
+  if (!currentUser) { openLoginScreen('log'); return; }
+  $('f-en').value = $('rc-entry').value;
+  $('f-sl').value = $('rc-sl').value;
+  const riskDollar = (parseFloat($('rc-balance').value)||bal) * (parseFloat($('rc-risk-pct').value)||1) / 100;
+  $('f-rk').value = riskDollar.toFixed(2);
+  goPage('journal');
+  openTrade();
+});
+// Init on load
+$('rc-balance').placeholder = bal ? bal.toLocaleString() : '10000';
+
+// ══════════════════════════════════════════════════════
+// ── EXPORT MODULE ──────────────────────────────────────
+// ══════════════════════════════════════════════════════
+
+// Add export button to journal page header
+(function addExportBtn() {
+  const journalBtns = $('journal-log-btn')?.parentElement;
+  if (!journalBtns) return;
+  const exportBtn = document.createElement('button');
+  exportBtn.className = 'btng bsm';
+  exportBtn.innerHTML = '⬇️ Export';
+  exportBtn.id = 'export-btn';
+  journalBtns.insertBefore(exportBtn, $('journal-log-btn'));
+
+  exportBtn.addEventListener('click', () => {
+    if (!trades.length) { alert('Belum ada trade untuk di-export.'); return; }
+    showExportModal();
+  });
+})();
+
+function showExportModal() {
+  // Create inline modal
+  const existing = document.getElementById('md-export');
+  if (existing) { existing.classList.add('open'); return; }
+
+  const modal = document.createElement('div');
+  modal.id = 'md-export';
+  modal.className = 'mo open';
+  modal.innerHTML = `
+    <div class="md" style="max-width:360px;text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">⬇️</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:6px">Export Journal</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">${trades.length} trade siap di-export</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn" id="exp-csv" style="width:100%;padding:12px">📊 Export ke CSV (Excel)</button>
+        <button class="btng" id="exp-json" style="width:100%">📋 Export ke JSON</button>
+        <button class="btng" id="exp-close" style="width:100%">Batal</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+
+  modal.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
+  $('exp-close').addEventListener('click', () => modal.classList.remove('open'));
+  $('exp-csv').addEventListener('click', () => { exportCSV(); modal.classList.remove('open'); });
+  $('exp-json').addEventListener('click', () => { exportJSON(); modal.classList.remove('open'); });
+}
+
+function exportCSV() {
+  const headers = ['#','Date','Pair','Direction','Session','Entry','Exit','SL','Risk($)','PnL($)','R-Multiple','Result','Setup','Emotion','Notes'];
+  const rows = trades.map((t,i) => [
+    i+1, t.date||'', t.pair||'', t.dir||'', t.session||'',
+    t.entry||'', t.exit||'', t.sl||'',
+    t.risk||0, t.pnl||0, t.r||0,
+    t.result||'', t.setup||'', t.emotion||'',
+    (t.notes||'').replace(/,/g,'；').replace(/
+/g,' ')
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('
+');
+  downloadFile('riskpertrade-journal-' + new Date().toISOString().slice(0,10) + '.csv', csv, 'text/csv');
+}
+
+function exportJSON() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    totalTrades: trades.length,
+    balance: bal,
+    trades: trades.map(({firestoreId, ...t}) => t)
+  };
+  downloadFile('riskpertrade-journal-' + new Date().toISOString().slice(0,10) + '.json',
+    JSON.stringify(data, null, 2), 'application/json');
+}
+
+function downloadFile(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Wire listenDaily after login ──────────────────────
+// (added to onAuthStateChanged flow via updateAll)
 
 // ══════════════════════════════════════════════════════
 // ── ONBOARDING TOUR ────────────────────────────────────
