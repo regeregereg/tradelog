@@ -1633,6 +1633,23 @@ import { getFirestore, doc, getDoc, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
+// ── FIREBASE INIT ──────────────────────────────────────
+const app = initializeApp({
+  apiKey: "AIzaSyC3vzvNh4vW4w9bDmVC0dkdtjFn7d2pKrA",
+  authDomain: "tradelog-regy.firebaseapp.com",
+  projectId: "tradelog-regy",
+  storageBucket: "tradelog-regy.firebasestorage.app",
+  messagingSenderId: "659047734617",
+  appId: "1:659047734617:web:9a15dc87aa9fa393c84048"
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── HELPERS ───────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const f2 = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const isMob = () => window.innerWidth <= 768;
+
 // ── INVITE CHECK ───────────────────────────────────────
 async function isEmailInvited(email, uid) {
   if (!email) return false;
@@ -1679,23 +1696,6 @@ function showLoginPanel() {
   $('login-panel').style.display      = 'block';
   showEmailStep();
 }
-
-// ── FIREBASE INIT ──────────────────────────────────────
-const app = initializeApp({
-  apiKey: "AIzaSyC3vzvNh4vW4w9bDmVC0dkdtjFn7d2pKrA",
-  authDomain: "tradelog-regy.firebaseapp.com",
-  projectId: "tradelog-regy",
-  storageBucket: "tradelog-regy.firebasestorage.app",
-  messagingSenderId: "659047734617",
-  appId: "1:659047734617:web:9a15dc87aa9fa393c84048"
-});
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
-// ── HELPERS ───────────────────────────────────────────
-const $ = id => document.getElementById(id);
-const f2 = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-const isMob = () => window.innerWidth <= 768;
 
 // ── STATE ─────────────────────────────────────────────
 let trades = [], bal = 0, calOff = 0, sbOpen = false;
@@ -3302,7 +3302,7 @@ window.delFinTx = async (firestoreId) => {
 };
 
 // ── OPEN MODAL ────────────────────────────────────────
-function openFinModal(tx = null) {
+window.openFinModal = function openFinModal(tx = null) {
   finEditId = tx ? tx.firestoreId : null;
   $('fin-modal-title').textContent = tx ? 'Edit Transaksi' : 'Tambah Transaksi';
   $('fin-f-tgl').value     = tx?.tanggal  || new Date().toISOString().slice(0,10);
@@ -3401,13 +3401,13 @@ function renderFinance() {
     const fid=t.firestoreId||'';
     return `<tr>
       <td>${t.tanggal||'–'}</td>
-      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="openFinModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">${t.nama||'–'}</td>
+      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="window.openFinModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">${t.nama||'–'}</td>
       <td><span class="b ${isIn?'bw':'bo'}">${t.jenis||'–'}</span></td>
       <td style="color:var(--text2)">${t.kategori||'–'}</td>
       <td class="${isIn?'pos':'neg'}" style="font-family:var(--mono)">${fRp(t.nominal)}</td>
       <td><span class="b ${rb}">${t.status||'–'}</span></td>
       <td style="color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${t.keterangan||''}">${t.keterangan||'–'}</td>
-      <td><button class="bdel" onclick="delFinTx('${fid}')">✕</button></td>
+      <td><button class="bdel" onclick="window.delFinTx('${fid}')">✕</button></td>
     </tr>`;
   }).join('');
 }
@@ -3499,7 +3499,7 @@ async function saveDailyEntry() {
 }
 
 // ── Load entry to form ────────────────────────────────
-function loadDailyEntry(dateStr) {
+window.loadDailyEntry = function loadDailyEntry(dateStr) {
   dailyDate = dateStr;
   $('daily-date').value = dateStr;
   $('daily-ps').textContent = new Date(dateStr + 'T12:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -3559,7 +3559,7 @@ function renderDailyHistory() {
     const moodIcon = {Fokus:'⚡',Tenang:'😌',Cemas:'😰',Greed:'🤑'}[e.mood]||'—';
     const chkCount = Object.values(e.checklist||{}).filter(Boolean).length;
     return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:border-color .15s"
-      onclick="loadDailyEntry('${date}')"
+      onclick="window.loadDailyEntry('${date}')"
       onmouseover="this.style.borderColor='var(--border2)'"
       onmouseout="this.style.borderColor='var(--border)'">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
@@ -3799,11 +3799,9 @@ function exportCSV() {
     t.entry||'', t.exit||'', t.sl||'',
     t.risk||0, t.pnl||0, t.r||0,
     t.result||'', t.setup||'', t.emotion||'',
-    (t.notes||'').replace(/,/g,'；').replace(/
-/g,' ')
+    (t.notes||'').replace(/,/g,'；').replace(/\n/g,' ')
   ]);
-  const csv = [headers, ...rows].map(r => r.join(',')).join('
-');
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
   downloadFile('riskpertrade-journal-' + new Date().toISOString().slice(0,10) + '.csv', csv, 'text/csv');
 }
 
