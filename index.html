@@ -512,6 +512,18 @@ select.fi option{background:var(--bg3);}
   .topbar{display:none !important;}
   .sidebar{top:0;height:100vh;}
 }
+
+/* ── BOTTOM NAV CLEARANCE: push fixed popups above nav on mobile ── */
+@media(max-width:768px){
+  #anon-banner{
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 10px) !important;
+    width: calc(100% - 24px) !important;
+  }
+  #float-cta{
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 12px) !important;
+    right: 12px !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1414,7 +1426,7 @@ select.fi option{background:var(--bg3);}
   </div>
 
   <!-- ANON UPGRADE BANNER — shown inside main for anonymous users -->
-  <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:500px">
+  <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:500px;transition:bottom .25s">
     <div style="background:linear-gradient(135deg,#1a1040,#0f0f1a);border:1px solid rgba(124,106,247,.4);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);flex-wrap:wrap">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
@@ -1437,7 +1449,7 @@ select.fi option{background:var(--bg3);}
 </main>
 
 <!-- ══ FLOATING CTA — shown only to guests (not logged in) ══ -->
-<div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:300;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards">
+<div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:300;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:bottom .25s">
 
   <!-- Dismiss button -->
   <button id="float-cta-dismiss"
@@ -1551,7 +1563,7 @@ select.fi option{background:var(--bg3);}
 }
 #float-cta { animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards; }
 @media(max-width:768px){
-  #float-cta { bottom:16px; right:16px; }
+  #float-cta { bottom:calc(62px + env(safe-area-inset-bottom,0px) + 12px); right:12px; }
   #float-cta > div:last-child { width:240px; }
 }
 </style>
