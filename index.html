@@ -118,6 +118,9 @@ function bnGo(p){if(window._bnReady)window._bnReady.bnGo(p);else window._bnQueue
 function bnToggleSB(){if(window._bnReady)window._bnReady.bnToggleSB();else window._bnQueue.push(['bnToggleSB']);}
 function openTrade(){if(window._bnReady)window._bnReady.openTrade();else window._bnQueue.push(['openTrade']);}
 function clearScreenshot(){if(window._bnReady)window._bnReady.clearScreenshot();}
+function bnMoreToggle(){if(window._bnReady)window._bnReady.bnMoreToggle();else window._bnQueue.push(['bnMoreToggle']);}
+function bnMoreClose(){if(window._bnReady)window._bnReady.bnMoreClose();}
+function bnMoreGo(p){if(window._bnReady)window._bnReady.bnMoreGo(p);else window._bnQueue.push(['bnMoreGo',p]);}
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -527,6 +530,35 @@ select.fi option{background:var(--bg3);}
     right: 12px !important;
   }
 }
+
+/* ── MORE POPUP ── */
+@keyframes morePopIn{
+  from{opacity:0;transform:scale(0.88) translateY(10px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+.bmp-item{
+  display:flex;align-items:center;gap:10px;
+  width:100%;border:none;background:none;
+  padding:9px 10px;border-radius:12px;
+  cursor:pointer;text-align:left;
+  transition:background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.bmp-item:active,.bmp-item:hover{background:rgba(255,255,255,0.06);}
+.bmp-item.active-page{background:rgba(124,106,247,0.12);}
+.bmp-icon{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.bmp-label{
+  font-size:13px;font-weight:500;color:#e8e8e8;
+  font-family:'DM Sans',sans-serif;flex:1;
+}
+.bmp-arrow{
+  font-size:10px;color:rgba(255,255,255,0.2);
+  flex-shrink:0;
+}
 </style>
 </head>
 <body>
@@ -761,8 +793,8 @@ select.fi option{background:var(--bg3);}
       <i class="bn-icon bi bi-bar-chart-line"></i>
       <span class="bn-label">Analytics</span>
     </button>
-    <button class="bn-item" id="bn-more" onclick="bnToggleSB()">
-      <i class="bn-icon bi bi-grid"></i>
+    <button class="bn-item" id="bn-more" onclick="bnMoreToggle()">
+      <i class="bn-icon bi bi-grid-3x3-gap"></i>
       <span class="bn-label">More</span>
     </button>
   </div>
@@ -4533,16 +4565,8 @@ window._bnReady = {
     goPage(page);
   },
   bnToggleSB() {
-    if (sbOpen) {
-      closeSB();
-      const moreBtn = document.getElementById('bn-more');
-      if (moreBtn) moreBtn.classList.remove('active');
-    } else {
-      toggleSB();
-      document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-      const moreBtn = document.getElementById('bn-more');
-      if (moreBtn) moreBtn.classList.add('active');
-    }
+    // kept for compatibility — now handled by bnMoreToggle
+    bnMoreToggle();
   },
   openTrade,
   clearScreenshot,
@@ -4568,6 +4592,73 @@ document.querySelectorAll('.ni[id^="nav-"]').forEach(el => {
     bnSyncActive(page);
   });
 });
+
+// ── MORE POPUP ───────────────────────────────────────────
+let bnMoreOpen = false;
+
+function bnMoreToggle() {
+  const popup   = document.getElementById('bn-more-popup');
+  const moreBtn = document.getElementById('bn-more');
+  if (!popup) return;
+  bnMoreOpen = !bnMoreOpen;
+  popup.style.display = bnMoreOpen ? 'block' : 'none';
+  if (moreBtn) {
+    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+    if (bnMoreOpen) moreBtn.classList.add('active');
+  }
+  // Sync owner-only items visibility
+  const ownerVisible = typeof isOwner === 'function' && isOwner();
+  ['bmp-ai-review','bmp-finance'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = ownerVisible ? 'flex' : 'none';
+  });
+}
+
+function bnMoreClose() {
+  const popup   = document.getElementById('bn-more-popup');
+  const moreBtn = document.getElementById('bn-more');
+  if (popup) popup.style.display = 'none';
+  bnMoreOpen = false;
+  if (moreBtn) moreBtn.classList.remove('active');
+}
+
+function bnMoreGo(page) {
+  bnMoreClose();
+  // Special cases that open modals, not pages
+  if (page === 'reminder') {
+    const md = document.getElementById('md-reminder');
+    if (md) md.classList.add('open');
+    return;
+  }
+  if (page === 'ai-review') {
+    const md = document.getElementById('md-ai-review');
+    if (md) md.classList.add('open');
+    return;
+  }
+  bnGo(page);
+}
+
+// Register in _bnReady
+window._bnReady.bnMoreToggle = bnMoreToggle;
+window._bnReady.bnMoreClose  = bnMoreClose;
+window._bnReady.bnMoreGo     = bnMoreGo;
+window.bnMoreToggle = bnMoreToggle;
+window.bnMoreClose  = bnMoreClose;
+window.bnMoreGo     = bnMoreGo;
+
+// Close popup when navigating via bottom nav main buttons
+document.querySelectorAll('.bn-item:not(#bn-more)').forEach(btn => {
+  btn.addEventListener('click', bnMoreClose);
+});
+
+// Highlight active page in More popup when goPage is called
+const _origGoPageMore = window.goPage;
+window.goPage = function(name) {
+  _origGoPageMore(name);
+  document.querySelectorAll('.bmp-item').forEach(b => b.classList.remove('active-page'));
+  const activeItem = document.getElementById('bmp-' + name);
+  if (activeItem) activeItem.classList.add('active-page');
+};
 </script>
 <!-- ══ AI TRADE REVIEW MODAL ══ -->
 <div class="mo" id="md-ai-review">
@@ -4641,6 +4732,86 @@ document.querySelectorAll('.ni[id^="nav-"]').forEach(el => {
       <button class="btng" id="reminder-test-btn" style="flex:1;padding:10px;font-size:13px">📤 Test</button>
       <button class="btn" id="reminder-save-btn" style="flex:1;padding:10px;font-size:13px">💾 Simpan</button>
     </div>
+  </div>
+</div>
+
+
+<!-- ══ MORE POPUP (mobile bottom nav) ══ -->
+<div id="bn-more-popup" style="display:none;position:fixed;bottom:72px;right:10px;z-index:600;width:220px;">
+  <!-- backdrop tap-to-close -->
+  <div id="bn-more-backdrop" onclick="bnMoreClose()" style="position:fixed;inset:0;z-index:-1;"></div>
+  <div style="
+    background:linear-gradient(160deg,#1e1e24 0%,#141418 100%);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:18px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 0 0.5px rgba(255,255,255,0.06);
+    overflow:hidden;
+    animation:morePopIn .22s cubic-bezier(.34,1.56,.64,1);
+  ">
+
+    <!-- Header label -->
+    <div style="padding:12px 16px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;">Menu</div>
+
+    <!-- Menu section -->
+    <div style="padding:0 8px 6px;display:flex;flex-direction:column;gap:2px;">
+
+      <button class="bmp-item" id="bmp-calendar" onclick="bnMoreGo('calendar')">
+        <span class="bmp-icon" style="background:rgba(124,106,247,0.15);color:#7c6af7;"><i class="bi bi-calendar3"></i></span>
+        <span class="bmp-label">Calendar</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+      <button class="bmp-item" id="bmp-ftmo" onclick="bnMoreGo('ftmo')">
+        <span class="bmp-icon" style="background:rgba(255,77,77,0.12);color:#ff6b6b;"><i class="bi bi-building-check"></i></span>
+        <span class="bmp-label">PropFirm</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+    </div>
+
+    <!-- Divider -->
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 8px;"></div>
+
+    <!-- Tools section -->
+    <div style="padding:6px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;padding-left:16px;padding-top:10px;">Tools</div>
+    <div style="padding:0 8px 6px;display:flex;flex-direction:column;gap:2px;">
+
+      <button class="bmp-item" id="bmp-daily" onclick="bnMoreGo('daily')">
+        <span class="bmp-icon" style="background:rgba(0,217,126,0.12);color:#00d97e;"><i class="bi bi-pen"></i></span>
+        <span class="bmp-label">Daily Journal</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+      <button class="bmp-item" id="bmp-riskcalc" onclick="bnMoreGo('riskcalc')">
+        <span class="bmp-icon" style="background:rgba(245,200,66,0.12);color:#f5c842;"><i class="bi bi-calculator"></i></span>
+        <span class="bmp-label">Risk Calculator</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+      <button class="bmp-item" id="bmp-reminder" onclick="bnMoreGo('reminder')">
+        <span class="bmp-icon" style="background:rgba(100,200,255,0.12);color:#64c8ff;"><i class="bi bi-bell"></i></span>
+        <span class="bmp-label">Daily Reminder</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+      <button class="bmp-item bmp-owner" id="bmp-ai-review" onclick="bnMoreGo('ai-review')" style="display:none;">
+        <span class="bmp-icon" style="background:rgba(124,106,247,0.2);color:#a89cf7;"><i class="bi bi-stars"></i></span>
+        <span class="bmp-label">AI Trade Review</span>
+        <span style="font-size:9px;background:rgba(124,106,247,0.2);color:#a89cf7;border-radius:4px;padding:1px 5px;font-weight:600;margin-left:auto;margin-right:4px;">PRO</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+      <button class="bmp-item bmp-owner" id="bmp-finance" onclick="bnMoreGo('finance')" style="display:none;">
+        <span class="bmp-icon" style="background:rgba(0,217,126,0.15);color:#00d97e;"><i class="bi bi-wallet2"></i></span>
+        <span class="bmp-label">Finance</span>
+        <span style="font-size:9px;background:rgba(0,217,126,0.15);color:#00d97e;border-radius:4px;padding:1px 5px;font-weight:600;margin-left:auto;margin-right:4px;">PRO</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
+    </div>
+
+    <!-- Bottom arrow pointer -->
+    <div style="position:absolute;bottom:-8px;right:28px;width:16px;height:16px;background:linear-gradient(135deg,transparent 50%,#141418 50%);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:rotate(45deg);"></div>
   </div>
 </div>
 
