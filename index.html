@@ -121,6 +121,7 @@ function clearScreenshot(){if(window._bnReady)window._bnReady.clearScreenshot();
 function bnMoreToggle(){if(window._bnReady)window._bnReady.bnMoreToggle();else window._bnQueue.push(['bnMoreToggle']);}
 function bnMoreClose(){if(window._bnReady)window._bnReady.bnMoreClose();}
 function bnMoreGo(p){if(window._bnReady)window._bnReady.bnMoreGo(p);else window._bnQueue.push(['bnMoreGo',p]);}
+function bnMoreOpenTour(){bnMoreClose();if(window._bnReady&&window._bnReady.openTour)window._bnReady.openTour();else if(window.openTour)window.openTour();}
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -4639,6 +4640,7 @@ function bnMoreGo(page) {
 }
 
 // Register in _bnReady
+window._bnReady.openTour = openTour;
 window._bnReady.bnMoreToggle = bnMoreToggle;
 window._bnReady.bnMoreClose  = bnMoreClose;
 window._bnReady.bnMoreGo     = bnMoreGo;
@@ -4808,6 +4810,21 @@ window.goPage = function(name) {
         <i class="bi bi-chevron-right bmp-arrow"></i>
       </button>
 
+    </div>
+
+    <!-- Divider -->
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 8px;"></div>
+
+    <!-- Cara Penggunaan -->
+    <div style="padding:6px 8px 10px;">
+      <button class="bmp-item" onclick="bnMoreOpenTour()" style="background:rgba(124,106,247,0.07);border-radius:12px;">
+        <span class="bmp-icon" style="background:rgba(124,106,247,0.18);color:#a89cf7;"><i class="bi bi-question-circle"></i></span>
+        <div style="flex:1;">
+          <div class="bmp-label">Cara Penggunaan</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);font-family:'DM Sans',sans-serif;margin-top:1px;">Panduan fitur lengkap</div>
+        </div>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
     </div>
 
     <!-- Bottom arrow pointer -->
