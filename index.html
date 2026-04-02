@@ -71,6 +71,23 @@ window.addEventListener('load', function() {
 }
 </script>
 
+<!-- ── Critical CSS: painted instantly before any external resource loads ── -->
+<style>
+/* Prevent white flash - set bg color immediately */
+html{background:#09090b;color:#f4f4f5;}
+body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:0;min-height:100vh;}
+/* Hide all content until app JS initializes (avoids layout flash) */
+#onboard-overlay,#login-screen{display:none;}
+</style>
+<!-- ── DNS prefetch + preconnect untuk Firebase & external services ── -->
+<link rel="preconnect" href="https://tradelog-regy.firebaseapp.com">
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+<link rel="dns-prefetch" href="https://firebaseapp.com">
+<link rel="dns-prefetch" href="https://firebaseio.com">
+<link rel="dns-prefetch" href="https://googleapis.com">
+<link rel="dns-prefetch" href="https://tradelog-regy.firebasestorage.app">
+<link rel="dns-prefetch" href="https://securetoken.googleapis.com">
 <!-- ── Preconnect untuk resource penting ── -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,7 +95,10 @@ window.addEventListener('load', function() {
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
 <!-- ── Google Fonts: digabung jadi 1 request, kurangi weight yang tidak dipakai ── -->
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- ── Google Fonts: non-blocking load dengan preload trick ── -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
 
 <!-- ── Bootstrap Icons: non-blocking dengan media trick ── -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
@@ -183,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function(){
   --accent:#8b5cf6;--ad:rgba(139,92,246,0.12);
   --accent2:#a78bfa;
   --gold:#f59e0b;
-  --font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+  --font:'Syne',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:'JetBrains Mono','Courier New',Courier,monospace;
   --sbw:216px;
   --radius:14px;
   --glow:0 0 0 1px rgba(139,92,246,0.15),0 4px 24px rgba(139,92,246,0.08);
@@ -279,8 +299,8 @@ body::before{
   z-index:400;overflow-y:auto;
   transition:transform .28s cubic-bezier(.4,0,.2,1);
   backdrop-filter:blur(20px);
-}
-.sidebar.off{transform:translateX(-100%);}
+;will-change:transform;}
+.sidebar.off{transform:translateX(-100%);contain:strict;}
 .sb-btn{position:fixed;top:20px;left:calc(var(--sbw) - 14px);width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:left .28s cubic-bezier(.4,0,.2,1),background .15s;z-index:500;}
 .sb-btn:hover{background:var(--bg4);color:var(--text);}
 .sb-btn.off{left:6px;}
@@ -303,7 +323,7 @@ body::before{
 /* ── MAIN ── */
 .main{margin-left:var(--sbw);min-height:100vh;padding:32px;min-width:0;transition:margin-left .28s cubic-bezier(.4,0,.2,1);}
 .main.off{margin-left:0;}
-.page{display:none;animation:fi .25s ease;}
+.page{display:none;animation:fi .25s ease;content-visibility:auto;}
 .page.active{display:block;}
 @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
@@ -777,6 +797,30 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   }
 }
 </style>
+
+<!-- ── PWA Manifest: inject inline untuk avoid extra network request ── -->
+<script>
+(function(){
+  var manifest = {
+  "name": "RiskPerTrade",
+  "short_name": "RPT",
+  "description": "Trading Journal & PropFirm Tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGASURBVHic7dAxAQAAAMKg9U9tDB+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAMBuAABHgAAAABJRU5ErkJggg==", "sizes": "128x128", "type": "image/png" }
+  ]
+};
+  var blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var l = document.createElement('link');
+  l.rel = 'manifest'; l.href = url;
+  document.head.appendChild(l);
+})();
+</script>
 </head>
 <body>
 
@@ -5054,5 +5098,15 @@ window.goPage = function(name) {
   </div>
 </div>
 
+
+<!-- ── Service Worker: cache CDN assets & enable offline ── -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .catch(function() {}); // Silent fail - tidak kritis
+  });
+}
+</script>
 </body>
 </html>
