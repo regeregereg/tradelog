@@ -106,7 +106,7 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 
 <!-- ── Chart.js: preload + defer agar browser download lebih awal tapi tidak blocking render ── -->
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" as="script">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
 <!-- ── html2canvas: DIHAPUS dari sini, di-lazy load saat dibutuhkan ── -->
 
@@ -166,36 +166,31 @@ function _onChartReady(fn){
   if(window._chartReady) fn();
   else window._chartQueue.push(fn);
 }
-function _initChartJs(){
-  if(window._chartReady) return;
-  if(typeof Chart === 'undefined') return;
-  const CrosshairPlugin = {
-    id: 'crosshair',
-    afterDraw(chart) {
-      if (!chart._crosshairX) return;
-      const { ctx, chartArea: { top, bottom } } = chart;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(chart._crosshairX, top);
-      ctx.lineTo(chart._crosshairX, bottom);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.restore();
-    }
-  };
-  try { Chart.register(CrosshairPlugin); } catch(e){}
-  window._chartReady = true;
-  window._chartQueue.forEach(fn=>fn());
-  window._chartQueue = [];
-}
-document.addEventListener('DOMContentLoaded', _initChartJs);
-window.addEventListener('load', _initChartJs);
-(function _pollChart(n){
-  if(window._chartReady || n<=0) return;
-  setTimeout(function(){ _initChartJs(); _pollChart(n-1); }, 300);
-})(10);
+document.addEventListener('DOMContentLoaded', function(){
+  // Chart.js defer sudah selesai saat DOMContentLoaded
+  if(typeof Chart !== 'undefined'){
+    const CrosshairPlugin = {
+      id: 'crosshair',
+      afterDraw(chart) {
+        if (!chart._crosshairX) return;
+        const { ctx, chartArea: { top, bottom } } = chart;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(chart._crosshairX, top);
+        ctx.lineTo(chart._crosshairX, bottom);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.restore();
+      }
+    };
+    Chart.register(CrosshairPlugin);
+    window._chartReady = true;
+    window._chartQueue.forEach(fn=>fn());
+    window._chartQueue = [];
+  }
+});
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -3593,9 +3588,8 @@ window.eqSetPeriod = function eqSetPeriod(period, btn) {
 }
 
 function renderEq(){
-  // Jika Chart.js belum siap, antri dan jalankan setelah ready
-  if(typeof Chart === 'undefined' || !window._chartReady){
-    _onChartReady(() => renderEq());
+  if(typeof Chart === 'undefined'){
+    setTimeout(renderEq, 200);
     return;
   }
   const { L, D, rawDates, ft } = getEq();
