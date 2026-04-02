@@ -1548,14 +1548,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="position:relative;height:160px"><canvas id="finDonutC"></canvas></div>
         <div id="fin-donut-legend" style="display:flex;justify-content:center;gap:16px;margin-top:12px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="width:10px;height:10px;border-radius:50%;background:#00d97e;display:inline-block"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#a78bfa;display:inline-block"></span>
             <span style="font-size:12px;color:var(--text2)">Pemasukan</span>
-            <span id="fin-donut-in" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#00d97e">0</span>
+            <span id="fin-donut-in" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#a78bfa">0</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="width:10px;height:10px;border-radius:50%;background:#ff4d4d;display:inline-block"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#f472b6;display:inline-block"></span>
             <span style="font-size:12px;color:var(--text2)">Pengeluaran</span>
-            <span id="fin-donut-out" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#ff4d4d">0</span>
+            <span id="fin-donut-out" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#f472b6">0</span>
           </div>
         </div>
       </div>
@@ -4303,6 +4303,7 @@ const OWNER_UID = 'PASTE_YOUR_UID_HERE'; // ← Ganti dengan UID di Firebase Con
 
 // ── STATE ─────────────────────────────────────────────
 let finTrades = [];
+let finTxMap  = {};
 let finPeriod = 'all';
 let finLineC, finBarC, finDonutC;
 let finEditId  = null; // null = tambah baru, string = edit existing
@@ -4342,6 +4343,7 @@ function listenFinance() {
   );
   onSnapshot(q, snap => {
     finTrades = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
+    finTxMap  = Object.fromEntries(finTrades.map(t => [t.firestoreId, t]));
     renderFinance();
   }, err => console.error('Finance listen error:', err));
 }
@@ -4365,7 +4367,8 @@ window.delFinTx = async (firestoreId) => {
 };
 
 // ── OPEN MODAL ────────────────────────────────────────
-window.openFinModal = function openFinModal(tx = null) {
+window.openFinModal = function openFinModal(txOrId = null) {
+  const tx = (typeof txOrId === 'string') ? (finTxMap[txOrId] || null) : txOrId;
   finEditId = tx ? tx.firestoreId : null;
   $('fin-modal-title').textContent = tx ? 'Edit Transaksi' : 'Tambah Transaksi';
   $('fin-f-tgl').value     = tx?.tanggal  || new Date().toISOString().slice(0,10);
@@ -4426,8 +4429,8 @@ function renderFinance() {
   finLineC=new Chart($('finLineC').getContext('2d'),{
     type:'line',
     data:{labels:lineLabels,datasets:[
-      {label:'Pemasukan',data:allM.map(m=>inMap[m]||0),borderColor:'#00d97e',backgroundColor:'rgba(0,217,126,.07)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointHoverBorderColor:'#fff',pointHoverBorderWidth:2},
-      {label:'Pengeluaran',data:allM.map(m=>outMap[m]||0),borderColor:'#ff4d4d',backgroundColor:'rgba(255,77,77,.05)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}
+      {label:'Pemasukan',data:allM.map(m=>inMap[m]||0),borderColor:'#a78bfa',backgroundColor:'rgba(139,92,246,.08)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointBackgroundColor:'#a78bfa',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2},
+      {label:'Pengeluaran',data:allM.map(m=>outMap[m]||0),borderColor:'#f472b6',backgroundColor:'rgba(244,114,182,.05)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointBackgroundColor:'#f472b6',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}
     ]},
     options:lineOpts
   });
@@ -4436,12 +4439,12 @@ function renderFinance() {
   const katMap={};
   ft.filter(t=>t.jenis==='Pemasukan').forEach(t=>{const k=t.kategori||'Lainnya';katMap[k]=(katMap[k]||0)+(t.nominal||0);});
   const katKeys=Object.keys(katMap).sort((a,b)=>katMap[b]-katMap[a]);
-  const katColors={'Produk':'#7c6af7','Jasa':'#00d97e','Operasional':'#f5c842','Marketing':'#ff9f43','Lainnya':'#555'};
+  const katColors={'Produk':'#a78bfa','Jasa':'#7c6af7','Operasional':'#c4b5fd','Marketing':'#f472b6','Lainnya':'rgba(139,92,246,.35)'};
   if(finBarC)finBarC.destroy();
   finBarC=new Chart($('finBarC').getContext('2d'),{
     type:'bar',
     data:{labels:katKeys.length?katKeys:['–'],datasets:[{data:katKeys.length?katKeys.map(k=>katMap[k]):[0],backgroundColor:katKeys.map(k=>katColors[k]||'#7c6af7'),borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(255,255,255,.12)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#444',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>fRp(v)}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.4)',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'DM Mono',size:10},callback:v=>fRp(v)}}}}
   });
 
   // ── Donut: income vs expense ───────────────────────
@@ -4449,8 +4452,8 @@ function renderFinance() {
   if(income>0||expense>0){
     finDonutC=new Chart($('finDonutC').getContext('2d'),{
       type:'doughnut',
-      data:{labels:['Pemasukan','Pengeluaran'],datasets:[{data:[income,expense],backgroundColor:['#00d97e','#ff4d4d'],borderWidth:0,hoverOffset:4}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(255,255,255,.12)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,displayColors:false,callbacks:{label:c=>`${c.label}: ${fRp(c.raw)}`}}}}
+      data:{labels:['Pemasukan','Pengeluaran'],datasets:[{data:[income,expense],backgroundColor:['#a78bfa','#f472b6'],borderWidth:0,hoverOffset:4}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,displayColors:false,callbacks:{label:c=>`${c.label}: ${fRp(c.raw)}`}}}}
     });
   }
   $('fin-donut-in').textContent  = fRp(income);
@@ -4464,7 +4467,7 @@ function renderFinance() {
     const fid=t.firestoreId||'';
     return `<tr>
       <td>${t.tanggal||'–'}</td>
-      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="window.openFinModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">${t.nama||'–'}</td>
+      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="window.openFinModal('${fid}')">${t.nama||'–'}</td>
       <td><span class="b ${isIn?'bw':'bo'}">${t.jenis||'–'}</span></td>
       <td style="color:var(--text2)">${t.kategori||'–'}</td>
       <td class="${isIn?'pos':'neg'}" style="font-family:var(--mono)">${fRp(t.nominal)}</td>
