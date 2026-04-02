@@ -218,6 +218,9 @@ body::before{
   pointer-events:none;z-index:0;opacity:.4;
 }
 
+/* ── EQUITY CURVE LIVE PULSE ── */
+@keyframes eqPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.65);}}
+
 /* ── PERIOD TABS ── */
 .period-tabs{display:flex;gap:3px;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;border:1px solid var(--border);}
 .ptab{flex:1;text-align:center;padding:7px 10px;font-size:11px;font-weight:600;font-family:var(--font);color:var(--text2);cursor:pointer;border-radius:9px;border:none;background:transparent;transition:all .2s cubic-bezier(.4,0,.2,1);white-space:nowrap;letter-spacing:.3px;}
@@ -1180,13 +1183,64 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div class="sc"><div class="sl">Trades</div><div class="sv" id="st-n">0</div><div class="sch" id="st-sk">—</div></div>
     </div>
 
-    <!-- Equity Curve -->
-    <div class="cc">
-      <div class="ch">
-        <div class="ct">Equity Curve</div>
-        <div class="cm"><span id="eqs">—</span><span id="eqn">—</span></div>
+    <!-- Equity Curve (Bybit-style) -->
+    <div class="cc" style="padding:16px 18px;">
+      <div class="ch" style="margin-bottom:10px;align-items:flex-start;">
+        <div>
+          <div class="ct" style="margin-bottom:5px;">Equity Curve</div>
+          <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+            <span id="eqBal" style="font-size:22px;font-weight:700;font-family:var(--mono);letter-spacing:-.5px;transition:color .3s;">—</span>
+            <span id="eqPct" style="font-size:11px;font-weight:700;font-family:var(--mono);padding:2px 8px;border-radius:6px;transition:all .3s;">—</span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:3px;">
+            <span id="eqs" style="margin-right:10px;">—</span><span id="eqn">—</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px;">
+          <div id="eq-live-badge" style="display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#00d97e;letter-spacing:.6px;font-family:var(--font);">
+            <span style="width:6px;height:6px;border-radius:50%;background:#00d97e;display:inline-block;animation:eqPulse 1.4s ease-in-out infinite;"></span>LIVE
+          </div>
+          <div class="period-tabs" style="border:none;padding:3px;">
+            <button class="ptab active" onclick="eqSetPeriod('all',this)">All</button>
+            <button class="ptab" onclick="eqSetPeriod('180',this)">180H</button>
+            <button class="ptab" onclick="eqSetPeriod('30',this)">30H</button>
+            <button class="ptab" onclick="eqSetPeriod('7',this)">7H</button>
+          </div>
+        </div>
       </div>
-      <div style="position:relative;height:200px"><canvas id="eqC"></canvas></div>
+      <!-- Mini stats row -->
+      <div id="eq-stats-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:3px;">High</div>
+          <div id="eq-high" style="font-size:12px;font-weight:700;font-family:var(--mono);color:#00d97e;">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:3px;">Low</div>
+          <div id="eq-low" style="font-size:12px;font-weight:700;font-family:var(--mono);color:#ef4444;">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:3px;">Max DD</div>
+          <div id="eq-maxdd" style="font-size:12px;font-weight:700;font-family:var(--mono);color:#f59e0b;">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:3px;">Trades</div>
+          <div id="eq-trades" style="font-size:12px;font-weight:700;font-family:var(--mono);color:var(--accent2);">—</div>
+        </div>
+      </div>
+      <!-- Chart area with custom crosshair + tooltip -->
+      <div style="position:relative;" id="eq-chart-area">
+        <div style="position:relative;height:180px;"><canvas id="eqC"></canvas></div>
+        <!-- Custom crosshair -->
+        <div id="eq-crosshair" style="position:absolute;top:0;bottom:20px;width:1px;background:rgba(255,255,255,0.14);pointer-events:none;opacity:0;transition:opacity .1s;left:0;">
+          <div id="eq-ch-dot" style="position:absolute;width:9px;height:9px;border-radius:50%;border:2px solid #fff;margin-left:-5px;top:0;"></div>
+        </div>
+        <!-- Custom tooltip -->
+        <div id="eq-tooltip" style="position:absolute;background:#16161a;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:9px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;min-width:130px;z-index:20;top:0;left:0;">
+          <div id="eq-tt-date" style="color:var(--text3);font-size:10px;font-family:var(--mono);margin-bottom:4px;"></div>
+          <div id="eq-tt-bal" style="font-weight:700;font-family:var(--mono);font-size:14px;"></div>
+          <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:2px;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Bottom Charts -->
@@ -3445,8 +3499,6 @@ function updateStats() {
     $('st-sk').textContent='—';$('st-sk').className='sch';
   }
 
-  $('eqs').textContent='Start $'+bal.toLocaleString();
-  $('eqn').textContent='Now $'+f2(b);
   $('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 }
 
@@ -3491,28 +3543,100 @@ function lineChartBase(yFmt, labelFmt) {
     }
   };
 }
-function getEq(){
-  const ft=getFilteredTrades();
-  // For equity: start from balance BEFORE the filtered period
-  const allTot=trades.reduce((s,t)=>s+t.pnl,0);
-  const ftTot=ft.reduce((s,t)=>s+t.pnl,0);
-  const startBal = (bal+allTot) - ftTot; // balance at start of period
-  let b=startBal;
-  const L=['Start'],D=[b];
-  ft.forEach(t=>{b+=t.pnl;L.push(t.date?t.date.slice(5):'');D.push(Math.round(b*100)/100);});
-  return{L,D};
+// ── eqLocalPeriod: period khusus equity curve (independen dari currentPeriod) ──
+let eqLocalPeriod = 'all';
+
+function getEq(periodOverride){
+  const period = periodOverride !== undefined ? periodOverride : eqLocalPeriod;
+  // Filter trades sesuai period lokal equity curve
+  let ft;
+  if(period === 'all'){
+    ft = trades;
+  } else {
+    const days = parseInt(period);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    const cutoffStr = cutoff.toISOString().slice(0,10);
+    ft = trades.filter(t => t.date >= cutoffStr);
+  }
+  // Hitung starting balance sebelum period
+  const allTot = trades.reduce((s,t)=>s+t.pnl,0);
+  const ftTot  = ft.reduce((s,t)=>s+t.pnl,0);
+  const startBal = (bal + allTot) - ftTot;
+  let b = startBal;
+  const L = ['Start'], D = [b], rawDates = [null];
+  ft.forEach(t => {
+    b += t.pnl;
+    L.push(t.date ? t.date.slice(5) : '');
+    D.push(Math.round(b * 100) / 100);
+    rawDates.push(t.date || '');
+  });
+  return { L, D, rawDates, ft };
+}
+
+function eqSetPeriod(period, btn) {
+  document.querySelectorAll('#eq-chart-area').forEach(()=>{});
+  const tabs = document.querySelectorAll('.eq-ptab-wrap .ptab');
+  // find sibling tabs
+  if(btn) {
+    const parent = btn.closest('.period-tabs');
+    if(parent) parent.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  eqLocalPeriod = period;
+  renderEq();
 }
 
 function renderEq(){
-  const{L,D}=getEq(),up=D.length<2||D[D.length-1]>=D[0],col=up?'#00d97e':'#ff4d4d';
-  const ctx=$('eqC').getContext('2d'),g=ctx.createLinearGradient(0,0,0,200);
-  g.addColorStop(0,up?'rgba(0,217,126,.18)':'rgba(255,77,77,.18)');g.addColorStop(1,'rgba(0,0,0,0)');
-  if(eqCh)eqCh.destroy();
-  const eqOpts = lineChartBase(
-    v => '$' + v.toLocaleString(),
-    v => '$' + f2(v)
-  );
-  eqOpts.plugins.tooltip.callbacks.title = items => items[0]?.label || '';
+  const { L, D, rawDates, ft } = getEq();
+  const up = D.length < 2 || D[D.length-1] >= D[0];
+  const col = up ? '#00d97e' : '#ef4444';
+  const colRgb = up ? '0,217,126' : '239,68,68';
+
+  // ── Header: balance + % change ──
+  const startVal = D[0], endVal = D[D.length-1];
+  const pct = startVal > 0 ? ((endVal - startVal) / startVal * 100) : 0;
+  const sign = pct >= 0 ? '+' : '';
+  const eqBalEl = $('eqBal'), eqPctEl = $('eqPct');
+  if(eqBalEl){
+    eqBalEl.textContent = '$' + endVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    eqBalEl.style.color = col;
+  }
+  if(eqPctEl){
+    eqPctEl.textContent = sign + pct.toFixed(2) + '%';
+    eqPctEl.style.background = up ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+    eqPctEl.style.color = col;
+  }
+
+  // ── Legacy eqs/eqn (kept for compatibility) ──
+  $('eqs').textContent = 'Start $' + startVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  $('eqn').textContent = 'Now $' + endVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // ── Stats row ──
+  const vals = D;
+  const high = Math.max(...vals), low = Math.min(...vals);
+  let peak = vals[0], maxDD = 0;
+  vals.forEach(v=>{ if(v>peak)peak=v; const dd=(peak-v)/peak*100; if(dd>maxDD)maxDD=dd; });
+  const fmtD = v => '$'+(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0));
+  const statHigh=$('eq-high'),statLow=$('eq-low'),statDD=$('eq-maxdd'),statTr=$('eq-trades');
+  if(statHigh) statHigh.textContent = fmtD(high);
+  if(statLow)  statLow.textContent  = fmtD(low);
+  if(statDD)   statDD.textContent   = '-' + maxDD.toFixed(2) + '%';
+  if(statTr)   statTr.textContent   = ft.length;
+
+  // ── LIVE badge: tampil kalau ada trades & period pendek ──
+  const liveBadge = $('eq-live-badge');
+  if(liveBadge) liveBadge.style.display = (ft.length > 0 && (eqLocalPeriod==='7'||eqLocalPeriod==='30')) ? 'flex' : 'none';
+
+  // ── Chart ──
+  const ctx = $('eqC').getContext('2d');
+  const h = 180;
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, `rgba(${colRgb},.16)`);
+  g.addColorStop(0.65, `rgba(${colRgb},.04)`);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+
+  if(eqCh) eqCh.destroy();
   eqCh = new Chart(ctx, {
     type: 'line',
     data: {
@@ -3522,18 +3646,109 @@ function renderEq(){
         borderColor: col,
         backgroundColor: g,
         borderWidth: 2,
-        pointRadius: D.length < 20 ? 4 : 0,
-        pointHoverRadius: 6,
-        pointBackgroundColor: col,
-        pointHoverBackgroundColor: col,
-        pointHoverBorderColor: '#fff',
-        pointHoverBorderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 0,
         fill: true,
-        tension: .35
+        tension: .35,
       }]
     },
-    options: eqOpts
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 350, easing: 'easeInOutQuart' },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { display: false },
+        y: {
+          display: true,
+          position: 'right',
+          grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
+          ticks: {
+            color: '#3f3f46',
+            font: { size: 10, family: "'JetBrains Mono','Courier New',monospace" },
+            maxTicksLimit: 5,
+            callback: v => '$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))
+          },
+          border: { display: false }
+        }
+      },
+      layout: { padding: { top: 6, right: 52, bottom: 0, left: 0 } }
+    }
   });
+
+  // ── Custom crosshair + tooltip ──
+  const area    = $('eq-chart-area');
+  const chEl    = $('eq-crosshair');
+  const dotEl   = $('eq-ch-dot');
+  const ttEl    = $('eq-tooltip');
+  const ttDate  = $('eq-tt-date');
+  const ttBal   = $('eq-tt-bal');
+  const ttPnl   = $('eq-tt-pnl');
+
+  if(!area) return;
+
+  // Remove old listeners by cloning
+  const newArea = area.cloneNode(true);
+  area.parentNode.replaceChild(newArea, area);
+  const areaEl = $('eq-chart-area');
+
+  areaEl.onmousemove = (e) => {
+    if(!eqCh) return;
+    const rect = areaEl.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ca = eqCh.chartArea;
+    if(!ca || x < ca.left || x > ca.right){
+      $('eq-crosshair').style.opacity = '0';
+      $('eq-tooltip').style.opacity = '0';
+      return;
+    }
+    const frac = (x - ca.left) / (ca.right - ca.left);
+    const idx = Math.max(0, Math.min(D.length-1, Math.round(frac*(D.length-1))));
+    const meta = eqCh.getDatasetMeta(0);
+    if(!meta || !meta.data[idx]) return;
+    const pt = meta.data[idx];
+
+    const crossh = $('eq-crosshair');
+    const dot    = $('eq-ch-dot');
+    const tt     = $('eq-tooltip');
+    const ttD    = $('eq-tt-date');
+    const ttB    = $('eq-tt-bal');
+    const ttP    = $('eq-tt-pnl');
+
+    crossh.style.opacity = '1';
+    crossh.style.left = pt.x + 'px';
+    dot.style.top = (pt.y - 5) + 'px';
+    dot.style.background = col;
+
+    const d = D[idx];
+    const lbl = L[idx];
+    const pnlVal = idx === 0 ? 0 : (D[idx] - D[idx-1]);
+    const pnlSign = pnlVal >= 0 ? '+' : '';
+    const pnlColor = pnlVal >= 0 ? '#22c55e' : '#ef4444';
+    const dateStr = rawDates[idx] ? new Date(rawDates[idx]+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : lbl;
+
+    ttD.textContent = dateStr;
+    ttB.textContent = '$' + d.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    ttB.style.color = col;
+    ttP.textContent = 'P&L: ' + pnlSign + '$' + Math.abs(pnlVal).toFixed(2);
+    ttP.style.color = pnlColor;
+    tt.style.opacity = '1';
+
+    // Posisi tooltip: kiri/kanan crosshair, jangan keluar layar
+    const ttW = 138;
+    let tx = pt.x + 14;
+    if(tx + ttW > rect.width - 10) tx = pt.x - ttW - 10;
+    tt.style.left = tx + 'px';
+    tt.style.top = Math.max(0, pt.y - 38) + 'px';
+  };
+
+  areaEl.onmouseleave = () => {
+    const crossh = $('eq-crosshair');
+    const tt     = $('eq-tooltip');
+    if(crossh) crossh.style.opacity = '0';
+    if(tt)     tt.style.opacity     = '0';
+  };
 }
 function renderPnl(){
   const ft=getFilteredTrades();
