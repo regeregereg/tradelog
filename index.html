@@ -166,31 +166,36 @@ function _onChartReady(fn){
   if(window._chartReady) fn();
   else window._chartQueue.push(fn);
 }
-document.addEventListener('DOMContentLoaded', function(){
-  // Chart.js defer sudah selesai saat DOMContentLoaded
-  if(typeof Chart !== 'undefined'){
-    const CrosshairPlugin = {
-      id: 'crosshair',
-      afterDraw(chart) {
-        if (!chart._crosshairX) return;
-        const { ctx, chartArea: { top, bottom } } = chart;
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(chart._crosshairX, top);
-        ctx.lineTo(chart._crosshairX, bottom);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.restore();
-      }
-    };
-    Chart.register(CrosshairPlugin);
-    window._chartReady = true;
-    window._chartQueue.forEach(fn=>fn());
-    window._chartQueue = [];
-  }
-});
+function _initChartJs(){
+  if(window._chartReady) return;
+  if(typeof Chart === 'undefined') return;
+  const CrosshairPlugin = {
+    id: 'crosshair',
+    afterDraw(chart) {
+      if (!chart._crosshairX) return;
+      const { ctx, chartArea: { top, bottom } } = chart;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(chart._crosshairX, top);
+      ctx.lineTo(chart._crosshairX, bottom);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.restore();
+    }
+  };
+  try { Chart.register(CrosshairPlugin); } catch(e){}
+  window._chartReady = true;
+  window._chartQueue.forEach(fn=>fn());
+  window._chartQueue = [];
+}
+document.addEventListener('DOMContentLoaded', _initChartJs);
+window.addEventListener('load', _initChartJs);
+(function _pollChart(n){
+  if(window._chartReady || n<=0) return;
+  setTimeout(function(){ _initChartJs(); _pollChart(n-1); }, 300);
+})(10);
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -3574,7 +3579,7 @@ function getEq(periodOverride){
   return { L, D, rawDates, ft };
 }
 
-function eqSetPeriod(period, btn) {
+window.eqSetPeriod = function eqSetPeriod(period, btn) {
   document.querySelectorAll('#eq-chart-area').forEach(()=>{});
   const tabs = document.querySelectorAll('.eq-ptab-wrap .ptab');
   // find sibling tabs
@@ -3588,6 +3593,11 @@ function eqSetPeriod(period, btn) {
 }
 
 function renderEq(){
+  // Jika Chart.js belum siap, antri dan jalankan setelah ready
+  if(typeof Chart === 'undefined' || !window._chartReady){
+    _onChartReady(() => renderEq());
+    return;
+  }
   const { L, D, rawDates, ft } = getEq();
   const up = D.length < 2 || D[D.length-1] >= D[0];
   const col = up ? '#00d97e' : '#ef4444';
