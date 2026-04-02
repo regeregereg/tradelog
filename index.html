@@ -3588,10 +3588,6 @@ window.eqSetPeriod = function eqSetPeriod(period, btn) {
 }
 
 function renderEq(){
-  if(typeof Chart === 'undefined'){
-    setTimeout(renderEq, 200);
-    return;
-  }
   const { L, D, rawDates, ft } = getEq();
   const up = D.length < 2 || D[D.length-1] >= D[0];
   const col = up ? '#00d97e' : '#ef4444';
@@ -3692,10 +3688,10 @@ function renderEq(){
 
   if(!area) return;
 
-  // Remove old listeners by cloning
-  const newArea = area.cloneNode(true);
-  area.parentNode.replaceChild(newArea, area);
-  const areaEl = $('eq-chart-area');
+  // Reset listeners langsung — JANGAN cloneNode karena akan menghapus canvas Chart.js dari DOM
+  area.onmousemove = null;
+  area.onmouseleave = null;
+  const areaEl = area;
 
   areaEl.onmousemove = (e) => {
     if(!eqCh) return;
