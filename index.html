@@ -218,7 +218,27 @@ body::before{
   pointer-events:none;z-index:0;opacity:.4;
 }
 
-/* ── EQUITY CURVE LIVE PULSE ── */
+/* ── TAG CHIPS ── */
+.tag-chip{
+  padding:5px 11px;border-radius:20px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:all .15s;letter-spacing:.2px;
+}
+.tag-chip:hover{border-color:var(--accent);color:var(--accent2);background:rgba(139,92,246,.08);}
+.tag-chip.active{background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.12));color:var(--accent2);border-color:rgba(139,92,246,.5);box-shadow:0 0 8px rgba(139,92,246,.2);}
+
+/* ── DEEP ANALYTICS CARDS ── */
+.ana-deep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
+.ana-stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.ana-stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:6px;}
+.ana-stat-val{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1;}
+.ana-stat-sub{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);}
+
+/* ── TAG FILTER CHIPS ── */
+.tag-filter-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.tag-filter-chip{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;letter-spacing:.2px;}
+.tag-filter-chip:hover{border-color:var(--accent);color:var(--accent2);}
+.tag-filter-chip.active{background:rgba(139,92,246,.15);color:var(--accent2);border-color:rgba(139,92,246,.4);}
 @keyframes eqPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.65);}}
 
 /* ── PERIOD TABS ── */
@@ -1314,7 +1334,17 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <tbody id="ttb"></tbody>
       </table>
     </div>
-    <div class="es" id="es">No trades yet — click <strong style="color:var(--accent)">+ Log Trade</strong> to start.</div>
+    <div class="es" id="es" style="padding:40px 20px 48px">
+      <div style="font-size:44px;margin-bottom:14px;filter:drop-shadow(0 0 18px rgba(139,92,246,.35))">📒</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:-.3px">Journal kamu masih kosong</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;max-width:300px;margin-left:auto;margin-right:auto">Trader yang konsisten mencatat setiap trade.<br>Mulai track performa kamu sekarang.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px">
+        <div style="background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.2);border-radius:10px;padding:10px 14px;font-size:11px;color:#00d97e;text-align:left;min-width:120px"><div style="font-size:18px;margin-bottom:4px">📈</div><div style="font-weight:600;margin-bottom:2px">Track P&amp;L</div><div style="opacity:.7">Lihat profit/loss setiap trade</div></div>
+        <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--accent2);text-align:left;min-width:120px"><div style="font-size:18px;margin-bottom:4px">🏷️</div><div style="font-weight:600;margin-bottom:2px">Tag Setup</div><div style="opacity:.7">BOS, OB, FVG &amp; lainnya</div></div>
+        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;font-size:11px;color:#f59e0b;text-align:left;min-width:120px"><div style="font-size:18px;margin-bottom:4px">📊</div><div style="font-weight:600;margin-bottom:2px">Analytics</div><div style="opacity:.7">Win rate, PF, equity curve</div></div>
+      </div>
+      <button onclick="openTrade()" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 16px rgba(139,92,246,.35);letter-spacing:.2px;transition:all .2s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">+ Log Trade Pertama</button>
+    </div>
     </div>
   </div>
 
@@ -1333,6 +1363,32 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <button class="ptab" data-aperiod="365">1 Tahun</button>
       </div>
     </div>
+
+    <!-- ── DEEP STATS GRID ── -->
+    <div class="cc" style="margin-bottom:16px">
+      <div class="ch"><div class="ct">📐 Deep Statistics</div></div>
+      <div class="ana-deep-grid" id="ana-deep-grid">
+        <div class="ana-stat-card"><div class="ana-stat-label">Avg Win</div><div class="ana-stat-val pos" id="ana-avg-win">—</div><div class="ana-stat-sub">per winning trade</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Avg Loss</div><div class="ana-stat-val neg" id="ana-avg-loss">—</div><div class="ana-stat-sub">per losing trade</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Best Trade</div><div class="ana-stat-val pos" id="ana-best-trade">—</div><div class="ana-stat-sub" id="ana-best-trade-pair">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Worst Trade</div><div class="ana-stat-val neg" id="ana-worst-trade">—</div><div class="ana-stat-sub" id="ana-worst-trade-pair">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Best Day</div><div class="ana-stat-val" id="ana-best-day">—</div><div class="ana-stat-sub" id="ana-best-day-pnl">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Worst Day</div><div class="ana-stat-val" id="ana-worst-day">—</div><div class="ana-stat-sub" id="ana-worst-day-pnl">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Win Streak</div><div class="ana-stat-val pos" id="ana-win-streak">—</div><div class="ana-stat-sub">best run</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Loss Streak</div><div class="ana-stat-val neg" id="ana-loss-streak">—</div><div class="ana-stat-sub">worst run</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Avg R:R Aktual</div><div class="ana-stat-val" id="ana-avg-rr">—</div><div class="ana-stat-sub">risk/reward realisasi</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Expectancy</div><div class="ana-stat-val" id="ana-expectancy">—</div><div class="ana-stat-sub">per trade average</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Best Session</div><div class="ana-stat-val" id="ana-best-session">—</div><div class="ana-stat-sub" id="ana-best-session-pnl">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Best Setup</div><div class="ana-stat-val" id="ana-best-setup" style="font-size:13px">—</div><div class="ana-stat-sub" id="ana-best-setup-wr">—</div></div>
+      </div>
+    </div>
+
+    <!-- ── P&L BY DAY OF WEEK ── -->
+    <div class="cc" style="margin-bottom:16px">
+      <div class="ch"><div class="ct">📅 P&L by Day of Week</div></div>
+      <div id="ana-dow" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:4px 0"></div>
+    </div>
+
     <div class="g3">
       <div class="smc"><div class="smt">P&amp;L by Pair</div><div id="pb"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
       <div class="smc"><div class="smt">P&amp;L by Session</div><div id="sb2"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
@@ -2030,7 +2086,23 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div class="fgg"><label class="fl">Risk ($)</label><input class="fi" type="number" id="f-rk" placeholder="100" step="any"></div>
       <div class="fgg"><label class="fl">P&amp;L ($)</label><input class="fi" type="number" id="f-pnl" placeholder="+250 or -100" step="any"></div>
       <div class="fgg"><label class="fl">Result</label><select class="fi" id="f-res"><option>Win</option><option>Loss</option><option>Breakeven</option></select></div>
-      <div class="fgg"><label class="fl">Setup Tag</label><input class="fi" type="text" id="f-su" placeholder="BOS, OB, FVG…"></div>
+      <div class="fgg full">
+        <label class="fl">🏷️ Setup Tag</label>
+        <div id="tag-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+          <button type="button" class="tag-chip" data-tag="BOS">BOS</button>
+          <button type="button" class="tag-chip" data-tag="OB">OB</button>
+          <button type="button" class="tag-chip" data-tag="FVG">FVG</button>
+          <button type="button" class="tag-chip" data-tag="Breakout">Breakout</button>
+          <button type="button" class="tag-chip" data-tag="Reversal">Reversal</button>
+          <button type="button" class="tag-chip" data-tag="Trend Follow">Trend Follow</button>
+          <button type="button" class="tag-chip" data-tag="News Play">News Play</button>
+          <button type="button" class="tag-chip" data-tag="Liquidity Grab">Liquidity Grab</button>
+          <button type="button" class="tag-chip" data-tag="Supply/Demand">Supply/Demand</button>
+          <button type="button" class="tag-chip" data-tag="EMA Cross">EMA Cross</button>
+        </div>
+        <input class="fi" type="text" id="f-su" placeholder="Pilih tag di atas atau ketik custom…" style="font-size:12px">
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">Bisa pilih beberapa tag sekaligus. Pisahkan dengan koma untuk custom.</div>
+      </div>
       <div class="fgg"><label class="fl">Emotion</label><select class="fi" id="f-em"><option>Calm</option><option>Confident</option><option>Anxious</option><option>FOMO</option><option>Impatient</option><option>Revenge</option></select></div>
       <div class="fgg full"><label class="fl">Notes</label><textarea class="ta" id="f-nt" placeholder="Setup, execution, lessons…"></textarea></div>
       <div class="fgg full">
@@ -3170,6 +3242,22 @@ $('welcome-btn').addEventListener('click', async () => {
 $('welcome-bal').addEventListener('keydown', e => { if(e.key==='Enter') $('welcome-btn').click(); });
 
 // ── TRADE MODAL ───────────────────────────────────────
+// Tag chips multi-select logic
+document.querySelectorAll('.tag-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('active');
+    const active = [...document.querySelectorAll('.tag-chip.active')].map(c => c.dataset.tag);
+    $('f-su').value = active.join(', ');
+  });
+});
+// Sync custom input back — deselect chips not in text
+$('f-su').addEventListener('input', () => {
+  const val = $('f-su').value.toLowerCase();
+  document.querySelectorAll('.tag-chip').forEach(chip => {
+    chip.classList.toggle('active', val.includes(chip.dataset.tag.toLowerCase()));
+  });
+});
+
 function openTrade() {
   if (!currentUser) {
     pendingAction = 'openTrade';
@@ -3186,7 +3274,11 @@ function openTrade() {
   $('md-trade').classList.add('open');
   setTimeout(() => $('f-pair').focus(), 80);
 }
-function closeTradeModal() { $('md-trade').classList.remove('open'); }
+function closeTradeModal() {
+  $('md-trade').classList.remove('open');
+  // Reset tag chips
+  document.querySelectorAll('.tag-chip.active').forEach(c => c.classList.remove('active'));
+}
 $('dash-log-btn').addEventListener('click', openTrade);
 $('journal-log-btn').addEventListener('click', openTrade);
 $('mob-log-btn').addEventListener('click', openTrade);
@@ -3882,6 +3974,7 @@ function renderAna(){
     $('pb').innerHTML=$('sb2').innerHTML=$('stb').innerHTML=nd;
     if(ddCh){ddCh.destroy();ddCh=null;}
     if(rCh){rCh.destroy();rCh=null;}
+    renderDeepAna(ft);
     return;
   }
 
@@ -3921,6 +4014,145 @@ function renderAna(){
   if(rCh)rCh.destroy();
   const rOpts=lineChartBase(v=>v+'R',v=>(v>=0?'+':'')+v+'R');
   rCh=new Chart($('rC').getContext('2d'),{type:'line',data:{labels:rL,datasets:[{data:rD,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#7c6af7',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}]},options:rOpts});
+
+  renderDeepAna(ft);
+}
+
+// ── DEEP ANALYTICS ────────────────────────────────────
+function renderDeepAna(ft) {
+  const empty = '—';
+  const f2l = v => (v >= 0 ? '+$' : '-$') + Math.abs(v).toFixed(2);
+
+  if (!ft || !ft.length) {
+    ['ana-avg-win','ana-avg-loss','ana-best-trade','ana-worst-trade',
+     'ana-best-day','ana-worst-day','ana-win-streak','ana-loss-streak',
+     'ana-avg-rr','ana-expectancy','ana-best-session','ana-best-setup'].forEach(id => {
+      const el = $(id); if(el) el.textContent = empty;
+    });
+    ['ana-best-trade-pair','ana-worst-trade-pair','ana-best-day-pnl',
+     'ana-worst-day-pnl','ana-best-session-pnl','ana-best-setup-wr'].forEach(id => {
+      const el = $(id); if(el) el.textContent = empty;
+    });
+    const dow = $('ana-dow'); if(dow) dow.innerHTML = '';
+    return;
+  }
+
+  const wins  = ft.filter(t => t.result === 'Win');
+  const losses= ft.filter(t => t.result === 'Loss');
+  const n = ft.length;
+
+  // Avg win / loss
+  const avgWin  = wins.length  ? wins.reduce((s,t)=>s+t.pnl,0)/wins.length   : 0;
+  const avgLoss = losses.length ? losses.reduce((s,t)=>s+t.pnl,0)/losses.length : 0;
+  const elAvgWin = $('ana-avg-win'), elAvgLoss = $('ana-avg-loss');
+  if(elAvgWin){ elAvgWin.textContent = wins.length ? f2l(avgWin) : empty; elAvgWin.className='ana-stat-val pos'; }
+  if(elAvgLoss){ elAvgLoss.textContent = losses.length ? f2l(avgLoss) : empty; elAvgLoss.className='ana-stat-val neg'; }
+
+  // Best / worst single trade
+  const best  = ft.reduce((a,b) => b.pnl > a.pnl ? b : a, ft[0]);
+  const worst = ft.reduce((a,b) => b.pnl < a.pnl ? b : a, ft[0]);
+  const elBT = $('ana-best-trade'), elWT = $('ana-worst-trade');
+  if(elBT){ elBT.textContent = f2l(best.pnl); elBT.className='ana-stat-val pos'; }
+  if(elWT){ elWT.textContent = f2l(worst.pnl); elWT.className='ana-stat-val neg'; }
+  const elBTP = $('ana-best-trade-pair'), elWTP = $('ana-worst-trade-pair');
+  if(elBTP) elBTP.textContent = (best.pair||'') + (best.date ? ' · '+best.date.slice(5) : '');
+  if(elWTP) elWTP.textContent = (worst.pair||'') + (worst.date ? ' · '+worst.date.slice(5) : '');
+
+  // Best / worst day
+  const dayMap = {};
+  ft.forEach(t => { if(!t.date) return; if(!dayMap[t.date]) dayMap[t.date]=0; dayMap[t.date]+=t.pnl; });
+  const dayArr = Object.entries(dayMap);
+  if(dayArr.length) {
+    const bestDay  = dayArr.reduce((a,b) => b[1]>a[1]?b:a);
+    const worstDay = dayArr.reduce((a,b) => b[1]<a[1]?b:a);
+    const fmtDay = d => { try{ return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short'}); }catch(e){return d;} };
+    const elBD=$('ana-best-day'),elWD=$('ana-worst-day');
+    if(elBD){ elBD.textContent=fmtDay(bestDay[0]); elBD.className='ana-stat-val pos'; }
+    if(elWD){ elWD.textContent=fmtDay(worstDay[0]); elWD.className='ana-stat-val neg'; }
+    const elBDP=$('ana-best-day-pnl'),elWDP=$('ana-worst-day-pnl');
+    if(elBDP) elBDP.textContent = f2l(bestDay[1]);
+    if(elWDP) elWDP.textContent = f2l(worstDay[1]);
+  }
+
+  // Win / loss streak (max, historical)
+  let maxWinStreak=0, maxLossStreak=0, curW=0, curL=0;
+  ft.forEach(t => {
+    if(t.result==='Win'){ curW++; curL=0; maxWinStreak=Math.max(maxWinStreak,curW); }
+    else if(t.result==='Loss'){ curL++; curW=0; maxLossStreak=Math.max(maxLossStreak,curL); }
+    else { curW=0; curL=0; }
+  });
+  const elWS=$('ana-win-streak'),elLS=$('ana-loss-streak');
+  if(elWS){ elWS.textContent = maxWinStreak || empty; elWS.className='ana-stat-val pos'; }
+  if(elLS){ elLS.textContent = maxLossStreak || empty; elLS.className='ana-stat-val neg'; }
+
+  // Avg R:R aktual
+  const avgRR = n ? (ft.reduce((s,t)=>s+(t.r||0),0)/n) : 0;
+  const elRR = $('ana-avg-rr');
+  if(elRR){ elRR.textContent = n ? (avgRR>=0?'+':'')+avgRR.toFixed(2)+'R' : empty; elRR.className='ana-stat-val '+(avgRR>0?'pos':avgRR<0?'neg':''); }
+
+  // Expectancy = (WR × avgWin) + ((1-WR) × avgLoss)
+  const wr = n ? wins.length/n : 0;
+  const exp = (wr * avgWin) + ((1-wr) * avgLoss);
+  const elExp = $('ana-expectancy');
+  if(elExp){ elExp.textContent = n ? f2l(exp) : empty; elExp.className='ana-stat-val '+(exp>0?'pos':exp<0?'neg':''); }
+
+  // Best session by P&L
+  const sesMap = {};
+  ft.forEach(t => { const s=t.session||'Unknown'; if(!sesMap[s]) sesMap[s]=0; sesMap[s]+=t.pnl; });
+  const sesArr = Object.entries(sesMap);
+  if(sesArr.length) {
+    const bestSes = sesArr.reduce((a,b)=>b[1]>a[1]?b:a);
+    const elBS=$('ana-best-session'), elBSP=$('ana-best-session-pnl');
+    if(elBS){ elBS.textContent=bestSes[0].split('-')[0]; elBS.className='ana-stat-val '+(bestSes[1]>=0?'pos':'neg'); }
+    if(elBSP) elBSP.textContent = f2l(bestSes[1]);
+  }
+
+  // Best setup by win rate (min 2 trades)
+  const setupWR = {};
+  ft.forEach(t => {
+    (t.setup||'Other').split(',').forEach(s => {
+      const tag = s.trim();
+      if(!setupWR[tag]) setupWR[tag]={w:0,n:0};
+      setupWR[tag].n++;
+      if(t.result==='Win') setupWR[tag].w++;
+    });
+  });
+  const setupArr = Object.entries(setupWR).filter(([,v])=>v.n>=2).map(([tag,v])=>({tag,wr:v.w/v.n,n:v.n})).sort((a,b)=>b.wr-a.wr);
+  const elBSetup=$('ana-best-setup'), elBSetupWR=$('ana-best-setup-wr');
+  if(setupArr.length) {
+    if(elBSetup){ elBSetup.textContent=setupArr[0].tag; elBSetup.className='ana-stat-val '+(setupArr[0].wr>=0.5?'pos':'neg'); }
+    if(elBSetupWR) elBSetupWR.textContent = (setupArr[0].wr*100).toFixed(0)+'% WR · '+setupArr[0].n+' trades';
+  } else {
+    if(elBSetup){ elBSetup.textContent=empty; }
+    if(elBSetupWR){ elBSetupWR.textContent='min 2 trades per setup'; }
+  }
+
+  // P&L by day of week
+  const dowMap = {0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  const dowCount = {0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  ft.forEach(t => {
+    if(!t.date) return;
+    const d = new Date(t.date+'T00:00:00').getDay();
+    dowMap[d] += t.pnl; dowCount[d]++;
+  });
+  const dowNames = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const dowVals = [0,1,2,3,4,5,6].map(d=>dowMap[d]);
+  const maxDow = Math.max(...dowVals.map(Math.abs), 1);
+  const dowEl = $('ana-dow');
+  if(dowEl) dowEl.innerHTML = [0,1,2,3,4,5,6].map(d => {
+    const v = dowMap[d], cnt = dowCount[d];
+    const pct = Math.abs(v)/maxDow*100;
+    const col = v>0?'#00d97e':v<0?'#ff4d4d':'#3f3f46';
+    const bg  = v>0?'rgba(0,217,126,.1)':v<0?'rgba(255,77,77,.1)':'rgba(255,255,255,.03)';
+    return `<div style="background:${bg};border:1px solid ${v>0?'rgba(0,217,126,.2)':v<0?'rgba(255,77,77,.2)':'var(--border)'};border-radius:10px;padding:10px 6px;text-align:center">
+      <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:6px;letter-spacing:.4px">${dowNames[d]}</div>
+      <div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px">
+        <div style="width:18px;background:${col};border-radius:3px 3px 0 0;height:${Math.max(pct,v!==0?8:0)}%;min-height:${v!==0?'4px':'0'};opacity:.85"></div>
+      </div>
+      <div style="font-size:10px;font-weight:700;font-family:var(--mono);color:${col}">${v>0?'+':''}${v!==0?'$'+Math.abs(v).toFixed(0):'—'}</div>
+      <div style="font-size:9px;color:var(--text3);margin-top:2px">${cnt?cnt+' trade':''}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── CALENDAR ──────────────────────────────────────────
