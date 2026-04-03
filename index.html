@@ -1326,49 +1326,46 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div id="donut-empty" style="display:none;text-align:center;padding:8px 0 4px;font-size:12px;color:var(--text3)">Belum ada trade di periode ini</div>
       </div>
     </div>
-  </div>
 
-  <!-- JOURNAL -->
-  <!-- ═══ DASH RIGHT PANEL: mini calendar ═══ -->
+  <!-- ═══ DASHBOARD TRADING CALENDAR (inline) ═══ -->
   <style>
-  #dash-right-panel{display:none;position:fixed;top:32px;right:32px;width:262px;z-index:10;pointer-events:auto;}
-  @media(min-width:1100px){
-    .page-dash-visible #dash-right-panel{display:block;}
-    #page-dashboard{padding-right:294px!important;}
-  }
-  #dash-cal-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
-  .dcal-header{padding:12px 13px 9px;border-bottom:1px solid var(--border);}
-  .dcal-tag{font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+  #dash-cal-panel{background:linear-gradient(160deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px;margin-bottom:16px;}
+  .dcal-header{padding:14px 18px 11px;border-bottom:1px solid var(--border);}
+  .dcal-tag{font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:5px;display:flex;align-items:center;gap:4px;}
   .dcal-month-row{display:flex;align-items:center;justify-content:space-between;}
-  .dcal-month-label{font-size:12.5px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
-  .dcal-nav{display:flex;gap:3px;}
-  .dcal-nav-btn{width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;padding:0;font-family:var(--font);}
+  .dcal-month-label{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+  .dcal-nav{display:flex;gap:4px;}
+  .dcal-nav-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;padding:0;font-family:var(--font);}
   .dcal-nav-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2);}
-  .dcal-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px 11px;border-bottom:1px solid var(--border);}
-  .dcal-stat{background:rgba(255,255,255,0.025);border-radius:6px;padding:6px 8px;}
-  .dcal-stat-l{font-size:7.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:2px;}
-  .dcal-stat-v{font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text);}
-  .dcal-grid-wrap{padding:8px 10px 9px;}
-  .dcal-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;}
-  .dcal-dl{font-size:7px;font-weight:700;color:var(--text3);text-align:center;text-transform:uppercase;padding:1px 0;}
-  .dcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-  .dcal-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px solid transparent;cursor:default;overflow:hidden;transition:opacity .12s;}
+  .dcal-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);}
+  .dcal-stat{background:rgba(255,255,255,0.025);border-radius:8px;padding:8px 10px;}
+  .dcal-stat-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px;}
+  .dcal-stat-v{font-size:14px;font-weight:700;font-family:var(--mono);color:var(--text);}
+  .dcal-grid-wrap{padding:10px 14px 12px;}
+  .dcal-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
+  .dcal-dl{font-size:9px;font-weight:700;color:var(--text3);text-align:center;text-transform:uppercase;padding:2px 0;}
+  .dcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .dcal-cell{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px solid transparent;cursor:default;overflow:hidden;transition:opacity .12s;}
   .dcal-cell.empty{background:transparent;border:none;}
   .dcal-cell.today{border-color:rgba(139,92,246,0.55)!important;background:rgba(139,92,246,0.08)!important;}
   .dcal-cell.win{background:rgba(0,217,126,0.1);border-color:rgba(0,217,126,0.18);}
   .dcal-cell.loss{background:rgba(239,68,68,0.09);border-color:rgba(239,68,68,0.14);}
   .dcal-cell:not(.empty):hover{opacity:.72;}
-  .dcal-dn{font-size:7.5px;color:rgba(255,255,255,0.25);line-height:1;font-family:var(--mono);}
-  .dcal-pnl{font-size:6px;line-height:1;margin-top:1px;white-space:nowrap;font-weight:700;font-family:var(--mono);}
+  .dcal-dn{font-size:clamp(7px,1.2vw,11px);color:rgba(255,255,255,0.25);line-height:1;font-family:var(--mono);}
+  .dcal-pnl{font-size:clamp(6px,0.9vw,9px);line-height:1.2;margin-top:2px;white-space:nowrap;font-weight:700;font-family:var(--mono);}
   .dcal-cell.win .dcal-dn{color:rgba(0,217,126,0.65);}.dcal-cell.win .dcal-pnl{color:#00d97e;}
   .dcal-cell.loss .dcal-dn{color:rgba(239,68,68,0.55);}.dcal-cell.loss .dcal-pnl{color:#f87171;}
-  .dcal-wr-row{padding:0 11px 10px;}
-  .dcal-wr-lbl{display:flex;justify-content:space-between;margin-bottom:3px;}
-  .dcal-wr-lbl span{font-size:8px;color:var(--text3);font-family:var(--mono);}
-  .dcal-wr-bg{height:2px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+  .dcal-wr-row{padding:0 16px 12px;}
+  .dcal-wr-lbl{display:flex;justify-content:space-between;margin-bottom:4px;}
+  .dcal-wr-lbl span{font-size:9px;color:var(--text3);font-family:var(--mono);}
+  .dcal-wr-bg{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
   .dcal-wr-fill{height:100%;border-radius:2px;transition:width .7s ease;width:0%;}
+  @media(max-width:768px){
+    .dcal-stats{grid-template-columns:repeat(2,1fr);}
+    .dcal-stat-v{font-size:12px;}
+  }
   </style>
-  <div id="dash-right-panel">
+  <div id="dash-right-panel" style="display:block;">
     <div id="dash-cal-panel">
       <div class="dcal-header">
         <div class="dcal-tag"><i class="bi bi-calendar3"></i>Trading Calendar</div>
@@ -1399,6 +1396,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
   </div>
+  </div><!-- end page-dashboard -->
 
   <div class="page" id="page-journal">
     <div class="ph">
@@ -3192,15 +3190,7 @@ function showApp() {
     $('main').style.marginLeft = '0';
     sbOpen = false;
   }
-  setTimeout(() => { renderCal(); renderDashCal();
-    const panel = $('dash-right-panel');
-    if (panel) panel.style.display = (window.innerWidth >= 1100) ? 'block' : 'none';
-    window.addEventListener('resize', () => {
-      const p = $('dash-right-panel');
-      const dashActive = $('page-dashboard') && $('page-dashboard').classList.contains('active');
-      if (p) p.style.display = (dashActive && window.innerWidth >= 1100) ? 'block' : 'none';
-    });
-  }, 200);
+  setTimeout(() => { renderCal(); renderDashCal(); }, 200);
 }
 
 // Show app immediately — no login required to browse
@@ -3327,9 +3317,6 @@ function goPage(name) {
   if (name === 'daily')     renderDailyPage();
   if (name === 'riskcalc')  calcRisk();
   if (name === 'dashboard') renderDashCal();
-  // show/hide right panel
-  const panel = $('dash-right-panel');
-  if (panel) panel.style.display = (name === 'dashboard' && window.innerWidth >= 1100) ? 'block' : 'none';
   if (isMob()) closeSB();
 }
 ['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
