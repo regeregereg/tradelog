@@ -240,15 +240,10 @@ body::before{
 .tag-filter-chip:hover{border-color:var(--accent);color:var(--accent2);}
 .tag-filter-chip.active{background:rgba(139,92,246,.15);color:var(--accent2);border-color:rgba(139,92,246,.4);}
 @keyframes eqPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.65);}}
-
 /* ── TRADER DNA RADAR ── */
 .dna-attr-row{cursor:default;transition:opacity .15s;}
 .dna-attr-row:hover{opacity:.85;}
-#trader-dna-card{cursor:default;}
-@media(max-width:640px){
-  #trader-dna-card>div{grid-template-columns:1fr!important;}
-  #trader-dna-card canvas{max-width:200px!important;max-height:200px!important;}
-}
+@media(max-width:640px){#trader-dna-card>div{grid-template-columns:1fr!important;}#trader-dna-card canvas{max-width:200px!important;max-height:200px!important;}}
 
 /* ── PERIOD TABS ── */
 .period-tabs{display:flex;gap:3px;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;border:1px solid var(--border);}
@@ -1258,35 +1253,28 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
       <!-- Chart area with custom crosshair + tooltip -->
       <div style="position:relative;" id="eq-chart-area">
-        <div style="position:relative;height:180px;"><canvas id="eqC"></canvas></div>
+        <div style="position:relative;height:180px;touch-action:none;"><canvas id="eqC"></canvas></div>
         <!-- Custom crosshair -->
-        <div id="eq-crosshair" style="position:absolute;top:0;bottom:20px;width:1px;background:rgba(255,255,255,0.14);pointer-events:none;opacity:0;transition:opacity .1s;left:0;">
-          <div id="eq-ch-dot" style="position:absolute;width:9px;height:9px;border-radius:50%;border:2px solid #fff;margin-left:-5px;top:0;"></div>
+        <div id="eq-crosshair" style="position:absolute;top:0;bottom:20px;width:1px;background:linear-gradient(to bottom,rgba(255,255,255,0.55),rgba(255,255,255,0.06));pointer-events:none;opacity:0;transition:opacity .08s;left:0;">
+          <div id="eq-ch-dot" style="position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,0.9);margin-left:-5px;top:0;transition:background .1s,box-shadow .1s;"></div>
         </div>
         <!-- Custom tooltip -->
-        <div id="eq-tooltip" style="position:absolute;background:#16161a;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:9px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;min-width:130px;z-index:20;top:0;left:0;">
-          <div id="eq-tt-date" style="color:var(--text3);font-size:10px;font-family:var(--mono);margin-bottom:4px;"></div>
-          <div id="eq-tt-bal" style="font-weight:700;font-family:var(--mono);font-size:14px;"></div>
-          <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:2px;"></div>
+        <div id="eq-tooltip" style="position:absolute;background:rgba(14,14,18,0.96);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:10px 14px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .12s;min-width:138px;z-index:20;top:0;left:0;backdrop-filter:blur(8px);box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+          <div id="eq-tt-date" style="color:rgba(255,255,255,0.3);font-size:10px;font-family:var(--mono);margin-bottom:5px;letter-spacing:.3px;"></div>
+          <div id="eq-tt-bal" style="font-weight:700;font-family:var(--mono);font-size:15px;letter-spacing:-.3px;"></div>
+          <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:3px;font-weight:600;"></div>
         </div>
       </div>
     </div>
 
     <!-- ── TRADER DNA RADAR ── -->
     <div class="cc" id="trader-dna-card" style="margin-bottom:16px;padding:0;overflow:hidden;position:relative;">
-      <!-- Ambient background glow -->
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(0,217,126,0.04) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(139,92,246,0.05) 0%,transparent 60%);pointer-events:none;"></div>
-
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(0,217,126,0.04),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(139,92,246,0.05),transparent 60%);pointer-events:none;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:280px;">
-
-        <!-- LEFT: Radar Canvas -->
-        <div style="display:flex;align-items:center;justify-content:center;padding:20px 10px 20px 20px;position:relative;">
+        <div style="display:flex;align-items:center;justify-content:center;padding:20px 10px 20px 20px;">
           <canvas id="dnaRadar" style="max-width:240px;max-height:240px;width:100%;height:100%;"></canvas>
         </div>
-
-        <!-- RIGHT: Attributes list -->
         <div style="padding:22px 20px 22px 12px;display:flex;flex-direction:column;justify-content:space-between;">
-          <!-- Title row -->
           <div style="margin-bottom:16px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
               <div style="width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#00d97e,#a78bfa);box-shadow:0 0 8px rgba(0,217,126,0.6);"></div>
@@ -1295,75 +1283,15 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div style="font-size:17px;font-weight:700;letter-spacing:-.4px;color:var(--text);line-height:1.2;">DNA Analysis</div>
             <div id="dna-archetype" style="font-size:11px;color:var(--accent2);font-family:var(--mono);margin-top:3px;font-weight:600;">—</div>
           </div>
-
-          <!-- Attribute bars -->
           <div style="display:flex;flex-direction:column;gap:9px;flex:1;">
-            <!-- CONSISTENCY -->
-            <div class="dna-attr-row" data-idx="0">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Consistency</span>
-                <span id="dna-v0" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#00d97e;">—</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
-                <div id="dna-b0" style="height:100%;width:0%;background:linear-gradient(90deg,#00d97e,rgba(0,217,126,0.4));border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1);"></div>
-              </div>
-            </div>
-            <!-- DISCIPLINE -->
-            <div class="dna-attr-row" data-idx="1">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Discipline</span>
-                <span id="dna-v1" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#a78bfa;">—</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
-                <div id="dna-b1" style="height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.4));border-radius:2px;transition:width 1.1s cubic-bezier(.4,0,.2,1);"></div>
-              </div>
-            </div>
-            <!-- AGGRESSION -->
-            <div class="dna-attr-row" data-idx="2">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Aggression</span>
-                <span id="dna-v2" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#f59e0b;">—</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
-                <div id="dna-b2" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,rgba(245,158,11,0.4));border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);"></div>
-              </div>
-            </div>
-            <!-- EXECUTION -->
-            <div class="dna-attr-row" data-idx="3">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Execution</span>
-                <span id="dna-v3" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#38bdf8;">—</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
-                <div id="dna-b3" style="height:100%;width:0%;background:linear-gradient(90deg,#38bdf8,rgba(56,189,248,0.4));border-radius:2px;transition:width 1.3s cubic-bezier(.4,0,.2,1);"></div>
-              </div>
-            </div>
-            <!-- ENDURANCE -->
-            <div class="dna-attr-row" data-idx="4">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Endurance</span>
-                <span id="dna-v4" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#fb923c;">—</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
-                <div id="dna-b4" style="height:100%;width:0%;background:linear-gradient(90deg,#fb923c,rgba(251,146,60,0.4));border-radius:2px;transition:width 1.4s cubic-bezier(.4,0,.2,1);"></div>
-              </div>
-            </div>
-            <!-- VISION -->
-            <div class="dna-attr-row" data-idx="5">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Vision</span>
-                <span id="dna-v5" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#e879f9;">—</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
-                <div id="dna-b5" style="height:100%;width:0%;background:linear-gradient(90deg,#e879f9,rgba(232,121,249,0.4));border-radius:2px;transition:width 1.5s cubic-bezier(.4,0,.2,1);"></div>
-              </div>
-            </div>
+            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Consistency</span><span id="dna-v0" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#00d97e;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b0" style="height:100%;width:0%;background:linear-gradient(90deg,#00d97e,rgba(0,217,126,0.4));border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1);"></div></div></div>
+            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Discipline</span><span id="dna-v1" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#a78bfa;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b1" style="height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.4));border-radius:2px;transition:width 1.1s cubic-bezier(.4,0,.2,1);"></div></div></div>
+            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Aggression</span><span id="dna-v2" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#f59e0b;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b2" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,rgba(245,158,11,0.4));border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);"></div></div></div>
+            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Execution</span><span id="dna-v3" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#38bdf8;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b3" style="height:100%;width:0%;background:linear-gradient(90deg,#38bdf8,rgba(56,189,248,0.4));border-radius:2px;transition:width 1.3s cubic-bezier(.4,0,.2,1);"></div></div></div>
+            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Endurance</span><span id="dna-v4" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#fb923c;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b4" style="height:100%;width:0%;background:linear-gradient(90deg,#fb923c,rgba(251,146,60,0.4));border-radius:2px;transition:width 1.4s cubic-bezier(.4,0,.2,1);"></div></div></div>
+            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Vision</span><span id="dna-v5" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#e879f9;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b5" style="height:100%;width:0%;background:linear-gradient(90deg,#e879f9,rgba(232,121,249,0.4));border-radius:2px;transition:width 1.5s cubic-bezier(.4,0,.2,1);"></div></div></div>
           </div>
-
-          <!-- Footer: needs-more-data notice -->
-          <div id="dna-min-notice" style="margin-top:12px;font-size:9.5px;color:rgba(255,255,255,0.2);font-family:var(--mono);display:none;">
-            ⚡ Min. 5 trades untuk akurasi optimal
-          </div>
+          <div id="dna-min-notice" style="margin-top:12px;font-size:9.5px;color:rgba(255,255,255,0.2);font-family:var(--mono);display:none;">⚡ Min. 5 trades untuk akurasi optimal</div>
         </div>
       </div>
     </div>
@@ -3833,6 +3761,29 @@ function renderEq(){
   g.addColorStop(0.65, `rgba(${colRgb},.04)`);
   g.addColorStop(1, 'rgba(0,0,0,0)');
 
+  // ── Premium scrub plugin: gray overlay right of cursor ──
+  let _scrubIdx = null;
+  const scrubPlugin = {
+    id: 'eqScrub',
+    afterDatasetsDraw(chart) {
+      if (_scrubIdx === null || _scrubIdx >= D.length - 1) return;
+      const { ctx: c, chartArea: ca } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data[_scrubIdx]) return;
+      const ptX = meta.data[_scrubIdx].x;
+      if (ptX >= ca.right) return;
+      c.save();
+      c.fillStyle = 'rgba(20,20,26,0.72)';
+      c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
+      const fadeGrad = c.createLinearGradient(ptX, 0, ptX + 28, 0);
+      fadeGrad.addColorStop(0, 'rgba(20,20,26,0.5)');
+      fadeGrad.addColorStop(1, 'rgba(20,20,26,0)');
+      c.fillStyle = fadeGrad;
+      c.fillRect(ptX, ca.top, 28, ca.bottom - ca.top);
+      c.restore();
+    }
+  };
+
   if(eqCh) eqCh.destroy();
   eqCh = new Chart(ctx, {
     type: 'line',
@@ -3842,13 +3793,14 @@ function renderEq(){
         data: D,
         borderColor: col,
         backgroundColor: g,
-        borderWidth: 2,
+        borderWidth: 2.5,
         pointRadius: 0,
         pointHoverRadius: 0,
         fill: true,
-        tension: .35,
+        tension: .38,
       }]
     },
+    plugins: [scrubPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -3874,56 +3826,66 @@ function renderEq(){
     }
   });
 
-  // ── Custom crosshair + tooltip ──
-  const area    = $('eq-chart-area');
-  const chEl    = $('eq-crosshair');
-  const dotEl   = $('eq-ch-dot');
-  const ttEl    = $('eq-tooltip');
-  const ttDate  = $('eq-tt-date');
-  const ttBal   = $('eq-tt-bal');
-  const ttPnl   = $('eq-tt-pnl');
-
+  // ── Smooth scrubbing: continuous crosshair + live header update + auto-restore ──
+  const area = $('eq-chart-area');
   if(!area) return;
 
-  // Reset listeners langsung — JANGAN cloneNode karena akan menghapus canvas Chart.js dari DOM
-  area.onmousemove = null;
-  area.onmouseleave = null;
-  const areaEl = area;
+  const eqBalScrub = eqBalEl;
+  const eqPctScrub = eqPctEl;
+  let _restoreTimer = null;
+  let _isScrubbing = false;
 
-  areaEl.onmousemove = (e) => {
+  const crossh = $('eq-crosshair');
+  const dot    = $('eq-ch-dot');
+  const tt     = $('eq-tooltip');
+  const ttD    = $('eq-tt-date');
+  const ttB    = $('eq-tt-bal');
+  const ttP    = $('eq-tt-pnl');
+
+  function doScrub(clientX) {
     if(!eqCh) return;
-    const rect = areaEl.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const rect = area.getBoundingClientRect();
+    const x = clientX - rect.left;
     const ca = eqCh.chartArea;
-    if(!ca || x < ca.left || x > ca.right){
-      $('eq-crosshair').style.opacity = '0';
-      $('eq-tooltip').style.opacity = '0';
-      return;
-    }
-    const frac = (x - ca.left) / (ca.right - ca.left);
-    const idx = Math.max(0, Math.min(D.length-1, Math.round(frac*(D.length-1))));
+    if(!ca || x < ca.left || x > ca.right){ hideScrub(); return; }
+
+    const frac = Math.max(0, Math.min(1, (x - ca.left) / (ca.right - ca.left)));
+    const idx  = Math.max(0, Math.min(D.length - 1, Math.round(frac * (D.length - 1))));
     const meta = eqCh.getDatasetMeta(0);
     if(!meta || !meta.data[idx]) return;
     const pt = meta.data[idx];
 
-    const crossh = $('eq-crosshair');
-    const dot    = $('eq-ch-dot');
-    const tt     = $('eq-tooltip');
-    const ttD    = $('eq-tt-date');
-    const ttB    = $('eq-tt-bal');
-    const ttP    = $('eq-tt-pnl');
+    _scrubIdx = idx;
+    eqCh.draw();
 
     crossh.style.opacity = '1';
     crossh.style.left = pt.x + 'px';
     dot.style.top = (pt.y - 5) + 'px';
     dot.style.background = col;
+    dot.style.boxShadow = `0 0 8px ${col}`;
 
-    const d = D[idx];
-    const lbl = L[idx];
-    const pnlVal = idx === 0 ? 0 : (D[idx] - D[idx-1]);
+    const d       = D[idx];
+    const lbl     = L[idx];
+    const pnlVal  = idx === 0 ? 0 : (D[idx] - D[idx-1]);
     const pnlSign = pnlVal >= 0 ? '+' : '';
-    const pnlColor = pnlVal >= 0 ? '#22c55e' : '#ef4444';
-    const dateStr = rawDates[idx] ? new Date(rawDates[idx]+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : lbl;
+    const pnlColor= pnlVal >= 0 ? '#22c55e' : '#ef4444';
+    const dateStr = rawDates[idx]
+      ? new Date(rawDates[idx]+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})
+      : lbl;
+
+    // Live update header
+    if(eqBalScrub) {
+      eqBalScrub.textContent = '$' + d.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const fromStart = startVal > 0 ? ((d - startVal) / startVal * 100) : 0;
+      const fsSign   = fromStart >= 0 ? '+' : '';
+      const fsColor  = fromStart >= 0 ? '#00d97e' : '#ef4444';
+      eqBalScrub.style.color = fsColor;
+      if(eqPctScrub) {
+        eqPctScrub.textContent = fsSign + fromStart.toFixed(2) + '%';
+        eqPctScrub.style.color = fsColor;
+        eqPctScrub.style.background = fromStart >= 0 ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+      }
+    }
 
     ttD.textContent = dateStr;
     ttB.textContent = '$' + d.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -3932,229 +3894,142 @@ function renderEq(){
     ttP.style.color = pnlColor;
     tt.style.opacity = '1';
 
-    // Posisi tooltip: kiri/kanan crosshair, jangan keluar layar
-    const ttW = 138;
-    let tx = pt.x + 14;
-    if(tx + ttW > rect.width - 10) tx = pt.x - ttW - 10;
+    const ttW = 145;
+    let tx = pt.x + 16;
+    if(tx + ttW > rect.width - 10) tx = pt.x - ttW - 12;
     tt.style.left = tx + 'px';
-    tt.style.top = Math.max(0, pt.y - 38) + 'px';
-  };
+    tt.style.top  = Math.max(4, pt.y - 42) + 'px';
 
-  areaEl.onmouseleave = () => {
-    const crossh = $('eq-crosshair');
-    const tt     = $('eq-tooltip');
-    if(crossh) crossh.style.opacity = '0';
-    if(tt)     tt.style.opacity     = '0';
-  };
-}
-// ── TRADER DNA RADAR ─────────────────────────────────────────────────────
-let dnaCh = null;
+    _isScrubbing = true;
+    if(_restoreTimer) clearTimeout(_restoreTimer);
+  }
 
-function calcDNA(tradeList) {
-  const n = tradeList.length;
-  if (n === 0) return [0,0,0,0,0,0];
-
-  const wins   = tradeList.filter(t => t.result === 'Win');
-  const losses = tradeList.filter(t => t.result === 'Loss');
-  const wr     = wins.length / n;
-
-  // 1. CONSISTENCY — berdasarkan win rate & volatilitas PnL
-  const avgPnl  = tradeList.reduce((s,t) => s + t.pnl, 0) / n;
-  const stdPnl  = Math.sqrt(tradeList.reduce((s,t) => s + Math.pow(t.pnl - avgPnl, 2), 0) / n);
-  const cv      = stdPnl > 0 ? Math.abs(avgPnl / stdPnl) : 0; // coefficient of variation inverse
-  const consistency = Math.min(100, Math.round(wr * 55 + Math.min(cv, 1) * 45));
-
-  // 2. DISCIPLINE — profit factor proxy + average R vs 1
-  const gw   = wins.reduce((s,t) => s + t.pnl, 0);
-  const gl   = Math.abs(losses.reduce((s,t) => s + t.pnl, 0));
-  const pf   = gl > 0 ? gw / gl : gw > 0 ? 3 : 1;
-  const avgR = n > 0 ? tradeList.reduce((s,t) => s + (t.r || 0), 0) / n : 0;
-  const discipline = Math.min(100, Math.round(Math.min(pf / 3, 1) * 60 + Math.min(Math.max(avgR, 0) / 3, 1) * 40));
-
-  // 3. AGGRESSION — frekuensi trading (trades per unique day) + avg |pnl|
-  const days = new Set(tradeList.map(t => t.date)).size || 1;
-  const freq = Math.min(n / days, 5) / 5; // normalize 0-1, max 5 trades/day = max
-  const aggression = Math.min(100, Math.round(freq * 55 + Math.min(Math.abs(avgPnl) / 200, 1) * 45));
-
-  // 4. EXECUTION — avg R:R quality: higher avg R + less losses by $ = better execution
-  const execR  = Math.min(Math.max(avgR, 0) / 4, 1);  // 4R max
-  const lossRate = n > 0 ? losses.length / n : 1;
-  const execution = Math.min(100, Math.round(execR * 65 + (1 - lossRate) * 35));
-
-  // 5. ENDURANCE — longest streak + no rage-quitting (not many big losses in a row)
-  let streak = 0, maxStreak = 0;
-  tradeList.forEach(t => {
-    if (t.result === 'Win') { streak++; maxStreak = Math.max(maxStreak, streak); }
-    else streak = 0;
-  });
-  const streakNorm = Math.min(maxStreak / Math.max(n * 0.4, 3), 1);
-  const endurance = Math.min(100, Math.round(streakNorm * 70 + wr * 30));
-
-  // 6. VISION — diversification across pairs
-  const pairs = new Set(tradeList.map(t => t.pair).filter(Boolean));
-  const divScore = Math.min(pairs.size / 6, 1); // 6 pairs = max
-  const vision = Math.min(100, Math.round(divScore * 60 + Math.min(n / 20, 1) * 40));
-
-  return [consistency, discipline, aggression, execution, endurance, vision];
-}
-
-function getTraderArchetype(scores) {
-  const [consistency, discipline, aggression, execution, endurance, vision] = scores;
-  const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
-
-  if (avg < 20) return '⚡ Novice — Terus berlatih';
-  if (consistency > 75 && discipline > 75) return '🎯 Precision Sniper';
-  if (aggression > 70 && execution > 65)   return '⚔️ Aggressive Hunter';
-  if (endurance > 70 && vision > 65)       return '🌊 Trend Surfer';
-  if (discipline > 70 && vision > 60)      return '🧠 Strategic Analyst';
-  if (consistency > 60 && endurance > 60)  return '🛡️ Risk Manager';
-  if (aggression > 65)                      return '🔥 Momentum Trader';
-  if (avg > 60)                             return '⚖️ Balanced Trader';
-  return '📈 Developing Trader';
-}
-
-function renderDNA() {
-  const ft = trades; // always use all trades for DNA
-  const scores = calcDNA(ft);
-  const colors = ['#00d97e','#a78bfa','#f59e0b','#38bdf8','#fb923c','#e879f9'];
-  const barIds = ['dna-b0','dna-b1','dna-b2','dna-b3','dna-b4','dna-b5'];
-  const valIds = ['dna-v0','dna-v1','dna-v2','dna-v3','dna-v4','dna-v5'];
-
-  // Update bars + values
-  scores.forEach((s, i) => {
-    const bar = $(barIds[i]);
-    const val = $(valIds[i]);
-    if (bar) { setTimeout(() => { bar.style.width = s + '%'; }, i * 60); }
-    if (val) val.textContent = s;
-  });
-
-  // Archetype
-  const arch = $('dna-archetype');
-  if (arch) arch.textContent = getTraderArchetype(scores);
-
-  // Min notice
-  const notice = $('dna-min-notice');
-  if (notice) notice.style.display = ft.length < 5 ? 'block' : 'none';
-
-  // Radar chart
-  const canvas = $('dnaRadar');
-  if (!canvas) return;
-
-  if (dnaCh) { dnaCh.destroy(); dnaCh = null; }
-
-  // Premium custom radar plugin — hexagon grid with glow
-  const hexRadarPlugin = {
-    id: 'hexRadar',
-    beforeDraw(chart) {
-      const { ctx, chartArea } = chart;
-      if (!chartArea) return;
-      const cx = (chartArea.left + chartArea.right) / 2;
-      const cy = (chartArea.top + chartArea.bottom) / 2;
-      const maxR = Math.min(chartArea.width, chartArea.height) / 2 * 0.85;
-      const n = 6;
-      const levels = 5;
-
-      ctx.save();
-      // Draw concentric hexagons (grid)
-      for (let lv = levels; lv >= 1; lv--) {
-        const r = maxR * (lv / levels);
-        ctx.beginPath();
-        for (let i = 0; i < n; i++) {
-          const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-          const x = cx + r * Math.cos(angle);
-          const y = cy + r * Math.sin(angle);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  function hideScrub() {
+    crossh.style.opacity = '0';
+    tt.style.opacity     = '0';
+    if(_isScrubbing) {
+      if(_restoreTimer) clearTimeout(_restoreTimer);
+      _restoreTimer = setTimeout(() => {
+        _scrubIdx    = null;
+        _isScrubbing = false;
+        if(eqCh) eqCh.draw();
+        if(eqBalScrub) {
+          eqBalScrub.textContent = '$' + endVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+          eqBalScrub.style.color = col;
         }
-        ctx.closePath();
-        ctx.strokeStyle = `rgba(255,255,255,${lv === levels ? 0.08 : 0.04})`;
-        ctx.lineWidth = lv === levels ? 1 : 0.5;
-        ctx.stroke();
-      }
+        if(eqPctScrub) {
+          eqPctScrub.textContent = sign + pct.toFixed(2) + '%';
+          eqPctScrub.style.color = col;
+          eqPctScrub.style.background = up ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+        }
+      }, 1200);
+    }
+  }
 
-      // Spoke lines
-      for (let i = 0; i < n; i++) {
-        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+  area.onmousemove  = (e) => doScrub(e.clientX);
+  area.onmouseleave = ()  => hideScrub();
+  area.ontouchmove  = (e) => { e.preventDefault(); if(e.touches[0]) doScrub(e.touches[0].clientX); };
+  area.ontouchend   = ()  => hideScrub();
+  area.ontouchcancel= ()  => hideScrub();
+}
+// ── TRADER DNA RADAR ────────────────────────────────────────────────────
+let dnaCh = null;
+function calcDNA(tl){
+  const n=tl.length;if(n===0)return[0,0,0,0,0,0];
+  const wins=tl.filter(t=>t.result==='Win'),losses=tl.filter(t=>t.result==='Loss');
+  const wr=wins.length/n;
+  const avgPnl=tl.reduce((s,t)=>s+t.pnl,0)/n;
+  const stdPnl=Math.sqrt(tl.reduce((s,t)=>s+Math.pow(t.pnl-avgPnl,2),0)/n);
+  const cv=stdPnl>0?Math.abs(avgPnl/stdPnl):0;
+  const consistency=Math.min(100,Math.round(wr*55+Math.min(cv,1)*45));
+  const gw=wins.reduce((s,t)=>s+t.pnl,0),gl=Math.abs(losses.reduce((s,t)=>s+t.pnl,0));
+  const pf=gl>0?gw/gl:gw>0?3:1;
+  const avgR=tl.reduce((s,t)=>s+(t.r||0),0)/n;
+  const discipline=Math.min(100,Math.round(Math.min(pf/3,1)*60+Math.min(Math.max(avgR,0)/3,1)*40));
+  const days=new Set(tl.map(t=>t.date)).size||1;
+  const freq=Math.min(n/days,5)/5;
+  const aggression=Math.min(100,Math.round(freq*55+Math.min(Math.abs(avgPnl)/200,1)*45));
+  const execR=Math.min(Math.max(avgR,0)/4,1);
+  const execution=Math.min(100,Math.round(execR*65+(1-losses.length/n)*35));
+  let streak=0,maxStreak=0;
+  tl.forEach(t=>{if(t.result==='Win'){streak++;maxStreak=Math.max(maxStreak,streak);}else streak=0;});
+  const endurance=Math.min(100,Math.round(Math.min(maxStreak/Math.max(n*0.4,3),1)*70+wr*30));
+  const pairs=new Set(tl.map(t=>t.pair).filter(Boolean));
+  const vision=Math.min(100,Math.round(Math.min(pairs.size/6,1)*60+Math.min(n/20,1)*40));
+  return[consistency,discipline,aggression,execution,endurance,vision];
+}
+function getArchetype(s){
+  const avg=s.reduce((a,b)=>a+b,0)/s.length;
+  if(avg<20)return'⚡ Novice — Terus berlatih';
+  if(s[0]>75&&s[1]>75)return'🎯 Precision Sniper';
+  if(s[2]>70&&s[3]>65)return'⚔️ Aggressive Hunter';
+  if(s[4]>70&&s[5]>65)return'🌊 Trend Surfer';
+  if(s[1]>70&&s[5]>60)return'🧠 Strategic Analyst';
+  if(s[0]>60&&s[4]>60)return'🛡️ Risk Manager';
+  if(s[2]>65)return'🔥 Momentum Trader';
+  if(avg>60)return'⚖️ Balanced Trader';
+  return'📈 Developing Trader';
+}
+function renderDNA(){
+  const scores=calcDNA(trades);
+  const colors=['#00d97e','#a78bfa','#f59e0b','#38bdf8','#fb923c','#e879f9'];
+  scores.forEach((s,i)=>{
+    const b=$('dna-b'+i),v=$('dna-v'+i);
+    if(b)setTimeout(()=>{b.style.width=s+'%';},i*60);
+    if(v)v.textContent=s;
+  });
+  const arch=$('dna-archetype');if(arch)arch.textContent=getArchetype(scores);
+  const notice=$('dna-min-notice');if(notice)notice.style.display=trades.length<5?'block':'none';
+  const canvas=$('dnaRadar');if(!canvas)return;
+  if(dnaCh){dnaCh.destroy();dnaCh=null;}
+  const hexPlugin={
+    id:'hexR',
+    beforeDraw(chart){
+      const{ctx,chartArea:ca}=chart;if(!ca)return;
+      const cx=(ca.left+ca.right)/2,cy=(ca.top+ca.bottom)/2;
+      const maxR=Math.min(ca.width,ca.height)/2*0.85;
+      ctx.save();
+      for(let lv=5;lv>=1;lv--){
+        const r=maxR*(lv/5);
         ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + maxR * Math.cos(angle), cy + maxR * Math.sin(angle));
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
+        for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+        ctx.closePath();
+        ctx.strokeStyle=`rgba(255,255,255,${lv===5?0.08:0.04})`;ctx.lineWidth=lv===5?1:0.5;ctx.stroke();
       }
+      for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=0.5;ctx.stroke();}
       ctx.restore();
     }
   };
-
-  const labels = ['Consistency','Discipline','Aggression','Execution','Endurance','Vision'];
-
-  dnaCh = new Chart(canvas.getContext('2d'), {
-    type: 'radar',
-    data: {
-      labels,
-      datasets: [{
-        data: scores,
-        backgroundColor: 'rgba(0,217,126,0.07)',
-        borderColor: 'rgba(0,217,126,0.7)',
-        borderWidth: 1.5,
-        pointRadius: 3,
-        pointBackgroundColor: scores.map((s, i) => colors[i]),
-        pointBorderColor: scores.map((s, i) => colors[i]),
-        pointBorderWidth: 0,
-        pointHoverRadius: 5,
-        fill: true,
-        tension: 0.1,
-      }, {
-        // Second dataset: accent overlay with purple
-        data: scores.map(s => s * 0.72),
-        backgroundColor: 'rgba(139,92,246,0.06)',
-        borderColor: 'rgba(139,92,246,0.35)',
-        borderWidth: 1,
-        pointRadius: 0,
-        fill: true,
-        tension: 0.1,
-      }]
+  dnaCh=new Chart(canvas.getContext('2d'),{
+    type:'radar',
+    data:{
+      labels:['Consistency','Discipline','Aggression','Execution','Endurance','Vision'],
+      datasets:[
+        {data:scores,backgroundColor:'rgba(0,217,126,0.07)',borderColor:'rgba(0,217,126,0.7)',borderWidth:1.5,pointRadius:3,pointBackgroundColor:colors,pointBorderColor:colors,pointBorderWidth:0,pointHoverRadius:5,fill:true,tension:0.1},
+        {data:scores.map(s=>s*0.72),backgroundColor:'rgba(139,92,246,0.06)',borderColor:'rgba(139,92,246,0.35)',borderWidth:1,pointRadius:0,fill:true,tension:0.1}
+      ]
     },
-    plugins: [hexRadarPlugin],
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      animation: { duration: 900, easing: 'easeInOutQuart' },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(14,14,18,0.95)',
-          borderColor: 'rgba(255,255,255,0.12)',
-          borderWidth: 1,
-          bodyColor: '#f0f0f0',
-          titleColor: 'rgba(255,255,255,0.4)',
-          bodyFont: { family: "'JetBrains Mono','Courier New',monospace", size: 12, weight: '700' },
-          titleFont: { family: "'DM Sans',-apple-system,sans-serif", size: 10 },
-          padding: 10,
-          cornerRadius: 10,
-          callbacks: {
-            title: (items) => labels[items[0].dataIndex],
-            label: (item) => {
-              if (item.datasetIndex === 1) return null;
-              return ' ' + item.raw + ' / 100';
-            }
+    plugins:[hexPlugin],
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      animation:{duration:900,easing:'easeInOutQuart'},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'rgba(14,14,18,0.95)',borderColor:'rgba(255,255,255,0.12)',borderWidth:1,
+          bodyColor:'#f0f0f0',titleColor:'rgba(255,255,255,0.4)',
+          bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:12,weight:'700'},
+          titleFont:{family:"'DM Sans',-apple-system,sans-serif",size:10},
+          padding:10,cornerRadius:10,
+          callbacks:{
+            title:(items)=>['Consistency','Discipline','Aggression','Execution','Endurance','Vision'][items[0].dataIndex],
+            label:(item)=>item.datasetIndex===1?null:' '+item.raw+' / 100'
           },
-          filter: (item) => item.datasetIndex === 0,
+          filter:(item)=>item.datasetIndex===0
         }
       },
-      scales: {
-        r: {
-          display: false,
-          min: 0,
-          max: 100,
-          grid: { display: false },
-          angleLines: { display: false },
-          pointLabels: { display: false },
-          ticks: { display: false },
-        }
-      },
-      elements: {
-        line: { borderJoinStyle: 'round' }
-      }
+      scales:{r:{display:false,min:0,max:100,grid:{display:false},angleLines:{display:false},pointLabels:{display:false},ticks:{display:false}}},
+      elements:{line:{borderJoinStyle:'round'}}
     }
   });
 }
@@ -4163,7 +4038,79 @@ function renderPnl(){
   const ft=getFilteredTrades();
   const L=ft.map((_,i)=>'#'+(i+1)),D=ft.map(t=>t.pnl);
   if(pnlCh)pnlCh.destroy();
-  pnlCh=new Chart($('pnlC').getContext('2d'),{type:'bar',data:{labels:L,datasets:[{data:D,backgroundColor:D.map(v=>v>=0?'#00d97e':'#ff4d4d'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+c.raw.toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:'#444',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v}}}}});
+
+  const premiumBarPlugin = {
+    id:'premiumBar',
+    beforeDatasetsDraw(chart){
+      const{ctx,data,chartArea:ca,scales:{x,y}}=chart;
+      if(!x||!y)return;
+      const meta=chart.getDatasetMeta(0);
+      const zeroY=y.getPixelForValue(0);
+      meta.data.forEach((bar,i)=>{
+        const val=data.datasets[0].data[i];
+        if(val===undefined||val===null)return;
+        const isPos=val>=0;
+        const bx=bar.x,bw=bar.width;
+        const bTop=isPos?bar.y:zeroY;
+        const bBot=isPos?zeroY:bar.y;
+        const bH=Math.abs(bBot-bTop);
+        if(bH<1)return;
+        const r=Math.min(4,bw/2);
+        ctx.save();
+        ctx.beginPath();
+        if(isPos){
+          ctx.moveTo(bx-bw/2+r,bTop);ctx.lineTo(bx+bw/2-r,bTop);
+          ctx.quadraticCurveTo(bx+bw/2,bTop,bx+bw/2,bTop+r);
+          ctx.lineTo(bx+bw/2,bBot);ctx.lineTo(bx-bw/2,bBot);
+          ctx.lineTo(bx-bw/2,bTop+r);
+          ctx.quadraticCurveTo(bx-bw/2,bTop,bx-bw/2+r,bTop);
+        }else{
+          ctx.moveTo(bx-bw/2,bTop);ctx.lineTo(bx+bw/2,bTop);
+          ctx.lineTo(bx+bw/2,bBot-r);
+          ctx.quadraticCurveTo(bx+bw/2,bBot,bx+bw/2-r,bBot);
+          ctx.lineTo(bx-bw/2+r,bBot);
+          ctx.quadraticCurveTo(bx-bw/2,bBot,bx-bw/2,bBot-r);
+          ctx.lineTo(bx-bw/2,bTop);
+        }
+        ctx.closePath();
+        const grad=ctx.createLinearGradient(0,bTop,0,bBot);
+        if(isPos){grad.addColorStop(0,'rgba(0,217,126,0.95)');grad.addColorStop(1,'rgba(0,217,126,0.35)');}
+        else{grad.addColorStop(0,'rgba(255,77,77,0.35)');grad.addColorStop(1,'rgba(255,77,77,0.9)');}
+        ctx.fillStyle=grad;
+        ctx.shadowColor=isPos?'rgba(0,217,126,0.4)':'rgba(255,77,77,0.35)';
+        ctx.shadowBlur=8;
+        ctx.fill();
+        ctx.shadowBlur=0;
+        ctx.restore();
+      });
+    }
+  };
+
+  pnlCh=new Chart($('pnlC').getContext('2d'),{
+    type:'bar',
+    data:{labels:L,datasets:[{data:D,backgroundColor:'transparent',borderWidth:0}]},
+    plugins:[premiumBarPlugin],
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:500,easing:'easeOutQuart'},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#16161a',borderColor:'rgba(255,255,255,.12)',borderWidth:1,
+          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:10,
+          callbacks:{
+            title:(items)=>'Trade '+items[0].label,
+            label:c=>{const s=c.raw>=0?'+':'';return' P&L: '+s+'$'+c.raw.toFixed(2);},
+            labelColor:(c)=>({borderColor:'transparent',backgroundColor:c.raw>=0?'#00d97e':'#ff4d4d',borderRadius:4})
+          }
+        }
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#3f3f46',font:{size:9}},border:{display:false}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3f3f46',font:{family:'DM Mono',size:9},callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))},border:{display:false}}
+      }
+    }
+  });
 }
 function renderDonut(){
   const ft=getFilteredTrades();
@@ -4172,7 +4119,6 @@ function renderDonut(){
   const be=ft.filter(t=>t.result==='Breakeven').length;
   const total=w+l+be;
 
-  // Update legend counts and percentages
   const pct=(n)=> total>0 ? '('+Math.round(n/total*100)+'%)' : '';
   $('dn-wins').textContent    = w;
   $('dn-losses').textContent  = l;
@@ -4190,25 +4136,55 @@ function renderDonut(){
   $('donut-legend').style.display='flex';
   $('donut-empty').style.display='none';
 
+  const donutGlowPlugin={
+    id:'donutGlow',
+    afterDraw(chart){
+      const{ctx,chartArea}=chart;
+      const cx=(chartArea.left+chartArea.right)/2;
+      const cy=(chartArea.top+chartArea.bottom)/2;
+      const wr=w/total,lr=l/total;
+      ctx.save();
+      const rg=ctx.createRadialGradient(cx,cy,0,cx,cy,32);
+      if(wr>lr){rg.addColorStop(0,'rgba(0,217,126,0.15)');rg.addColorStop(1,'rgba(0,217,126,0)');}
+      else if(lr>wr){rg.addColorStop(0,'rgba(255,77,77,0.12)');rg.addColorStop(1,'rgba(255,77,77,0)');}
+      else{rg.addColorStop(0,'rgba(139,92,246,0.1)');rg.addColorStop(1,'rgba(139,92,246,0)');}
+      ctx.fillStyle=rg;ctx.beginPath();ctx.arc(cx,cy,32,0,Math.PI*2);ctx.fill();
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      const winRate=total>0?Math.round(w/total*100):0;
+      ctx.font='bold 16px "DM Mono","JetBrains Mono",monospace';
+      ctx.fillStyle=wr>=lr?'#00d97e':'#ff4d4d';
+      ctx.fillText(winRate+'%',cx,cy-7);
+      ctx.font='9px "DM Sans",-apple-system,sans-serif';
+      ctx.fillStyle='rgba(255,255,255,0.3)';
+      ctx.fillText('WIN RATE',cx,cy+9);
+      ctx.restore();
+    }
+  };
+
   if(dnCh)dnCh.destroy();
   dnCh=new Chart($('dnC').getContext('2d'),{
     type:'doughnut',
     data:{
       labels:['Wins','Losses','Breakeven'],
-      datasets:[{data:[w,l,be],backgroundColor:['#00d97e','#ff4d4d','#555'],borderWidth:0,hoverOffset:4}]
+      datasets:[{
+        data:[w,l,be],
+        backgroundColor:['rgba(0,217,126,1)','rgba(255,77,77,1)','rgba(80,80,90,1)'],
+        hoverBackgroundColor:['rgba(0,240,140,1)','rgba(255,100,100,1)','rgba(110,110,120,1)'],
+        borderWidth:0,hoverOffset:6,spacing:2
+      }]
     },
+    plugins:[donutGlowPlugin],
     options:{
-      responsive:true,maintainAspectRatio:false,cutout:'70%',
+      responsive:true,maintainAspectRatio:false,cutout:'72%',
+      animation:{duration:700,easing:'easeInOutQuart'},
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
-          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},
+          backgroundColor:'#16161a',borderColor:'rgba(255,255,255,.12)',borderWidth:1,
+          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:10,
           callbacks:{
-            label: c => {
-              const pct = total>0 ? Math.round(c.raw/total*100) : 0;
-              return ` ${c.label}: ${c.raw} (${pct}%)`;
-            }
+            label:c=>{const p=total>0?Math.round(c.raw/total*100):0;return` ${c.label}: ${c.raw} (${p}%)`;},
+            labelColor:(c)=>{const cols=['rgba(0,217,126,0.8)','rgba(255,77,77,0.8)','rgba(80,80,90,0.8)'];return{borderColor:'transparent',backgroundColor:cols[c.dataIndex],borderRadius:3};}
           }
         }
       }
