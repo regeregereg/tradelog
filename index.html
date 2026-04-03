@@ -268,19 +268,15 @@ body::before{
 .dna-stat-val{font-size:10.5px;font-weight:700;font-family:var(--mono);min-width:24px;text-align:right;}
 
 /* ── DASHBOARD DESKTOP 2-COL ── */
+#dash-main-content{min-width:0;}
 @media(min-width:1100px){
-  #page-dashboard{display:grid;grid-template-columns:1fr 272px;column-gap:18px;align-items:start;}
-  #page-dashboard>.ph{grid-column:1/3;}
-  #page-dashboard>#trader-card{grid-column:1/3;}
-  #page-dashboard>#guest-banner{grid-column:1/3;}
-  #page-dashboard>.bbal{grid-column:1/3;}
-  #page-dashboard>#period-tabs-wrap{grid-column:1/3;}
-  #dash-main-content{grid-column:1;}
-  #dash-right-panel{grid-column:2;align-self:start;position:sticky;top:32px;}
+  #dash-inner-wrap{display:flex;gap:18px;align-items:flex-start;}
+  #dash-main-content{flex:1;min-width:0;}
+  #dash-right-panel{width:272px;flex-shrink:0;position:sticky;top:32px;align-self:flex-start;}
 }
 @media(max-width:1099px){
+  #dash-inner-wrap{display:block;}
   #dash-right-panel{display:none!important;}
-  #dash-main-content{display:contents;}
 }
 
 /* ── MINI CALENDAR PANEL ── */
@@ -1259,8 +1255,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
 
-    <!-- Period Filter Tabs -->
-    <div id="period-tabs-wrap" style="margin-bottom:16px">
+    <!-- Period Filter Tabs (full width, outside inner wrap) -->
+    <div style="margin-bottom:16px">
       <div class="period-tabs" id="period-tabs">
         <button class="ptab active" data-period="all">Overview</button>
         <button class="ptab" data-period="7">7 Hari</button>
@@ -1269,6 +1265,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
 
+    <!-- Desktop 2-col: main content left, calendar right -->
+    <div id="dash-inner-wrap">
     <div id="dash-main-content">
 
     <!-- Stat Cards -->
@@ -1444,6 +1442,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
   </div>
 
+  </div><!-- /dash-inner-wrap -->
   </div><!-- /page-dashboard -->
 
   <!-- JOURNAL -->
