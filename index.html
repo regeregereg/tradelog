@@ -45,15 +45,7 @@ window.addEventListener('load', function() {
 });
 </script>
 <meta name="theme-color" content="#0e0e10">
-  
-<!-- PWA Manifest -->
-<link rel="manifest" href="/manifest.json">
 
-<!-- iOS Support -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RiskPerTrade">
-  
 <!-- ── Structured Data (JSON-LD) for Google ── -->
 <script type="application/ld+json">
 {
@@ -1257,16 +1249,16 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
       <!-- Chart area with custom crosshair + tooltip -->
       <div style="position:relative;" id="eq-chart-area">
-        <div style="position:relative;height:180px;"><canvas id="eqC"></canvas></div>
+        <div style="position:relative;height:180px;touch-action:none;"><canvas id="eqC"></canvas></div>
         <!-- Custom crosshair -->
-        <div id="eq-crosshair" style="position:absolute;top:0;bottom:20px;width:1px;background:rgba(255,255,255,0.14);pointer-events:none;opacity:0;transition:opacity .1s;left:0;">
-          <div id="eq-ch-dot" style="position:absolute;width:9px;height:9px;border-radius:50%;border:2px solid #fff;margin-left:-5px;top:0;"></div>
+        <div id="eq-crosshair" style="position:absolute;top:0;bottom:20px;width:1px;background:linear-gradient(to bottom,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.08) 100%);pointer-events:none;opacity:0;transition:opacity .08s;left:0;">
+          <div id="eq-ch-dot" style="position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,0.9);margin-left:-5px;top:0;box-shadow:0 0 10px rgba(0,217,126,0.6);transition:background .1s,box-shadow .1s;"></div>
         </div>
         <!-- Custom tooltip -->
-        <div id="eq-tooltip" style="position:absolute;background:#16161a;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:9px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;min-width:130px;z-index:20;top:0;left:0;">
-          <div id="eq-tt-date" style="color:var(--text3);font-size:10px;font-family:var(--mono);margin-bottom:4px;"></div>
-          <div id="eq-tt-bal" style="font-weight:700;font-family:var(--mono);font-size:14px;"></div>
-          <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:2px;"></div>
+        <div id="eq-tooltip" style="position:absolute;background:rgba(14,14,18,0.96);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:10px 14px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .12s;min-width:138px;z-index:20;top:0;left:0;backdrop-filter:blur(8px);box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+          <div id="eq-tt-date" style="color:rgba(255,255,255,0.3);font-size:10px;font-family:var(--mono);margin-bottom:5px;letter-spacing:.3px;"></div>
+          <div id="eq-tt-bal" style="font-weight:700;font-family:var(--mono);font-size:15px;letter-spacing:-.3px;"></div>
+          <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:3px;font-weight:600;"></div>
         </div>
       </div>
     </div>
@@ -3708,7 +3700,6 @@ function renderEq(){
     eqPctEl.style.color = col;
   }
 
-  // ── Legacy eqs/eqn (kept for compatibility) ──
   $('eqs').textContent = 'Start $' + startVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   $('eqn').textContent = 'Now $' + endVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -3724,7 +3715,6 @@ function renderEq(){
   if(statDD)   statDD.textContent   = '-' + maxDD.toFixed(2) + '%';
   if(statTr)   statTr.textContent   = ft.length;
 
-  // ── LIVE badge: tampil kalau ada trades & period pendek ──
   const liveBadge = $('eq-live-badge');
   if(liveBadge) liveBadge.style.display = (ft.length > 0 && (eqLocalPeriod==='7'||eqLocalPeriod==='30')) ? 'flex' : 'none';
 
@@ -3736,6 +3726,33 @@ function renderEq(){
   g.addColorStop(0.65, `rgba(${colRgb},.04)`);
   g.addColorStop(1, 'rgba(0,0,0,0)');
 
+  // ── Premium scrub plugin: gray area to the right of cursor ──
+  let _scrubIdx = null;
+  const scrubPlugin = {
+    id: 'eqScrub',
+    afterDatasetsDraw(chart) {
+      if (_scrubIdx === null || _scrubIdx >= D.length - 1) return;
+      const { ctx: c, chartArea: ca, scales: { x, y } } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data[_scrubIdx]) return;
+      const ptX = meta.data[_scrubIdx].x;
+      if (ptX >= ca.right) return;
+
+      // Gray overlay on right side
+      c.save();
+      c.fillStyle = 'rgba(30,30,35,0.72)';
+      c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
+
+      // Subtle right-edge fade
+      const fadeGrad = c.createLinearGradient(ptX, 0, ptX + 24, 0);
+      fadeGrad.addColorStop(0, 'rgba(30,30,35,0.55)');
+      fadeGrad.addColorStop(1, 'rgba(30,30,35,0)');
+      c.fillStyle = fadeGrad;
+      c.fillRect(ptX, ca.top, 24, ca.bottom - ca.top);
+      c.restore();
+    }
+  };
+
   if(eqCh) eqCh.destroy();
   eqCh = new Chart(ctx, {
     type: 'line',
@@ -3745,13 +3762,14 @@ function renderEq(){
         data: D,
         borderColor: col,
         backgroundColor: g,
-        borderWidth: 2,
+        borderWidth: 2.5,
         pointRadius: 0,
         pointHoverRadius: 0,
         fill: true,
-        tension: .35,
+        tension: .38,
       }]
     },
+    plugins: [scrubPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -3777,56 +3795,74 @@ function renderEq(){
     }
   });
 
-  // ── Custom crosshair + tooltip ──
+  // ── Custom smooth scrubbing crosshair + tooltip ──
   const area    = $('eq-chart-area');
-  const chEl    = $('eq-crosshair');
-  const dotEl   = $('eq-ch-dot');
-  const ttEl    = $('eq-tooltip');
-  const ttDate  = $('eq-tt-date');
-  const ttBal   = $('eq-tt-bal');
-  const ttPnl   = $('eq-tt-pnl');
-
   if(!area) return;
 
-  // Reset listeners langsung — JANGAN cloneNode karena akan menghapus canvas Chart.js dari DOM
-  area.onmousemove = null;
-  area.onmouseleave = null;
-  const areaEl = area;
+  // Header elements for live update during scrub
+  const eqBalScrub = eqBalEl;
+  const eqPctScrub = eqPctEl;
+  let _restoreTimer = null;
+  let _isScrubbing = false;
 
-  areaEl.onmousemove = (e) => {
+  const crossh = $('eq-crosshair');
+  const dot    = $('eq-ch-dot');
+  const tt     = $('eq-tooltip');
+  const ttD    = $('eq-tt-date');
+  const ttB    = $('eq-tt-bal');
+  const ttP    = $('eq-tt-pnl');
+
+  function doScrub(clientX, clientY) {
     if(!eqCh) return;
-    const rect = areaEl.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const rect = area.getBoundingClientRect();
+    const x = clientX - rect.left;
     const ca = eqCh.chartArea;
     if(!ca || x < ca.left || x > ca.right){
-      $('eq-crosshair').style.opacity = '0';
-      $('eq-tooltip').style.opacity = '0';
-      return;
+      hideScrub(); return;
     }
-    const frac = (x - ca.left) / (ca.right - ca.left);
-    const idx = Math.max(0, Math.min(D.length-1, Math.round(frac*(D.length-1))));
+    // Smooth continuous idx — interpolate, not snap
+    const frac = Math.max(0, Math.min(1, (x - ca.left) / (ca.right - ca.left)));
+    const idxExact = frac * (D.length - 1);
+    const idx = Math.max(0, Math.min(D.length - 1, Math.round(idxExact)));
+
     const meta = eqCh.getDatasetMeta(0);
     if(!meta || !meta.data[idx]) return;
     const pt = meta.data[idx];
 
-    const crossh = $('eq-crosshair');
-    const dot    = $('eq-ch-dot');
-    const tt     = $('eq-tooltip');
-    const ttD    = $('eq-tt-date');
-    const ttB    = $('eq-tt-bal');
-    const ttP    = $('eq-tt-pnl');
+    // Update scrub plugin index & redraw
+    _scrubIdx = idx;
+    eqCh.draw();
 
+    // Crosshair
     crossh.style.opacity = '1';
     crossh.style.left = pt.x + 'px';
     dot.style.top = (pt.y - 5) + 'px';
     dot.style.background = col;
+    dot.style.boxShadow = `0 0 8px ${col}`;
 
+    // Values
     const d = D[idx];
     const lbl = L[idx];
     const pnlVal = idx === 0 ? 0 : (D[idx] - D[idx-1]);
     const pnlSign = pnlVal >= 0 ? '+' : '';
     const pnlColor = pnlVal >= 0 ? '#22c55e' : '#ef4444';
-    const dateStr = rawDates[idx] ? new Date(rawDates[idx]+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : lbl;
+    const dateStr = rawDates[idx]
+      ? new Date(rawDates[idx]+'T00:00:00').toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})
+      : lbl;
+
+    // Update header live
+    if(eqBalScrub) {
+      eqBalScrub.textContent = '$' + d.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const fromStart = startVal > 0 ? ((d - startVal) / startVal * 100) : 0;
+      const fsSign = fromStart >= 0 ? '+' : '';
+      const fsColor = fromStart >= 0 ? '#00d97e' : '#ef4444';
+      eqBalScrub.style.color = fsColor;
+      if(eqPctScrub) {
+        eqPctScrub.textContent = fsSign + fromStart.toFixed(2) + '%';
+        eqPctScrub.style.color = fsColor;
+        eqPctScrub.style.background = fromStart >= 0 ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+      }
+    }
 
     ttD.textContent = dateStr;
     ttB.textContent = '$' + d.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -3835,26 +3871,179 @@ function renderEq(){
     ttP.style.color = pnlColor;
     tt.style.opacity = '1';
 
-    // Posisi tooltip: kiri/kanan crosshair, jangan keluar layar
-    const ttW = 138;
-    let tx = pt.x + 14;
-    if(tx + ttW > rect.width - 10) tx = pt.x - ttW - 10;
+    const ttW = 145;
+    let tx = pt.x + 16;
+    if(tx + ttW > rect.width - 10) tx = pt.x - ttW - 12;
     tt.style.left = tx + 'px';
-    tt.style.top = Math.max(0, pt.y - 38) + 'px';
-  };
+    tt.style.top = Math.max(4, pt.y - 42) + 'px';
 
-  areaEl.onmouseleave = () => {
-    const crossh = $('eq-crosshair');
-    const tt     = $('eq-tooltip');
-    if(crossh) crossh.style.opacity = '0';
-    if(tt)     tt.style.opacity     = '0';
+    _isScrubbing = true;
+    if(_restoreTimer) clearTimeout(_restoreTimer);
+  }
+
+  function hideScrub() {
+    crossh.style.opacity = '0';
+    tt.style.opacity = '0';
+
+    if(_isScrubbing) {
+      // Delay restore of header/gray area
+      if(_restoreTimer) clearTimeout(_restoreTimer);
+      _restoreTimer = setTimeout(() => {
+        _scrubIdx = null;
+        _isScrubbing = false;
+        if(eqCh) eqCh.draw();
+        // Restore header to current values
+        if(eqBalScrub) {
+          eqBalScrub.textContent = '$' + endVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+          eqBalScrub.style.color = col;
+        }
+        if(eqPctScrub) {
+          eqPctScrub.textContent = sign + pct.toFixed(2) + '%';
+          eqPctScrub.style.color = col;
+          eqPctScrub.style.background = up ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+        }
+      }, 1200);
+    }
+  }
+
+  area.onmousemove = (e) => doScrub(e.clientX, e.clientY);
+  area.onmouseleave = () => hideScrub();
+
+  // Touch support
+  area.ontouchmove = (e) => {
+    e.preventDefault();
+    if(e.touches.length > 0) doScrub(e.touches[0].clientX, e.touches[0].clientY);
   };
+  area.ontouchend = () => hideScrub();
+  area.ontouchcancel = () => hideScrub();
 }
 function renderPnl(){
   const ft=getFilteredTrades();
   const L=ft.map((_,i)=>'#'+(i+1)),D=ft.map(t=>t.pnl);
   if(pnlCh)pnlCh.destroy();
-  pnlCh=new Chart($('pnlC').getContext('2d'),{type:'bar',data:{labels:L,datasets:[{data:D,backgroundColor:D.map(v=>v>=0?'#00d97e':'#ff4d4d'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+c.raw.toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:'#444',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v}}}}});
+
+  // ── Premium gradient bar plugin ──
+  const premiumBarPlugin = {
+    id: 'premiumBar',
+    beforeDatasetsDraw(chart) {
+      const { ctx, data, chartArea: { top, bottom }, scales: { x, y } } = chart;
+      if (!x || !y) return;
+      const dataset = data.datasets[0];
+      const meta = chart.getDatasetMeta(0);
+      const zeroY = y.getPixelForValue(0);
+      meta.data.forEach((bar, i) => {
+        const val = dataset.data[i];
+        if (val === undefined || val === null) return;
+        const isPos = val >= 0;
+        const barX = bar.x;
+        const barW = bar.width;
+        const barTop = isPos ? bar.y : zeroY;
+        const barBot = isPos ? zeroY : bar.y;
+        const barH = Math.abs(barBot - barTop);
+        if (barH < 1) return;
+
+        const radius = Math.min(4, barW / 2);
+        ctx.save();
+        ctx.beginPath();
+        if (isPos) {
+          ctx.moveTo(barX - barW/2 + radius, barTop);
+          ctx.lineTo(barX + barW/2 - radius, barTop);
+          ctx.quadraticCurveTo(barX + barW/2, barTop, barX + barW/2, barTop + radius);
+          ctx.lineTo(barX + barW/2, barBot);
+          ctx.lineTo(barX - barW/2, barBot);
+          ctx.lineTo(barX - barW/2, barTop + radius);
+          ctx.quadraticCurveTo(barX - barW/2, barTop, barX - barW/2 + radius, barTop);
+        } else {
+          ctx.moveTo(barX - barW/2, barTop);
+          ctx.lineTo(barX + barW/2, barTop);
+          ctx.lineTo(barX + barW/2, barBot - radius);
+          ctx.quadraticCurveTo(barX + barW/2, barBot, barX + barW/2 - radius, barBot);
+          ctx.lineTo(barX - barW/2 + radius, barBot);
+          ctx.quadraticCurveTo(barX - barW/2, barBot, barX - barW/2, barBot - radius);
+          ctx.lineTo(barX - barW/2, barTop);
+        }
+        ctx.closePath();
+
+        // Gradient fill
+        const grad = ctx.createLinearGradient(0, barTop, 0, barBot);
+        if (isPos) {
+          grad.addColorStop(0, 'rgba(0,217,126,0.95)');
+          grad.addColorStop(1, 'rgba(0,217,126,0.35)');
+        } else {
+          grad.addColorStop(0, 'rgba(255,77,77,0.35)');
+          grad.addColorStop(1, 'rgba(255,77,77,0.9)');
+        }
+        ctx.fillStyle = grad;
+
+        // Glow shadow
+        ctx.shadowColor = isPos ? 'rgba(0,217,126,0.4)' : 'rgba(255,77,77,0.35)';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      });
+    }
+  };
+
+  pnlCh = new Chart($('pnlC').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: L,
+      datasets: [{
+        data: D,
+        backgroundColor: 'transparent',
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    plugins: [premiumBarPlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 500, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#16161a',
+          borderColor: 'rgba(255,255,255,.12)',
+          borderWidth: 1,
+          bodyColor: '#f0f0f0',
+          bodyFont: { family: 'DM Mono', size: 11 },
+          padding: 10,
+          cornerRadius: 10,
+          callbacks: {
+            title: (items) => 'Trade ' + items[0].label,
+            label: c => {
+              const sign = c.raw >= 0 ? '+' : '';
+              return ' P&L: ' + sign + '$' + c.raw.toFixed(2);
+            },
+            labelColor: (c) => ({
+              borderColor: 'transparent',
+              backgroundColor: c.raw >= 0 ? '#00d97e' : '#ff4d4d',
+              borderRadius: 4,
+            })
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#3f3f46', font: { size: 9 } },
+          border: { display: false }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
+          ticks: {
+            color: '#3f3f46',
+            font: { family: 'DM Mono', size: 9 },
+            callback: v => '$' + (Math.abs(v) >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0))
+          },
+          border: { display: false }
+        }
+      }
+    }
+  });
 }
 function renderDonut(){
   const ft=getFilteredTrades();
@@ -3863,7 +4052,6 @@ function renderDonut(){
   const be=ft.filter(t=>t.result==='Breakeven').length;
   const total=w+l+be;
 
-  // Update legend counts and percentages
   const pct=(n)=> total>0 ? '('+Math.round(n/total*100)+'%)' : '';
   $('dn-wins').textContent    = w;
   $('dn-losses').textContent  = l;
@@ -3881,24 +4069,95 @@ function renderDonut(){
   $('donut-legend').style.display='flex';
   $('donut-empty').style.display='none';
 
+  // Premium inner glow plugin for donut
+  const donutGlowPlugin = {
+    id: 'donutGlow',
+    afterDraw(chart) {
+      const { ctx, chartArea } = chart;
+      const cx = (chartArea.left + chartArea.right) / 2;
+      const cy = (chartArea.top + chartArea.bottom) / 2;
+      const wr = w / total, lr = l / total;
+      // Center glow
+      ctx.save();
+      const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 32);
+      if (wr > lr) {
+        radGrad.addColorStop(0, 'rgba(0,217,126,0.15)');
+        radGrad.addColorStop(1, 'rgba(0,217,126,0)');
+      } else if (lr > wr) {
+        radGrad.addColorStop(0, 'rgba(255,77,77,0.12)');
+        radGrad.addColorStop(1, 'rgba(255,77,77,0)');
+      } else {
+        radGrad.addColorStop(0, 'rgba(139,92,246,0.1)');
+        radGrad.addColorStop(1, 'rgba(139,92,246,0)');
+      }
+      ctx.fillStyle = radGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Win rate label in center
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const winRate = total > 0 ? Math.round(w / total * 100) : 0;
+      ctx.font = 'bold 16px "DM Mono","JetBrains Mono",monospace';
+      ctx.fillStyle = wr >= lr ? '#00d97e' : '#ff4d4d';
+      ctx.fillText(winRate + '%', cx, cy - 7);
+      ctx.font = '9px "DM Sans",-apple-system,sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.letterSpacing = '1px';
+      ctx.fillText('WIN RATE', cx, cy + 9);
+      ctx.restore();
+    }
+  };
+
   if(dnCh)dnCh.destroy();
-  dnCh=new Chart($('dnC').getContext('2d'),{
-    type:'doughnut',
-    data:{
-      labels:['Wins','Losses','Breakeven'],
-      datasets:[{data:[w,l,be],backgroundColor:['#00d97e','#ff4d4d','#555'],borderWidth:0,hoverOffset:4}]
+  dnCh = new Chart($('dnC').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Wins','Losses','Breakeven'],
+      datasets: [{
+        data: [w, l, be],
+        backgroundColor: [
+          'rgba(0,217,126,1)',
+          'rgba(255,77,77,1)',
+          'rgba(80,80,90,1)'
+        ],
+        hoverBackgroundColor: [
+          'rgba(0,240,140,1)',
+          'rgba(255,100,100,1)',
+          'rgba(110,110,120,1)'
+        ],
+        borderWidth: 0,
+        hoverOffset: 6,
+        spacing: 2,
+      }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:false,cutout:'70%',
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
-          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},
-          callbacks:{
+    plugins: [donutGlowPlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      animation: { duration: 700, easing: 'easeInOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#16161a',
+          borderColor: 'rgba(255,255,255,.12)',
+          borderWidth: 1,
+          bodyColor: '#f0f0f0',
+          bodyFont: { family: 'DM Mono', size: 11 },
+          padding: 10,
+          cornerRadius: 10,
+          callbacks: {
             label: c => {
-              const pct = total>0 ? Math.round(c.raw/total*100) : 0;
+              const pct = total > 0 ? Math.round(c.raw / total * 100) : 0;
               return ` ${c.label}: ${c.raw} (${pct}%)`;
+            },
+            labelColor: (c) => {
+              const colors = ['rgba(0,217,126,0.8)', 'rgba(255,77,77,0.8)', 'rgba(80,80,90,0.8)'];
+              return { borderColor: 'transparent', backgroundColor: colors[c.dataIndex], borderRadius: 3 };
             }
           }
         }
