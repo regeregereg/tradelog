@@ -240,10 +240,81 @@ body::before{
 .tag-filter-chip:hover{border-color:var(--accent);color:var(--accent2);}
 .tag-filter-chip.active{background:rgba(139,92,246,.15);color:var(--accent2);border-color:rgba(139,92,246,.4);}
 @keyframes eqPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.65);}}
-/* ── TRADER DNA RADAR ── */
-.dna-attr-row{cursor:default;transition:opacity .15s;}
-.dna-attr-row:hover{opacity:.85;}
-@media(max-width:640px){#trader-dna-card>div{grid-template-columns:1fr!important;}#trader-dna-card canvas{max-width:200px!important;max-height:200px!important;}}
+/* ── TRADER DNA HOLOGRAM ── */
+#trader-dna-card{margin-bottom:16px;padding:0;overflow:hidden;position:relative;}
+.dna-holo-wrap{display:grid;grid-template-columns:210px 1fr;gap:0;min-height:256px;position:relative;}
+@media(max-width:560px){.dna-holo-wrap{grid-template-columns:1fr;min-height:auto;}.dna-holo-left{padding:20px 20px 8px!important;justify-content:center;}.dna-holo-right{padding:8px 20px 20px!important;}}
+.dna-holo-left{display:flex;align-items:center;justify-content:center;padding:22px 6px 22px 18px;position:relative;}
+.dna-holo-scene{width:174px;height:174px;position:relative;perspective:500px;cursor:crosshair;}
+.dna-holo-ring{position:absolute;inset:0;transform:rotateX(0deg) rotateY(0deg);transform-style:preserve-3d;transition:transform 0.12s ease-out;will-change:transform;}
+@keyframes dnaGlowPulse{0%,100%{opacity:.5;}50%{opacity:.85;}}
+.dna-holo-glow{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(0,217,126,0.1) 0%,rgba(139,92,246,0.06) 45%,transparent 70%);animation:dnaGlowPulse 4s ease-in-out infinite;pointer-events:none;}
+@keyframes dnaScan{0%{top:12%;opacity:0;}8%{opacity:.5;}88%{opacity:.3;}100%{top:88%;opacity:0;}}
+.dna-scan-line{position:absolute;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,217,126,0.45),transparent);animation:dnaScan 5s ease-in-out infinite;pointer-events:none;z-index:10;}
+.dna-holo-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;filter:drop-shadow(0 0 6px rgba(0,217,126,0.3)) drop-shadow(0 0 16px rgba(139,92,246,0.15));}
+.dna-bracket{position:absolute;width:12px;height:12px;transition:opacity .3s;}
+.dna-bracket-tl{top:0;left:0;border-top:1.5px solid rgba(0,217,126,0.4);border-left:1.5px solid rgba(0,217,126,0.4);}
+.dna-bracket-tr{top:0;right:0;border-top:1.5px solid rgba(0,217,126,0.4);border-right:1.5px solid rgba(0,217,126,0.4);}
+.dna-bracket-bl{bottom:0;left:0;border-bottom:1.5px solid rgba(0,217,126,0.4);border-left:1.5px solid rgba(0,217,126,0.4);}
+.dna-bracket-br{bottom:0;right:0;border-bottom:1.5px solid rgba(0,217,126,0.4);border-right:1.5px solid rgba(0,217,126,0.4);}
+.dna-holo-scene:hover .dna-bracket{opacity:1;}
+.dna-holo-right{padding:20px 18px 20px 14px;display:flex;flex-direction:column;justify-content:space-between;}
+.dna-stat-item{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);transition:background .18s,border-color .18s;cursor:default;}
+.dna-stat-item:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.07);}
+.dna-stat-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.dna-stat-name{flex:1;font-size:9.5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,0.32);}
+.dna-stat-bar-wrap{flex:1.6;height:2px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+.dna-stat-bar{height:100%;width:0%;border-radius:2px;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
+.dna-stat-val{font-size:10.5px;font-weight:700;font-family:var(--mono);min-width:24px;text-align:right;}
+
+/* ── DASHBOARD DESKTOP 2-COL ── */
+@media(min-width:1100px){
+  #page-dashboard{display:grid;grid-template-columns:1fr 272px;column-gap:18px;align-items:start;}
+  #page-dashboard>.ph{grid-column:1/3;}
+  #page-dashboard>#trader-card{grid-column:1/3;}
+  #page-dashboard>#guest-banner{grid-column:1/3;}
+  #page-dashboard>.bbal{grid-column:1/3;}
+  #page-dashboard>#period-tabs-wrap{grid-column:1/3;}
+  #dash-main-content{grid-column:1;}
+  #dash-right-panel{grid-column:2;align-self:start;position:sticky;top:32px;}
+}
+@media(max-width:1099px){
+  #dash-right-panel{display:none!important;}
+  #dash-main-content{display:contents;}
+}
+
+/* ── MINI CALENDAR PANEL ── */
+#dash-cal-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.dcal-header{padding:13px 14px 10px;border-bottom:1px solid var(--border);}
+.dcal-tag{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:4px;}
+.dcal-month-row{display:flex;align-items:center;justify-content:space-between;}
+.dcal-month-label{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
+.dcal-nav{display:flex;gap:3px;}
+.dcal-nav-btn{width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--font);line-height:1;}
+.dcal-nav-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2);}
+.dcal-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:9px 12px;border-bottom:1px solid var(--border);}
+.dcal-stat{background:rgba(255,255,255,0.025);border-radius:7px;padding:7px 9px;}
+.dcal-stat-l{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:3px;}
+.dcal-stat-v{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text);}
+.dcal-grid-wrap{padding:9px 11px 10px;}
+.dcal-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;}
+.dcal-dl{font-size:7.5px;font-weight:700;color:var(--text3);text-align:center;text-transform:uppercase;padding:2px 0;}
+.dcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.dcal-cell{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px solid transparent;position:relative;cursor:default;transition:opacity .15s;overflow:hidden;}
+.dcal-cell.empty{background:transparent;border:none;}
+.dcal-cell.today{border-color:rgba(139,92,246,0.55)!important;background:rgba(139,92,246,0.07)!important;}
+.dcal-cell.win{background:rgba(0,217,126,0.11);border-color:rgba(0,217,126,0.2);}
+.dcal-cell.loss{background:rgba(239,68,68,0.09);border-color:rgba(239,68,68,0.16);}
+.dcal-cell:not(.empty):hover{opacity:.72;}
+.dcal-dn{font-size:8px;color:rgba(255,255,255,0.28);line-height:1;font-family:var(--mono);}
+.dcal-pnl{font-size:6.5px;line-height:1;margin-top:1px;white-space:nowrap;font-weight:700;font-family:var(--mono);}
+.dcal-cell.win .dcal-dn{color:rgba(0,217,126,0.7);}.dcal-cell.win .dcal-pnl{color:#00d97e;}
+.dcal-cell.loss .dcal-dn{color:rgba(239,68,68,0.6);}.dcal-cell.loss .dcal-pnl{color:#f87171;}
+.dcal-wr-row{padding:0 12px 11px;}
+.dcal-wr-lbl{display:flex;justify-content:space-between;margin-bottom:4px;}
+.dcal-wr-lbl span{font-size:8.5px;color:var(--text3);font-family:var(--mono);}
+.dcal-wr-bg{height:2px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+.dcal-wr-fill{height:100%;border-radius:2px;transition:width .7s ease;width:0%;}
 
 /* ── PERIOD TABS ── */
 .period-tabs{display:flex;gap:3px;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;border:1px solid var(--border);}
@@ -1189,7 +1260,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Period Filter Tabs -->
-    <div style="margin-bottom:16px">
+    <div id="period-tabs-wrap" style="margin-bottom:16px">
       <div class="period-tabs" id="period-tabs">
         <button class="ptab active" data-period="all">Overview</button>
         <button class="ptab" data-period="7">7 Hari</button>
@@ -1197,6 +1268,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <button class="ptab" data-period="180">180 Hari</button>
       </div>
     </div>
+
+    <div id="dash-main-content">
 
     <!-- Stat Cards -->
     <div class="stats">
@@ -1267,105 +1340,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
 
-    <!-- ── TRADER DNA RADAR ── -->
-    <style>
-    /* ── DNA HOLOGRAM STYLES ── */
-    #trader-dna-card{margin-bottom:16px;padding:0;overflow:hidden;position:relative;}
-    .dna-holo-wrap{
-      display:grid;grid-template-columns:210px 1fr;gap:0;min-height:256px;
-      position:relative;
-    }
-    @media(max-width:560px){
-      .dna-holo-wrap{grid-template-columns:1fr;min-height:auto;}
-      .dna-holo-left{padding:20px 20px 8px!important;justify-content:center;}
-      .dna-holo-right{padding:8px 20px 20px!important;}
-    }
-    .dna-holo-left{
-      display:flex;align-items:center;justify-content:center;
-      padding:22px 6px 22px 18px;position:relative;
-    }
-    /* 3D tilt scene — perspective lives on parent */
-    .dna-holo-scene{
-      width:174px;height:174px;position:relative;
-      perspective:500px;
-      cursor:crosshair;
-    }
-    /* the tilting layer — JS updates transform on mouse/touch */
-    .dna-holo-ring{
-      position:absolute;inset:0;
-      transform:rotateX(0deg) rotateY(0deg);
-      transform-style:preserve-3d;
-      transition:transform 0.12s ease-out;
-      will-change:transform;
-    }
-    /* subtle glow pulse — stays calm */
-    @keyframes dnaGlowPulse{
-      0%,100%{opacity:.5;}50%{opacity:.85;}
-    }
-    .dna-holo-glow{
-      position:absolute;inset:-18px;border-radius:50%;
-      background:radial-gradient(circle,rgba(0,217,126,0.1) 0%,rgba(139,92,246,0.06) 45%,transparent 70%);
-      animation:dnaGlowPulse 4s ease-in-out infinite;
-      pointer-events:none;
-    }
-    /* single slow scan line — subtle */
-    @keyframes dnaScan{
-      0%{top:12%;opacity:0;}8%{opacity:.5;}88%{opacity:.3;}100%{top:88%;opacity:0;}
-    }
-    .dna-scan-line{
-      position:absolute;left:8%;right:8%;height:1px;
-      background:linear-gradient(90deg,transparent,rgba(0,217,126,0.45),transparent);
-      animation:dnaScan 5s ease-in-out infinite;
-      pointer-events:none;z-index:10;
-    }
-    .dna-holo-canvas{
-      position:absolute;inset:0;width:100%!important;height:100%!important;
-      filter:drop-shadow(0 0 6px rgba(0,217,126,0.3)) drop-shadow(0 0 16px rgba(139,92,246,0.15));
-    }
-    /* corner brackets */
-    .dna-bracket{position:absolute;width:12px;height:12px;transition:opacity .3s;}
-    .dna-bracket-tl{top:0;left:0;border-top:1.5px solid rgba(0,217,126,0.4);border-left:1.5px solid rgba(0,217,126,0.4);}
-    .dna-bracket-tr{top:0;right:0;border-top:1.5px solid rgba(0,217,126,0.4);border-right:1.5px solid rgba(0,217,126,0.4);}
-    .dna-bracket-bl{bottom:0;left:0;border-bottom:1.5px solid rgba(0,217,126,0.4);border-left:1.5px solid rgba(0,217,126,0.4);}
-    .dna-bracket-br{bottom:0;right:0;border-bottom:1.5px solid rgba(0,217,126,0.4);border-right:1.5px solid rgba(0,217,126,0.4);}
-    .dna-holo-scene:hover .dna-bracket{opacity:1;}
-    /* right panel */
-    .dna-holo-right{
-      padding:20px 18px 20px 14px;
-      display:flex;flex-direction:column;justify-content:space-between;
-    }
-    /* stat rows — app theme colors only (green + purple + muted white) */
-    .dna-stat-item{
-      display:flex;align-items:center;gap:9px;
-      padding:6px 9px;border-radius:8px;
-      background:rgba(255,255,255,0.02);
-      border:1px solid rgba(255,255,255,0.04);
-      transition:background .18s,border-color .18s;
-      cursor:default;
-    }
-    .dna-stat-item:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.07);}
-    .dna-stat-dot{
-      width:5px;height:5px;border-radius:50%;flex-shrink:0;
-    }
-    .dna-stat-name{
-      flex:1;font-size:9.5px;font-weight:600;letter-spacing:.5px;
-      text-transform:uppercase;color:rgba(255,255,255,0.32);
-    }
-    .dna-stat-bar-wrap{
-      flex:1.6;height:2px;background:rgba(255,255,255,0.05);
-      border-radius:2px;overflow:hidden;
-    }
-    .dna-stat-bar{height:100%;width:0%;border-radius:2px;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
-    .dna-stat-val{
-      font-size:10.5px;font-weight:700;font-family:var(--mono);
-      min-width:24px;text-align:right;
-    }
-    </style>
+    <!-- ── TRADER DNA HOLOGRAM ── -->
     <div class="cc" id="trader-dna-card">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 22% 50%,rgba(0,217,126,0.05),transparent 55%),radial-gradient(ellipse at 78% 50%,rgba(139,92,246,0.05),transparent 55%);pointer-events:none;z-index:0;"></div>
       <div class="dna-holo-wrap" style="position:relative;z-index:1;">
-
-        <!-- LEFT: hologram with tilt-on-hover -->
         <div class="dna-holo-left">
           <div class="dna-holo-scene" id="dnaScene">
             <div class="dna-holo-glow"></div>
@@ -1379,8 +1357,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             </div>
           </div>
         </div>
-
-        <!-- RIGHT: info + stats (tema warna: green & purple only) -->
         <div class="dna-holo-right">
           <div style="margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
@@ -1390,95 +1366,18 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div style="font-size:16px;font-weight:700;letter-spacing:-.3px;color:var(--text);line-height:1.2;">DNA Analysis</div>
             <div id="dna-archetype" style="font-size:10px;color:var(--accent2);font-family:var(--mono);margin-top:4px;font-weight:600;letter-spacing:.2px;">—</div>
           </div>
-
           <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
-            <!-- green = performance stats, purple = strategic stats, muted = neutral -->
-            <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:#00d97e;box-shadow:0 0 5px rgba(0,217,126,0.7);"></div>
-              <span class="dna-stat-name">Consistency</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b0" class="dna-stat-bar" style="background:linear-gradient(90deg,#00d97e,rgba(0,217,126,0.25));"></div></div>
-              <span id="dna-v0" class="dna-stat-val" style="color:#00d97e;">—</span>
-            </div>
-            <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:#8b5cf6;box-shadow:0 0 5px rgba(139,92,246,0.6);"></div>
-              <span class="dna-stat-name">Discipline</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b1" class="dna-stat-bar" style="background:linear-gradient(90deg,#8b5cf6,rgba(139,92,246,0.25));"></div></div>
-              <span id="dna-v1" class="dna-stat-val" style="color:#a78bfa;">—</span>
-            </div>
-            <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:rgba(255,255,255,0.3);"></div>
-              <span class="dna-stat-name">Aggression</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b2" class="dna-stat-bar" style="background:linear-gradient(90deg,rgba(255,255,255,0.5),rgba(255,255,255,0.1));"></div></div>
-              <span id="dna-v2" class="dna-stat-val" style="color:rgba(255,255,255,0.55);">—</span>
-            </div>
-            <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:#00d97e;box-shadow:0 0 5px rgba(0,217,126,0.5);opacity:.7;"></div>
-              <span class="dna-stat-name">Execution</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b3" class="dna-stat-bar" style="background:linear-gradient(90deg,#22c55e,rgba(34,197,94,0.25));"></div></div>
-              <span id="dna-v3" class="dna-stat-val" style="color:#4ade80;">—</span>
-            </div>
-            <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:#a78bfa;box-shadow:0 0 5px rgba(167,139,250,0.5);opacity:.8;"></div>
-              <span class="dna-stat-name">Endurance</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b4" class="dna-stat-bar" style="background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.25));"></div></div>
-              <span id="dna-v4" class="dna-stat-val" style="color:#c4b5fd;">—</span>
-            </div>
-            <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:rgba(255,255,255,0.25);"></div>
-              <span class="dna-stat-name">Vision</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b5" class="dna-stat-bar" style="background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0.08));"></div></div>
-              <span id="dna-v5" class="dna-stat-val" style="color:rgba(255,255,255,0.45);">—</span>
-            </div>
+            <div class="dna-stat-item"><div class="dna-stat-dot" style="background:#00d97e;box-shadow:0 0 5px rgba(0,217,126,0.7);"></div><span class="dna-stat-name">Consistency</span><div class="dna-stat-bar-wrap"><div id="dna-b0" class="dna-stat-bar" style="background:linear-gradient(90deg,#00d97e,rgba(0,217,126,0.25));"></div></div><span id="dna-v0" class="dna-stat-val" style="color:#00d97e;">—</span></div>
+            <div class="dna-stat-item"><div class="dna-stat-dot" style="background:#8b5cf6;box-shadow:0 0 5px rgba(139,92,246,0.6);"></div><span class="dna-stat-name">Discipline</span><div class="dna-stat-bar-wrap"><div id="dna-b1" class="dna-stat-bar" style="background:linear-gradient(90deg,#8b5cf6,rgba(139,92,246,0.25));"></div></div><span id="dna-v1" class="dna-stat-val" style="color:#a78bfa;">—</span></div>
+            <div class="dna-stat-item"><div class="dna-stat-dot" style="background:rgba(255,255,255,0.3);"></div><span class="dna-stat-name">Aggression</span><div class="dna-stat-bar-wrap"><div id="dna-b2" class="dna-stat-bar" style="background:linear-gradient(90deg,rgba(255,255,255,0.5),rgba(255,255,255,0.1));"></div></div><span id="dna-v2" class="dna-stat-val" style="color:rgba(255,255,255,0.55);">—</span></div>
+            <div class="dna-stat-item"><div class="dna-stat-dot" style="background:#00d97e;opacity:.7;"></div><span class="dna-stat-name">Execution</span><div class="dna-stat-bar-wrap"><div id="dna-b3" class="dna-stat-bar" style="background:linear-gradient(90deg,#22c55e,rgba(34,197,94,0.25));"></div></div><span id="dna-v3" class="dna-stat-val" style="color:#4ade80;">—</span></div>
+            <div class="dna-stat-item"><div class="dna-stat-dot" style="background:#a78bfa;opacity:.8;"></div><span class="dna-stat-name">Endurance</span><div class="dna-stat-bar-wrap"><div id="dna-b4" class="dna-stat-bar" style="background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.25));"></div></div><span id="dna-v4" class="dna-stat-val" style="color:#c4b5fd;">—</span></div>
+            <div class="dna-stat-item"><div class="dna-stat-dot" style="background:rgba(255,255,255,0.25);"></div><span class="dna-stat-name">Vision</span><div class="dna-stat-bar-wrap"><div id="dna-b5" class="dna-stat-bar" style="background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0.08));"></div></div><span id="dna-v5" class="dna-stat-val" style="color:rgba(255,255,255,0.45);">—</span></div>
           </div>
-
           <div id="dna-min-notice" style="margin-top:9px;font-size:9px;color:rgba(255,255,255,0.16);font-family:var(--mono);display:none;letter-spacing:.2px;">⚡ Min. 5 trades untuk akurasi optimal</div>
         </div>
       </div>
     </div>
-    <!-- DNA tilt interaction -->
-    <script>
-    (function(){
-      function initDnaTilt(){
-        var scene=document.getElementById('dnaScene');
-        var ring=document.getElementById('dnaRing');
-        if(!scene||!ring)return;
-        var maxTilt=14;
-        var isTouch=false;
-        function applyTilt(rx,ry){
-          ring.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)';
-        }
-        scene.addEventListener('mousemove',function(e){
-          if(isTouch)return;
-          var r=scene.getBoundingClientRect();
-          var cx=r.left+r.width/2,cy=r.top+r.height/2;
-          var dx=(e.clientX-cx)/(r.width/2);
-          var dy=(e.clientY-cy)/(r.height/2);
-          applyTilt(-dy*maxTilt, dx*maxTilt);
-        });
-        scene.addEventListener('mouseleave',function(){
-          ring.style.transition='transform 0.55s cubic-bezier(.4,0,.2,1)';
-          applyTilt(0,0);
-          setTimeout(function(){ring.style.transition='transform 0.12s ease-out';},560);
-        });
-        scene.addEventListener('touchmove',function(e){
-          isTouch=true;
-          if(!e.touches[0])return;
-          var r=scene.getBoundingClientRect();
-          var cx=r.left+r.width/2,cy=r.top+r.height/2;
-          var dx=(e.touches[0].clientX-cx)/(r.width/2);
-          var dy=(e.touches[0].clientY-cy)/(r.height/2);
-          applyTilt(-dy*maxTilt, dx*maxTilt);
-        },{passive:true});
-        scene.addEventListener('touchend',function(){
-          ring.style.transition='transform 0.55s cubic-bezier(.4,0,.2,1)';
-          applyTilt(0,0);
-          setTimeout(function(){ring.style.transition='transform 0.12s ease-out';isTouch=false;},560);
-        });
-      }
-      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initDnaTilt);
-      else initDnaTilt();
-    })();
-    </script>
 
     <!-- Bottom Charts -->
     <div class="g2">
@@ -1510,7 +1409,42 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div id="donut-empty" style="display:none;text-align:center;padding:8px 0 4px;font-size:12px;color:var(--text3)">Belum ada trade di periode ini</div>
       </div>
     </div>
+  </div><!-- /dash-main-content -->
+
+  <!-- RIGHT PANEL: mini calendar, desktop only -->
+  <div id="dash-right-panel">
+    <div id="dash-cal-panel">
+      <div class="dcal-header">
+        <div class="dcal-tag"><i class="bi bi-calendar3" style="font-size:9px;margin-right:4px;"></i>Trading Calendar</div>
+        <div class="dcal-month-row">
+          <div class="dcal-month-label" id="dash-cal-lbl">—</div>
+          <div class="dcal-nav">
+            <button class="dcal-nav-btn" id="dash-cal-prev">‹</button>
+            <button class="dcal-nav-btn" id="dash-cal-next">›</button>
+          </div>
+        </div>
+      </div>
+      <div class="dcal-stats">
+        <div class="dcal-stat"><div class="dcal-stat-l">Monthly P&L</div><div class="dcal-stat-v" id="dash-cal-pnl">—</div></div>
+        <div class="dcal-stat"><div class="dcal-stat-l">Win Rate</div><div class="dcal-stat-v" id="dash-cal-wr">—</div></div>
+        <div class="dcal-stat"><div class="dcal-stat-l">Trades</div><div class="dcal-stat-v" id="dash-cal-trades">0</div></div>
+        <div class="dcal-stat"><div class="dcal-stat-l">Avg / Trade</div><div class="dcal-stat-v" id="dash-cal-avg">—</div></div>
+      </div>
+      <div class="dcal-grid-wrap">
+        <div class="dcal-labels">
+          <div class="dcal-dl">Su</div><div class="dcal-dl">Mo</div><div class="dcal-dl">Tu</div>
+          <div class="dcal-dl">We</div><div class="dcal-dl">Th</div><div class="dcal-dl">Fr</div><div class="dcal-dl">Sa</div>
+        </div>
+        <div class="dcal-grid" id="dash-cal-grid"></div>
+      </div>
+      <div class="dcal-wr-row" id="dash-cal-wr-row" style="display:none;">
+        <div class="dcal-wr-lbl"><span>Win Rate</span><span id="dash-cal-wr-lbl">0%</span></div>
+        <div class="dcal-wr-bg"><div class="dcal-wr-fill" id="dash-cal-wr-bar"></div></div>
+      </div>
+    </div>
   </div>
+
+  </div><!-- /page-dashboard -->
 
   <!-- JOURNAL -->
   <div class="page" id="page-journal">
@@ -3292,7 +3226,7 @@ function updateGuestUI() {
   $('cal-wr-bar-wrap').style.display='none';
 
   // ── Calendar still works for guests ──
-  renderCal();
+  renderCal(); renderDashCal();
 }
 
 function showApp() {
@@ -3305,7 +3239,7 @@ function showApp() {
     $('main').style.marginLeft = '0';
     sbOpen = false;
   }
-  setTimeout(() => renderCal(), 200);
+  setTimeout(() => { renderCal(); renderDashCal(); }, 200);
 }
 
 // Show app immediately — no login required to browse
@@ -3742,7 +3676,7 @@ $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
 // ── UPDATE ALL ────────────────────────────────────────
 function updateAll() {
   if (!bal) return;
-  updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil();
+  updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil(); renderDashCal();
   const total = trades.reduce((s,t) => s+t.pnl, 0);
   const currentBal = bal + total;
   $('sbf-bal').textContent = 'Balance: $' + f2(currentBal);
@@ -4116,7 +4050,7 @@ function renderEq(){
   area.ontouchend   = ()  => hideScrub();
   area.ontouchcancel= ()  => hideScrub();
 }
-// ── TRADER DNA RADAR ────────────────────────────────────────────────────
+// ── TRADER DNA HOLOGRAM ─────────────────────────────────────────────────
 let dnaCh = null;
 function calcDNA(tl){
   const n=tl.length;if(n===0)return[0,0,0,0,0,0];
@@ -4173,25 +4107,15 @@ function renderDNA(){
       const cx=(ca.left+ca.right)/2,cy=(ca.top+ca.bottom)/2;
       const maxR=Math.min(ca.width,ca.height)/2*0.82;
       ctx.save();
-      // hex grid rings
       for(let lv=5;lv>=1;lv--){
         const r=maxR*(lv/5);
         ctx.beginPath();
         for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
         ctx.closePath();
-        const alpha=lv===5?0.12:0.05;
-        ctx.strokeStyle=`rgba(0,217,126,${alpha})`;
-        ctx.lineWidth=lv===5?1:0.5;ctx.stroke();
-        // fill innermost ring subtly
+        ctx.strokeStyle=`rgba(0,217,126,${lv===5?0.12:0.05})`;ctx.lineWidth=lv===5?1:0.5;ctx.stroke();
         if(lv===1){ctx.fillStyle='rgba(0,217,126,0.025)';ctx.fill();}
       }
-      // axis lines
-      for(let i=0;i<6;i++){
-        const a=(Math.PI*2*i/6)-Math.PI/2;
-        ctx.beginPath();ctx.moveTo(cx,cy);
-        ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));
-        ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=0.5;ctx.stroke();
-      }
+      for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=0.5;ctx.stroke();}
       ctx.restore();
     }
   };
@@ -4228,6 +4152,100 @@ function renderDNA(){
     }
   });
 }
+
+// ── DNA TILT INTERACTION ──────────────────────────────────────────────────
+(function(){
+  function initDnaTilt(){
+    var scene=document.getElementById('dnaScene');
+    var ring=document.getElementById('dnaRing');
+    if(!scene||!ring)return;
+    var maxTilt=14, isTouch=false;
+    function applyTilt(rx,ry){ring.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)';}
+    scene.addEventListener('mousemove',function(e){
+      if(isTouch)return;
+      var r=scene.getBoundingClientRect();
+      var dx=(e.clientX-(r.left+r.width/2))/(r.width/2);
+      var dy=(e.clientY-(r.top+r.height/2))/(r.height/2);
+      ring.style.transition='transform 0.12s ease-out';
+      applyTilt(-dy*maxTilt,dx*maxTilt);
+    });
+    scene.addEventListener('mouseleave',function(){
+      ring.style.transition='transform 0.55s cubic-bezier(.4,0,.2,1)';
+      applyTilt(0,0);
+    });
+    scene.addEventListener('touchmove',function(e){
+      isTouch=true;
+      if(!e.touches[0])return;
+      var r=scene.getBoundingClientRect();
+      var dx=(e.touches[0].clientX-(r.left+r.width/2))/(r.width/2);
+      var dy=(e.touches[0].clientY-(r.top+r.height/2))/(r.height/2);
+      ring.style.transition='transform 0.12s ease-out';
+      applyTilt(-dy*maxTilt,dx*maxTilt);
+    },{passive:true});
+    scene.addEventListener('touchend',function(){
+      ring.style.transition='transform 0.55s cubic-bezier(.4,0,.2,1)';
+      applyTilt(0,0);
+      setTimeout(function(){isTouch=false;},600);
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initDnaTilt);
+  else initDnaTilt();
+})();
+
+// ── DASH MINI CALENDAR ────────────────────────────────────────────────────
+let dashCalOff = 0;
+function renderDashCal(){
+  const now=new Date(), d=new Date(now.getFullYear(),now.getMonth()+dashCalOff,1);
+  const yr=d.getFullYear(), mo=d.getMonth();
+  const monthStr=`${yr}-${String(mo+1).padStart(2,'0')}`;
+  const todayStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const lbl=$('dash-cal-lbl');
+  if(lbl)lbl.textContent=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+  const dm={};trades.forEach(t=>{if(!dm[t.date])dm[t.date]=0;dm[t.date]+=t.pnl;});
+  const mt=trades.filter(t=>t.date&&t.date.startsWith(monthStr));
+  const wins=mt.filter(t=>t.result==='Win').length;
+  const total=mt.length;
+  const mpnl=mt.reduce((s,t)=>s+t.pnl,0);
+  const wr=total>0?(wins/total*100):null;
+  const avg=total>0?mpnl/total:null;
+  const pnlEl=$('dash-cal-pnl');
+  if(pnlEl){pnlEl.textContent=total>0?(mpnl>=0?'+$':'-$')+Math.abs(mpnl).toFixed(0):'—';pnlEl.style.color=mpnl>0?'#00d97e':mpnl<0?'#f87171':'var(--text)';}
+  const wrEl=$('dash-cal-wr');
+  if(wrEl){wrEl.textContent=wr!==null?wr.toFixed(1)+'%':'—';wrEl.style.color=wr>=50?'#00d97e':wr!==null?'#f87171':'var(--text)';}
+  const tEl=$('dash-cal-trades');if(tEl)tEl.textContent=total;
+  const aEl=$('dash-cal-avg');
+  if(aEl){aEl.textContent=avg!==null?(avg>=0?'+$':'-$')+Math.abs(avg).toFixed(0):'—';aEl.style.color=avg>0?'#00d97e':avg<0?'#f87171':'var(--text)';}
+  const barRow=$('dash-cal-wr-row');
+  if(barRow){
+    if(total>0){
+      barRow.style.display='block';
+      const pct=Math.round(wr||0);
+      const bar=$('dash-cal-wr-bar');if(bar){bar.style.width=pct+'%';bar.style.background=pct>=50?'#00d97e':'#f87171';}
+      const bl=$('dash-cal-wr-lbl');if(bl)bl.textContent=pct+'%';
+    } else barRow.style.display='none';
+  }
+  const grid=$('dash-cal-grid');if(!grid)return;
+  let html='';
+  const first=new Date(yr,mo,1).getDay();
+  for(let i=0;i<first;i++)html+=`<div class="dcal-cell empty"></div>`;
+  const dim=new Date(yr,mo+1,0).getDate();
+  for(let day=1;day<=dim;day++){
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const pnl=dm[ds];const isToday=ds===todayStr;
+    let cls='dcal-cell'+(isToday?' today':'');
+    let inner=`<span class="dcal-dn">${day}</span>`;
+    if(pnl!==undefined){
+      cls+=' '+(pnl>=0?'win':'loss');
+      const av=Math.abs(pnl);
+      const lb=av>=1000?(pnl>=0?'+':'-')+'$'+(av/1000).toFixed(1)+'k':(pnl>=0?'+':'-')+'$'+av.toFixed(0);
+      inner+=`<span class="dcal-pnl">${lb}</span>`;
+    }
+    html+=`<div class="${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div>`;
+  }
+  grid.innerHTML=html;
+}
+$('dash-cal-prev').addEventListener('click',()=>{dashCalOff--;renderDashCal();});
+$('dash-cal-next').addEventListener('click',()=>{dashCalOff++;renderDashCal();});
 
 function renderPnl(){
   const ft=getFilteredTrades();
