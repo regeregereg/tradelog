@@ -1268,30 +1268,181 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- ── TRADER DNA RADAR ── -->
-    <div class="cc" id="trader-dna-card" style="margin-bottom:16px;padding:0;overflow:hidden;position:relative;">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(0,217,126,0.04),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(139,92,246,0.05),transparent 60%);pointer-events:none;"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:280px;">
-        <div style="display:flex;align-items:center;justify-content:center;padding:20px 10px 20px 20px;">
-          <canvas id="dnaRadar" style="max-width:240px;max-height:240px;width:100%;height:100%;"></canvas>
-        </div>
-        <div style="padding:22px 20px 22px 12px;display:flex;flex-direction:column;justify-content:space-between;">
-          <div style="margin-bottom:16px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <div style="width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#00d97e,#a78bfa);box-shadow:0 0 8px rgba(0,217,126,0.6);"></div>
-              <span style="font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Trader Profile</span>
+    <style>
+    /* ── DNA HOLOGRAM STYLES ── */
+    #trader-dna-card{margin-bottom:16px;padding:0;overflow:hidden;position:relative;}
+    .dna-holo-wrap{
+      display:grid;grid-template-columns:220px 1fr;gap:0;min-height:260px;
+      position:relative;
+    }
+    @media(max-width:560px){
+      .dna-holo-wrap{grid-template-columns:1fr;min-height:auto;}
+      .dna-holo-left{padding:20px 20px 10px!important;justify-content:center;}
+      .dna-holo-right{padding:10px 20px 20px!important;}
+    }
+    /* hologram container */
+    .dna-holo-left{
+      display:flex;align-items:center;justify-content:center;
+      padding:24px 8px 24px 20px;position:relative;
+    }
+    .dna-holo-scene{
+      width:180px;height:180px;position:relative;
+      perspective:600px;
+    }
+    /* rotating hologram ring */
+    .dna-holo-ring{
+      position:absolute;inset:0;
+      animation:dnaRingRotate 8s linear infinite;
+      transform-style:preserve-3d;
+    }
+    @keyframes dnaRingRotate{
+      from{transform:rotateY(0deg) rotateX(8deg);}
+      to{transform:rotateY(360deg) rotateX(8deg);}
+    }
+    /* slow pulse on outer glow */
+    @keyframes dnaGlowPulse{
+      0%,100%{opacity:.45;}50%{opacity:.9;}
+    }
+    .dna-holo-glow{
+      position:absolute;inset:-20px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,217,126,0.13) 0%,rgba(139,92,246,0.08) 40%,transparent 70%);
+      animation:dnaGlowPulse 3s ease-in-out infinite;
+      pointer-events:none;
+    }
+    /* scan line sweep */
+    @keyframes dnaScan{
+      0%{top:10%;opacity:0;}
+      10%{opacity:.6;}
+      90%{opacity:.4;}
+      100%{top:90%;opacity:0;}
+    }
+    .dna-scan-line{
+      position:absolute;left:10%;right:10%;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,217,126,0.6),transparent);
+      animation:dnaScan 3.5s ease-in-out infinite;
+      pointer-events:none;z-index:10;
+    }
+    /* canvas sits inside scene */
+    .dna-holo-canvas{
+      position:absolute;inset:0;width:100%!important;height:100%!important;
+      filter:drop-shadow(0 0 8px rgba(0,217,126,0.35)) drop-shadow(0 0 20px rgba(139,92,246,0.2));
+    }
+    /* corner brackets deco */
+    .dna-bracket{position:absolute;width:14px;height:14px;}
+    .dna-bracket-tl{top:0;left:0;border-top:1.5px solid rgba(0,217,126,0.5);border-left:1.5px solid rgba(0,217,126,0.5);}
+    .dna-bracket-tr{top:0;right:0;border-top:1.5px solid rgba(0,217,126,0.5);border-right:1.5px solid rgba(0,217,126,0.5);}
+    .dna-bracket-bl{bottom:0;left:0;border-bottom:1.5px solid rgba(0,217,126,0.5);border-left:1.5px solid rgba(0,217,126,0.5);}
+    .dna-bracket-br{bottom:0;right:0;border-bottom:1.5px solid rgba(0,217,126,0.5);border-right:1.5px solid rgba(0,217,126,0.5);}
+    /* right panel */
+    .dna-holo-right{
+      padding:22px 20px 22px 16px;
+      display:flex;flex-direction:column;justify-content:space-between;
+    }
+    /* stat rows — new premium style */
+    .dna-stat-item{
+      display:flex;align-items:center;gap:10px;
+      padding:7px 10px;border-radius:9px;
+      background:rgba(255,255,255,0.025);
+      border:1px solid rgba(255,255,255,0.04);
+      transition:background .2s,border-color .2s;
+      cursor:default;
+    }
+    .dna-stat-item:hover{background:rgba(255,255,255,0.045);border-color:rgba(255,255,255,0.08);}
+    .dna-stat-dot{
+      width:6px;height:6px;border-radius:50%;flex-shrink:0;
+      box-shadow:0 0 6px currentColor;
+    }
+    .dna-stat-name{
+      flex:1;font-size:10px;font-weight:600;letter-spacing:.4px;
+      text-transform:uppercase;color:rgba(255,255,255,0.38);
+    }
+    .dna-stat-bar-wrap{
+      flex:1.4;height:2px;background:rgba(255,255,255,0.05);
+      border-radius:2px;overflow:hidden;
+    }
+    .dna-stat-bar{height:100%;width:0%;border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+    .dna-stat-val{
+      font-size:11px;font-weight:700;font-family:var(--mono);
+      min-width:26px;text-align:right;
+    }
+    </style>
+    <div class="cc" id="trader-dna-card">
+      <!-- ambient bg -->
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 25% 50%,rgba(0,217,126,0.05),transparent 55%),radial-gradient(ellipse at 75% 50%,rgba(139,92,246,0.06),transparent 55%);pointer-events:none;z-index:0;"></div>
+      <div class="dna-holo-wrap" style="position:relative;z-index:1;">
+
+        <!-- LEFT: hologram -->
+        <div class="dna-holo-left">
+          <div class="dna-holo-scene">
+            <!-- ambient glow -->
+            <div class="dna-holo-glow"></div>
+            <!-- scan line -->
+            <div class="dna-scan-line"></div>
+            <!-- corner brackets -->
+            <div class="dna-bracket dna-bracket-tl"></div>
+            <div class="dna-bracket dna-bracket-tr"></div>
+            <div class="dna-bracket dna-bracket-bl"></div>
+            <div class="dna-bracket dna-bracket-br"></div>
+            <!-- rotating ring wrap -->
+            <div class="dna-holo-ring">
+              <canvas id="dnaRadar" class="dna-holo-canvas"></canvas>
             </div>
-            <div style="font-size:17px;font-weight:700;letter-spacing:-.4px;color:var(--text);line-height:1.2;">DNA Analysis</div>
-            <div id="dna-archetype" style="font-size:11px;color:var(--accent2);font-family:var(--mono);margin-top:3px;font-weight:600;">—</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:9px;flex:1;">
-            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Consistency</span><span id="dna-v0" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#00d97e;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b0" style="height:100%;width:0%;background:linear-gradient(90deg,#00d97e,rgba(0,217,126,0.4));border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1);"></div></div></div>
-            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Discipline</span><span id="dna-v1" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#a78bfa;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b1" style="height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.4));border-radius:2px;transition:width 1.1s cubic-bezier(.4,0,.2,1);"></div></div></div>
-            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Aggression</span><span id="dna-v2" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#f59e0b;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b2" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,rgba(245,158,11,0.4));border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);"></div></div></div>
-            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Execution</span><span id="dna-v3" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#38bdf8;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b3" style="height:100%;width:0%;background:linear-gradient(90deg,#38bdf8,rgba(56,189,248,0.4));border-radius:2px;transition:width 1.3s cubic-bezier(.4,0,.2,1);"></div></div></div>
-            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Endurance</span><span id="dna-v4" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#fb923c;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b4" style="height:100%;width:0%;background:linear-gradient(90deg,#fb923c,rgba(251,146,60,0.4));border-radius:2px;transition:width 1.4s cubic-bezier(.4,0,.2,1);"></div></div></div>
-            <div class="dna-attr-row"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;">Vision</span><span id="dna-v5" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#e879f9;">—</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;"><div id="dna-b5" style="height:100%;width:0%;background:linear-gradient(90deg,#e879f9,rgba(232,121,249,0.4));border-radius:2px;transition:width 1.5s cubic-bezier(.4,0,.2,1);"></div></div></div>
+        </div>
+
+        <!-- RIGHT: info + stats -->
+        <div class="dna-holo-right">
+          <!-- header -->
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#00d97e;box-shadow:0 0 8px rgba(0,217,126,0.8);animation:dnaGlowPulse 2s ease-in-out infinite;"></div>
+              <span style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Trader Profile</span>
+            </div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:-.3px;color:var(--text);line-height:1.2;">DNA Analysis</div>
+            <div id="dna-archetype" style="font-size:10.5px;color:var(--accent2);font-family:var(--mono);margin-top:4px;font-weight:600;letter-spacing:.2px;">—</div>
           </div>
-          <div id="dna-min-notice" style="margin-top:12px;font-size:9.5px;color:rgba(255,255,255,0.2);font-family:var(--mono);display:none;">⚡ Min. 5 trades untuk akurasi optimal</div>
+
+          <!-- stat rows -->
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1;">
+            <div class="dna-stat-item">
+              <div class="dna-stat-dot" style="color:#00d97e;background:#00d97e;"></div>
+              <span class="dna-stat-name">Consistency</span>
+              <div class="dna-stat-bar-wrap"><div id="dna-b0" class="dna-stat-bar" style="background:linear-gradient(90deg,#00d97e,rgba(0,217,126,0.3));"></div></div>
+              <span id="dna-v0" class="dna-stat-val" style="color:#00d97e;">—</span>
+            </div>
+            <div class="dna-stat-item">
+              <div class="dna-stat-dot" style="color:#a78bfa;background:#a78bfa;"></div>
+              <span class="dna-stat-name">Discipline</span>
+              <div class="dna-stat-bar-wrap"><div id="dna-b1" class="dna-stat-bar" style="background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.3));"></div></div>
+              <span id="dna-v1" class="dna-stat-val" style="color:#a78bfa;">—</span>
+            </div>
+            <div class="dna-stat-item">
+              <div class="dna-stat-dot" style="color:#f59e0b;background:#f59e0b;"></div>
+              <span class="dna-stat-name">Aggression</span>
+              <div class="dna-stat-bar-wrap"><div id="dna-b2" class="dna-stat-bar" style="background:linear-gradient(90deg,#f59e0b,rgba(245,158,11,0.3));"></div></div>
+              <span id="dna-v2" class="dna-stat-val" style="color:#f59e0b;">—</span>
+            </div>
+            <div class="dna-stat-item">
+              <div class="dna-stat-dot" style="color:#38bdf8;background:#38bdf8;"></div>
+              <span class="dna-stat-name">Execution</span>
+              <div class="dna-stat-bar-wrap"><div id="dna-b3" class="dna-stat-bar" style="background:linear-gradient(90deg,#38bdf8,rgba(56,189,248,0.3));"></div></div>
+              <span id="dna-v3" class="dna-stat-val" style="color:#38bdf8;">—</span>
+            </div>
+            <div class="dna-stat-item">
+              <div class="dna-stat-dot" style="color:#fb923c;background:#fb923c;"></div>
+              <span class="dna-stat-name">Endurance</span>
+              <div class="dna-stat-bar-wrap"><div id="dna-b4" class="dna-stat-bar" style="background:linear-gradient(90deg,#fb923c,rgba(251,146,60,0.3));"></div></div>
+              <span id="dna-v4" class="dna-stat-val" style="color:#fb923c;">—</span>
+            </div>
+            <div class="dna-stat-item">
+              <div class="dna-stat-dot" style="color:#e879f9;background:#e879f9;"></div>
+              <span class="dna-stat-name">Vision</span>
+              <div class="dna-stat-bar-wrap"><div id="dna-b5" class="dna-stat-bar" style="background:linear-gradient(90deg,#e879f9,rgba(232,121,249,0.3));"></div></div>
+              <span id="dna-v5" class="dna-stat-val" style="color:#e879f9;">—</span>
+            </div>
+          </div>
+
+          <div id="dna-min-notice" style="margin-top:10px;font-size:9px;color:rgba(255,255,255,0.18);font-family:var(--mono);display:none;letter-spacing:.2px;">⚡ Min. 5 trades untuk akurasi optimal</div>
         </div>
       </div>
     </div>
@@ -3987,16 +4138,27 @@ function renderDNA(){
     beforeDraw(chart){
       const{ctx,chartArea:ca}=chart;if(!ca)return;
       const cx=(ca.left+ca.right)/2,cy=(ca.top+ca.bottom)/2;
-      const maxR=Math.min(ca.width,ca.height)/2*0.85;
+      const maxR=Math.min(ca.width,ca.height)/2*0.82;
       ctx.save();
+      // hex grid rings
       for(let lv=5;lv>=1;lv--){
         const r=maxR*(lv/5);
         ctx.beginPath();
         for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
         ctx.closePath();
-        ctx.strokeStyle=`rgba(255,255,255,${lv===5?0.08:0.04})`;ctx.lineWidth=lv===5?1:0.5;ctx.stroke();
+        const alpha=lv===5?0.12:0.05;
+        ctx.strokeStyle=`rgba(0,217,126,${alpha})`;
+        ctx.lineWidth=lv===5?1:0.5;ctx.stroke();
+        // fill innermost ring subtly
+        if(lv===1){ctx.fillStyle='rgba(0,217,126,0.025)';ctx.fill();}
       }
-      for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=0.5;ctx.stroke();}
+      // axis lines
+      for(let i=0;i<6;i++){
+        const a=(Math.PI*2*i/6)-Math.PI/2;
+        ctx.beginPath();ctx.moveTo(cx,cy);
+        ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));
+        ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=0.5;ctx.stroke();
+      }
       ctx.restore();
     }
   };
@@ -4005,22 +4167,22 @@ function renderDNA(){
     data:{
       labels:['Consistency','Discipline','Aggression','Execution','Endurance','Vision'],
       datasets:[
-        {data:scores,backgroundColor:'rgba(0,217,126,0.07)',borderColor:'rgba(0,217,126,0.7)',borderWidth:1.5,pointRadius:3,pointBackgroundColor:colors,pointBorderColor:colors,pointBorderWidth:0,pointHoverRadius:5,fill:true,tension:0.1},
-        {data:scores.map(s=>s*0.72),backgroundColor:'rgba(139,92,246,0.06)',borderColor:'rgba(139,92,246,0.35)',borderWidth:1,pointRadius:0,fill:true,tension:0.1}
+        {data:scores,backgroundColor:'rgba(0,217,126,0.09)',borderColor:'rgba(0,217,126,0.8)',borderWidth:1.5,pointRadius:3.5,pointBackgroundColor:colors,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,pointHoverRadius:5.5,fill:true,tension:0.05},
+        {data:scores.map(s=>s*0.68),backgroundColor:'rgba(139,92,246,0.05)',borderColor:'rgba(139,92,246,0.3)',borderWidth:1,pointRadius:0,fill:true,tension:0.05}
       ]
     },
     plugins:[hexPlugin],
     options:{
       responsive:true,maintainAspectRatio:true,
-      animation:{duration:900,easing:'easeInOutQuart'},
+      animation:{duration:1100,easing:'easeInOutQuart'},
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'rgba(14,14,18,0.95)',borderColor:'rgba(255,255,255,0.12)',borderWidth:1,
-          bodyColor:'#f0f0f0',titleColor:'rgba(255,255,255,0.4)',
-          bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:12,weight:'700'},
-          titleFont:{family:"'DM Sans',-apple-system,sans-serif",size:10},
-          padding:10,cornerRadius:10,
+          backgroundColor:'rgba(9,9,11,0.96)',borderColor:'rgba(0,217,126,0.2)',borderWidth:1,
+          bodyColor:'#f0f0f0',titleColor:'rgba(255,255,255,0.35)',
+          bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:11,weight:'700'},
+          titleFont:{family:"'DM Sans',-apple-system,sans-serif",size:9,weight:'600'},
+          padding:9,cornerRadius:8,
           callbacks:{
             title:(items)=>['Consistency','Discipline','Aggression','Execution','Endurance','Vision'][items[0].dataIndex],
             label:(item)=>item.datasetIndex===1?null:' '+item.raw+' / 100'
