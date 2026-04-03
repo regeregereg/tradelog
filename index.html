@@ -1329,21 +1329,20 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 
   <!-- JOURNAL -->
-  <!-- ═══ DASHBOARD RIGHT PANEL: mini calendar (injected, zero layout impact) ═══ -->
+  <!-- ═══ DASH RIGHT PANEL: mini calendar ═══ -->
   <style>
-  #dash-right-panel{display:none;position:fixed;top:32px;right:32px;width:268px;z-index:10;}
+  #dash-right-panel{display:none;position:fixed;top:32px;right:32px;width:262px;z-index:10;pointer-events:auto;}
   @media(min-width:1100px){
-    #dash-right-panel{display:block;}
-    /* shrink main content right padding so panel doesn't overlap */
-    #page-dashboard{padding-right:300px!important;}
+    .page-dash-visible #dash-right-panel{display:block;}
+    #page-dashboard{padding-right:294px!important;}
   }
-  #dash-cal-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
-  .dcal-header{padding:12px 14px 9px;border-bottom:1px solid var(--border);}
+  #dash-cal-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+  .dcal-header{padding:12px 13px 9px;border-bottom:1px solid var(--border);}
   .dcal-tag{font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:4px;display:flex;align-items:center;gap:4px;}
   .dcal-month-row{display:flex;align-items:center;justify-content:space-between;}
   .dcal-month-label{font-size:12.5px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
   .dcal-nav{display:flex;gap:3px;}
-  .dcal-nav-btn{width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;padding:0;}
+  .dcal-nav-btn{width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;padding:0;font-family:var(--font);}
   .dcal-nav-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2);}
   .dcal-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px 11px;border-bottom:1px solid var(--border);}
   .dcal-stat{background:rgba(255,255,255,0.025);border-radius:6px;padding:6px 8px;}
@@ -1368,10 +1367,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   .dcal-wr-lbl span{font-size:8px;color:var(--text3);font-family:var(--mono);}
   .dcal-wr-bg{height:2px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
   .dcal-wr-fill{height:100%;border-radius:2px;transition:width .7s ease;width:0%;}
-  /* hide panel when not on dashboard page */
-  body:not(.page-dashboard-active) #dash-right-panel{display:none!important;}
   </style>
-
   <div id="dash-right-panel">
     <div id="dash-cal-panel">
       <div class="dcal-header">
@@ -1398,7 +1394,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div class="dcal-grid" id="dash-cal-grid"></div>
       </div>
       <div class="dcal-wr-row" id="dash-cal-wr-row" style="display:none;">
-        <div class="dcal-wr-lbl"><span>Win Rate bulan ini</span><span id="dash-cal-wr-lbl">0%</span></div>
+        <div class="dcal-wr-lbl"><span>Win Rate</span><span id="dash-cal-wr-lbl">0%</span></div>
         <div class="dcal-wr-bg"><div class="dcal-wr-fill" id="dash-cal-wr-bar"></div></div>
       </div>
     </div>
@@ -3183,7 +3179,7 @@ function updateGuestUI() {
   $('cal-wr-bar-wrap').style.display='none';
 
   // ── Calendar still works for guests ──
-  renderCal();
+  renderCal(); renderDashCal();
 }
 
 function showApp() {
@@ -3196,7 +3192,15 @@ function showApp() {
     $('main').style.marginLeft = '0';
     sbOpen = false;
   }
-  setTimeout(() => renderCal(), 200);
+  setTimeout(() => { renderCal(); renderDashCal();
+    const panel = $('dash-right-panel');
+    if (panel) panel.style.display = (window.innerWidth >= 1100) ? 'block' : 'none';
+    window.addEventListener('resize', () => {
+      const p = $('dash-right-panel');
+      const dashActive = $('page-dashboard') && $('page-dashboard').classList.contains('active');
+      if (p) p.style.display = (dashActive && window.innerWidth >= 1100) ? 'block' : 'none';
+    });
+  }, 200);
 }
 
 // Show app immediately — no login required to browse
@@ -3322,6 +3326,10 @@ function goPage(name) {
   if (name === 'finance')   renderFinance();
   if (name === 'daily')     renderDailyPage();
   if (name === 'riskcalc')  calcRisk();
+  if (name === 'dashboard') renderDashCal();
+  // show/hide right panel
+  const panel = $('dash-right-panel');
+  if (panel) panel.style.display = (name === 'dashboard' && window.innerWidth >= 1100) ? 'block' : 'none';
   if (isMob()) closeSB();
 }
 ['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
@@ -3628,12 +3636,62 @@ document.querySelectorAll('[data-pperiod]').forEach(btn => {
 $('cal-prev').addEventListener('click', () => { calOff--; renderCal(); });
 $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
 
+// ── DASH MINI CALENDAR (right panel) ─────────────────────────────────────
+let dashCalOff = 0;
+function renderDashCal() {
+  const now = new Date(), d = new Date(now.getFullYear(), now.getMonth() + dashCalOff, 1);
+  const yr = d.getFullYear(), mo = d.getMonth();
+  const monthStr = `${yr}-${String(mo+1).padStart(2,'0')}`;
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const lbl = $('dash-cal-lbl'); if (lbl) lbl.textContent = d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+  const dm = {}; trades.forEach(t => { if (!dm[t.date]) dm[t.date]=0; dm[t.date]+=t.pnl; });
+  const mt = trades.filter(t => t.date && t.date.startsWith(monthStr));
+  const wins = mt.filter(t => t.result==='Win').length, total = mt.length;
+  const mpnl = mt.reduce((s,t)=>s+t.pnl,0), wr = total>0?(wins/total*100):null, avg = total>0?mpnl/total:null;
+  const setV = (id, txt, col) => { const e=$(''+id); if(e){e.textContent=txt; if(col)e.style.color=col;} };
+  const fmt = v => (v>=0?'+$':'-$')+Math.abs(v).toFixed(0);
+  setV('dash-cal-pnl', total>0?fmt(mpnl):'—', mpnl>0?'#00d97e':mpnl<0?'#f87171':'var(--text)');
+  setV('dash-cal-wr', wr!==null?wr.toFixed(1)+'%':'—', wr>=50?'#00d97e':wr!==null?'#f87171':'var(--text)');
+  setV('dash-cal-trades', total);
+  setV('dash-cal-avg', avg!==null?fmt(avg):'—', avg>0?'#00d97e':avg<0?'#f87171':'var(--text)');
+  const barRow = $('dash-cal-wr-row');
+  if (barRow) {
+    if (total > 0) {
+      barRow.style.display = 'block';
+      const pct = Math.round(wr||0);
+      const bar = $('dash-cal-wr-bar'); if(bar){bar.style.width=pct+'%';bar.style.background=pct>=50?'#00d97e':'#f87171';}
+      setV('dash-cal-wr-lbl', pct+'%');
+    } else { barRow.style.display = 'none'; }
+  }
+  const grid = $('dash-cal-grid'); if (!grid) return;
+  let html = '';
+  const first = new Date(yr,mo,1).getDay();
+  for (let i=0;i<first;i++) html+=`<div class="dcal-cell empty"></div>`;
+  const dim = new Date(yr,mo+1,0).getDate();
+  for (let day=1;day<=dim;day++) {
+    const ds = `${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const pnl = dm[ds], isToday = ds===todayStr;
+    let cls = 'dcal-cell'+(isToday?' today':'');
+    let inner = `<span class="dcal-dn">${day}</span>`;
+    if (pnl !== undefined) {
+      cls += ' '+(pnl>=0?'win':'loss');
+      const av = Math.abs(pnl);
+      const lb = av>=1000?(pnl>=0?'+':'-')+'$'+(av/1000).toFixed(1)+'k':(pnl>=0?'+':'-')+'$'+av.toFixed(0);
+      inner += `<span class="dcal-pnl">${lb}</span>`;
+    }
+    html += `<div class="${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div>`;
+  }
+  grid.innerHTML = html;
+}
+$('dash-cal-prev').addEventListener('click', () => { dashCalOff--; renderDashCal(); });
+$('dash-cal-next').addEventListener('click', () => { dashCalOff++; renderDashCal(); });
+
 
 
 // ── UPDATE ALL ────────────────────────────────────────
 function updateAll() {
   if (!bal) return;
-  updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil();
+  updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil(); renderDashCal();
   const total = trades.reduce((s,t) => s+t.pnl, 0);
   const currentBal = bal + total;
   $('sbf-bal').textContent = 'Balance: $' + f2(currentBal);
@@ -5925,124 +5983,6 @@ if ('serviceWorker' in navigator) {
       .catch(function() {}); // Silent fail - tidak kritis
   });
 }
-</script>
-<!-- ═══ DASH MINI CALENDAR JS ═══ -->
-<script>
-(function(){
-  var dashCalOff = 0;
-
-  function renderDashCal(){
-    var now=new Date(), d=new Date(now.getFullYear(),now.getMonth()+dashCalOff,1);
-    var yr=d.getFullYear(), mo=d.getMonth();
-    var monthStr=yr+'-'+String(mo+1).padStart(2,'0');
-    var todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-
-    var lbl=document.getElementById('dash-cal-lbl');
-    if(lbl) lbl.textContent=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
-
-    // build daily pnl map from global trades array
-    var dm={};
-    if(window.trades && trades.length){
-      trades.forEach(function(t){if(!dm[t.date])dm[t.date]=0; dm[t.date]+=t.pnl;});
-    }
-
-    // monthly stats
-    var mt=window.trades ? trades.filter(function(t){return t.date&&t.date.startsWith(monthStr);}) : [];
-    var wins=mt.filter(function(t){return t.result==='Win';}).length;
-    var total=mt.length;
-    var mpnl=mt.reduce(function(s,t){return s+t.pnl;},0);
-    var wr=total>0?(wins/total*100):null;
-    var avg=total>0?mpnl/total:null;
-
-    function setEl(id,text,color){var e=document.getElementById(id);if(e){e.textContent=text;if(color)e.style.color=color;}}
-    function fmt(v){return(v>=0?'+$':'-$')+Math.abs(v).toFixed(0);}
-
-    setEl('dash-cal-pnl', total>0?fmt(mpnl):'—', mpnl>0?'#00d97e':mpnl<0?'#f87171':'var(--text)');
-    setEl('dash-cal-wr', wr!==null?wr.toFixed(1)+'%':'—', wr>=50?'#00d97e':wr!==null?'#f87171':'var(--text)');
-    setEl('dash-cal-trades', total);
-    setEl('dash-cal-avg', avg!==null?fmt(avg):'—', avg>0?'#00d97e':avg<0?'#f87171':'var(--text)');
-
-    var barRow=document.getElementById('dash-cal-wr-row');
-    if(barRow){
-      if(total>0){
-        barRow.style.display='block';
-        var pct=Math.round(wr||0);
-        var bar=document.getElementById('dash-cal-wr-bar');
-        if(bar){bar.style.width=pct+'%';bar.style.background=pct>=50?'#00d97e':'#f87171';}
-        setEl('dash-cal-wr-lbl',pct+'%');
-      } else { barRow.style.display='none'; }
-    }
-
-    var grid=document.getElementById('dash-cal-grid');
-    if(!grid) return;
-    var html='';
-    var first=new Date(yr,mo,1).getDay();
-    for(var i=0;i<first;i++) html+='<div class="dcal-cell empty"></div>';
-    var dim=new Date(yr,mo+1,0).getDate();
-    for(var day=1;day<=dim;day++){
-      var ds=yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-      var pnl=dm[ds]; var isToday=ds===todayStr;
-      var cls='dcal-cell'+(isToday?' today':'');
-      var inner='<span class="dcal-dn">'+day+'</span>';
-      if(pnl!==undefined){
-        cls+=' '+(pnl>=0?'win':'loss');
-        var av=Math.abs(pnl);
-        var lb=av>=1000?(pnl>=0?'+':'-')+'$'+(av/1000).toFixed(1)+'k':(pnl>=0?'+':'-')+'$'+av.toFixed(0);
-        inner+='<span class="dcal-pnl">'+lb+'</span>';
-      }
-      html+='<div class="'+cls+'" title="'+ds+(pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):'')+'">'+inner+'</div>';
-    }
-    grid.innerHTML=html;
-  }
-
-  // show/hide panel based on active page
-  function updatePanelVisibility(){
-    var panel=document.getElementById('dash-right-panel');
-    if(!panel) return;
-    var dashActive=document.getElementById('page-dashboard') && document.getElementById('page-dashboard').classList.contains('active');
-    panel.style.display=(dashActive && window.innerWidth>=1100)?'block':'none';
-  }
-
-  // hook into existing bnGo / nav system via MutationObserver on page-dashboard
-  var dashPage=document.getElementById('page-dashboard');
-  if(dashPage){
-    var obs=new MutationObserver(function(){
-      updatePanelVisibility();
-      if(dashPage.classList.contains('active')) renderDashCal();
-    });
-    obs.observe(dashPage,{attributes:true,attributeFilter:['class']});
-  }
-
-  window.addEventListener('resize', updatePanelVisibility);
-
-  // nav buttons
-  var prevBtn=document.getElementById('dash-cal-prev');
-  var nextBtn=document.getElementById('dash-cal-next');
-  if(prevBtn) prevBtn.addEventListener('click',function(){dashCalOff--;renderDashCal();});
-  if(nextBtn) nextBtn.addEventListener('click',function(){dashCalOff++;renderDashCal();});
-
-  // patch global render to also update dash calendar
-  var _origRenderAll = window.renderDNA; // sentinel — run after app init
-  document.addEventListener('DOMContentLoaded', function(){
-    // Wait for app to initialize, then patch
-    setTimeout(function(){
-      var origUpdate = window.updateStats;
-      if(origUpdate){
-        window.updateStats = function(){
-          origUpdate.apply(this, arguments);
-          renderDashCal();
-        };
-      }
-      // initial render
-      renderDashCal();
-      updatePanelVisibility();
-    }, 800);
-  });
-
-  // also expose globally so it can be called directly
-  window.renderDashCal = renderDashCal;
-  window.updateDashPanelVisibility = updatePanelVisibility;
-})();
 </script>
 </body>
 </html>
