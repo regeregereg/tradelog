@@ -458,6 +458,26 @@ tr:hover td{background:rgba(139,92,246,.04);}
 .bias-btn.active{background:rgba(139,92,246,.15)!important;border-color:rgba(139,92,246,.45)!important;color:var(--text)!important;box-shadow:0 0 0 1px rgba(139,92,246,.2);}
 .mood-btn.active{background:rgba(139,92,246,.12)!important;border-color:rgba(139,92,246,.4)!important;color:var(--text)!important;box-shadow:0 0 0 1px rgba(139,92,246,.15);}
 .bias-btn:hover,.mood-btn:hover{border-color:rgba(139,92,246,.3)!important;background:rgba(139,92,246,.06)!important;}
+/* ── TRADE MODAL PREMIUM ── */
+.tm-section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:14px 14px 12px;}
+.tm-section-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.tm-section-label i{font-size:11px;}
+.qpair-btn{padding:4px 9px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--mono);transition:all .15s;letter-spacing:.3px;}
+.qpair-btn:hover,.qpair-btn.active{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.4);color:var(--accent2);}
+.dir-toggle-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
+.dir-toggle-btn.active-long{background:rgba(0,217,126,.08)!important;border-color:rgba(0,217,126,.5)!important;color:#00d97e!important;}
+.dir-toggle-btn.active-short{background:rgba(255,77,77,.08)!important;border-color:rgba(255,77,77,.5)!important;color:#ff4d4d!important;}
+.result-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
+.result-btn.active-win{background:rgba(0,217,126,.1)!important;border-color:rgba(0,217,126,.5)!important;color:#00d97e!important;}
+.result-btn.active-loss{background:rgba(255,77,77,.1)!important;border-color:rgba(255,77,77,.5)!important;color:#ff4d4d!important;}
+.result-btn.active-be{background:rgba(167,139,250,.1)!important;border-color:rgba(167,139,250,.5)!important;color:#a78bfa!important;}
+.emotion-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.05);}
+.emotion-btn.active{background:rgba(139,92,246,.12)!important;border-color:rgba(139,92,246,.45)!important;color:var(--accent2)!important;}
+#md-trade .md{border-radius:20px;}
+@media(max-width:600px){
+  #md-trade-inner{width:100%!important;border-radius:20px 20px 0 0!important;position:fixed!important;bottom:0;left:0;right:0;max-height:92vh!important;}
+  #md-trade{align-items:flex-end!important;}
+}
 .bdel{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
 .bdel:hover{color:var(--red);background:var(--rd);}
 .fsel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:var(--font);outline:none;cursor:pointer;}
@@ -3740,21 +3760,171 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
 <!-- LOG TRADE MODAL -->
 <div class="mo" id="md-trade">
-  <div class="md">
-    <div class="mdt">Log New Trade</div>
-    <div class="fg">
-      <div class="fgg"><label class="fl">Date</label><input class="fi" type="date" id="f-dt"></div>
-      <div class="fgg"><label class="fl">Pair</label><input class="fi" type="text" id="f-pair" placeholder="XAUUSD"></div>
-      <div class="fgg"><label class="fl">Direction</label><select class="fi" id="f-dir"><option>Long</option><option>Short</option></select></div>
-      <div class="fgg"><label class="fl">Session</label><select class="fi" id="f-ses"><option>London</option><option>New York</option><option>Asia</option><option>London-NY Overlap</option></select></div>
-      <div class="fgg"><label class="fl">Entry</label><input class="fi" type="number" id="f-en" placeholder="0.00" step="any"></div>
-      <div class="fgg"><label class="fl">Exit</label><input class="fi" type="number" id="f-ex" placeholder="0.00" step="any"></div>
-      <div class="fgg"><label class="fl">Stop Loss</label><input class="fi" type="number" id="f-sl" placeholder="0.00" step="any"></div>
-      <div class="fgg"><label class="fl">Risk ($)</label><input class="fi" type="number" id="f-rk" placeholder="100" step="any"></div>
-      <div class="fgg"><label class="fl">P&amp;L ($)</label><input class="fi" type="number" id="f-pnl" placeholder="+250 or -100" step="any"></div>
-      <div class="fgg"><label class="fl">Result</label><select class="fi" id="f-res"><option>Win</option><option>Loss</option><option>Breakeven</option></select></div>
-      <div class="fgg full">
-        <label class="fl">🏷️ Setup Tag</label>
+  <div class="md" id="md-trade-inner" style="width:580px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+
+    <!-- Modal Header -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(139,92,246,.02))">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-pencil-square" style="color:var(--accent);font-size:15px"></i>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:-.4px">Log New Trade</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px" id="trade-modal-subtitle">Catat trade baru ke journal kamu</div>
+          </div>
+        </div>
+        <button id="trade-cancel" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)';this.style.color='var(--text)'" onmouseout="this.style.background='rgba(255,255,255,.05)';this.style.color='var(--text3)'">
+          <i class="bi bi-x-lg" style="font-size:12px"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div style="overflow-y:auto;flex:1;padding:20px 24px">
+
+      <!-- ── STEP 1: Basic Info ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-info-circle"></i> Informasi Dasar</div>
+        <div class="fg" style="gap:10px">
+
+          <!-- Pair with quick select -->
+          <div class="fgg full">
+            <label class="fl">Pair / Instrumen</label>
+            <div style="position:relative">
+              <i class="bi bi-currency-exchange" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none"></i>
+              <input class="fi" type="text" id="f-pair" placeholder="XAUUSD, EURUSD, BTC..." style="padding-left:32px;text-transform:uppercase;font-size:14px;font-weight:600;letter-spacing:.5px">
+            </div>
+            <!-- Quick pair buttons -->
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px" id="quick-pairs">
+              <button type="button" class="qpair-btn" data-pair="XAUUSD">XAU/USD</button>
+              <button type="button" class="qpair-btn" data-pair="EURUSD">EUR/USD</button>
+              <button type="button" class="qpair-btn" data-pair="GBPUSD">GBP/USD</button>
+              <button type="button" class="qpair-btn" data-pair="USDJPY">USD/JPY</button>
+              <button type="button" class="qpair-btn" data-pair="BTCUSD">BTC/USD</button>
+              <button type="button" class="qpair-btn" data-pair="NAS100">NAS100</button>
+              <button type="button" class="qpair-btn" data-pair="US30">US30</button>
+            </div>
+          </div>
+
+          <!-- Date -->
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-calendar3" style="margin-right:3px"></i>Tanggal</label>
+            <input class="fi" type="date" id="f-dt">
+          </div>
+
+          <!-- Session -->
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-clock" style="margin-right:3px"></i>Sesi</label>
+            <select class="fi" id="f-ses">
+              <option value="London">🇬🇧 London</option>
+              <option value="New York">🗽 New York</option>
+              <option value="Asia">🌏 Asia</option>
+              <option value="London-NY Overlap">⚡ London-NY Overlap</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Direction (big toggle) ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-arrows-expand"></i> Arah Posisi</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button type="button" class="dir-toggle-btn" id="dir-long" onclick="setTradeDir('Long')"
+            style="padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:var(--text2)">
+            <i class="bi bi-arrow-up-right-circle-fill" style="font-size:18px;color:#00d97e"></i>
+            LONG / BUY
+          </button>
+          <button type="button" class="dir-toggle-btn" id="dir-short" onclick="setTradeDir('Short')"
+            style="padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:var(--text2)">
+            <i class="bi bi-arrow-down-right-circle-fill" style="font-size:18px;color:#ff4d4d"></i>
+            SHORT / SELL
+          </button>
+        </div>
+        <input type="hidden" id="f-dir" value="Long">
+      </div>
+
+      <!-- ── STEP 3: Price Levels ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-graph-up"></i> Level Harga</div>
+        <div class="fg" style="gap:10px">
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-box-arrow-in-right" style="margin-right:3px;color:#38bdf8"></i>Entry Price</label>
+            <div style="position:relative">
+              <input class="fi" type="number" id="f-en" placeholder="0.00000" step="any" oninput="calcRR()">
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);font-family:var(--mono)">price</span>
+            </div>
+          </div>
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-box-arrow-right" style="margin-right:3px;color:#a78bfa"></i>Exit Price</label>
+            <div style="position:relative">
+              <input class="fi" type="number" id="f-ex" placeholder="0.00000" step="any" oninput="calcRR()">
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);font-family:var(--mono)">price</span>
+            </div>
+          </div>
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-shield-exclamation" style="margin-right:3px;color:#ff4d4d"></i>Stop Loss</label>
+            <div style="position:relative">
+              <input class="fi" type="number" id="f-sl" placeholder="0.00000" step="any" oninput="calcRR()">
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);font-family:var(--mono)">price</span>
+            </div>
+          </div>
+          <!-- RR Display -->
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-calculator" style="margin-right:3px"></i>R:R Ratio</label>
+            <div id="rr-display" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;gap:6px;min-height:38px">
+              <i class="bi bi-dash-lg" style="font-size:11px"></i>
+              <span id="rr-val">Isi entry & SL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: P&L ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-cash-stack"></i> Risk & P&L</div>
+        <div class="fg" style="gap:10px">
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-shield-fill-minus" style="margin-right:3px;color:#f59e0b"></i>Risk ($)</label>
+            <div style="position:relative">
+              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
+              <input class="fi" type="number" id="f-rk" placeholder="100" step="any" style="padding-left:22px">
+            </div>
+          </div>
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-currency-dollar" style="margin-right:3px;color:#00d97e"></i>P&amp;L ($)</label>
+            <div style="position:relative">
+              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
+              <input class="fi" type="number" id="f-pnl" placeholder="+250 atau -100" step="any" style="padding-left:22px" oninput="autoSetResult()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 5: Result (big buttons) ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-trophy"></i> Hasil Trade</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <button type="button" class="result-btn" id="res-win" onclick="setResult('Win')"
+            style="padding:11px 8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
+            <i class="bi bi-check-circle-fill" style="font-size:15px;color:#00d97e"></i> WIN
+          </button>
+          <button type="button" class="result-btn" id="res-loss" onclick="setResult('Loss')"
+            style="padding:11px 8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
+            <i class="bi bi-x-circle-fill" style="font-size:15px;color:#ff4d4d"></i> LOSS
+          </button>
+          <button type="button" class="result-btn" id="res-be" onclick="setResult('Breakeven')"
+            style="padding:11px 8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
+            <i class="bi bi-dash-circle-fill" style="font-size:15px;color:#a78bfa"></i> BE
+          </button>
+        </div>
+        <input type="hidden" id="f-res" value="Win">
+      </div>
+
+      <!-- ── STEP 6: Setup Tags ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-tags"></i> Setup Tag</div>
         <div id="tag-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
           <button type="button" class="tag-chip" data-tag="BOS">BOS</button>
           <button type="button" class="tag-chip" data-tag="OB">OB</button>
@@ -3763,28 +3933,92 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <button type="button" class="tag-chip" data-tag="Reversal">Reversal</button>
           <button type="button" class="tag-chip" data-tag="Trend Follow">Trend Follow</button>
           <button type="button" class="tag-chip" data-tag="News Play">News Play</button>
-          <button type="button" class="tag-chip" data-tag="Liquidity Grab">Liquidity Grab</button>
-          <button type="button" class="tag-chip" data-tag="Supply/Demand">Supply/Demand</button>
+          <button type="button" class="tag-chip" data-tag="Liquidity Grab">Liq. Grab</button>
+          <button type="button" class="tag-chip" data-tag="Supply/Demand">S&D</button>
           <button type="button" class="tag-chip" data-tag="EMA Cross">EMA Cross</button>
         </div>
-        <input class="fi" type="text" id="f-su" placeholder="Pilih tag di atas atau ketik custom…" style="font-size:12px">
-        <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)">Bisa pilih beberapa tag sekaligus. Pisahkan dengan koma untuk custom.</div>
+        <div style="position:relative">
+          <i class="bi bi-pencil" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none"></i>
+          <input class="fi" type="text" id="f-su" placeholder="Custom tag... (pisahkan dengan koma)" style="font-size:12px;padding-left:30px">
+        </div>
       </div>
-      <div class="fgg"><label class="fl">Emotion</label><select class="fi" id="f-em"><option>Calm</option><option>Confident</option><option>Anxious</option><option>FOMO</option><option>Impatient</option><option>Revenge</option></select></div>
-      <div class="fgg full"><label class="fl">Notes</label><textarea class="ta" id="f-nt" placeholder="Setup, execution, lessons…"></textarea></div>
-      <div class="fgg full">
-        <label class="fl">📸 Chart Screenshot <span style="font-weight:400;color:var(--text3)">(opsional)</span></label>
-        <div id="screenshot-drop-zone" style="border:2px dashed var(--border2);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg3)" onclick="document.getElementById('f-screenshot').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleScreenshotDrop(event)">
+
+      <!-- ── STEP 7: Emotion ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-heart-pulse"></i> Kondisi Saat Trading</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px" id="emotion-btns">
+          <button type="button" class="emotion-btn" data-em="Calm" onclick="setEmotion('Calm')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-cloud" style="color:#38bdf8;font-size:13px"></i> Calm
+          </button>
+          <button type="button" class="emotion-btn" data-em="Confident" onclick="setEmotion('Confident')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-emoji-sunglasses" style="color:#00d97e;font-size:13px"></i> Confident
+          </button>
+          <button type="button" class="emotion-btn" data-em="Anxious" onclick="setEmotion('Anxious')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-emoji-dizzy" style="color:#f59e0b;font-size:13px"></i> Anxious
+          </button>
+          <button type="button" class="emotion-btn" data-em="FOMO" onclick="setEmotion('FOMO')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-lightning-charge" style="color:#a78bfa;font-size:13px"></i> FOMO
+          </button>
+          <button type="button" class="emotion-btn" data-em="Impatient" onclick="setEmotion('Impatient')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-hourglass-split" style="color:#fb923c;font-size:13px"></i> Impatient
+          </button>
+          <button type="button" class="emotion-btn" data-em="Revenge" onclick="setEmotion('Revenge')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-fire" style="color:#ff4d4d;font-size:13px"></i> Revenge
+          </button>
+        </div>
+        <input type="hidden" id="f-em" value="Calm">
+      </div>
+
+      <!-- ── STEP 8: Notes ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-chat-left-text"></i> Catatan</div>
+        <textarea class="ta" id="f-nt" placeholder="Setup yang digunakan, alasan entry, eksekusi, pelajaran…" style="min-height:70px;font-size:12px"></textarea>
+      </div>
+
+      <!-- ── STEP 9: Screenshot ── -->
+      <div class="tm-section" style="margin-bottom:4px">
+        <div class="tm-section-label">
+          <i class="bi bi-image"></i> Chart Screenshot
+          <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px">(opsional)</span>
+        </div>
+        <div id="screenshot-drop-zone"
+          style="border:2px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)"
+          onclick="document.getElementById('f-screenshot').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='rgba(139,92,246,.06)'"
+          ondragleave="this.style.borderColor='var(--border2)';this.style.background='var(--bg3)'"
+          ondrop="handleScreenshotDrop(event)">
           <input type="file" id="f-screenshot" accept="image/*" style="display:none" onchange="handleScreenshotFile(this.files[0])">
-          <div id="screenshot-placeholder" style="color:var(--text3);font-size:12px;pointer-events:none"><span style="font-size:20px">📷</span><br>Drop screenshot di sini atau klik upload<br><span style="font-size:10px">PNG/JPG maks 3MB</span></div>
-          <div id="screenshot-preview" style="display:none;position:relative;display:none">
+          <div id="screenshot-placeholder" style="color:var(--text3);font-size:12px;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <i class="bi bi-cloud-arrow-up" style="font-size:26px;color:var(--text3)"></i>
+            <span>Drop screenshot atau <span style="color:var(--accent)">klik untuk upload</span></span>
+            <span style="font-size:10px;color:var(--text3);opacity:.7">PNG / JPG — maks 3MB</span>
+          </div>
+          <div id="screenshot-preview" style="display:none;position:relative">
             <img id="screenshot-img" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain" alt="chart">
-            <button onclick="event.stopPropagation();clearScreenshot()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.75);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1">✕</button>
+            <button onclick="event.stopPropagation();clearScreenshot()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-x-lg"></i>
+            </button>
           </div>
         </div>
       </div>
+
+    </div><!-- /scrollable body -->
+
+    <!-- Footer actions -->
+    <div style="padding:14px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:10px;align-items:center;background:var(--bg2)">
+      <div style="flex:1;font-size:11px;color:var(--text3);font-family:var(--mono)" id="trade-rr-footer"></div>
+      <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="padding:9px 18px;font-size:13px">Batal</button>
+      <button class="btn" id="trade-save" style="padding:9px 24px;font-size:13px;display:flex;align-items:center;gap:7px">
+        <i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Trade
+      </button>
     </div>
-    <div class="fa"><button class="btng" id="trade-cancel">Cancel</button><button class="btn" id="trade-save">Log Trade</button></div>
+
   </div>
 </div>
 
@@ -4909,6 +5143,77 @@ $('welcome-btn').addEventListener('click', async () => {
 $('welcome-bal').addEventListener('keydown', e => { if(e.key==='Enter') $('welcome-btn').click(); });
 
 // ── TRADE MODAL ───────────────────────────────────────
+
+// Direction toggle
+window.setTradeDir = function(dir) {
+  $('f-dir').value = dir;
+  $('dir-long').classList.toggle('active-long', dir === 'Long');
+  $('dir-long').classList.toggle('active-short', false);
+  $('dir-short').classList.toggle('active-short', dir === 'Short');
+  $('dir-short').classList.toggle('active-long', false);
+};
+
+// Result toggle
+window.setResult = function(res) {
+  $('f-res').value = res;
+  ['win','loss','be'].forEach(k => {
+    $('res-'+k).classList.remove('active-win','active-loss','active-be');
+  });
+  const map = { Win:'win', Loss:'loss', Breakeven:'be' };
+  $('res-'+map[res]).classList.add('active-'+res.toLowerCase().replace('breakeven','be'));
+};
+
+// Emotion toggle
+window.setEmotion = function(em) {
+  $('f-em').value = em;
+  document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.emotion-btn').forEach(b => {
+    if (b.dataset.em === em) b.classList.add('active');
+  });
+};
+
+// Quick pair buttons
+document.querySelectorAll('.qpair-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('f-pair').value = btn.dataset.pair;
+    document.querySelectorAll('.qpair-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// R:R calculator
+window.calcRR = function() {
+  const en = parseFloat($('f-en').value);
+  const sl = parseFloat($('f-sl').value);
+  const ex = parseFloat($('f-ex').value);
+  const rrEl = $('rr-val');
+  const rrDisplay = $('rr-display');
+  const footer = $('trade-rr-footer');
+  if (!en || !sl) { rrEl.textContent='Isi entry & SL'; rrDisplay.style.color='var(--text3)'; if(footer) footer.textContent=''; return; }
+  const risk = Math.abs(en - sl);
+  if (!risk) { rrEl.textContent='SL = Entry?'; return; }
+  if (ex) {
+    const reward = Math.abs(ex - en);
+    const rr = (reward / risk).toFixed(2);
+    rrEl.textContent = '1 : ' + rr;
+    const good = parseFloat(rr) >= 1.5;
+    rrDisplay.style.color = good ? '#00d97e' : parseFloat(rr) >= 1 ? '#f59e0b' : '#ff4d4d';
+    if (footer) footer.textContent = 'R:R = 1:' + rr + (good ? ' ✓' : '');
+  } else {
+    rrEl.textContent = 'Isi exit dulu';
+    rrDisplay.style.color = 'var(--text3)';
+  }
+};
+
+// Auto-set result dari P&L
+window.autoSetResult = function() {
+  const pnl = parseFloat($('f-pnl').value);
+  if (isNaN(pnl)) return;
+  if (pnl > 0) setResult('Win');
+  else if (pnl < 0) setResult('Loss');
+  else setResult('Breakeven');
+};
+
 // Tag chips multi-select logic
 document.querySelectorAll('.tag-chip').forEach(chip => {
   chip.addEventListener('click', () => {
@@ -4917,7 +5222,7 @@ document.querySelectorAll('.tag-chip').forEach(chip => {
     $('f-su').value = active.join(', ');
   });
 });
-// Sync custom input back — deselect chips not in text
+// Sync custom input back
 $('f-su').addEventListener('input', () => {
   const val = $('f-su').value.toLowerCase();
   document.querySelectorAll('.tag-chip').forEach(chip => {
@@ -4925,32 +5230,54 @@ $('f-su').addEventListener('input', () => {
   });
 });
 
+function _resetTradeModal() {
+  // Reset direction
+  setTradeDir('Long');
+  // Reset result
+  setResult('Win');
+  // Reset emotion
+  setEmotion('Calm');
+  // Reset quick pairs
+  document.querySelectorAll('.qpair-btn').forEach(b => b.classList.remove('active'));
+  // Reset tag chips
+  document.querySelectorAll('.tag-chip.active').forEach(c => c.classList.remove('active'));
+  // Reset RR
+  const rrEl = $('rr-val');
+  if (rrEl) { rrEl.textContent = 'Isi entry & SL'; $('rr-display').style.color='var(--text3)'; }
+  const footer = $('trade-rr-footer');
+  if (footer) footer.textContent = '';
+}
+
 function openTrade() {
   if (!currentUser) {
     pendingAction = 'openTrade';
     openLoginScreen('log');
     return;
   }
-  // Check anon trade limit
   if (currentUser.isAnonymous && trades.length >= ANON_LIMIT) {
     openAnonLimitModal();
     return;
   }
   clearScreenshot();
   $('f-dt').value = new Date().toISOString().slice(0,10);
+  _resetTradeModal();
   $('md-trade').classList.add('open');
+  // scroll modal body to top
+  const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
+  if (body) body.scrollTop = 0;
   setTimeout(() => $('f-pair').focus(), 80);
 }
+
 function closeTradeModal() {
   $('md-trade').classList.remove('open');
-  // Reset tag chips
-  document.querySelectorAll('.tag-chip.active').forEach(c => c.classList.remove('active'));
 }
+
 $('dash-log-btn').addEventListener('click', openTrade);
 $('journal-log-btn').addEventListener('click', openTrade);
 $('mob-log-btn').addEventListener('click', openTrade);
 $('trade-cancel').addEventListener('click', closeTradeModal);
 $('md-trade').addEventListener('click', e => { if(e.target===$('md-trade')) closeTradeModal(); });
+
 $('trade-save').addEventListener('click', async () => {
   const risk = parseFloat($('f-rk').value) || 100;
   const pnl  = parseFloat($('f-pnl').value) || 0;
