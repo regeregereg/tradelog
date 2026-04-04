@@ -1314,8 +1314,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div id="tc-tagline" style="font-size:11px;color:var(--accent2);margin-top:4px;font-family:var(--mono);opacity:.8">📈 Konsisten adalah kunci</div>
         </div>
         <!-- Share button -->
-        <button id="share-btn" style="background:rgba(139,92,246,.15);color:var(--accent2);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;flex-shrink:0;letter-spacing:.2px" title="Bagikan statistik trading kamu">
-          📤 Share Stats
+        <button id="share-btn" style="background:rgba(139,92,246,.15);color:var(--accent2);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;flex-shrink:0;letter-spacing:.2px;display:flex;align-items:center;gap:6px" title="Bagikan statistik trading kamu">
+          <i class="bi bi-share-fill" style="font-size:12px"></i> Share Stats
         </button>
       </div>
     </div>
@@ -4058,86 +4058,221 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 </div>
 
 <!-- SHARE STATS MODAL -->
-<div class="mo" id="md-share">
-  <div class="md" style="max-width:420px">
-    <div style="padding:4px 0 0">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div>
-          <div style="font-size:16px;font-weight:600;letter-spacing:-.3px">Share Trading Stats</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:2px">Unduh sebagai gambar atau copy teks</div>
+<div class="mo" id="md-share" style="align-items:center">
+  <div class="md" style="max-width:480px;padding:0;overflow:hidden;border-radius:20px;display:flex;flex-direction:column;max-height:94vh">
+
+    <!-- Modal header -->
+    <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,rgba(139,92,246,.07),transparent)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-share-fill" style="color:var(--accent);font-size:14px"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Share Trading Stats</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px">Pilih template, lalu unduh atau copy</div>
+          </div>
         </div>
-        <button id="share-cancel" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;line-height:1">✕</button>
+        <button id="share-cancel" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">
+          <i class="bi bi-x-lg" style="font-size:11px"></i>
+        </button>
       </div>
 
-      <!-- ─── Share Card (this div gets captured as image) ─── -->
-      <div id="share-preview" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1040 50%,#0a1628 100%);border-radius:16px;padding:24px;margin-bottom:16px;font-family:var(--font);position:relative;overflow:hidden">
-        <!-- Background decoration -->
-        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(124,106,247,.08);pointer-events:none"></div>
-        <div style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(0,217,126,.05);pointer-events:none"></div>
+      <!-- Template Selector -->
+      <div style="display:flex;gap:6px;margin-top:12px">
+        <button class="share-tpl-btn active" data-tpl="dark" onclick="setShareTemplate('dark')" style="flex:1;padding:6px 4px;border-radius:8px;border:1.5px solid rgba(139,92,246,.5);background:rgba(139,92,246,.1);color:var(--accent2);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;letter-spacing:.3px">
+          <i class="bi bi-moon-stars-fill" style="font-size:11px;display:block;margin:0 auto 3px"></i>DARK
+        </button>
+        <button class="share-tpl-btn" data-tpl="minimal" onclick="setShareTemplate('minimal')" style="flex:1;padding:6px 4px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;letter-spacing:.3px">
+          <i class="bi bi-square" style="font-size:11px;display:block;margin:0 auto 3px"></i>MINIMAL
+        </button>
+        <button class="share-tpl-btn" data-tpl="neon" onclick="setShareTemplate('neon')" style="flex:1;padding:6px 4px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;letter-spacing:.3px">
+          <i class="bi bi-lightning-charge-fill" style="font-size:11px;display:block;margin:0 auto 3px"></i>NEON
+        </button>
+      </div>
+    </div>
 
-        <!-- Header: avatar + name + brand -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div id="sp-avatar" style="width:44px;height:44px;border-radius:50%;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(124,106,247,.5)"></div>
-            <div>
-              <div id="sp-name" style="font-size:15px;font-weight:700;color:#f0f0f0;line-height:1.2"></div>
-              <div style="font-size:10px;color:#7c6af7;font-family:var(--mono);margin-top:2px">Trading Journal</div>
+    <!-- Scrollable content -->
+    <div style="overflow-y:auto;flex:1;padding:18px 22px">
+
+      <!-- ─── Share Card Preview (captured as image) ─── -->
+      <div id="share-preview" style="border-radius:16px;margin-bottom:16px;font-family:'Syne',-apple-system,sans-serif;position:relative;overflow:hidden;transition:all .3s">
+
+        <!-- DARK TEMPLATE (default) -->
+        <div id="sp-tpl-dark" style="background:linear-gradient(145deg,#0d0d14 0%,#130e2a 45%,#09131f 100%);padding:26px 24px">
+
+          <!-- Noise overlay -->
+          <div style="position:absolute;inset:0;opacity:.025;pointer-events:none;background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E')"></div>
+
+          <!-- Glow orbs -->
+          <div style="position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.14) 0%,transparent 70%);pointer-events:none"></div>
+          <div style="position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(0,217,126,.08) 0%,transparent 70%);pointer-events:none"></div>
+
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;position:relative">
+            <div style="display:flex;align-items:center;gap:11px">
+              <div id="sp-avatar" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#7c6af7,#5b21b6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;border:1.5px solid rgba(139,92,246,.45)"></div>
+              <div>
+                <div id="sp-name" style="font-size:15px;font-weight:800;color:#f4f4f5;line-height:1.2;letter-spacing:-.3px"></div>
+                <div style="font-size:9px;color:rgba(167,139,250,.7);font-family:'JetBrains Mono',monospace;margin-top:2px;letter-spacing:.5px;text-transform:uppercase">Trader</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:10px;font-weight:800;color:#8b5cf6;letter-spacing:1.5px;text-transform:uppercase">RiskPerTrade</div>
+              <div style="font-size:8px;color:#3f3f46;font-family:'JetBrains Mono',monospace;margin-top:2px">riskpertrade.me</div>
             </div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:11px;font-weight:700;color:#7c6af7;letter-spacing:.5px">RISKPERTRADE</div>
-            <div style="font-size:9px;color:#444;font-family:var(--mono);margin-top:1px">riskpertrade.me</div>
+
+          <!-- Main stat: P&L -->
+          <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 20px;margin-bottom:12px;position:relative;overflow:hidden">
+            <div style="position:absolute;right:0;top:0;bottom:0;width:4px;border-radius:0 14px 14px 0" id="sp-pnl-bar" style="background:#00d97e"></div>
+            <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Total P&amp;L</div>
+            <div id="sp-pnl" style="font-size:30px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#00d97e;line-height:1;letter-spacing:-1px">$0</div>
+            <div id="sp-period" style="font-size:9px;color:#52525b;margin-top:6px;font-family:'JetBrains Mono',monospace">All time</div>
+          </div>
+
+          <!-- Stats row -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 10px">
+              <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Win Rate</div>
+              <div id="sp-wr" style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f4f4f5;line-height:1">—</div>
+            </div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 10px">
+              <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Trades</div>
+              <div id="sp-trades" style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f4f4f5;line-height:1">0</div>
+            </div>
+            <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 10px">
+              <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Prof. Factor</div>
+              <div id="sp-pf" style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f4f4f5;line-height:1">—</div>
+            </div>
+          </div>
+
+          <!-- Bottom row: RR + Streak + Tagline -->
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:10px">
+              <div>
+                <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Avg R:R</div>
+                <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#a78bfa">—</div>
+              </div>
+              <div style="width:1px;height:24px;background:rgba(255,255,255,.07)"></div>
+              <div>
+                <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Best Streak</div>
+                <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#00d97e">—</div>
+              </div>
+            </div>
+            <div id="sp-tagline" style="font-size:9px;color:rgba(139,92,246,.65);font-family:'JetBrains Mono',monospace;text-align:right;letter-spacing:.2px;max-width:100px;line-height:1.4"></div>
           </div>
         </div>
 
-        <!-- Divider -->
-        <div style="height:1px;background:rgba(255,255,255,.07);margin-bottom:16px"></div>
-
-        <!-- Stats grid -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-          <div style="background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.15);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Total P&amp;L</div>
-            <div id="sp-pnl" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#00d97e;line-height:1">$0</div>
+        <!-- MINIMAL TEMPLATE (hidden by default) -->
+        <div id="sp-tpl-minimal" style="display:none;background:#f5f5f0;padding:28px 26px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <div>
+              <div id="sp-name-m" style="font-size:16px;font-weight:800;color:#111;letter-spacing:-.4px"></div>
+              <div style="font-size:9px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-top:2px">Trading Stats</div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase">RISKPERTRADE</div>
           </div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Win Rate</div>
-            <div id="sp-wr" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#f0f0f0;line-height:1">—</div>
+          <div style="height:2px;background:#eee;margin-bottom:22px"></div>
+          <div style="margin-bottom:20px">
+            <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total P&L</div>
+            <div id="sp-pnl-m" style="font-size:36px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#111;line-height:1;letter-spacing:-1.5px">$0</div>
           </div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Trades</div>
-            <div id="sp-trades" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#f0f0f0;line-height:1">0</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+            <div>
+              <div style="font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Win Rate</div>
+              <div id="sp-wr-m" style="font-size:20px;font-weight:800;color:#111;font-family:'JetBrains Mono',monospace">—</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Trades</div>
+              <div id="sp-trades-m" style="font-size:20px;font-weight:800;color:#111;font-family:'JetBrains Mono',monospace">0</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Prof. Factor</div>
+              <div id="sp-pf-m" style="font-size:20px;font-weight:800;color:#111;font-family:'JetBrains Mono',monospace">—</div>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Profit Factor</div>
-            <div id="sp-pf" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#f0f0f0;line-height:1">—</div>
+          <div style="height:1px;background:#eee;margin-bottom:14px"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:16px">
+              <div>
+                <div style="font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Avg R:R</div>
+                <div id="sp-rr-m" style="font-size:13px;font-weight:700;color:#555;font-family:'JetBrains Mono',monospace">—</div>
+              </div>
+              <div>
+                <div style="font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Best Streak</div>
+                <div id="sp-streak-m" style="font-size:13px;font-weight:700;color:#555;font-family:'JetBrains Mono',monospace">—</div>
+              </div>
+            </div>
+            <div id="sp-tagline-m" style="font-size:9px;color:#bbb;font-family:'JetBrains Mono',monospace;text-align:right;max-width:100px;line-height:1.4"></div>
           </div>
         </div>
 
-        <!-- Streak bar -->
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:11px;color:#888">Avg R:R</div>
-          <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:var(--mono);color:#7c6af7">—</div>
-          <div style="width:1px;height:16px;background:rgba(255,255,255,.1)"></div>
-          <div style="font-size:11px;color:#888">Best Streak</div>
-          <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:var(--mono);color:#00d97e">—</div>
+        <!-- NEON TEMPLATE (hidden by default) -->
+        <div id="sp-tpl-neon" style="display:none;background:#000;padding:26px 24px;border:1px solid rgba(0,255,150,.15)">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,150,.5),transparent)"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.4),transparent)"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div>
+              <div id="sp-name-n" style="font-size:14px;font-weight:800;color:#00ff96;letter-spacing:.5px;text-shadow:0 0 20px rgba(0,255,150,.4)"></div>
+              <div style="font-size:8px;color:rgba(0,255,150,.35);letter-spacing:2px;text-transform:uppercase;margin-top:3px;font-family:'JetBrains Mono',monospace">TRADER</div>
+            </div>
+            <div style="font-size:8px;font-weight:700;color:rgba(139,92,246,.7);letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 12px rgba(139,92,246,.3)">RISKPERTRADE</div>
+          </div>
+          <div style="border-top:1px solid rgba(0,255,150,.08);padding-top:16px;margin-bottom:16px">
+            <div style="font-size:9px;color:rgba(0,255,150,.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:'JetBrains Mono',monospace">TOTAL P&amp;L</div>
+            <div id="sp-pnl-n" style="font-size:32px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#00ff96;line-height:1;letter-spacing:-1px;text-shadow:0 0 30px rgba(0,255,150,.5)">$0</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+            <div style="border:1px solid rgba(0,255,150,.12);border-radius:8px;padding:10px">
+              <div style="font-size:7px;color:rgba(0,255,150,.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-family:'JetBrains Mono',monospace">WIN RATE</div>
+              <div id="sp-wr-n" style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#fff">—</div>
+            </div>
+            <div style="border:1px solid rgba(0,255,150,.12);border-radius:8px;padding:10px">
+              <div style="font-size:7px;color:rgba(0,255,150,.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-family:'JetBrains Mono',monospace">TRADES</div>
+              <div id="sp-trades-n" style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#fff">0</div>
+            </div>
+            <div style="border:1px solid rgba(0,255,150,.12);border-radius:8px;padding:10px">
+              <div style="font-size:7px;color:rgba(0,255,150,.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-family:'JetBrains Mono',monospace">PROF. F.</div>
+              <div id="sp-pf-n" style="font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#fff">—</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;border-top:1px solid rgba(139,92,246,.15);padding-top:10px;display:flex;gap:16px">
+              <div>
+                <div style="font-size:7px;color:rgba(139,92,246,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'JetBrains Mono',monospace">AVG R:R</div>
+                <div id="sp-rr-n" style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#a78bfa;text-shadow:0 0 10px rgba(167,139,250,.4)">—</div>
+              </div>
+              <div>
+                <div style="font-size:7px;color:rgba(139,92,246,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'JetBrains Mono',monospace">STREAK</div>
+                <div id="sp-streak-n" style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#00ff96;text-shadow:0 0 10px rgba(0,255,150,.4)">—</div>
+              </div>
+            </div>
+            <div id="sp-tagline-n" style="font-size:8px;color:rgba(0,255,150,.3);font-family:'JetBrains Mono',monospace;text-align:right;letter-spacing:.5px;max-width:90px;line-height:1.5"></div>
+          </div>
         </div>
 
-        <!-- Tagline -->
-        <div id="sp-tagline" style="font-size:11px;color:rgba(124,106,247,.8);font-family:var(--mono);text-align:center;letter-spacing:.3px">📈 Konsisten adalah kunci</div>
-      </div>
+      </div><!-- /share-preview -->
 
       <!-- Action buttons -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button class="btng" id="copy-link-btn" style="display:flex;align-items:center;justify-content:center;gap:6px">
-          📋 Copy Teks
+        <button class="btng" id="copy-link-btn" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;font-size:12px;font-weight:600;border-radius:11px">
+          <i class="bi bi-clipboard" style="font-size:14px"></i> Copy Teks
         </button>
-        <button class="btn" id="download-img-btn" style="display:flex;align-items:center;justify-content:center;gap:6px">
-          ⬇️ Unduh Gambar
+        <button class="btn" id="download-img-btn" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;font-size:12px;font-weight:600;border-radius:11px">
+          <i class="bi bi-download" style="font-size:14px"></i> Unduh Gambar
         </button>
       </div>
-      <div id="copy-success" style="display:none;font-size:12px;color:var(--green);margin-top:10px;text-align:center">✓ Teks berhasil dicopy! Paste ke Instagram / Twitter / WA</div>
-      <div id="download-loading" style="display:none;font-size:12px;color:var(--text2);margin-top:10px;text-align:center">⏳ Membuat gambar...</div>
-    </div>
+
+      <!-- Feedback messages -->
+      <div id="copy-success" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.2);font-size:12px;color:#00d97e;text-align:center;display:none">
+        <i class="bi bi-check-circle-fill" style="margin-right:5px"></i> Berhasil dicopy! Paste ke Instagram / Twitter / WA
+      </div>
+      <div id="download-loading" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);font-size:12px;color:var(--accent2);text-align:center">
+        <i class="bi bi-arrow-repeat" style="margin-right:5px"></i> Membuat gambar...
+      </div>
+
+    </div><!-- /scrollable -->
   </div>
 </div>
 
@@ -5332,45 +5467,98 @@ $('bal-in').addEventListener('keydown', e => { if(e.key==='Enter') $('bal-save')
 $('ftmo-set-btn').addEventListener('click', () => $('md-ftmo').classList.add('open'));
 
 // ── SHARE STATS ────────────────────────────────────────
+let _shareStats = {};
+
+function _computeShareStats() {
+  const n    = trades.length;
+  const W    = trades.filter(t=>t.result==='Win');
+  const L    = trades.filter(t=>t.result==='Loss');
+  const tot  = trades.reduce((s,t)=>s+t.pnl,0);
+  const wr   = n>0?(W.length/n*100).toFixed(1)+'%':'—';
+  const gw   = W.reduce((s,t)=>s+t.pnl,0);
+  const gl   = Math.abs(L.reduce((s,t)=>s+t.pnl,0));
+  const pf   = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
+  const rr   = n>0?(trades.reduce((s,t)=>s+t.r,0)/n).toFixed(2)+'R':'—';
+  let bestStreak=0,curStreak=0,curType='';
+  trades.forEach(t=>{
+    if(t.result===curType){curStreak++;}else{curType=t.result;curStreak=1;}
+    if(t.result==='Win'&&curStreak>bestStreak)bestStreak=curStreak;
+  });
+  const pnlStr  = (tot>=0?'+$':'-$')+f2(Math.abs(tot));
+  const pnlColor = tot>=0?'#00d97e':'#ff4d4d';
+  let tagline = 'Konsisten adalah kunci';
+  if(n===0) tagline='Perjalanan dimulai';
+  else if(tot>0&&W.length/n>=0.6) tagline=`${(W.length/n*100).toFixed(0)}% WR — On fire!`;
+  else if(tot>0) tagline=`+$${tot.toFixed(0)} — Keep going!`;
+  else if(tot<0) tagline='Every loss = lesson';
+  const streakStr = bestStreak>0?bestStreak+' W streak':'—';
+  const name = currentUser?.displayName||'Trader';
+  return {n,wr,pf,rr,pnlStr,pnlColor,tagline,streakStr,name,tot};
+}
+
+function _fillShareTemplates(s) {
+  // Dark
+  const av = $('sp-avatar');
+  if(av){av.textContent=s.name.charAt(0).toUpperCase();}
+  $('sp-name').textContent    = s.name;
+  $('sp-pnl').textContent     = s.pnlStr;
+  $('sp-pnl').style.color     = s.pnlColor;
+  const bar = $('sp-pnl-bar');
+  if(bar) bar.style.background = s.pnlColor;
+  $('sp-wr').textContent      = s.wr;
+  $('sp-trades').textContent  = s.n;
+  $('sp-pf').textContent      = s.pf;
+  $('sp-rr').textContent      = s.rr;
+  $('sp-streak').textContent  = s.streakStr;
+  $('sp-tagline').textContent = s.tagline;
+
+  // Minimal
+  const nm=$('sp-name-m');if(nm)nm.textContent=s.name;
+  const pm=$('sp-pnl-m');
+  if(pm){pm.textContent=s.pnlStr;pm.style.color=s.tot>=0?'#16a34a':'#dc2626';}
+  const wm=$('sp-wr-m');if(wm)wm.textContent=s.wr;
+  const tm=$('sp-trades-m');if(tm)tm.textContent=s.n;
+  const fm=$('sp-pf-m');if(fm)fm.textContent=s.pf;
+  const rm=$('sp-rr-m');if(rm)rm.textContent=s.rr;
+  const sm=$('sp-streak-m');if(sm)sm.textContent=s.streakStr;
+  const tlm=$('sp-tagline-m');if(tlm)tlm.textContent=s.tagline;
+
+  // Neon
+  const nn=$('sp-name-n');if(nn)nn.textContent=s.name;
+  const pn=$('sp-pnl-n');
+  if(pn){pn.textContent=s.pnlStr;pn.style.color=s.tot>=0?'#00ff96':'#ff4d4d';pn.style.textShadow=s.tot>=0?'0 0 30px rgba(0,255,150,.5)':'0 0 30px rgba(255,77,77,.5)';}
+  const wn=$('sp-wr-n');if(wn)wn.textContent=s.wr;
+  const tn=$('sp-trades-n');if(tn)tn.textContent=s.n;
+  const fn=$('sp-pf-n');if(fn)fn.textContent=s.pf;
+  const rn=$('sp-rr-n');if(rn)rn.textContent=s.rr;
+  const sn=$('sp-streak-n');if(sn)sn.textContent=s.streakStr;
+  const tln=$('sp-tagline-n');if(tln)tln.textContent=s.tagline;
+}
+
+// Template switcher
+window.setShareTemplate = function(tpl) {
+  // update button states
+  document.querySelectorAll('.share-tpl-btn').forEach(b=>{
+    const active = b.dataset.tpl===tpl;
+    b.classList.toggle('active',active);
+    b.style.borderColor=active?'rgba(139,92,246,.5)':'var(--border)';
+    b.style.background=active?'rgba(139,92,246,.1)':'var(--bg3)';
+    b.style.color=active?'var(--accent2)':'var(--text2)';
+  });
+  // show/hide templates
+  ['dark','minimal','neon'].forEach(t=>{
+    const el=document.getElementById('sp-tpl-'+t);
+    if(el) el.style.display=t===tpl?'block':'none';
+  });
+};
+
 $('share-btn').addEventListener('click', () => {
   if (!currentUser) return;
-
-  // Populate share card stats
-  const n   = trades.length;
-  const W   = trades.filter(t=>t.result==='Win');
-  const L   = trades.filter(t=>t.result==='Loss');
-  const tot = trades.reduce((s,t)=>s+t.pnl,0);
-  const wr  = n>0?(W.length/n*100).toFixed(1)+'%':'—';
-  const gw  = W.reduce((s,t)=>s+t.pnl,0);
-  const gl  = Math.abs(L.reduce((s,t)=>s+t.pnl,0));
-  const pf  = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
-  const rr  = n>0?(trades.reduce((s,t)=>s+t.r,0)/n).toFixed(2)+'R':'—';
-
-  // Best streak
-  let bestStreak=0, curStreak=0, curType='';
-  trades.forEach(t=>{
-    if(t.result===curType){ curStreak++; } else { curType=t.result; curStreak=1; }
-    if(t.result==='Win' && curStreak>bestStreak) bestStreak=curStreak;
-  });
-
-  $('sp-pnl').textContent   = (tot>=0?'+$':'-$')+f2(Math.abs(tot));
-  $('sp-pnl').style.color   = tot>=0?'#00d97e':'#ff4d4d';
-  $('sp-wr').textContent    = wr;
-  $('sp-trades').textContent= n;
-  $('sp-pf').textContent    = pf;
-  $('sp-rr').textContent    = rr;
-  $('sp-streak').textContent= bestStreak>0?bestStreak+'W':'—';
-
-  // Tagline
-  let tagline = '📈 Konsisten adalah kunci';
-  if(n===0) tagline='🚀 Perjalanan trading dimulai';
-  else if(tot>0 && W.length/n>=0.6) tagline=`🔥 ${(W.length/n*100).toFixed(0)}% win rate — On fire!`;
-  else if(tot>0) tagline=`💪 +$${tot.toFixed(0)} total profit — Keep going!`;
-  else if(tot<0) tagline='📚 Setiap loss = pelajaran berharga';
-  $('sp-tagline').textContent = tagline;
-
+  _shareStats = _computeShareStats();
+  _fillShareTemplates(_shareStats);
   $('copy-success').style.display='none';
   $('download-loading').style.display='none';
+  setShareTemplate('dark');
   $('md-share').classList.add('open');
 });
 
@@ -5379,26 +5567,25 @@ $('md-share').addEventListener('click', e => { if(e.target===$('md-share')) $('m
 
 // ── Copy text ──────────────────────────────────────────
 $('copy-link-btn').addEventListener('click', () => {
-  const name = currentUser?.displayName||'Saya';
-  const n    = trades.length;
-  const W    = trades.filter(t=>t.result==='Win');
-  const tot  = trades.reduce((s,t)=>s+t.pnl,0);
-  const wr   = n>0?(W.length/n*100).toFixed(1):0;
+  const s    = _shareStats;
+  const name = s.name||'Saya';
   const text =
 `📊 Trading Journal Update — ${name}
 
-💰 Total P&L  : ${tot>=0?'+':''}$${f2(Math.abs(tot))}
-🎯 Win Rate   : ${wr}% (${W.length}/${n} trades)
-📈 Konsisten adalah kunci!
+💰 Total P&L  : ${s.pnlStr}
+🎯 Win Rate   : ${s.wr} (${s.n} trades)
+📈 Profit Factor : ${s.pf}
+⚡ Best Streak   : ${s.streakStr}
 
+${s.tagline}
 Tracked via RiskPerTrade 🚀
 riskpertrade.me`;
 
   const doFeedback = () => {
     $('copy-success').style.display='block';
-    $('copy-link-btn').innerHTML='✓ Copied!';
+    $('copy-link-btn').innerHTML='<i class="bi bi-check-lg" style="font-size:14px"></i> Copied!';
     setTimeout(()=>{
-      $('copy-link-btn').innerHTML='📋 Copy Teks';
+      $('copy-link-btn').innerHTML='<i class="bi bi-clipboard" style="font-size:14px"></i> Copy Teks';
       $('copy-success').style.display='none';
     },3000);
   };
@@ -5417,38 +5604,33 @@ $('download-img-btn').addEventListener('click', async () => {
   const loading = $('download-loading');
 
   btn.disabled = true;
-  btn.innerHTML = '⏳ Proses...';
+  btn.innerHTML = '<i class="bi bi-arrow-repeat" style="font-size:14px"></i> Proses...';
   loading.style.display = 'block';
 
   try {
-    // Lazy load html2canvas hanya saat user klik download
     if(!window.html2canvas){
       await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     }
     const canvas = await html2canvas(preview, {
       backgroundColor: null,
-      scale: 2,            // 2x resolution for crisp result
-      useCORS: true,       // allow cross-origin images (avatar)
+      scale: 2.5,
+      useCORS: true,
       logging: false,
       width: preview.offsetWidth,
       height: preview.offsetHeight,
     });
-
-    // Convert to PNG and trigger download
     const link = document.createElement('a');
-    const name = (currentUser?.displayName||'trader').replace(/\s+/g,'-').toLowerCase();
+    const name = (_shareStats.name||'trader').replace(/\s+/g,'-').toLowerCase();
     link.download = `riskpertrade-${name}-stats.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
-
-    btn.innerHTML = '✓ Tersimpan!';
-    setTimeout(()=>{ btn.innerHTML='⬇️ Unduh Gambar'; btn.disabled=false; loading.style.display='none'; },2000);
+    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:14px"></i> Tersimpan!';
+    setTimeout(()=>{ btn.innerHTML='<i class="bi bi-download" style="font-size:14px"></i> Unduh Gambar'; btn.disabled=false; loading.style.display='none'; },2000);
   } catch(err) {
     console.error('Download error:', err);
-    btn.innerHTML = '⬇️ Unduh Gambar';
+    btn.innerHTML = '<i class="bi bi-download" style="font-size:14px"></i> Unduh Gambar';
     btn.disabled = false;
     loading.style.display='none';
-    alert('Gagal membuat gambar. Coba screenshot manual ya!');
   }
 });
 $('ftmo-cancel').addEventListener('click', () => $('md-ftmo').classList.remove('open'));
