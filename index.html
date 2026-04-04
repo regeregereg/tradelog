@@ -6040,10 +6040,11 @@ $('rc-balance').placeholder = bal ? bal.toLocaleString() : '10000';
 // ── EXPORT MODULE ──────────────────────────────────────
 // ══════════════════════════════════════════════════════
 
-// Add export button to journal page header
+// Add export + import buttons to journal page header
 (function addExportBtn() {
   const journalBtns = $('journal-log-btn')?.parentElement;
   if (!journalBtns) return;
+
   const exportBtn = document.createElement('button');
   exportBtn.className = 'btng bsm';
   exportBtn.innerHTML = '⬇️ Export';
@@ -6053,6 +6054,17 @@ $('rc-balance').placeholder = bal ? bal.toLocaleString() : '10000';
   exportBtn.addEventListener('click', () => {
     if (!trades.length) { alert('Belum ada trade untuk di-export.'); return; }
     showExportModal();
+  });
+
+  const importBtn = document.createElement('button');
+  importBtn.className = 'btng bsm';
+  importBtn.innerHTML = '⬆️ Import';
+  importBtn.id = 'import-btn';
+  journalBtns.insertBefore(importBtn, exportBtn);
+
+  importBtn.addEventListener('click', () => {
+    if (!currentUser || currentUser.isAnonymous) { openLoginScreen('general'); return; }
+    showImportModal();
   });
 })();
 
@@ -6773,6 +6785,856 @@ window.goPage = function(name) {
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════
+     ── IMPORT MODULE ──────────────────────────────────────
+     Support: Bybit API, Binance API, CSV (Exness/MT4/MT5/Universal)
+     ══════════════════════════════════════════════════════ -->
+<style>
+/* ── Import Modal Styles ── */
+#md-import .md { max-width: 520px; text-align: left; }
+.imp-tabs { display:flex; gap:4px; background:rgba(255,255,255,.04); border-radius:10px; padding:4px; margin-bottom:20px; border:1px solid var(--border); }
+.imp-tab { flex:1; text-align:center; padding:8px 6px; font-size:12px; font-weight:600; font-family:var(--font); color:var(--text2); cursor:pointer; border-radius:7px; border:none; background:transparent; transition:all .2s; }
+.imp-tab.active { background:rgba(139,92,246,.2); color:var(--accent2); border:1px solid rgba(139,92,246,.3); }
+.imp-panel { display:none; }
+.imp-panel.active { display:block; }
+.imp-label { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.7px; margin-bottom:6px; }
+.imp-input { width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:10px 12px; color:var(--text); font-size:13px; font-family:var(--mono); outline:none; transition:border-color .2s; }
+.imp-input:focus { border-color:rgba(139,92,246,.5); }
+.imp-note { font-size:11px; color:var(--text3); line-height:1.6; margin-top:6px; }
+.imp-note a { color:var(--accent2); text-decoration:none; }
+.imp-section { margin-bottom:16px; }
+.imp-broker-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+.imp-broker-card { padding:12px 14px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all .2s; }
+.imp-broker-card:hover, .imp-broker-card.selected { border-color:rgba(139,92,246,.4); background:rgba(139,92,246,.07); }
+.imp-broker-card .ibc-name { font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.imp-broker-card .ibc-desc { font-size:10px; color:var(--text3); }
+.imp-drop-zone { border:2px dashed var(--border2); border-radius:12px; padding:28px 20px; text-align:center; cursor:pointer; transition:all .2s; background:var(--bg3); margin-bottom:14px; }
+.imp-drop-zone:hover, .imp-drop-zone.dragover { border-color:var(--accent); background:rgba(139,92,246,.06); }
+.imp-drop-zone .idz-icon { font-size:28px; margin-bottom:8px; }
+.imp-drop-zone .idz-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.imp-drop-zone .idz-sub { font-size:11px; color:var(--text3); }
+.imp-preview { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px; max-height:180px; overflow-y:auto; }
+.imp-preview-row { display:flex; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); font-size:11px; align-items:center; }
+.imp-preview-row:last-child { border-bottom:none; }
+.imp-preview-pair { font-family:var(--mono); font-weight:500; color:var(--text); min-width:60px; }
+.imp-preview-dir { padding:2px 7px; border-radius:4px; font-size:10px; font-weight:600; }
+.imp-pnl-pos { color:var(--green); font-family:var(--mono); }
+.imp-pnl-neg { color:var(--red); font-family:var(--mono); }
+.imp-status { padding:10px 14px; border-radius:9px; font-size:12px; margin-bottom:12px; display:none; }
+.imp-status.success { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2); color:var(--green); }
+.imp-status.error { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); color:var(--red); }
+.imp-status.loading { background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.2); color:var(--accent2); }
+.imp-status.info { background:rgba(255,255,255,.04); border:1px solid var(--border2); color:var(--text2); }
+.imp-progress { width:100%; height:4px; background:var(--bg4); border-radius:2px; margin-top:8px; overflow:hidden; }
+.imp-progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width .3s; }
+.imp-mapping { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.imp-map-row { display:flex; flex-direction:column; gap:4px; }
+.imp-map-select { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:7px 10px; color:var(--text); font-size:12px; font-family:var(--body); outline:none; width:100%; }
+</style>
+
+<script>
+// ══════════════════════════════════════════════════════
+// IMPORT MODULE
+// ══════════════════════════════════════════════════════
+
+// ── Detect session from time ──
+function detectSession(dateStr) {
+  if (!dateStr) return 'Other';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return 'Other';
+  // Use UTC hour (adjust: WIB = UTC+7)
+  const utcH = d.getUTCHours();
+  // Asia: 00:00-08:00 UTC (07:00-15:00 WIB)
+  if (utcH >= 0 && utcH < 8) return 'Asia';
+  // London: 07:00-16:00 UTC
+  if (utcH >= 7 && utcH < 16) return 'London';
+  // New York: 12:00-21:00 UTC
+  if (utcH >= 12 && utcH < 21) return 'New York';
+  return 'Other';
+}
+
+// ── Normalize symbol name ──
+function normalizePair(sym) {
+  if (!sym) return 'N/A';
+  // Bybit: BTCUSDT → BTC/USDT style, keep as is but uppercase
+  return sym.replace(/[-_\/]/g, '').toUpperCase();
+}
+
+// ── Detect direction from side string ──
+function normalizeDir(side) {
+  if (!side) return 'Long';
+  const s = side.toLowerCase();
+  if (s.includes('buy') || s.includes('long') || s === 'b') return 'Long';
+  if (s.includes('sell') || s.includes('short') || s === 's') return 'Short';
+  return 'Long';
+}
+
+// ── Detect result from pnl ──
+function pnlToResult(pnl) {
+  const v = parseFloat(pnl);
+  if (isNaN(v)) return 'loss';
+  if (v > 0) return 'win';
+  if (v < 0) return 'loss';
+  return 'be';
+}
+
+// ══ PARSER: Bybit Trade History CSV ══
+// Format: Date(UTC),Symbol,Side,Quantity,Price,Realized P&L,Fee,...
+function parseBybitCSV(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) throw new Error('File kosong atau format tidak dikenali.');
+  const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
+
+  // Detect column indices
+  const colMap = {
+    date: findCol(header, ['date(utc)', 'time', 'date', 'createtime', 'created time', 'transaction time']),
+    symbol: findCol(header, ['symbol', 'pair', 'contract']),
+    side: findCol(header, ['side', 'direction', 'type']),
+    qty: findCol(header, ['quantity', 'qty', 'size', 'exec qty']),
+    price: findCol(header, ['price', 'exec price', 'avg price', 'filled price']),
+    pnl: findCol(header, ['realized p&l', 'realised pnl', 'pnl', 'profit', 'realized profit', 'closed p&l']),
+    fee: findCol(header, ['fee', 'trading fee', 'commission']),
+  };
+
+  if (colMap.symbol === -1 || colMap.pnl === -1) {
+    throw new Error('Kolom Symbol atau P&L tidak ditemukan. Pastikan file dari Bybit Trade History.');
+  }
+
+  const results = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    const sym = clean(cols[colMap.symbol]);
+    if (!sym) continue;
+    const pnl = parseFloat(clean(cols[colMap.pnl])) || 0;
+    const dateRaw = colMap.date >= 0 ? clean(cols[colMap.date]) : '';
+    const price = colMap.price >= 0 ? parseFloat(clean(cols[colMap.price])) || 0 : 0;
+    const fee = colMap.fee >= 0 ? parseFloat(clean(cols[colMap.fee])) || 0 : 0;
+    const side = colMap.side >= 0 ? clean(cols[colMap.side]) : 'Buy';
+
+    results.push({
+      date: formatTradeDate(dateRaw),
+      pair: normalizePair(sym),
+      dir: normalizeDir(side),
+      session: detectSession(dateRaw),
+      entry: price, exit: price, sl: 0,
+      risk: Math.abs(pnl) || 100,
+      pnl: pnl - Math.abs(fee),
+      r: 0,
+      result: pnlToResult(pnl),
+      setup: 'Import Bybit',
+      emotion: 'neutral',
+      notes: `Imported from Bybit CSV. Fee: ${fee}`,
+    });
+  }
+  if (!results.length) throw new Error('Tidak ada trade yang berhasil diparse.');
+  return results;
+}
+
+// ══ PARSER: Binance Trade History CSV ══
+// Format: Date(UTC),Pair,Side,Price,Executed,Amount,Fee,Fee Coin,Total
+function parseBinanceCSV(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) throw new Error('File kosong atau format tidak dikenali.');
+  const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
+
+  const colMap = {
+    date: findCol(header, ['date(utc)', 'date', 'time', 'utc_time']),
+    symbol: findCol(header, ['pair', 'symbol', 'market']),
+    side: findCol(header, ['side', 'type', 'order side']),
+    price: findCol(header, ['price', 'avg price', 'executed price']),
+    amount: findCol(header, ['amount', 'total', 'realized p&l', 'pnl', 'order amount']),
+    fee: findCol(header, ['fee', 'commission']),
+  };
+
+  if (colMap.symbol === -1) throw new Error('Kolom Pair/Symbol tidak ditemukan. Pastikan file dari Binance Trade History.');
+
+  const results = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    const sym = clean(cols[colMap.symbol]);
+    if (!sym) continue;
+    const dateRaw = colMap.date >= 0 ? clean(cols[colMap.date]) : '';
+    const price = colMap.price >= 0 ? parseFloat(clean(cols[colMap.price])) || 0 : 0;
+    const amount = colMap.amount >= 0 ? parseFloat(clean(cols[colMap.amount])) || 0 : 0;
+    const fee = colMap.fee >= 0 ? parseFloat(clean(cols[colMap.fee])) || 0 : 0;
+    const side = colMap.side >= 0 ? clean(cols[colMap.side]) : 'BUY';
+    // For spot Binance, pnl is estimated from amount
+    const pnl = amount;
+
+    results.push({
+      date: formatTradeDate(dateRaw),
+      pair: normalizePair(sym),
+      dir: normalizeDir(side),
+      session: detectSession(dateRaw),
+      entry: price, exit: price, sl: 0,
+      risk: Math.abs(pnl) || 100,
+      pnl: pnl,
+      r: 0,
+      result: pnlToResult(pnl),
+      setup: 'Import Binance',
+      emotion: 'neutral',
+      notes: `Imported from Binance CSV. Fee: ${fee}`,
+    });
+  }
+  if (!results.length) throw new Error('Tidak ada trade yang berhasil diparse.');
+  return results;
+}
+
+// ══ PARSER: MT4/MT5 Statement HTML/CSV (Exness, FTMO, dll) ══
+// MT4 CSV format: #,Time,Type,Size,Item,Price,S/L,T/P,Price,Commission,Swap,Profit
+function parseMT4CSV(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) throw new Error('File kosong atau format tidak dikenali.');
+  const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
+
+  // MT4 header: #, time, type, size, item, price, s/l, t/p, price, commission, swap, profit
+  const colMap = {
+    time: findCol(header, ['time', 'close time', 'closetime', 'date']),
+    type: findCol(header, ['type', 'action', 'direction', 'side']),
+    size: findCol(header, ['size', 'lots', 'volume', 'qty']),
+    item: findCol(header, ['item', 'symbol', 'pair', 'instrument']),
+    price_open: findCol(header, ['price', 'open price', 'open', 'entry']),
+    sl: findCol(header, ['s/l', 'sl', 'stop loss', 'stoploss']),
+    profit: findCol(header, ['profit', 'pnl', 'p&l', 'net profit', 'realized p&l']),
+    commission: findCol(header, ['commission', 'comm']),
+    swap: findCol(header, ['swap']),
+  };
+
+  if (colMap.item === -1 && colMap.profit === -1) {
+    throw new Error('Format MT4/MT5 tidak dikenali. Coba gunakan "Universal CSV" dan mapping manual.');
+  }
+
+  const results = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    const sym = clean(cols[colMap.item]);
+    if (!sym || sym === '') continue;
+    // Skip balance/deposit/withdrawal rows
+    const typeRaw = colMap.type >= 0 ? clean(cols[colMap.type]).toLowerCase() : '';
+    if (typeRaw.includes('balance') || typeRaw.includes('deposit') || typeRaw.includes('withdrawal') || typeRaw.includes('credit')) continue;
+
+    const profit = colMap.profit >= 0 ? parseFloat(clean(cols[colMap.profit])) || 0 : 0;
+    const commission = colMap.commission >= 0 ? parseFloat(clean(cols[colMap.commission])) || 0 : 0;
+    const swap = colMap.swap >= 0 ? parseFloat(clean(cols[colMap.swap])) || 0 : 0;
+    const dateRaw = colMap.time >= 0 ? clean(cols[colMap.time]) : '';
+    const priceOpen = colMap.price_open >= 0 ? parseFloat(clean(cols[colMap.price_open])) || 0 : 0;
+    const sl = colMap.sl >= 0 ? parseFloat(clean(cols[colMap.sl])) || 0 : 0;
+    const netPnl = profit + commission + swap;
+
+    results.push({
+      date: formatTradeDate(dateRaw),
+      pair: normalizePair(sym),
+      dir: normalizeDir(typeRaw || 'buy'),
+      session: detectSession(dateRaw),
+      entry: priceOpen, exit: priceOpen, sl: sl,
+      risk: Math.abs(netPnl) || 100,
+      pnl: netPnl,
+      r: 0,
+      result: pnlToResult(netPnl),
+      setup: 'Import MT4/MT5',
+      emotion: 'neutral',
+      notes: `Imported from MT4/MT5. Commission: ${commission}, Swap: ${swap}`,
+    });
+  }
+  if (!results.length) throw new Error('Tidak ada trade yang berhasil diparse. Pastikan file berisi closed positions.');
+  return results;
+}
+
+// ══ PARSER: Exness CSV ══
+// Exness format slightly different from MT4 standard
+function parseExnessCSV(text) {
+  // Exness sometimes exports with semicolons
+  const sep = text.includes(';') ? ';' : ',';
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) throw new Error('File kosong.');
+  const header = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
+
+  const colMap = {
+    time: findCol(header, ['close time', 'time', 'closing time', 'date']),
+    symbol: findCol(header, ['symbol', 'item', 'instrument', 'pair']),
+    type: findCol(header, ['type', 'direction', 'side']),
+    entry: findCol(header, ['open price', 'entry', 'open']),
+    close: findCol(header, ['close price', 'exit', 'close']),
+    sl: findCol(header, ['stop loss', 's/l', 'sl']),
+    profit: findCol(header, ['profit', 'net profit', 'p/l', 'pnl', 'realized p&l']),
+    commission: findCol(header, ['commission', 'comm']),
+    swap: findCol(header, ['swap']),
+  };
+
+  const results = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(sep).map(c => c.trim().replace(/^"|"$/g,''));
+    const sym = colMap.symbol >= 0 ? cols[colMap.symbol] : '';
+    if (!sym) continue;
+    const typeRaw = colMap.type >= 0 ? cols[colMap.type].toLowerCase() : '';
+    if (typeRaw.includes('balance') || typeRaw.includes('deposit') || typeRaw.includes('withdrawal')) continue;
+
+    const profit = colMap.profit >= 0 ? parseFloat(cols[colMap.profit]) || 0 : 0;
+    const commission = colMap.commission >= 0 ? parseFloat(cols[colMap.commission]) || 0 : 0;
+    const swap = colMap.swap >= 0 ? parseFloat(cols[colMap.swap]) || 0 : 0;
+    const dateRaw = colMap.time >= 0 ? cols[colMap.time] : '';
+    const entry = colMap.entry >= 0 ? parseFloat(cols[colMap.entry]) || 0 : 0;
+    const exit = colMap.close >= 0 ? parseFloat(cols[colMap.close]) || 0 : 0;
+    const sl = colMap.sl >= 0 ? parseFloat(cols[colMap.sl]) || 0 : 0;
+    const netPnl = profit + commission + swap;
+
+    results.push({
+      date: formatTradeDate(dateRaw),
+      pair: normalizePair(sym),
+      dir: normalizeDir(typeRaw || 'buy'),
+      session: detectSession(dateRaw),
+      entry, exit, sl,
+      risk: Math.abs(netPnl) || 100,
+      pnl: netPnl,
+      r: 0,
+      result: pnlToResult(netPnl),
+      setup: 'Import Exness',
+      emotion: 'neutral',
+      notes: `Imported from Exness. Commission: ${commission}, Swap: ${swap}`,
+    });
+  }
+  if (!results.length) throw new Error('Tidak ada trade yang berhasil diparse.');
+  return results;
+}
+
+// ══ BYBIT API IMPORT ══
+async function fetchBybitTrades(apiKey, apiSecret, days = 30) {
+  // Bybit V5 API: GET /v5/execution/list
+  // Note: API secret signing must be done client-side via HMAC-SHA256
+  // We use Web Crypto API for signing
+  const endTime = Date.now();
+  const startTime = endTime - (days * 86400000);
+  const recvWindow = 5000;
+  const timestamp = Date.now().toString();
+
+  const params = {
+    category: 'linear',
+    startTime: startTime.toString(),
+    endTime: endTime.toString(),
+    limit: '200',
+  };
+  const queryString = Object.entries(params).sort().map(([k,v]) => `${k}=${v}`).join('&');
+  const signStr = timestamp + apiKey + recvWindow + queryString;
+
+  // HMAC-SHA256 via Web Crypto
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(apiSecret);
+  const msgData = encoder.encode(signStr);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sigBuf = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
+  const signature = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+
+  // Use CORS proxy since Bybit blocks direct browser calls
+  const baseUrl = 'https://api.bybit.com/v5/execution/list';
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(baseUrl + '?' + queryString)}`;
+
+  const res = await fetch(proxyUrl, {
+    headers: {
+      'X-BAPI-API-KEY': apiKey,
+      'X-BAPI-SIGN': signature,
+      'X-BAPI-TIMESTAMP': timestamp,
+      'X-BAPI-RECV-WINDOW': recvWindow.toString(),
+    }
+  });
+  const json = await res.json();
+  if (json.retCode !== 0) throw new Error(`Bybit API error: ${json.retMsg}`);
+
+  const list = json.result?.list || [];
+  return list.map(t => {
+    const pnl = parseFloat(t.closedPnl) || parseFloat(t.execValue) || 0;
+    return {
+      date: formatTradeDate(new Date(parseInt(t.execTime)).toISOString()),
+      pair: normalizePair(t.symbol),
+      dir: normalizeDir(t.side),
+      session: detectSession(new Date(parseInt(t.execTime)).toISOString()),
+      entry: parseFloat(t.execPrice) || 0,
+      exit: parseFloat(t.execPrice) || 0,
+      sl: 0, risk: Math.abs(pnl) || 100,
+      pnl, r: 0,
+      result: pnlToResult(pnl),
+      setup: 'Import Bybit API',
+      emotion: 'neutral',
+      notes: `OrderId: ${t.orderId}. Qty: ${t.execQty}`,
+    };
+  });
+}
+
+// ══ BINANCE API IMPORT ══
+async function fetchBinanceTrades(apiKey, apiSecret, days = 30) {
+  // Binance: GET /api/v3/myTrades — requires symbol, so we use recent trades approach
+  // For futures: GET /fapi/v1/userTrades
+  const endTime = Date.now();
+  const startTime = endTime - (days * 86400000);
+  const timestamp = Date.now().toString();
+
+  const params = `startTime=${startTime}&endTime=${endTime}&limit=1000&timestamp=${timestamp}`;
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(apiSecret);
+  const msgData = encoder.encode(params);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sigBuf = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
+  const signature = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+
+  const url = `https://fapi.binance.com/fapi/v1/income?${params}&signature=${signature}&incomeType=REALIZED_PNL`;
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+
+  const res = await fetch(proxyUrl, { headers: { 'X-MBX-APIKEY': apiKey } });
+  const json = await res.json();
+  if (!Array.isArray(json)) throw new Error(`Binance API error: ${json.msg || 'Unknown error'}`);
+
+  // Group by symbol roughly
+  return json.map(t => {
+    const pnl = parseFloat(t.income) || 0;
+    const dateRaw = new Date(t.time).toISOString();
+    return {
+      date: formatTradeDate(dateRaw),
+      pair: normalizePair(t.symbol || 'UNKNOWN'),
+      dir: pnl >= 0 ? 'Long' : 'Short',
+      session: detectSession(dateRaw),
+      entry: 0, exit: 0, sl: 0,
+      risk: Math.abs(pnl) || 100,
+      pnl, r: 0,
+      result: pnlToResult(pnl),
+      setup: 'Import Binance API',
+      emotion: 'neutral',
+      notes: `TradeId: ${t.tradeId || ''}`,
+    };
+  });
+}
+
+// ── CSV helper utils ──
+function findCol(header, candidates) {
+  for (const c of candidates) {
+    const idx = header.findIndex(h => h.includes(c));
+    if (idx >= 0) return idx;
+  }
+  return -1;
+}
+function clean(val) {
+  if (val === undefined || val === null) return '';
+  return String(val).trim().replace(/^"|"$/g, '');
+}
+function splitCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { inQ = !inQ; continue; }
+    if (ch === ',' && !inQ) { result.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  result.push(cur);
+  return result;
+}
+function formatTradeDate(raw) {
+  if (!raw) return new Date().toISOString().slice(0,16);
+  try {
+    const d = new Date(raw);
+    if (!isNaN(d)) return d.toISOString().slice(0,16);
+  } catch(e) {}
+  // Try common formats: "2024.01.15 12:30:00", "15/01/2024 12:30"
+  try {
+    const cleaned = raw.replace(/\./g, '-').replace(/\//g, '-');
+    const d = new Date(cleaned);
+    if (!isNaN(d)) return d.toISOString().slice(0,16);
+  } catch(e) {}
+  return new Date().toISOString().slice(0,16);
+}
+
+// ── Detect broker from CSV header ──
+function autoDetectBroker(text) {
+  const firstLine = text.split('\n')[0].toLowerCase();
+  if (firstLine.includes('realized p&l') || firstLine.includes('exec price') || (firstLine.includes('side') && firstLine.includes('quantity'))) return 'bybit';
+  if (firstLine.includes('pair') && firstLine.includes('executed') && firstLine.includes('fee coin')) return 'binance';
+  if (firstLine.includes('commission') && firstLine.includes('swap') && firstLine.includes('s/l')) return 'mt4';
+  if (firstLine.includes('closing time') || firstLine.includes('close time')) return 'exness';
+  return 'universal';
+}
+
+// ── Run correct parser ──
+function parseCSVByBroker(text, broker) {
+  switch(broker) {
+    case 'bybit': return parseBybitCSV(text);
+    case 'binance': return parseBinanceCSV(text);
+    case 'mt4': return parseMT4CSV(text);
+    case 'exness': return parseExnessCSV(text);
+    default: return parseMT4CSV(text); // universal fallback tries MT4 format
+  }
+}
+
+// ── Batch save trades to Firestore ──
+async function batchSaveImportedTrades(tradeList, onProgress) {
+  let saved = 0;
+  for (const trade of tradeList) {
+    try {
+      // Recalculate R if risk > 0
+      if (trade.risk > 0) trade.r = Math.round(trade.pnl / trade.risk * 100) / 100;
+      await saveTradeToCloud(trade);
+      saved++;
+      onProgress(saved, tradeList.length);
+      // Small delay to avoid Firestore rate limits
+      if (saved % 10 === 0) await new Promise(r => setTimeout(r, 200));
+    } catch(e) { console.warn('Failed to save trade:', e); }
+  }
+  return saved;
+}
+
+// ══════════════════════════════════════════════════════
+// IMPORT MODAL UI
+// ══════════════════════════════════════════════════════
+function showImportModal() {
+  const existing = document.getElementById('md-import');
+  if (existing) { existing.classList.add('open'); resetImportModal(); return; }
+
+  const modal = document.createElement('div');
+  modal.id = 'md-import';
+  modal.className = 'mo open';
+  modal.innerHTML = `
+  <div class="md" style="max-width:520px;text-align:left">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:17px;font-weight:700;font-family:var(--font);letter-spacing:-.3px">⬆️ Import Trade</div>
+      <button id="imp-close-x" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;line-height:1;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.6">Import otomatis dari broker atau exchange favoritmu. Data akan langsung masuk ke journal.</p>
+
+    <!-- Tabs -->
+    <div class="imp-tabs">
+      <button class="imp-tab active" data-tab="csv">📄 Upload CSV</button>
+      <button class="imp-tab" data-tab="api">🔌 API Connect</button>
+    </div>
+
+    <!-- CSV PANEL -->
+    <div class="imp-panel active" id="imp-panel-csv">
+
+      <!-- Broker selector -->
+      <div class="imp-section">
+        <div class="imp-label">Pilih Broker / Exchange</div>
+        <div class="imp-broker-grid">
+          <div class="imp-broker-card selected" data-broker="auto">
+            <div class="ibc-name">🤖 Auto-Detect</div>
+            <div class="ibc-desc">Deteksi format otomatis</div>
+          </div>
+          <div class="imp-broker-card" data-broker="bybit">
+            <div class="ibc-name">🟡 Bybit</div>
+            <div class="ibc-desc">Trade History CSV</div>
+          </div>
+          <div class="imp-broker-card" data-broker="binance">
+            <div class="ibc-name">🟠 Binance</div>
+            <div class="ibc-desc">Trade History CSV</div>
+          </div>
+          <div class="imp-broker-card" data-broker="exness">
+            <div class="ibc-name">🔵 Exness</div>
+            <div class="ibc-desc">Statement CSV</div>
+          </div>
+          <div class="imp-broker-card" data-broker="mt4">
+            <div class="ibc-name">📊 MT4/MT5</div>
+            <div class="ibc-desc">FTMO, MyFxBook, dll</div>
+          </div>
+          <div class="imp-broker-card" data-broker="universal">
+            <div class="ibc-name">📋 Universal</div>
+            <div class="ibc-desc">Format CSV apapun</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drop zone -->
+      <div class="imp-drop-zone" id="imp-drop-zone">
+        <div class="idz-icon">📂</div>
+        <div class="idz-title">Drop file CSV di sini</div>
+        <div class="idz-sub">atau klik untuk pilih file · .csv, .txt</div>
+        <input type="file" id="imp-file-input" accept=".csv,.txt" style="display:none">
+      </div>
+
+      <!-- How to export guides -->
+      <div id="imp-guide" style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text3);line-height:1.7">
+        <strong style="color:var(--text2)">Cara export dari broker:</strong><br>
+        <span id="imp-guide-text">Pilih broker di atas untuk melihat panduan export.</span>
+      </div>
+
+      <!-- Status -->
+      <div class="imp-status" id="imp-csv-status"></div>
+
+      <!-- Preview -->
+      <div id="imp-preview-wrap" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Preview (<span id="imp-preview-count">0</span> trade terdeteksi)</div>
+          <button id="imp-clear-btn" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer">Batal</button>
+        </div>
+        <div class="imp-preview" id="imp-preview-list"></div>
+        <button class="btn" id="imp-save-csv-btn" style="width:100%;padding:12px;font-size:14px">💾 Simpan ke Journal</button>
+      </div>
+    </div>
+
+    <!-- API PANEL -->
+    <div class="imp-panel" id="imp-panel-api">
+      <div class="imp-section">
+        <div class="imp-label">Pilih Exchange</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="imp-broker-card selected" data-api="bybit" style="flex:1">
+            <div class="ibc-name">🟡 Bybit</div>
+            <div class="ibc-desc">Futures & Spot</div>
+          </button>
+          <button class="imp-broker-card" data-api="binance" style="flex:1">
+            <div class="ibc-name">🟠 Binance</div>
+            <div class="ibc-desc">Futures (USDT-M)</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="imp-section">
+        <div class="imp-label">API Key</div>
+        <input class="imp-input" type="text" id="imp-api-key" placeholder="Paste API Key di sini..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="imp-section">
+        <div class="imp-label">API Secret</div>
+        <input class="imp-input" type="password" id="imp-api-secret" placeholder="Paste API Secret di sini..." autocomplete="off">
+        <div class="imp-note">⚠️ Gunakan API Key dengan izin <strong>Read Only</strong>. Jangan pernah berikan izin trading/withdraw.</div>
+      </div>
+      <div class="imp-section">
+        <div class="imp-label">Periode Import</div>
+        <select class="imp-input" id="imp-api-days" style="cursor:pointer">
+          <option value="7">7 hari terakhir</option>
+          <option value="30" selected>30 hari terakhir</option>
+          <option value="90">90 hari terakhir</option>
+        </select>
+      </div>
+
+      <div class="imp-note" style="margin-bottom:14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:10px 12px">
+        <strong style="color:var(--accent2)">🔒 Keamanan API:</strong> API Key hanya diproses di browser kamu secara langsung — tidak disimpan ke server manapun. Selalu gunakan Read-Only key.
+      </div>
+
+      <div class="imp-status" id="imp-api-status"></div>
+
+      <div id="imp-api-preview-wrap" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Preview (<span id="imp-api-count">0</span> trade)</div>
+          <button id="imp-api-clear-btn" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer">Batal</button>
+        </div>
+        <div class="imp-preview" id="imp-api-preview-list"></div>
+        <button class="btn" id="imp-save-api-btn" style="width:100%;padding:12px;font-size:14px">💾 Simpan ke Journal</button>
+      </div>
+
+      <button class="btn" id="imp-api-fetch-btn" style="width:100%;padding:12px;font-size:14px">🔌 Fetch Trade History</button>
+    </div>
+
+    <!-- Progress bar (shared) -->
+    <div id="imp-progress-wrap" style="display:none;margin-top:12px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:5px" id="imp-progress-label">Menyimpan...</div>
+      <div class="imp-progress"><div class="imp-progress-bar" id="imp-progress-bar" style="width:0%"></div></div>
+    </div>
+  </div>`;
+
+  document.body.appendChild(modal);
+  setupImportModalEvents(modal);
+}
+
+function setupImportModalEvents(modal) {
+  let parsedTrades = [];
+  let selectedBroker = 'auto';
+  let selectedAPI = 'bybit';
+
+  const showStatus = (id, type, msg) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `imp-status ${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+  };
+  const hideStatus = (id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+
+  // Close
+  document.getElementById('imp-close-x').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+  // Tabs
+  modal.querySelectorAll('.imp-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      modal.querySelectorAll('.imp-tab').forEach(t => t.classList.remove('active'));
+      modal.querySelectorAll('.imp-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`imp-panel-${tab.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  // Broker cards (CSV tab)
+  const guides = {
+    auto: 'Format akan terdeteksi otomatis saat file diupload.',
+    bybit: 'Bybit → Orders → Trade History → Export. Pilih periode lalu klik Export.',
+    binance: 'Binance → Trade History → Export. Untuk Futures: Futures → Trade History → Export.',
+    exness: 'Exness → MT4/MT5 → History → Export Statement to CSV.',
+    mt4: 'MT4/MT5: History Center → pilih pair → klik kanan → Export. Atau: Account History → klik kanan → Save as Report.',
+    universal: 'Upload CSV apapun. Kolom yang dikenali: Date, Symbol/Pair, Side/Direction, P&L/Profit, Entry, Exit, SL.',
+  };
+  modal.querySelectorAll('[data-broker]').forEach(card => {
+    card.addEventListener('click', () => {
+      modal.querySelectorAll('[data-broker]').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedBroker = card.dataset.broker;
+      document.getElementById('imp-guide-text').textContent = guides[selectedBroker] || '';
+    });
+  });
+
+  // API cards
+  modal.querySelectorAll('[data-api]').forEach(card => {
+    card.addEventListener('click', () => {
+      modal.querySelectorAll('[data-api]').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedAPI = card.dataset.api;
+    });
+  });
+
+  // File drop zone
+  const dropZone = document.getElementById('imp-drop-zone');
+  const fileInput = document.getElementById('imp-file-input');
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processCSVFile(file);
+  });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) processCSVFile(e.target.files[0]); });
+
+  function processCSVFile(file) {
+    hideStatus('imp-csv-status');
+    showStatus('imp-csv-status', 'loading', `⏳ Membaca ${file.name}...`);
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const text = e.target.result;
+        const broker = selectedBroker === 'auto' ? autoDetectBroker(text) : selectedBroker;
+        parsedTrades = parseCSVByBroker(text, broker);
+        const brokerName = broker.charAt(0).toUpperCase() + broker.slice(1);
+        showStatus('imp-csv-status', 'success', `✅ ${parsedTrades.length} trade terdeteksi dari format ${brokerName}`);
+        showPreview(parsedTrades, 'imp-preview-list', 'imp-preview-count', 'imp-preview-wrap');
+      } catch(err) {
+        showStatus('imp-csv-status', 'error', `❌ ${err.message}`);
+        document.getElementById('imp-preview-wrap').style.display = 'none';
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // Clear CSV
+  document.getElementById('imp-clear-btn').addEventListener('click', () => {
+    parsedTrades = [];
+    document.getElementById('imp-preview-wrap').style.display = 'none';
+    hideStatus('imp-csv-status');
+    fileInput.value = '';
+  });
+
+  // Save CSV trades
+  document.getElementById('imp-save-csv-btn').addEventListener('click', async () => {
+    if (!parsedTrades.length) return;
+    await runSave(parsedTrades);
+  });
+
+  // API Fetch
+  document.getElementById('imp-api-fetch-btn').addEventListener('click', async () => {
+    const key = document.getElementById('imp-api-key').value.trim();
+    const secret = document.getElementById('imp-api-secret').value.trim();
+    const days = parseInt(document.getElementById('imp-api-days').value);
+    if (!key || !secret) { showStatus('imp-api-status', 'error', '❌ Masukkan API Key dan Secret terlebih dahulu.'); return; }
+
+    showStatus('imp-api-status', 'loading', `⏳ Menghubungi ${selectedAPI} API...`);
+    document.getElementById('imp-api-fetch-btn').disabled = true;
+
+    try {
+      let apiTrades = [];
+      if (selectedAPI === 'bybit') apiTrades = await fetchBybitTrades(key, secret, days);
+      else if (selectedAPI === 'binance') apiTrades = await fetchBinanceTrades(key, secret, days);
+
+      if (!apiTrades.length) { showStatus('imp-api-status', 'info', 'ℹ️ Tidak ada trade dalam periode yang dipilih.'); }
+      else {
+        parsedTrades = apiTrades;
+        showStatus('imp-api-status', 'success', `✅ ${apiTrades.length} trade berhasil diambil dari ${selectedAPI}`);
+        showPreview(apiTrades, 'imp-api-preview-list', 'imp-api-count', 'imp-api-preview-wrap');
+      }
+    } catch(err) {
+      showStatus('imp-api-status', 'error', `❌ Gagal: ${err.message}. Pastikan API Key valid dan CORS proxy aktif.`);
+    } finally {
+      document.getElementById('imp-api-fetch-btn').disabled = false;
+    }
+  });
+
+  // Clear API
+  document.getElementById('imp-api-clear-btn').addEventListener('click', () => {
+    parsedTrades = [];
+    document.getElementById('imp-api-preview-wrap').style.display = 'none';
+    hideStatus('imp-api-status');
+  });
+
+  // Save API trades
+  document.getElementById('imp-save-api-btn').addEventListener('click', async () => {
+    if (!parsedTrades.length) return;
+    await runSave(parsedTrades);
+  });
+
+  async function runSave(list) {
+    const progressWrap = document.getElementById('imp-progress-wrap');
+    const progressBar = document.getElementById('imp-progress-bar');
+    const progressLabel = document.getElementById('imp-progress-label');
+    progressWrap.style.display = 'block';
+
+    // Disable save buttons
+    ['imp-save-csv-btn','imp-save-api-btn'].forEach(id => { const b = document.getElementById(id); if(b) b.disabled = true; });
+
+    const saved = await batchSaveImportedTrades(list, (done, total) => {
+      const pct = Math.round(done/total*100);
+      progressBar.style.width = pct + '%';
+      progressLabel.textContent = `Menyimpan ${done} / ${total} trade...`;
+    });
+
+    progressLabel.textContent = `✅ ${saved} trade berhasil disimpan ke journal!`;
+    progressBar.style.width = '100%';
+
+    // Reset after 2s
+    setTimeout(() => {
+      modal.classList.remove('open');
+      parsedTrades = [];
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '0%';
+      document.getElementById('imp-preview-wrap').style.display = 'none';
+      document.getElementById('imp-api-preview-wrap').style.display = 'none';
+      ['imp-save-csv-btn','imp-save-api-btn'].forEach(id => { const b = document.getElementById(id); if(b) b.disabled = false; });
+    }, 2500);
+  }
+
+  function showPreview(list, listId, countId, wrapId) {
+    document.getElementById(countId).textContent = list.length;
+    const container = document.getElementById(listId);
+    container.innerHTML = '';
+    const preview = list.slice(0, 15); // show first 15
+    preview.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'imp-preview-row';
+      const dirClass = t.dir === 'Long' ? 'dir-long' : 'dir-short';
+      const pnlClass = t.pnl >= 0 ? 'imp-pnl-pos' : 'imp-pnl-neg';
+      row.innerHTML = `
+        <span class="imp-preview-pair">${t.pair}</span>
+        <span class="mock-trade-dir ${dirClass}">${t.dir.toUpperCase()}</span>
+        <span style="font-size:10px;color:var(--text3);flex:1">${t.date?.slice(0,10) || ''}</span>
+        <span class="${pnlClass}">${t.pnl >= 0 ? '+' : ''}$${parseFloat(t.pnl).toFixed(2)}</span>`;
+      container.appendChild(row);
+    });
+    if (list.length > 15) {
+      const more = document.createElement('div');
+      more.style.cssText = 'text-align:center;padding:8px;font-size:11px;color:var(--text3)';
+      more.textContent = `+ ${list.length - 15} trade lainnya`;
+      container.appendChild(more);
+    }
+    document.getElementById(wrapId).style.display = 'block';
+  }
+}
+
+function resetImportModal() {
+  // Reset fields if modal re-opened
+  ['imp-api-key','imp-api-secret'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['imp-preview-wrap','imp-api-preview-wrap','imp-progress-wrap'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  ['imp-csv-status','imp-api-status'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+}
+</script>
 
 <!-- ── Service Worker: cache CDN assets & enable offline ── -->
 <script>
