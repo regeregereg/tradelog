@@ -3681,8 +3681,8 @@ function setAnonUI(isAnon) {
     // Anonymous: hide the upgrade CTA (show anon-banner instead)
     setFloatCTA(false);
   } else {
-    // Logged-in (non-anonymous): show upgrade CTA after short delay
-    setFloatCTA(true);
+    // Logged-in (non-anonymous): hide upgrade CTA — user sudah punya akun
+    setFloatCTA(false);
   }
 }
 
