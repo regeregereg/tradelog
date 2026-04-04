@@ -2398,7 +2398,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   }
   /* Score text block */
   .ana-score-text { flex:1; min-width:180px; }
-  .ana-score-heading { font-size:20px; font-weight:800; letter-spacing:-.5px; margin-bottom:4px; }
+  .ana-score-heading { font-size:20px; font-weight:800; letter-spacing:-.5px; margin-bottom:4px; font-family:var(--font); }
   .ana-score-sub { font-size:12px; color:rgba(255,255,255,.4); font-family:var(--mono); }
   /* Quick KPI pills */
   .ana-score-pills { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
@@ -2438,6 +2438,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     font-size:11px; font-weight:800; color:rgba(255,255,255,.32);
     text-transform:uppercase; letter-spacing:1.8px;
     display:flex; align-items:center; gap:9px;
+    font-family:var(--font);
   }
   .ana-card-title-icon {
     width:30px; height:30px; border-radius:9px;
@@ -2445,9 +2446,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     font-size:15px; flex-shrink:0;
     box-shadow:0 2px 8px rgba(0,0,0,.3);
   }
+  .ana-card-title-icon i { font-size:15px; }
   .ana-card-badge {
     font-size:10px; font-weight:700; padding:3px 11px; border-radius:20px;
-    letter-spacing:.6px; text-transform:uppercase;
+    letter-spacing:.6px; text-transform:uppercase; font-family:var(--font);
   }
 
   /* ══ STAT CARDS GRID ══ */
@@ -2487,8 +2489,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   .ana-stat-card.card-gold:hover  { border-color:rgba(245,158,11,.28); background:rgba(245,158,11,.048); box-shadow:0 10px 30px rgba(0,0,0,.3), 0 0 0 1px rgba(245,158,11,.12); }
   .ana-stat-card.card-gold::after { background:linear-gradient(90deg,transparent,rgba(245,158,11,.55),transparent); }
 
-  .ana-stat-card-icon { font-size:20px; margin-bottom:9px; display:block; line-height:1; }
-  .ana-stat-label { font-size:9px; font-weight:700; color:rgba(255,255,255,.28); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:7px; }
+  .ana-stat-card-icon { font-size:20px; margin-bottom:9px; display:block; line-height:1; color:rgba(255,255,255,.35); }
+  .ana-stat-label { font-size:9px; font-weight:700; color:rgba(255,255,255,.28); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:7px; font-family:var(--font); }
   .ana-stat-val   { font-size:18px; font-weight:700; font-family:var(--mono); letter-spacing:-.5px; line-height:1; margin-bottom:5px; transition:color .3s; }
   .ana-stat-sub   { font-size:10px; color:rgba(255,255,255,.2); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
@@ -2548,7 +2550,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     background:linear-gradient(to bottom,rgba(255,255,255,.15),transparent);
     border-radius:5px 5px 0 0; pointer-events:none;
   }
-  .ana-dow-label { font-size:10px; font-weight:700; color:rgba(255,255,255,.28); letter-spacing:.6px; }
+  .ana-dow-label { font-size:10px; font-weight:700; color:rgba(255,255,255,.28); letter-spacing:.6px; font-family:var(--font); }
   .ana-dow-val   { font-size:10px; font-family:var(--mono); font-weight:700; line-height:1; }
   .ana-dow-count { font-size:9px; color:rgba(255,255,255,.18); font-family:var(--mono); }
 
@@ -2587,7 +2589,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     font-size:10px; font-weight:800; color:rgba(255,255,255,.28);
     text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px;
     display:flex; align-items:center; gap:7px; position:relative;
+    font-family:var(--font);
   }
+  .ana-breakdown-title i { font-size:12px; }
 
   .ana-brow { display:flex; align-items:center; gap:9px; margin-bottom:9px; transition:opacity .15s; }
   .ana-brow:hover { opacity:.82; }
@@ -2628,11 +2632,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     background:radial-gradient(ellipse at top right, rgba(139,92,246,.05), transparent 55%);
   }
   .ana-chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-  .ana-chart-title  { font-size:11px; font-weight:800; color:rgba(255,255,255,.32); text-transform:uppercase; letter-spacing:1.4px; display:flex; align-items:center; gap:8px; }
+  .ana-chart-title  { font-size:11px; font-weight:800; color:rgba(255,255,255,.32); text-transform:uppercase; letter-spacing:1.4px; display:flex; align-items:center; gap:8px; font-family:var(--font); }
   .ana-chart-dot    { width:7px; height:7px; border-radius:50%; flex-shrink:0; animation:anaSonar 2.5s ease-in-out infinite; }
 
   /* ══ TAGS ══ */
-  .ana-tag { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:3px 9px; border-radius:20px; }
+  .ana-tag { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:3px 9px; border-radius:20px; font-family:var(--font); }
+  .ana-tag i { font-size:10px; }
   .ana-tag-green  { background:rgba(34,197,94,.12);  color:#22c55e; border:1px solid rgba(34,197,94,.22);  }
   .ana-tag-red    { background:rgba(239,68,68,.1);   color:#ef4444; border:1px solid rgba(239,68,68,.2);   }
   .ana-tag-purple { background:rgba(139,92,246,.12); color:#a78bfa; border:1px solid rgba(139,92,246,.22); }
@@ -2704,80 +2709,80 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="ana-premium-card">
     <div class="ana-card-header">
       <div class="ana-card-title">
-        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08))">📐</div>
+        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08))"><i class="bi bi-bar-chart-line" style="color:#c4b5fd"></i></div>
         Deep Statistics
       </div>
       <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">12 Metrics</span>
     </div>
     <div class="ana-deep-grid" id="ana-deep-grid">
       <div class="ana-stat-card card-win">
-        <span class="ana-stat-card-icon">💰</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-graph-up-arrow"></i></span>
         <div class="ana-stat-label">Avg Win</div>
         <div class="ana-stat-val pos" id="ana-avg-win">—</div>
         <div class="ana-stat-sub">per winning trade</div>
       </div>
       <div class="ana-stat-card card-loss">
-        <span class="ana-stat-card-icon">📉</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-graph-down-arrow"></i></span>
         <div class="ana-stat-label">Avg Loss</div>
         <div class="ana-stat-val neg" id="ana-avg-loss">—</div>
         <div class="ana-stat-sub">per losing trade</div>
       </div>
       <div class="ana-stat-card card-win">
-        <span class="ana-stat-card-icon">🏆</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-trophy"></i></span>
         <div class="ana-stat-label">Best Trade</div>
         <div class="ana-stat-val pos" id="ana-best-trade">—</div>
         <div class="ana-stat-sub" id="ana-best-trade-pair">—</div>
       </div>
       <div class="ana-stat-card card-loss">
-        <span class="ana-stat-card-icon">💀</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-x-octagon"></i></span>
         <div class="ana-stat-label">Worst Trade</div>
         <div class="ana-stat-val neg" id="ana-worst-trade">—</div>
         <div class="ana-stat-sub" id="ana-worst-trade-pair">—</div>
       </div>
       <div class="ana-stat-card card-gold">
-        <span class="ana-stat-card-icon">🌟</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-star"></i></span>
         <div class="ana-stat-label">Best Day</div>
         <div class="ana-stat-val pos" id="ana-best-day">—</div>
         <div class="ana-stat-sub" id="ana-best-day-pnl">—</div>
       </div>
       <div class="ana-stat-card card-loss">
-        <span class="ana-stat-card-icon">🔥</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-fire"></i></span>
         <div class="ana-stat-label">Worst Day</div>
         <div class="ana-stat-val neg" id="ana-worst-day">—</div>
         <div class="ana-stat-sub" id="ana-worst-day-pnl">—</div>
       </div>
       <div class="ana-stat-card card-win">
-        <span class="ana-stat-card-icon">⚡</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-lightning-charge"></i></span>
         <div class="ana-stat-label">Win Streak</div>
         <div class="ana-stat-val pos" id="ana-win-streak">—</div>
         <div class="ana-stat-sub">best run</div>
       </div>
       <div class="ana-stat-card card-loss">
-        <span class="ana-stat-card-icon">❄️</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-snow"></i></span>
         <div class="ana-stat-label">Loss Streak</div>
         <div class="ana-stat-val neg" id="ana-loss-streak">—</div>
         <div class="ana-stat-sub">worst run</div>
       </div>
       <div class="ana-stat-card">
-        <span class="ana-stat-card-icon">⚖️</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-bar-chart-steps"></i></span>
         <div class="ana-stat-label">Avg R:R Aktual</div>
         <div class="ana-stat-val" id="ana-avg-rr">—</div>
         <div class="ana-stat-sub">risk/reward realisasi</div>
       </div>
       <div class="ana-stat-card card-gold">
-        <span class="ana-stat-card-icon">🎯</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-crosshair"></i></span>
         <div class="ana-stat-label">Expectancy</div>
         <div class="ana-stat-val" id="ana-expectancy">—</div>
         <div class="ana-stat-sub">per trade average</div>
       </div>
       <div class="ana-stat-card">
-        <span class="ana-stat-card-icon">🕐</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-clock-history"></i></span>
         <div class="ana-stat-label">Best Session</div>
         <div class="ana-stat-val" id="ana-best-session">—</div>
         <div class="ana-stat-sub" id="ana-best-session-pnl">—</div>
       </div>
       <div class="ana-stat-card">
-        <span class="ana-stat-card-icon">🏷️</span>
+        <span class="ana-stat-card-icon"><i class="bi bi-tags"></i></span>
         <div class="ana-stat-label">Best Setup</div>
         <div class="ana-stat-val" id="ana-best-setup" style="font-size:13px">—</div>
         <div class="ana-stat-sub" id="ana-best-setup-wr">—</div>
@@ -2789,10 +2794,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="ana-premium-card">
     <div class="ana-card-header">
       <div class="ana-card-title">
-        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.07))">📅</div>
+        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.07))"><i class="bi bi-calendar-week" style="color:#f59e0b"></i></div>
         P&amp;L by Day of Week
       </div>
-      <span class="ana-tag ana-tag-gold">⚡ Weekly Pattern</span>
+      <span class="ana-tag ana-tag-gold"><i class="bi bi-lightning-charge"></i> Weekly Pattern</span>
     </div>
     <div id="ana-dow" style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:6px 0 4px;min-height:130px;align-items:end"></div>
   </div>
@@ -2800,15 +2805,15 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <!-- ══ BREAKDOWN ROWS ══ -->
   <div class="ana-breakdown-g3">
     <div class="ana-breakdown-card">
-      <div class="ana-breakdown-title"><span>💱</span> P&amp;L by Pair</div>
+      <div class="ana-breakdown-title"><i class="bi bi-currency-exchange"></i> P&amp;L by Pair</div>
       <div id="pb"><span style="font-size:12px;color:rgba(255,255,255,.18)">No data yet</span></div>
     </div>
     <div class="ana-breakdown-card">
-      <div class="ana-breakdown-title"><span>🌍</span> P&amp;L by Session</div>
+      <div class="ana-breakdown-title"><i class="bi bi-globe2"></i> P&amp;L by Session</div>
       <div id="sb2"><span style="font-size:12px;color:rgba(255,255,255,.18)">No data yet</span></div>
     </div>
     <div class="ana-breakdown-card">
-      <div class="ana-breakdown-title"><span>🏷️</span> Trades by Setup</div>
+      <div class="ana-breakdown-title"><i class="bi bi-tags"></i> Trades by Setup</div>
       <div id="stb"><span style="font-size:12px;color:rgba(255,255,255,.18)">No data yet</span></div>
     </div>
   </div>
@@ -2821,7 +2826,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <span class="ana-chart-dot" style="background:#ef4444;box-shadow:0 0 0 0 rgba(239,68,68,.4)"></span>
           Drawdown (%)
         </div>
-        <span class="ana-tag ana-tag-red">⚠ Risk Monitor</span>
+        <span class="ana-tag ana-tag-red"><i class="bi bi-shield-exclamation"></i> Risk Monitor</span>
       </div>
       <div style="position:relative;height:170px"><canvas id="ddC"></canvas></div>
     </div>
@@ -2831,7 +2836,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <span class="ana-chart-dot" style="background:#a78bfa;box-shadow:0 0 0 0 rgba(167,139,250,.4)"></span>
           Cumulative R
         </div>
-        <span class="ana-tag ana-tag-purple">📈 Edge Tracker</span>
+        <span class="ana-tag ana-tag-purple"><i class="bi bi-graph-up"></i> Edge Tracker</span>
       </div>
       <div style="position:relative;height:170px"><canvas id="rC"></canvas></div>
     </div>
@@ -3401,7 +3406,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7c6af7,#00d97e);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;box-shadow:0 0 0 2px rgba(124,106,247,.3)">📊</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#f0f0f0;line-height:1.2">RiskPerTrade</div>
-        <div style="font-size:10px;color:#7c6af7;font-family:'DM Mono',monospace">Trading Journal Pro</div>
+        <div style="font-size:10px;color:#7c6af7;font-family:var(--mono)">Trading Journal Pro</div>
       </div>
       <!-- Online dot -->
       <div style="width:8px;height:8px;border-radius:50%;background:#00d97e;box-shadow:0 0 6px #00d97e;margin-left:auto;flex-shrink:0"></div>
@@ -3418,14 +3423,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <!-- CTA Button -->
     <button id="float-cta-btn"
-      style="width:100%;padding:11px;background:linear-gradient(135deg,#7c6af7,#5b50d6);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(124,106,247,.4);letter-spacing:.2px"
+      style="width:100%;padding:11px;background:linear-gradient(135deg,#7c6af7,#5b50d6);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 4px 16px rgba(124,106,247,.4);letter-spacing:.2px"
       onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(124,106,247,.5)'"
       onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 16px rgba(124,106,247,.4)'">
       🔓 Dapatkan Akses Full →
     </button>
 
     <!-- Sub note -->
-    <div style="text-align:center;margin-top:8px;font-size:10px;color:#555;font-family:'DM Mono',monospace">Bayar sekali · Akses selamanya</div>
+    <div style="text-align:center;margin-top:8px;font-size:10px;color:#555;font-family:var(--mono)">Bayar sekali · Akses selamanya</div>
   </div>
 </div>
 
@@ -3692,7 +3697,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
 
       <!-- ─── Share Card (this div gets captured as image) ─── -->
-      <div id="share-preview" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1040 50%,#0a1628 100%);border-radius:16px;padding:24px;margin-bottom:16px;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden">
+      <div id="share-preview" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1040 50%,#0a1628 100%);border-radius:16px;padding:24px;margin-bottom:16px;font-family:var(--font);position:relative;overflow:hidden">
         <!-- Background decoration -->
         <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(124,106,247,.08);pointer-events:none"></div>
         <div style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(0,217,126,.05);pointer-events:none"></div>
@@ -3703,12 +3708,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div id="sp-avatar" style="width:44px;height:44px;border-radius:50%;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(124,106,247,.5)"></div>
             <div>
               <div id="sp-name" style="font-size:15px;font-weight:700;color:#f0f0f0;line-height:1.2"></div>
-              <div style="font-size:10px;color:#7c6af7;font-family:'DM Mono',monospace;margin-top:2px">Trading Journal</div>
+              <div style="font-size:10px;color:#7c6af7;font-family:var(--mono);margin-top:2px">Trading Journal</div>
             </div>
           </div>
           <div style="text-align:right">
             <div style="font-size:11px;font-weight:700;color:#7c6af7;letter-spacing:.5px">RISKPERTRADE</div>
-            <div style="font-size:9px;color:#444;font-family:'DM Mono',monospace;margin-top:1px">riskpertrade.me</div>
+            <div style="font-size:9px;color:#444;font-family:var(--mono);margin-top:1px">riskpertrade.me</div>
           </div>
         </div>
 
@@ -3719,33 +3724,33 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
           <div style="background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.15);border-radius:10px;padding:12px">
             <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Total P&amp;L</div>
-            <div id="sp-pnl" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#00d97e;line-height:1">$0</div>
+            <div id="sp-pnl" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#00d97e;line-height:1">$0</div>
           </div>
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
             <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Win Rate</div>
-            <div id="sp-wr" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">—</div>
+            <div id="sp-wr" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#f0f0f0;line-height:1">—</div>
           </div>
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
             <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Trades</div>
-            <div id="sp-trades" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">0</div>
+            <div id="sp-trades" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#f0f0f0;line-height:1">0</div>
           </div>
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
             <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Profit Factor</div>
-            <div id="sp-pf" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">—</div>
+            <div id="sp-pf" style="font-size:22px;font-weight:800;font-family:var(--mono);color:#f0f0f0;line-height:1">—</div>
           </div>
         </div>
 
         <!-- Streak bar -->
         <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
           <div style="font-size:11px;color:#888">Avg R:R</div>
-          <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#7c6af7">—</div>
+          <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:var(--mono);color:#7c6af7">—</div>
           <div style="width:1px;height:16px;background:rgba(255,255,255,.1)"></div>
           <div style="font-size:11px;color:#888">Best Streak</div>
-          <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#00d97e">—</div>
+          <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:var(--mono);color:#00d97e">—</div>
         </div>
 
         <!-- Tagline -->
-        <div id="sp-tagline" style="font-size:11px;color:rgba(124,106,247,.8);font-family:'DM Mono',monospace;text-align:center;letter-spacing:.3px">📈 Konsisten adalah kunci</div>
+        <div id="sp-tagline" style="font-size:11px;color:rgba(124,106,247,.8);font-family:var(--mono);text-align:center;letter-spacing:.3px">📈 Konsisten adalah kunci</div>
       </div>
 
       <!-- Action buttons -->
@@ -5137,9 +5142,9 @@ function lineChartBase(yFmt, labelFmt) {
         borderColor: 'rgba(255,255,255,0.12)',
         borderWidth: 1,
         titleColor: '#666',
-        titleFont: { family: 'DM Mono', size: 10 },
+        titleFont: { family: 'JetBrains Mono', size: 10 },
         bodyColor: '#f0f0f0',
-        bodyFont: { family: 'DM Mono', size: 12 },
+        bodyFont: { family: 'JetBrains Mono', size: 12 },
         padding: 10,
         cornerRadius: 8,
         displayColors: false,
@@ -5151,11 +5156,11 @@ function lineChartBase(yFmt, labelFmt) {
     scales: {
       x: {
         grid: { color: 'rgba(255,255,255,.04)' },
-        ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8, maxRotation: 0 }
+        ticks: { color: '#444', font: { family: 'JetBrains Mono', size: 10 }, maxTicksLimit: 8, maxRotation: 0 }
       },
       y: {
         grid: { color: 'rgba(255,255,255,.04)' },
-        ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, callback: yFmt }
+        ticks: { color: '#444', font: { family: 'JetBrains Mono', size: 10 }, callback: yFmt }
       }
     }
   };
@@ -5522,7 +5527,7 @@ function renderDNA(){
           backgroundColor:'rgba(9,9,11,0.97)',borderColor:'rgba(0,217,126,0.35)',borderWidth:1,
           bodyColor:'#f0f0f0',titleColor:'#00d97e',
           bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:13,weight:'700'},
-          titleFont:{family:"'DM Sans',-apple-system,sans-serif",size:10,weight:'700'},
+          titleFont:{family:"'Syne',-apple-system,sans-serif",size:10,weight:'700'},
           padding:12,cornerRadius:10,caretSize:6,displayColors:false,
           callbacks:{
             title:(items)=>['Consistency','Discipline','Aggression','Execution','Endurance','Vision'][items[0].dataIndex],
@@ -5600,7 +5605,7 @@ function renderPnl(){
         legend:{display:false},
         tooltip:{
           backgroundColor:'#16161a',borderColor:'rgba(255,255,255,.12)',borderWidth:1,
-          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:10,
+          bodyColor:'#f0f0f0',bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:10,
           callbacks:{
             title:(items)=>'Trade '+items[0].label,
             label:c=>{const s=c.raw>=0?'+':'';return' P&L: '+s+'$'+c.raw.toFixed(2);},
@@ -5610,7 +5615,7 @@ function renderPnl(){
       },
       scales:{
         x:{grid:{display:false},ticks:{color:'#3f3f46',font:{size:9}},border:{display:false}},
-        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3f3f46',font:{family:'DM Mono',size:9},callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))},border:{display:false}}
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3f3f46',font:{family:'JetBrains Mono',size:9},callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))},border:{display:false}}
       }
     }
   });
@@ -5657,7 +5662,7 @@ function renderDonut(){
       ctx.font='bold 16px "DM Mono","JetBrains Mono",monospace';
       ctx.fillStyle=wr>=lr?'#00d97e':'#ff4d4d';
       ctx.fillText(winRate+'%',cx,cy-7);
-      ctx.font='9px "DM Sans",-apple-system,sans-serif';
+      ctx.font='9px "Syne",-apple-system,sans-serif';
       ctx.fillStyle='rgba(255,255,255,0.3)';
       ctx.fillText('WIN RATE',cx,cy+9);
       ctx.restore();
@@ -5684,7 +5689,7 @@ function renderDonut(){
         legend:{display:false},
         tooltip:{
           backgroundColor:'#16161a',borderColor:'rgba(255,255,255,.12)',borderWidth:1,
-          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:10,
+          bodyColor:'#f0f0f0',bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:10,
           callbacks:{
             label:c=>{const p=total>0?Math.round(c.raw/total*100):0;return` ${c.label}: ${c.raw} (${p}%)`;},
             labelColor:(c)=>{const cols=['rgba(0,217,126,0.8)','rgba(255,77,77,0.8)','rgba(80,80,90,0.8)'];return{borderColor:'transparent',backgroundColor:cols[c.dataIndex],borderRadius:3};}
@@ -6246,7 +6251,7 @@ function renderFinance() {
   finBarC=new Chart($('finBarC').getContext('2d'),{
     type:'bar',
     data:{labels:katKeys.length?katKeys:['–'],datasets:[{data:katKeys.length?katKeys.map(k=>katMap[k]):[0],backgroundColor:katKeys.map(k=>katColors[k]||'#7c6af7'),borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.4)',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'DM Mono',size:10},callback:v=>fRp(v)}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.4)',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'JetBrains Mono',size:10},callback:v=>fRp(v)}}}}
   });
 
   // ── Donut: income vs expense ───────────────────────
@@ -6255,7 +6260,7 @@ function renderFinance() {
     finDonutC=new Chart($('finDonutC').getContext('2d'),{
       type:'doughnut',
       data:{labels:['Pemasukan','Pengeluaran'],datasets:[{data:[income,expense],backgroundColor:['#a78bfa','#f472b6'],borderWidth:0,hoverOffset:4}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,displayColors:false,callbacks:{label:c=>`${c.label}: ${fRp(c.raw)}`}}}}
+      options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'JetBrains Mono',size:11},padding:10,displayColors:false,callbacks:{label:c=>`${c.label}: ${fRp(c.raw)}`}}}}
     });
   }
   $('fin-donut-in').textContent  = fRp(income);
@@ -7351,7 +7356,7 @@ window.goPage = function(name) {
         <span class="bmp-icon" style="background:rgba(124,106,247,0.18);color:#a89cf7;"><i class="bi bi-question-circle"></i></span>
         <div style="flex:1;">
           <div class="bmp-label">Cara Penggunaan</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.3);font-family:'DM Sans',sans-serif;margin-top:1px;">Panduan fitur lengkap</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);font-family:var(--font);margin-top:1px;">Panduan fitur lengkap</div>
         </div>
         <i class="bi bi-chevron-right bmp-arrow"></i>
       </button>
