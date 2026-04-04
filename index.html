@@ -451,6 +451,13 @@ tr:hover td{background:rgba(139,92,246,.04);}
   .journal-tool-btn{padding:7px 10px;}
   .journal-actions{gap:6px;}
 }
+/* ── DAILY JOURNAL PREMIUM STYLES ── */
+#daily-checklist label:hover{background:rgba(139,92,246,.06)!important;border-color:rgba(139,92,246,.25)!important;}
+#daily-checklist label:has(input:checked){background:rgba(0,217,126,.06)!important;border-color:rgba(0,217,126,.28)!important;color:var(--text)!important;}
+#daily-checklist label:has(input:checked) i{color:var(--green)!important;}
+.bias-btn.active{background:rgba(139,92,246,.15)!important;border-color:rgba(139,92,246,.45)!important;color:var(--text)!important;box-shadow:0 0 0 1px rgba(139,92,246,.2);}
+.mood-btn.active{background:rgba(139,92,246,.12)!important;border-color:rgba(139,92,246,.4)!important;color:var(--text)!important;box-shadow:0 0 0 1px rgba(139,92,246,.15);}
+.bias-btn:hover,.mood-btn:hover{border-color:rgba(139,92,246,.3)!important;background:rgba(139,92,246,.06)!important;}
 .bdel{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
 .bdel:hover{color:var(--red);background:var(--rd);}
 .fsel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:var(--font);outline:none;cursor:pointer;}
@@ -1231,7 +1238,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="ni" id="nav-ftmo"><i class="nic bi bi-building-check"></i>PropFirm</div>
   <div class="ni" id="nav-finance" style="display:none"><i class="nic bi bi-wallet2"></i>Finance</div>
   <div class="nlbl" style="margin-top:6px">Tools</div>
-  <div class="ni" id="nav-daily"><i class="nic bi bi-pen"></i>Daily Journal</div>
+  <div class="ni" id="nav-daily"><i class="nic bi bi-journal-bookmark-fill"></i>Daily Journal</div>
   <div class="ni" id="nav-riskcalc"><i class="nic bi bi-calculator"></i>Risk Calculator</div>
   <div class="ni" id="nav-ai-review" style="display:none"><i class="nic bi bi-stars"></i>AI Trade Review</div>
   <div class="ni" id="nav-reminder"><i class="nic bi bi-bell"></i>Daily Reminder</div>
@@ -3159,54 +3166,111 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   <!-- ══ DAILY JOURNAL PAGE ══ -->
   <div class="page" id="page-daily">
+
+    <!-- Page header -->
     <div class="ph">
       <div>
-        <div class="pt">📔 Daily Journal</div>
+        <div class="pt" style="display:flex;align-items:center;gap:8px">
+          <i class="bi bi-journal-bookmark-fill" style="color:var(--accent);font-size:18px"></i>
+          Daily Journal
+        </div>
         <div class="ps" id="daily-ps">Refleksi harian trading kamu</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <input type="date" class="fi" id="daily-date" style="width:auto;padding:6px 12px;font-size:12px">
-        <button class="btn bsm" id="daily-save-btn">💾 Simpan</button>
+        <div style="position:relative;display:flex;align-items:center">
+          <i class="bi bi-calendar3" style="position:absolute;left:10px;font-size:12px;color:var(--text3);pointer-events:none"></i>
+          <input type="date" class="fi" id="daily-date" style="width:auto;padding:6px 12px 6px 30px;font-size:12px">
+        </div>
+        <button class="btn bsm" id="daily-save-btn" style="display:flex;align-items:center;gap:6px">
+          <i class="bi bi-cloud-check" style="font-size:13px"></i> Simpan
+        </button>
       </div>
     </div>
 
     <!-- Quick nav: prev / next day -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
-      <button class="btng bsm" id="daily-prev-btn">‹ Kemarin</button>
-      <button class="btng bsm" id="daily-next-btn">Besok ›</button>
-      <button class="btng bsm" id="daily-today-btn">Hari Ini</button>
+    <div style="display:flex;gap:6px;margin-bottom:18px;align-items:center">
+      <button class="btng bsm" id="daily-prev-btn" style="display:flex;align-items:center;gap:5px">
+        <i class="bi bi-chevron-left" style="font-size:11px"></i> Kemarin
+      </button>
+      <button class="btng bsm" id="daily-next-btn" style="display:flex;align-items:center;gap:5px">
+        Besok <i class="bi bi-chevron-right" style="font-size:11px"></i>
+      </button>
+      <button class="btng bsm" id="daily-today-btn" style="display:flex;align-items:center;gap:5px">
+        <i class="bi bi-circle-fill" style="font-size:7px;color:var(--accent)"></i> Hari Ini
+      </button>
       <div id="daily-status" style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-left:4px"></div>
     </div>
 
     <!-- Journal form -->
     <div class="g2" style="margin-bottom:14px">
+
       <!-- Left column -->
       <div style="display:flex;flex-direction:column;gap:12px">
+
         <!-- Market bias -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px"><div class="ct">📊 Market Bias</div></div>
-          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-            <button class="bias-btn" data-bias="Bullish" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s">🟢 Bullish</button>
-            <button class="bias-btn" data-bias="Bearish" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s">🔴 Bearish</button>
-            <button class="bias-btn" data-bias="Neutral" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s">⚪ Neutral</button>
+          <div class="ch" style="margin-bottom:12px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-graph-up-arrow" style="color:var(--accent);font-size:14px"></i>
+              Market Bias
+            </div>
           </div>
-          <input class="fi" type="text" id="daily-pairs" placeholder="Pair yang mau diwatch: XAUUSD, EURUSD..." style="font-size:12px">
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <button class="bias-btn" data-bias="Bullish"
+              style="flex:1;padding:8px 6px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px">
+              <i class="bi bi-arrow-up-circle-fill" style="color:#00d97e;font-size:13px"></i> Bullish
+            </button>
+            <button class="bias-btn" data-bias="Bearish"
+              style="flex:1;padding:8px 6px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px">
+              <i class="bi bi-arrow-down-circle-fill" style="color:#ff4d4d;font-size:13px"></i> Bearish
+            </button>
+            <button class="bias-btn" data-bias="Neutral"
+              style="flex:1;padding:8px 6px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px">
+              <i class="bi bi-dash-circle-fill" style="color:var(--text3);font-size:13px"></i> Neutral
+            </button>
+          </div>
+          <div style="position:relative">
+            <i class="bi bi-eye" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none"></i>
+            <input class="fi" type="text" id="daily-pairs" placeholder="Pair yang mau diwatch: XAUUSD, EURUSD..." style="font-size:12px;padding-left:30px">
+          </div>
         </div>
 
         <!-- Pre-market plan -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px"><div class="ct">🎯 Pre-Market Plan</div></div>
+          <div class="ch" style="margin-bottom:10px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-crosshair" style="color:#7c6af7;font-size:14px"></i>
+              Pre-Market Plan
+            </div>
+          </div>
           <textarea class="ta" id="daily-preplan" placeholder="Rencana trading hari ini...&#10;- Key level yang diperhatikan&#10;- Setup yang dicari&#10;- Kondisi yang harus ada sebelum entry" style="min-height:100px"></textarea>
         </div>
 
         <!-- Mood & energy -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px"><div class="ct">🧠 Kondisi Mental</div></div>
-          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-            <button class="mood-btn" data-mood="Fokus" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ Fokus</button>
-            <button class="mood-btn" data-mood="Tenang" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Tenang</button>
-            <button class="mood-btn" data-mood="Cemas" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Cemas</button>
-            <button class="mood-btn" data-mood="Greed" style="flex:1;padding:6px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s">🤑 Greed</button>
+          <div class="ch" style="margin-bottom:12px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-activity" style="color:#f59e0b;font-size:14px"></i>
+              Kondisi Mental
+            </div>
+          </div>
+          <div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap">
+            <button class="mood-btn" data-mood="Fokus"
+              style="flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px">
+              <i class="bi bi-lightning-charge-fill" style="color:#f59e0b;font-size:12px"></i> Fokus
+            </button>
+            <button class="mood-btn" data-mood="Tenang"
+              style="flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px">
+              <i class="bi bi-patch-check-fill" style="color:#00d97e;font-size:12px"></i> Tenang
+            </button>
+            <button class="mood-btn" data-mood="Cemas"
+              style="flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px">
+              <i class="bi bi-exclamation-triangle-fill" style="color:#ff4d4d;font-size:12px"></i> Cemas
+            </button>
+            <button class="mood-btn" data-mood="Greed"
+              style="flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px">
+              <i class="bi bi-currency-dollar" style="color:#a78bfa;font-size:12px"></i> Greed
+            </button>
           </div>
           <textarea class="ta" id="daily-mental" placeholder="Catatan kondisi mental hari ini..." style="min-height:60px"></textarea>
         </div>
@@ -3214,64 +3278,101 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- Right column -->
       <div style="display:flex;flex-direction:column;gap:12px">
+
         <!-- Post-market review -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px"><div class="ct">📝 Post-Market Review</div></div>
+          <div class="ch" style="margin-bottom:10px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-file-earmark-text" style="color:#38bdf8;font-size:14px"></i>
+              Post-Market Review
+            </div>
+          </div>
           <textarea class="ta" id="daily-review" placeholder="Review setelah market tutup...&#10;- Apa yang terjadi hari ini?&#10;- Trade mana yang dieksekusi?&#10;- Apakah mengikuti plan?" style="min-height:100px"></textarea>
         </div>
 
         <!-- Lessons learned -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px"><div class="ct">💡 Pelajaran Hari Ini</div></div>
+          <div class="ch" style="margin-bottom:10px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-lightbulb-fill" style="color:#fbbf24;font-size:14px"></i>
+              Pelajaran Hari Ini
+            </div>
+          </div>
           <textarea class="ta" id="daily-lessons" placeholder="Apa yang kamu pelajari hari ini?&#10;Satu lesson spesifik yang akan kamu ingat..." style="min-height:80px"></textarea>
         </div>
 
-        <!-- Rules followed -->
+        <!-- Rules followed / Checklist -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px"><div class="ct">✅ Checklist Hari Ini</div></div>
-          <div style="display:flex;flex-direction:column;gap:8px" id="daily-checklist">
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-              <input type="checkbox" id="chk-plan" style="accent-color:var(--accent)"> Mengikuti trading plan
+          <div class="ch" style="margin-bottom:12px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-check2-square" style="color:#00d97e;font-size:14px"></i>
+              Checklist Hari Ini
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px" id="daily-checklist">
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:background .15s">
+              <input type="checkbox" id="chk-plan" style="accent-color:var(--accent);width:14px;height:14px">
+              <i class="bi bi-journal-check" style="font-size:12px;color:var(--text3)"></i>
+              Mengikuti trading plan
             </label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-              <input type="checkbox" id="chk-risk" style="accent-color:var(--accent)"> Menjaga risk management
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:background .15s">
+              <input type="checkbox" id="chk-risk" style="accent-color:var(--accent);width:14px;height:14px">
+              <i class="bi bi-shield-check" style="font-size:12px;color:var(--text3)"></i>
+              Menjaga risk management
             </label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-              <input type="checkbox" id="chk-emotion" style="accent-color:var(--accent)"> Tidak trading karena emosi
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:background .15s">
+              <input type="checkbox" id="chk-emotion" style="accent-color:var(--accent);width:14px;height:14px">
+              <i class="bi bi-heart-pulse" style="font-size:12px;color:var(--text3)"></i>
+              Tidak trading karena emosi
             </label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-              <input type="checkbox" id="chk-patience" style="accent-color:var(--accent)"> Bersabar menunggu setup
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:background .15s">
+              <input type="checkbox" id="chk-patience" style="accent-color:var(--accent);width:14px;height:14px">
+              <i class="bi bi-hourglass-split" style="font-size:12px;color:var(--text3)"></i>
+              Bersabar menunggu setup
             </label>
           </div>
         </div>
 
         <!-- Daily rating -->
         <div class="cc" style="margin-bottom:0;padding:16px">
-          <div class="ch" style="margin-bottom:10px">
-            <div class="ct">⭐ Rating Hari Ini</div>
-            <div id="daily-rating-val" style="font-size:14px;font-weight:600;color:var(--accent)">—</div>
+          <div class="ch" style="margin-bottom:12px">
+            <div class="ct" style="display:flex;align-items:center;gap:7px">
+              <i class="bi bi-star-fill" style="color:#f59e0b;font-size:14px"></i>
+              Rating Hari Ini
+            </div>
+            <div id="daily-rating-val" style="font-size:14px;font-weight:600;color:var(--accent);font-family:var(--mono)">—</div>
           </div>
-          <div style="display:flex;gap:6px">
+          <div style="display:flex;gap:6px;align-items:center">
+            <i class="bi bi-emoji-frown" style="font-size:14px;color:var(--text3)"></i>
             <input type="range" id="daily-rating" min="1" max="10" value="5"
               style="flex:1;accent-color:var(--accent)">
+            <i class="bi bi-emoji-laughing" style="font-size:14px;color:var(--text3)"></i>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px">
             <span>1 — Sangat Buruk</span><span>10 — Luar Biasa</span>
           </div>
         </div>
+
       </div>
     </div>
 
     <!-- Past journal entries list -->
     <div class="cc">
       <div class="ch">
-        <div class="ct">📅 Riwayat Journal</div>
+        <div class="ct" style="display:flex;align-items:center;gap:7px">
+          <i class="bi bi-clock-history" style="color:var(--accent);font-size:14px"></i>
+          Riwayat Journal
+        </div>
         <div class="cm" id="daily-count">0 entri</div>
       </div>
       <div id="daily-history" style="display:flex;flex-direction:column;gap:8px">
-        <div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Belum ada journal — isi form di atas dan klik Simpan.</div>
+        <div style="text-align:center;padding:28px 24px;color:var(--text3);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:8px">
+          <i class="bi bi-journal-x" style="font-size:28px;opacity:.35"></i>
+          Belum ada journal — isi form di atas dan klik Simpan.
+        </div>
       </div>
     </div>
+
   </div>
 
   <!-- ══ RISK CALCULATOR PAGE ══ -->
