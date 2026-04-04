@@ -235,9 +235,9 @@ body::before{
 .tag-chip:hover{border-color:var(--accent);color:var(--accent2);background:rgba(139,92,246,.08);}
 .tag-chip.active{background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.12));color:var(--accent2);border-color:rgba(139,92,246,.5);box-shadow:0 0 8px rgba(139,92,246,.2);}
 
-/* ── DEEP ANALYTICS CARDS ── */
-.ana-deep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
-.ana-stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+/* ── DEEP ANALYTICS CARDS (base — overridden by premium analytics CSS) ── */
+.ana-deep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.ana-stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;}
 .ana-stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:6px;}
 .ana-stat-val{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1;}
 .ana-stat-sub{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);}
@@ -2302,54 +2302,625 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   <!-- ANALYTICS -->
   <div class="page" id="page-analytics">
-    <div class="ph">
-      <div><div class="pt">Analytics</div><div class="ps" id="ana-ps">Performance breakdown</div></div>
-    </div>
-    <!-- Period tabs -->
-    <div style="margin-bottom:16px">
-      <div class="period-tabs" id="ana-period-tabs">
-        <button class="ptab active" data-aperiod="all">Semua</button>
-        <button class="ptab" data-aperiod="7">7 Hari</button>
-        <button class="ptab" data-aperiod="30">30 Hari</button>
-        <button class="ptab" data-aperiod="180">6 Bulan</button>
-        <button class="ptab" data-aperiod="365">1 Tahun</button>
+
+  <!-- ══ PREMIUM ANALYTICS CSS v2 ══ -->
+  <style>
+  /* ══ RESET & AMBIENT ══ */
+  #page-analytics { position:relative; }
+  #page-analytics::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:-1;
+    background:
+      radial-gradient(ellipse 55% 35% at 85% 8%,  rgba(139,92,246,.055) 0%, transparent 65%),
+      radial-gradient(ellipse 45% 55% at 8%  82%,  rgba(34,197,94,.04)  0%, transparent 65%),
+      radial-gradient(ellipse 30% 30% at 50% 50%,  rgba(245,158,11,.02) 0%, transparent 70%);
+  }
+
+  /* ══ PAGE HEADER ══ */
+  #page-analytics .pt {
+    font-size:28px; font-weight:800; letter-spacing:-1px;
+    background: linear-gradient(120deg, #f4f4f5 0%, #c4b5fd 40%, #86efac 80%, #fde68a 100%);
+    background-size:200% 100%;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    animation: anaGradShift 6s ease-in-out infinite alternate;
+  }
+  @keyframes anaGradShift {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 100% 0%; }
+  }
+
+  /* ══ LIVE DOT ══ */
+  .ana-live-dot {
+    width:7px; height:7px; border-radius:50%; background:#22c55e; display:inline-block;
+    box-shadow:0 0 0 0 rgba(34,197,94,.4);
+    animation: anaSonar 2s ease-in-out infinite;
+  }
+  @keyframes anaSonar {
+    0%   { box-shadow:0 0 0 0   rgba(34,197,94,.5); }
+    70%  { box-shadow:0 0 0 8px rgba(34,197,94,0); }
+    100% { box-shadow:0 0 0 0   rgba(34,197,94,0); }
+  }
+
+  /* ══ PERIOD TABS ══ */
+  #ana-period-tabs {
+    display:inline-flex; gap:2px; padding:4px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:13px;
+  }
+  #ana-period-tabs .ptab {
+    border-radius:9px; font-size:12px; padding:7px 18px;
+    font-weight:700; transition:all .22s cubic-bezier(.4,0,.2,1);
+    letter-spacing:.3px; position:relative; overflow:hidden;
+  }
+  #ana-period-tabs .ptab::before {
+    content:''; position:absolute; inset:0; opacity:0; transition:opacity .2s;
+    background:linear-gradient(135deg, rgba(167,139,250,.18), rgba(34,197,94,.08));
+  }
+  #ana-period-tabs .ptab:hover::before { opacity:1; }
+  #ana-period-tabs .ptab.active {
+    background:linear-gradient(135deg, rgba(139,92,246,.3), rgba(124,58,237,.18));
+    color:#c4b5fd;
+    box-shadow:0 0 0 1px rgba(139,92,246,.4), 0 6px 20px rgba(139,92,246,.2);
+  }
+
+  /* ══ PERFORMANCE SCORE BANNER ══ */
+  .ana-score-banner {
+    position:relative; overflow:hidden; border-radius:20px; margin-bottom:16px;
+    background:linear-gradient(135deg, rgba(17,17,22,.97) 0%, rgba(30,20,50,.9) 100%);
+    border:1px solid rgba(139,92,246,.25);
+    padding:22px 28px;
+    box-shadow: 0 0 0 1px rgba(139,92,246,.1), 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+    animation: anaSlideDown .5s cubic-bezier(.4,0,.2,1) both;
+  }
+  .ana-score-banner::before {
+    content:''; position:absolute; top:-60px; right:-60px;
+    width:240px; height:240px; border-radius:50%;
+    background:radial-gradient(circle, rgba(139,92,246,.15), transparent 65%);
+    pointer-events:none;
+  }
+  .ana-score-banner::after {
+    content:''; position:absolute; bottom:-40px; left:20%;
+    width:160px; height:160px; border-radius:50%;
+    background:radial-gradient(circle, rgba(34,197,94,.08), transparent 65%);
+    pointer-events:none;
+  }
+  .ana-score-inner { position:relative; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+  /* Animated ring */
+  .ana-ring-wrap { position:relative; width:72px; height:72px; flex-shrink:0; }
+  .ana-ring-wrap svg { transform:rotate(-90deg); width:72px; height:72px; }
+  .ana-ring-bg   { fill:none; stroke:rgba(255,255,255,.06); stroke-width:6; }
+  .ana-ring-fill { fill:none; stroke-width:6; stroke-linecap:round;
+    stroke-dasharray:188; stroke-dashoffset:188;
+    transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1),stroke .4s; }
+  .ana-ring-label {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:16px; font-weight:800; font-family:var(--mono); color:#c4b5fd;
+  }
+  /* Score text block */
+  .ana-score-text { flex:1; min-width:180px; }
+  .ana-score-heading { font-size:20px; font-weight:800; letter-spacing:-.5px; margin-bottom:4px; }
+  .ana-score-sub { font-size:12px; color:rgba(255,255,255,.4); font-family:var(--mono); }
+  /* Quick KPI pills */
+  .ana-score-pills { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .ana-kpi-pill {
+    display:flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
+    border-radius:30px; padding:5px 12px;
+    font-size:11px; font-family:var(--mono); font-weight:700;
+    transition:all .2s;
+  }
+  .ana-kpi-pill:hover { background:rgba(139,92,246,.1); border-color:rgba(139,92,246,.25); }
+  .ana-kpi-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+
+  /* ══ PREMIUM SECTION CARD ══ */
+  .ana-premium-card {
+    background:linear-gradient(160deg, rgba(14,14,18,.98), rgba(20,20,26,.92));
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:20px; padding:22px 24px; margin-bottom:16px;
+    position:relative; overflow:hidden;
+    transition:border-color .3s, box-shadow .35s, transform .25s;
+    will-change:transform;
+  }
+  .ana-premium-card:hover {
+    border-color:rgba(139,92,246,.22);
+    box-shadow:0 0 0 1px rgba(139,92,246,.09), 0 24px 70px rgba(0,0,0,.45);
+    transform:translateY(-1px);
+  }
+  .ana-premium-card::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 80% 60% at 0% 0%, rgba(139,92,246,.07), transparent 55%);
+  }
+  .ana-card-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px; position:relative;
+  }
+  .ana-card-title {
+    font-size:11px; font-weight:800; color:rgba(255,255,255,.32);
+    text-transform:uppercase; letter-spacing:1.8px;
+    display:flex; align-items:center; gap:9px;
+  }
+  .ana-card-title-icon {
+    width:30px; height:30px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; flex-shrink:0;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+  }
+  .ana-card-badge {
+    font-size:10px; font-weight:700; padding:3px 11px; border-radius:20px;
+    letter-spacing:.6px; text-transform:uppercase;
+  }
+
+  /* ══ STAT CARDS GRID ══ */
+  .ana-deep-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+  }
+  @media(max-width:960px){ .ana-deep-grid{grid-template-columns:repeat(3,1fr);} }
+  @media(max-width:640px){ .ana-deep-grid{grid-template-columns:repeat(2,1fr);} }
+
+  .ana-stat-card {
+    background:rgba(255,255,255,.022);
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:15px; padding:15px 16px;
+    position:relative; overflow:hidden; cursor:default;
+    transition:all .28s cubic-bezier(.4,0,.2,1);
+  }
+  /* Shine sweep on hover */
+  .ana-stat-card::before {
+    content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+    background:linear-gradient(105deg, transparent, rgba(255,255,255,.04), transparent);
+    transition:left .5s ease; pointer-events:none;
+  }
+  .ana-stat-card:hover::before { left:160%; }
+  /* Bottom accent line */
+  .ana-stat-card::after {
+    content:''; position:absolute; bottom:0; left:10%; right:10%; height:1.5px;
+    border-radius:1px; opacity:0; transition:opacity .3s;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.6),transparent);
+  }
+  .ana-stat-card:hover { transform:translateY(-3px); border-color:rgba(139,92,246,.22); background:rgba(139,92,246,.06); box-shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px rgba(139,92,246,.12); }
+  .ana-stat-card:hover::after { opacity:1; }
+
+  .ana-stat-card.card-win:hover { border-color:rgba(34,197,94,.28); background:rgba(34,197,94,.055); box-shadow:0 10px 30px rgba(0,0,0,.3), 0 0 0 1px rgba(34,197,94,.12); }
+  .ana-stat-card.card-win::after  { background:linear-gradient(90deg,transparent,rgba(34,197,94,.55),transparent); }
+  .ana-stat-card.card-loss:hover  { border-color:rgba(239,68,68,.22); background:rgba(239,68,68,.045); box-shadow:0 10px 30px rgba(0,0,0,.3), 0 0 0 1px rgba(239,68,68,.1); }
+  .ana-stat-card.card-loss::after { background:linear-gradient(90deg,transparent,rgba(239,68,68,.5),transparent); }
+  .ana-stat-card.card-gold:hover  { border-color:rgba(245,158,11,.28); background:rgba(245,158,11,.048); box-shadow:0 10px 30px rgba(0,0,0,.3), 0 0 0 1px rgba(245,158,11,.12); }
+  .ana-stat-card.card-gold::after { background:linear-gradient(90deg,transparent,rgba(245,158,11,.55),transparent); }
+
+  .ana-stat-card-icon { font-size:20px; margin-bottom:9px; display:block; line-height:1; }
+  .ana-stat-label { font-size:9px; font-weight:700; color:rgba(255,255,255,.28); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:7px; }
+  .ana-stat-val   { font-size:18px; font-weight:700; font-family:var(--mono); letter-spacing:-.5px; line-height:1; margin-bottom:5px; transition:color .3s; }
+  .ana-stat-sub   { font-size:10px; color:rgba(255,255,255,.2); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ══ ENTRY ANIMATIONS ══ */
+  @keyframes anaSlideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:none} }
+  @keyframes anaSlideIn   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:none} }
+  @keyframes anaFadeIn    { from{opacity:0}                              to{opacity:1} }
+
+  #page-analytics.active .ana-score-banner  { animation:anaSlideDown .4s .0s ease both; }
+  #page-analytics.active .ana-premium-card:nth-of-type(1) { animation:anaSlideIn .38s .05s ease both; }
+  #page-analytics.active .ana-premium-card:nth-of-type(2) { animation:anaSlideIn .38s .10s ease both; }
+  #page-analytics.active .ana-premium-card:nth-of-type(3) { animation:anaSlideIn .38s .15s ease both; }
+  #page-analytics.active .ana-breakdown-g3  { animation:anaSlideIn .38s .20s ease both; }
+  #page-analytics.active .ana-chart-g2      { animation:anaSlideIn .38s .25s ease both; }
+
+  #page-analytics.active .ana-stat-card { animation:anaSlideIn .32s ease both; }
+  #page-analytics.active .ana-stat-card:nth-child(1) {animation-delay:.06s}
+  #page-analytics.active .ana-stat-card:nth-child(2) {animation-delay:.10s}
+  #page-analytics.active .ana-stat-card:nth-child(3) {animation-delay:.14s}
+  #page-analytics.active .ana-stat-card:nth-child(4) {animation-delay:.18s}
+  #page-analytics.active .ana-stat-card:nth-child(5) {animation-delay:.22s}
+  #page-analytics.active .ana-stat-card:nth-child(6) {animation-delay:.26s}
+  #page-analytics.active .ana-stat-card:nth-child(7) {animation-delay:.30s}
+  #page-analytics.active .ana-stat-card:nth-child(8) {animation-delay:.34s}
+  #page-analytics.active .ana-stat-card:nth-child(9) {animation-delay:.38s}
+  #page-analytics.active .ana-stat-card:nth-child(10){animation-delay:.42s}
+  #page-analytics.active .ana-stat-card:nth-child(11){animation-delay:.46s}
+  #page-analytics.active .ana-stat-card:nth-child(12){animation-delay:.50s}
+
+  /* ══ DOW BARS ══ */
+  .ana-dow-col {
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    cursor:default; transition:transform .2s;
+  }
+  .ana-dow-col:hover { transform:translateY(-3px); }
+  .ana-dow-bar-wrap {
+    width:100%; height:88px; position:relative;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .ana-dow-bar {
+    width:70%; border-radius:5px 5px 0 0; min-height:3px;
+    transition:height .8s cubic-bezier(.4,0,.2,1);
+    position:relative;
+  }
+  .ana-dow-bar.pos {
+    background:linear-gradient(to top, rgba(22,163,74,.8), rgba(34,197,94,1));
+    box-shadow:0 -4px 14px rgba(34,197,94,.35);
+  }
+  .ana-dow-bar.neg {
+    background:linear-gradient(to top, rgba(185,28,28,.8), rgba(239,68,68,1));
+    box-shadow:0 -4px 14px rgba(239,68,68,.3);
+  }
+  .ana-dow-bar.neu { background:rgba(255,255,255,.07); }
+  /* Shimmer on bar */
+  .ana-dow-bar::after {
+    content:''; position:absolute; top:0; left:0; right:0; height:30%;
+    background:linear-gradient(to bottom,rgba(255,255,255,.15),transparent);
+    border-radius:5px 5px 0 0; pointer-events:none;
+  }
+  .ana-dow-label { font-size:10px; font-weight:700; color:rgba(255,255,255,.28); letter-spacing:.6px; }
+  .ana-dow-val   { font-size:10px; font-family:var(--mono); font-weight:700; line-height:1; }
+  .ana-dow-count { font-size:9px; color:rgba(255,255,255,.18); font-family:var(--mono); }
+
+  #page-analytics.active .ana-dow-col { animation:anaSlideIn .38s ease both; }
+  #page-analytics.active .ana-dow-col:nth-child(1){animation-delay:.06s}
+  #page-analytics.active .ana-dow-col:nth-child(2){animation-delay:.11s}
+  #page-analytics.active .ana-dow-col:nth-child(3){animation-delay:.16s}
+  #page-analytics.active .ana-dow-col:nth-child(4){animation-delay:.21s}
+  #page-analytics.active .ana-dow-col:nth-child(5){animation-delay:.26s}
+  #page-analytics.active .ana-dow-col:nth-child(6){animation-delay:.31s}
+  #page-analytics.active .ana-dow-col:nth-child(7){animation-delay:.36s}
+
+  /* ══ BREAKDOWN CARDS ══ */
+  .ana-breakdown-g3 {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px;
+  }
+  @media(max-width:900px){.ana-breakdown-g3{grid-template-columns:1fr 1fr;}}
+  @media(max-width:560px){.ana-breakdown-g3{grid-template-columns:1fr;}}
+
+  .ana-breakdown-card {
+    background:linear-gradient(160deg, rgba(14,14,18,.98), rgba(20,20,26,.9));
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:18px; padding:18px 20px;
+    position:relative; overflow:hidden;
+    transition:border-color .28s, box-shadow .28s, transform .22s;
+  }
+  .ana-breakdown-card:hover {
+    border-color:rgba(139,92,246,.2); transform:translateY(-2px);
+    box-shadow:0 12px 36px rgba(0,0,0,.4), 0 0 0 1px rgba(139,92,246,.09);
+  }
+  .ana-breakdown-card::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 0% 0%, rgba(139,92,246,.05), transparent 60%);
+  }
+  .ana-breakdown-title {
+    font-size:10px; font-weight:800; color:rgba(255,255,255,.28);
+    text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px;
+    display:flex; align-items:center; gap:7px; position:relative;
+  }
+
+  .ana-brow { display:flex; align-items:center; gap:9px; margin-bottom:9px; transition:opacity .15s; }
+  .ana-brow:hover { opacity:.82; }
+  .ana-blbl { font-size:11px; color:rgba(255,255,255,.52); width:72px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+  .ana-btr  { flex:1; height:6px; background:rgba(255,255,255,.04); border-radius:3px; overflow:hidden; }
+  .ana-bfl  { height:100%; border-radius:3px; position:relative; overflow:hidden; transition:width .9s cubic-bezier(.4,0,.2,1); }
+  .ana-bfl::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.2) 50%, transparent 100%);
+    animation:anaShimmer 2.8s ease-in-out infinite;
+  }
+  @keyframes anaShimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(300%)} }
+  .ana-bfl.bfl-green  { background:linear-gradient(90deg,#15803d,#22c55e); }
+  .ana-bfl.bfl-red    { background:linear-gradient(90deg,#b91c1c,#ef4444); }
+  .ana-bfl.bfl-purple { background:linear-gradient(90deg,#6d28d9,#8b5cf6); }
+  .ana-bfl.bfl-gold   { background:linear-gradient(90deg,#b45309,#f59e0b); }
+  .ana-bfl.bfl-cyan   { background:linear-gradient(90deg,#0e7490,#22d3ee); }
+  .ana-bvl { font-size:11px; font-family:var(--mono); font-weight:700; width:54px; text-align:right; flex-shrink:0; }
+
+  /* ══ CHART CARDS ══ */
+  .ana-chart-g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  @media(max-width:768px){.ana-chart-g2{grid-template-columns:1fr;}}
+
+  .ana-chart-card {
+    background:linear-gradient(160deg, rgba(14,14,18,.99), rgba(20,20,26,.92));
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:20px; padding:20px 22px;
+    position:relative; overflow:hidden;
+    transition:border-color .3s, box-shadow .35s, transform .25s;
+  }
+  .ana-chart-card:hover {
+    border-color:rgba(139,92,246,.2);
+    box-shadow:0 0 0 1px rgba(139,92,246,.08), 0 18px 54px rgba(0,0,0,.4);
+    transform:translateY(-1px);
+  }
+  .ana-chart-card::before {
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at top right, rgba(139,92,246,.05), transparent 55%);
+  }
+  .ana-chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .ana-chart-title  { font-size:11px; font-weight:800; color:rgba(255,255,255,.32); text-transform:uppercase; letter-spacing:1.4px; display:flex; align-items:center; gap:8px; }
+  .ana-chart-dot    { width:7px; height:7px; border-radius:50%; flex-shrink:0; animation:anaSonar 2.5s ease-in-out infinite; }
+
+  /* ══ TAGS ══ */
+  .ana-tag { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; padding:3px 9px; border-radius:20px; }
+  .ana-tag-green  { background:rgba(34,197,94,.12);  color:#22c55e; border:1px solid rgba(34,197,94,.22);  }
+  .ana-tag-red    { background:rgba(239,68,68,.1);   color:#ef4444; border:1px solid rgba(239,68,68,.2);   }
+  .ana-tag-purple { background:rgba(139,92,246,.12); color:#a78bfa; border:1px solid rgba(139,92,246,.22); }
+  .ana-tag-gold   { background:rgba(245,158,11,.1);  color:#f59e0b; border:1px solid rgba(245,158,11,.2);  }
+
+  /* ══ DIVIDER GLOW ══ */
+  .ana-divider {
+    height:1px; margin:4px 0 16px; border-radius:1px;
+    background:linear-gradient(90deg, transparent, rgba(139,92,246,.3), rgba(34,197,94,.15), transparent);
+  }
+  </style>
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="ph" style="margin-bottom:10px">
+    <div>
+      <div class="pt">Analytics</div>
+      <div class="ps" id="ana-ps" style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:rgba(255,255,255,.35)">
+        <span class="ana-live-dot"></span>
+        <span>Performance breakdown · real-time</span>
       </div>
     </div>
+  </div>
 
-    <!-- ── DEEP STATS GRID ── -->
-    <div class="cc" style="margin-bottom:16px">
-      <div class="ch"><div class="ct">📐 Deep Statistics</div></div>
-      <div class="ana-deep-grid" id="ana-deep-grid">
-        <div class="ana-stat-card"><div class="ana-stat-label">Avg Win</div><div class="ana-stat-val pos" id="ana-avg-win">—</div><div class="ana-stat-sub">per winning trade</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Avg Loss</div><div class="ana-stat-val neg" id="ana-avg-loss">—</div><div class="ana-stat-sub">per losing trade</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Trade</div><div class="ana-stat-val pos" id="ana-best-trade">—</div><div class="ana-stat-sub" id="ana-best-trade-pair">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Worst Trade</div><div class="ana-stat-val neg" id="ana-worst-trade">—</div><div class="ana-stat-sub" id="ana-worst-trade-pair">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Day</div><div class="ana-stat-val" id="ana-best-day">—</div><div class="ana-stat-sub" id="ana-best-day-pnl">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Worst Day</div><div class="ana-stat-val" id="ana-worst-day">—</div><div class="ana-stat-sub" id="ana-worst-day-pnl">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Win Streak</div><div class="ana-stat-val pos" id="ana-win-streak">—</div><div class="ana-stat-sub">best run</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Loss Streak</div><div class="ana-stat-val neg" id="ana-loss-streak">—</div><div class="ana-stat-sub">worst run</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Avg R:R Aktual</div><div class="ana-stat-val" id="ana-avg-rr">—</div><div class="ana-stat-sub">risk/reward realisasi</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Expectancy</div><div class="ana-stat-val" id="ana-expectancy">—</div><div class="ana-stat-sub">per trade average</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Session</div><div class="ana-stat-val" id="ana-best-session">—</div><div class="ana-stat-sub" id="ana-best-session-pnl">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Setup</div><div class="ana-stat-val" id="ana-best-setup" style="font-size:13px">—</div><div class="ana-stat-sub" id="ana-best-setup-wr">—</div></div>
+  <!-- ── PERIOD TABS ── -->
+  <div style="margin-bottom:18px">
+    <div class="period-tabs" id="ana-period-tabs">
+      <button class="ptab active" data-aperiod="all">Semua</button>
+      <button class="ptab" data-aperiod="7">7 Hari</button>
+      <button class="ptab" data-aperiod="30">30 Hari</button>
+      <button class="ptab" data-aperiod="180">6 Bulan</button>
+      <button class="ptab" data-aperiod="365">1 Tahun</button>
+    </div>
+  </div>
+
+  <!-- ══ PERFORMANCE SCORE BANNER ══ -->
+  <div class="ana-score-banner" id="ana-score-banner">
+    <div class="ana-score-inner">
+      <!-- Animated ring -->
+      <div class="ana-ring-wrap">
+        <svg viewBox="0 0 72 72">
+          <circle class="ana-ring-bg"   cx="36" cy="36" r="30"/>
+          <circle class="ana-ring-fill" id="ana-ring-fill" cx="36" cy="36" r="30" stroke="url(#anaRingGrad)"/>
+          <defs>
+            <linearGradient id="anaRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#8b5cf6"/>
+              <stop offset="50%"  stop-color="#22c55e"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ana-ring-label" id="ana-ring-label">—</div>
+      </div>
+      <!-- Text -->
+      <div class="ana-score-text">
+        <div class="ana-score-heading" id="ana-score-heading" style="background:linear-gradient(135deg,#f4f4f5,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Performance Score</div>
+        <div class="ana-score-sub" id="ana-score-sub">Hitung ulang dari semua trade kamu</div>
+        <!-- Quick pills -->
+        <div class="ana-score-pills" id="ana-score-pills">
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#22c55e"></span><span id="pill-wr" style="color:#22c55e">WR —</span></div>
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#a78bfa"></span><span id="pill-pf" style="color:#a78bfa">PF —</span></div>
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#f59e0b"></span><span id="pill-rr" style="color:#f59e0b">R:R —</span></div>
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#22d3ee"></span><span id="pill-n"  style="color:#22d3ee">0 Trades</span></div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- ── P&L BY DAY OF WEEK ── -->
-    <div class="cc" style="margin-bottom:16px">
-      <div class="ch"><div class="ct">📅 P&L by Day of Week</div></div>
-      <div id="ana-dow" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:4px 0"></div>
+  <!-- ══ DEEP STATS GRID ══ -->
+  <div class="ana-premium-card">
+    <div class="ana-card-header">
+      <div class="ana-card-title">
+        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08))">📐</div>
+        Deep Statistics
+      </div>
+      <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">12 Metrics</span>
     </div>
+    <div class="ana-deep-grid" id="ana-deep-grid">
+      <div class="ana-stat-card card-win">
+        <span class="ana-stat-card-icon">💰</span>
+        <div class="ana-stat-label">Avg Win</div>
+        <div class="ana-stat-val pos" id="ana-avg-win">—</div>
+        <div class="ana-stat-sub">per winning trade</div>
+      </div>
+      <div class="ana-stat-card card-loss">
+        <span class="ana-stat-card-icon">📉</span>
+        <div class="ana-stat-label">Avg Loss</div>
+        <div class="ana-stat-val neg" id="ana-avg-loss">—</div>
+        <div class="ana-stat-sub">per losing trade</div>
+      </div>
+      <div class="ana-stat-card card-win">
+        <span class="ana-stat-card-icon">🏆</span>
+        <div class="ana-stat-label">Best Trade</div>
+        <div class="ana-stat-val pos" id="ana-best-trade">—</div>
+        <div class="ana-stat-sub" id="ana-best-trade-pair">—</div>
+      </div>
+      <div class="ana-stat-card card-loss">
+        <span class="ana-stat-card-icon">💀</span>
+        <div class="ana-stat-label">Worst Trade</div>
+        <div class="ana-stat-val neg" id="ana-worst-trade">—</div>
+        <div class="ana-stat-sub" id="ana-worst-trade-pair">—</div>
+      </div>
+      <div class="ana-stat-card card-gold">
+        <span class="ana-stat-card-icon">🌟</span>
+        <div class="ana-stat-label">Best Day</div>
+        <div class="ana-stat-val pos" id="ana-best-day">—</div>
+        <div class="ana-stat-sub" id="ana-best-day-pnl">—</div>
+      </div>
+      <div class="ana-stat-card card-loss">
+        <span class="ana-stat-card-icon">🔥</span>
+        <div class="ana-stat-label">Worst Day</div>
+        <div class="ana-stat-val neg" id="ana-worst-day">—</div>
+        <div class="ana-stat-sub" id="ana-worst-day-pnl">—</div>
+      </div>
+      <div class="ana-stat-card card-win">
+        <span class="ana-stat-card-icon">⚡</span>
+        <div class="ana-stat-label">Win Streak</div>
+        <div class="ana-stat-val pos" id="ana-win-streak">—</div>
+        <div class="ana-stat-sub">best run</div>
+      </div>
+      <div class="ana-stat-card card-loss">
+        <span class="ana-stat-card-icon">❄️</span>
+        <div class="ana-stat-label">Loss Streak</div>
+        <div class="ana-stat-val neg" id="ana-loss-streak">—</div>
+        <div class="ana-stat-sub">worst run</div>
+      </div>
+      <div class="ana-stat-card">
+        <span class="ana-stat-card-icon">⚖️</span>
+        <div class="ana-stat-label">Avg R:R Aktual</div>
+        <div class="ana-stat-val" id="ana-avg-rr">—</div>
+        <div class="ana-stat-sub">risk/reward realisasi</div>
+      </div>
+      <div class="ana-stat-card card-gold">
+        <span class="ana-stat-card-icon">🎯</span>
+        <div class="ana-stat-label">Expectancy</div>
+        <div class="ana-stat-val" id="ana-expectancy">—</div>
+        <div class="ana-stat-sub">per trade average</div>
+      </div>
+      <div class="ana-stat-card">
+        <span class="ana-stat-card-icon">🕐</span>
+        <div class="ana-stat-label">Best Session</div>
+        <div class="ana-stat-val" id="ana-best-session">—</div>
+        <div class="ana-stat-sub" id="ana-best-session-pnl">—</div>
+      </div>
+      <div class="ana-stat-card">
+        <span class="ana-stat-card-icon">🏷️</span>
+        <div class="ana-stat-label">Best Setup</div>
+        <div class="ana-stat-val" id="ana-best-setup" style="font-size:13px">—</div>
+        <div class="ana-stat-sub" id="ana-best-setup-wr">—</div>
+      </div>
+    </div>
+  </div>
 
-    <div class="g3">
-      <div class="smc"><div class="smt">P&amp;L by Pair</div><div id="pb"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
-      <div class="smc"><div class="smt">P&amp;L by Session</div><div id="sb2"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
-      <div class="smc"><div class="smt">Trades by Setup</div><div id="stb"><span style="font-size:12px;color:var(--text3)">No data yet</span></div></div>
+  <!-- ══ P&L BY DAY OF WEEK ══ -->
+  <div class="ana-premium-card">
+    <div class="ana-card-header">
+      <div class="ana-card-title">
+        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.07))">📅</div>
+        P&amp;L by Day of Week
+      </div>
+      <span class="ana-tag ana-tag-gold">⚡ Weekly Pattern</span>
     </div>
-    <div class="g2">
-      <div class="cc" style="margin-bottom:0"><div class="ch"><div class="ct">Drawdown (%)</div></div><div style="position:relative;height:165px"><canvas id="ddC"></canvas></div></div>
-      <div class="cc" style="margin-bottom:0"><div class="ch"><div class="ct">Cumulative R</div></div><div style="position:relative;height:165px"><canvas id="rC"></canvas></div></div>
+    <div id="ana-dow" style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:6px 0 4px;min-height:130px;align-items:end"></div>
+  </div>
+
+  <!-- ══ BREAKDOWN ROWS ══ -->
+  <div class="ana-breakdown-g3">
+    <div class="ana-breakdown-card">
+      <div class="ana-breakdown-title"><span>💱</span> P&amp;L by Pair</div>
+      <div id="pb"><span style="font-size:12px;color:rgba(255,255,255,.18)">No data yet</span></div>
     </div>
+    <div class="ana-breakdown-card">
+      <div class="ana-breakdown-title"><span>🌍</span> P&amp;L by Session</div>
+      <div id="sb2"><span style="font-size:12px;color:rgba(255,255,255,.18)">No data yet</span></div>
+    </div>
+    <div class="ana-breakdown-card">
+      <div class="ana-breakdown-title"><span>🏷️</span> Trades by Setup</div>
+      <div id="stb"><span style="font-size:12px;color:rgba(255,255,255,.18)">No data yet</span></div>
+    </div>
+  </div>
+
+  <!-- ══ CHARTS ══ -->
+  <div class="ana-chart-g2">
+    <div class="ana-chart-card">
+      <div class="ana-chart-header">
+        <div class="ana-chart-title">
+          <span class="ana-chart-dot" style="background:#ef4444;box-shadow:0 0 0 0 rgba(239,68,68,.4)"></span>
+          Drawdown (%)
+        </div>
+        <span class="ana-tag ana-tag-red">⚠ Risk Monitor</span>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="ddC"></canvas></div>
+    </div>
+    <div class="ana-chart-card">
+      <div class="ana-chart-header">
+        <div class="ana-chart-title">
+          <span class="ana-chart-dot" style="background:#a78bfa;box-shadow:0 0 0 0 rgba(167,139,250,.4)"></span>
+          Cumulative R
+        </div>
+        <span class="ana-tag ana-tag-purple">📈 Edge Tracker</span>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="rC"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Bottom divider glow -->
+  <div class="ana-divider"></div>
+
+  <!-- ══ PERFORMANCE SCORE JS ══ -->
+  <script>
+  (function(){
+    // Update the performance score banner whenever analytics renders
+    function updateScoreBanner(){
+      // Grab latest analytics data from rendered elements
+      var wrEl  = document.getElementById('st-wr');
+      var pfEl  = document.getElementById('st-pf');
+      var rrEl  = document.getElementById('st-rr');
+      var nEl   = document.getElementById('st-n');
+
+      var wrRaw  = wrEl  ? wrEl.textContent.replace('%','').trim()  : '';
+      var pfRaw  = pfEl  ? pfEl.textContent.trim() : '';
+      var rrRaw  = rrEl  ? rrEl.textContent.replace('R','').trim()  : '';
+      var nRaw   = nEl   ? nEl.textContent.trim()  : '0';
+
+      var wr  = parseFloat(wrRaw)  || 0;
+      var pf  = parseFloat(pfRaw)  || 0;
+      var rr  = parseFloat(rrRaw)  || 0;
+      var n   = parseInt(nRaw,10)  || 0;
+
+      // Pill updates
+      var pillWr = document.getElementById('pill-wr');
+      var pillPf = document.getElementById('pill-pf');
+      var pillRr = document.getElementById('pill-rr');
+      var pillN  = document.getElementById('pill-n');
+      if(pillWr) pillWr.textContent = 'WR ' + (wr?wr.toFixed(1)+'%':'—');
+      if(pillPf) pillPf.textContent = 'PF ' + (pf?pf.toFixed(2):'—');
+      if(pillRr) pillRr.textContent = 'R:R '+ (rr?rr.toFixed(2)+'R':'—');
+      if(pillN)  pillN.textContent  = n + ' Trade'+(n!==1?'s':'');
+
+      // Score calc: weighted composite 0–100
+      // WR (max 60 → 40pts), PF (max 3 → 30pts), RR (max 3 → 20pts), consistency bonus 10pts
+      var scoreWR  = n>0 ? Math.min(wr/60*40, 40) : 0;
+      var scorePF  = n>0 ? Math.min(pf/3*30,  30) : 0;
+      var scoreRR  = n>0 ? Math.min(rr/3*20,  20) : 0;
+      var scoreN   = n>0 ? Math.min(n/20*10,  10) : 0;
+      var score    = Math.round(scoreWR + scorePF + scoreRR + scoreN);
+      if(n===0) score = 0;
+
+      // Ring
+      var ringFill  = document.getElementById('ana-ring-fill');
+      var ringLabel = document.getElementById('ana-ring-label');
+      var scoreHead = document.getElementById('ana-score-heading');
+      var scoreSub  = document.getElementById('ana-score-sub');
+
+      var circumf = 2 * Math.PI * 30; // r=30
+      var offset  = circumf * (1 - score/100);
+
+      var grade, gradeColor, gradeMsg;
+      if(score>=85)      { grade='S'; gradeColor='#f59e0b'; gradeMsg='Elite Trader 🏆'; }
+      else if(score>=70) { grade='A'; gradeColor='#22c55e'; gradeMsg='Konsisten & Profitable ⚡'; }
+      else if(score>=55) { grade='B'; gradeColor='#a78bfa'; gradeMsg='On The Right Track 📈'; }
+      else if(score>=40) { grade='C'; gradeColor='#22d3ee'; gradeMsg='Terus Berkembang 💪'; }
+      else if(n>0)       { grade='D'; gradeColor='#ef4444'; gradeMsg='Perlu Evaluasi 🔍'; }
+      else               { grade='—'; gradeColor='rgba(255,255,255,.25)'; gradeMsg='Log trade pertamamu 🚀'; }
+
+      if(ringFill){
+        ringFill.style.strokeDasharray  = circumf;
+        ringFill.style.strokeDashoffset = offset;
+        ringFill.style.stroke = gradeColor;
+        ringFill.style.transition = 'stroke-dashoffset 1.3s cubic-bezier(.4,0,.2,1), stroke .4s';
+      }
+      if(ringLabel){ ringLabel.textContent = grade; ringLabel.style.color = gradeColor; }
+      if(scoreHead && n>0){
+        scoreHead.style.background = 'linear-gradient(135deg, '+gradeColor+', #c4b5fd)';
+        scoreHead.style.webkitBackgroundClip = 'text'; scoreHead.style.backgroundClip='text';
+        scoreHead.style.webkitTextFillColor  = 'transparent';
+      }
+      if(scoreSub) scoreSub.textContent = n>0 ? gradeMsg + ' · Score ' + score + '/100' : 'Log trade pertamamu untuk melihat score';
+    }
+
+    // Run on page switch and on data updates
+    document.addEventListener('tradesUpdated', function(){ setTimeout(updateScoreBanner, 300); });
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(updateScoreBanner, 800); });
+    // Poll every 3s as fallback
+    setInterval(updateScoreBanner, 3000);
+    window._updateScoreBanner = updateScoreBanner;
+  })();
+  </script>
+
   </div>
 
   <!-- CALENDAR -->
@@ -5213,13 +5784,17 @@ function renderAna(){
     if(!sm[t.session])sm[t.session]=0; sm[t.session]+=t.pnl;
     (t.setup||'Other').split(',').forEach(s=>{const tg=s.trim();if(!stm[tg])stm[tg]=0;stm[tg]++;});
   });
-  const mkB=(arr,mx)=>arr.map(([lbl,v])=>`<div class="brow"><div class="blbl">${lbl}</div><div class="btr"><div class="bfl" style="width:${Math.abs(v)/mx*100}%;background:${v>=0?'#00d97e':'#ff4d4d'}"></div></div><div class="bvl ${v>=0?'pos':'neg'}">${v>=0?'+':''}$${Math.abs(v).toFixed(0)}</div></div>`).join('');
+  const mkB=(arr,mx)=>arr.map(([lbl,v],i)=>{
+    const colorClass=v>=0?'bfl-green':'bfl-red';
+    const colors=['bfl-green','bfl-purple','bfl-gold','bfl-cyan','bfl-green','bfl-purple'];
+    return `<div class="ana-brow"><div class="ana-blbl">${lbl}</div><div class="ana-btr"><div class="ana-bfl ${colorClass}" style="width:${Math.abs(v)/mx*100}%"></div></div><div class="ana-bvl ${v>=0?'pos':'neg'}">${v>=0?'+':''}$${Math.abs(v).toFixed(0)}</div></div>`;
+  }).join('');
   const pA=Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,6);
   $('pb').innerHTML=pA.length?mkB(pA,Math.max(...pA.map(p=>Math.abs(p[1])),1)):'<span style="font-size:12px;color:var(--text3)">No data</span>';
   const sA=Object.entries(sm).sort((a,b)=>b[1]-a[1]);
   $('sb2').innerHTML=sA.length?mkB(sA,Math.max(...sA.map(s=>Math.abs(s[1])),1)):'<span style="font-size:12px;color:var(--text3)">No data</span>';
   const stA=Object.entries(stm).sort((a,b)=>b[1]-a[1]).slice(0,6),mSt=Math.max(...stA.map(s=>s[1]),1);
-  $('stb').innerHTML=stA.length?stA.map(([tag,n])=>`<div class="brow"><div class="blbl">${tag}</div><div class="btr"><div class="bfl" style="width:${n/mSt*100}%;background:var(--accent)"></div></div><div class="bvl neu">${n}</div></div>`).join(''):'<span style="font-size:12px;color:var(--text3)">No data</span>';
+  $('stb').innerHTML=stA.length?stA.map(([tag,n])=>`<div class="ana-brow"><div class="ana-blbl">${tag}</div><div class="ana-btr"><div class="ana-bfl bfl-purple" style="width:${n/mSt*100}%"></div></div><div class="ana-bvl neu">${n}</div></div>`).join(''):'<span style="font-size:12px;color:var(--text3)">No data</span>';
 
   // Drawdown chart using filtered trades equity
   const allTot=trades.reduce((s,t)=>s+t.pnl,0);
@@ -5366,16 +5941,18 @@ function renderDeepAna(ft) {
   const dowEl = $('ana-dow');
   if(dowEl) dowEl.innerHTML = [0,1,2,3,4,5,6].map(d => {
     const v = dowMap[d], cnt = dowCount[d];
-    const pct = Math.abs(v)/maxDow*100;
-    const col = v>0?'#00d97e':v<0?'#ff4d4d':'#3f3f46';
-    const bg  = v>0?'rgba(0,217,126,.1)':v<0?'rgba(255,77,77,.1)':'rgba(255,255,255,.03)';
-    return `<div style="background:${bg};border:1px solid ${v>0?'rgba(0,217,126,.2)':v<0?'rgba(255,77,77,.2)':'var(--border)'};border-radius:10px;padding:10px 6px;text-align:center">
-      <div style="font-size:9px;color:var(--text3);font-weight:600;margin-bottom:6px;letter-spacing:.4px">${dowNames[d]}</div>
-      <div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px">
-        <div style="width:18px;background:${col};border-radius:3px 3px 0 0;height:${Math.max(pct,v!==0?8:0)}%;min-height:${v!==0?'4px':'0'};opacity:.85"></div>
+    const pct = Math.round(Math.abs(v)/maxDow*100);
+    const isPos = v > 0, isNeg = v < 0;
+    const barClass = isPos ? 'pos' : isNeg ? 'neg' : 'neu';
+    const valColor = isPos ? '#22c55e' : isNeg ? '#ef4444' : 'rgba(255,255,255,.25)';
+    const barH = Math.max(pct, v!==0?8:0);
+    return `<div class="ana-dow-col">
+      <div class="ana-dow-val" style="color:${valColor}">${v!==0?(isPos?'+':'')+'$'+Math.abs(v).toFixed(0):'—'}</div>
+      <div class="ana-dow-bar-wrap">
+        <div class="ana-dow-bar ${barClass}" style="height:${barH}%"></div>
       </div>
-      <div style="font-size:10px;font-weight:700;font-family:var(--mono);color:${col}">${v>0?'+':''}${v!==0?'$'+Math.abs(v).toFixed(0):'—'}</div>
-      <div style="font-size:9px;color:var(--text3);margin-top:2px">${cnt?cnt+' trade':''}</div>
+      <div class="ana-dow-label">${dowNames[d]}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.18);font-family:var(--mono)">${cnt||''}</div>
     </div>`;
   }).join('');
 }
