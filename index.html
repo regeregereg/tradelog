@@ -423,6 +423,34 @@ tr:hover td{background:rgba(139,92,246,.04);}
 .btng{background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;font-weight:600;}
 .btng:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.07);}
 .bsm{padding:6px 12px;font-size:11px;}
+
+/* ── JOURNAL ACTION BUTTONS ── */
+.journal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.journal-tool-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 13px;border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--text2);font-size:12px;font-weight:600;
+  font-family:var(--font);cursor:pointer;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  white-space:nowrap;letter-spacing:.15px;
+}
+.journal-tool-btn i{font-size:13px;transition:transform .2s;}
+.journal-tool-btn:hover{
+  color:var(--text);
+  border-color:rgba(139,92,246,.35);
+  background:rgba(139,92,246,.08);
+  box-shadow:0 0 0 1px rgba(139,92,246,.12),0 4px 14px rgba(0,0,0,.25);
+}
+.journal-tool-btn:hover i{transform:translateY(-1px);}
+#import-btn:hover i{transform:translateY(-1px);}
+#export-btn:hover i{transform:translateY(1px);}
+@media(max-width:480px){
+  .journal-tool-btn span{display:none;}
+  .journal-tool-btn{padding:7px 10px;}
+  .journal-actions{gap:6px;}
+}
 .bdel{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
 .bdel:hover{color:var(--red);background:var(--rd);}
 .fsel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:var(--font);outline:none;cursor:pointer;}
@@ -2249,9 +2277,19 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   <!-- JOURNAL -->
   <div class="page" id="page-journal">
-    <div class="ph">
+    <div class="ph" style="margin-bottom:16px">
       <div><div class="pt">Trade Journal</div><div class="ps" id="journal-ps">Full history</div></div>
-      <button class="btn" id="journal-log-btn">+ Log Trade</button>
+      <div class="journal-actions">
+        <button class="journal-tool-btn" id="import-btn" title="Import trades">
+          <i class="bi bi-upload"></i>
+          <span>Import</span>
+        </button>
+        <button class="journal-tool-btn" id="export-btn" title="Export trades">
+          <i class="bi bi-download"></i>
+          <span>Export</span>
+        </button>
+        <button class="btn" id="journal-log-btn"><i class="bi bi-plus-lg" style="font-size:11px"></i> Log Trade</button>
+      </div>
     </div>
 
     <!-- Journal filter bar -->
@@ -6622,32 +6660,24 @@ $('rc-balance').placeholder = bal ? bal.toLocaleString() : '10000';
 // ── EXPORT MODULE ──────────────────────────────────────
 // ══════════════════════════════════════════════════════
 
-// Add export + import buttons to journal page header
+// Wire up export + import buttons (already in HTML)
 (function addExportBtn() {
-  const journalBtns = $('journal-log-btn')?.parentElement;
-  if (!journalBtns) return;
+  const exportBtn = document.getElementById('export-btn');
+  const importBtn = document.getElementById('import-btn');
 
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'btng bsm';
-  exportBtn.innerHTML = '⬇️ Export';
-  exportBtn.id = 'export-btn';
-  journalBtns.insertBefore(exportBtn, $('journal-log-btn'));
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      if (!trades.length) { alert('Belum ada trade untuk di-export.'); return; }
+      showExportModal();
+    });
+  }
 
-  exportBtn.addEventListener('click', () => {
-    if (!trades.length) { alert('Belum ada trade untuk di-export.'); return; }
-    showExportModal();
-  });
-
-  const importBtn = document.createElement('button');
-  importBtn.className = 'btng bsm';
-  importBtn.innerHTML = '⬆️ Import';
-  importBtn.id = 'import-btn';
-  journalBtns.insertBefore(importBtn, exportBtn);
-
-  importBtn.addEventListener('click', () => {
-    if (!currentUser || currentUser.isAnonymous) { openLoginScreen('general'); return; }
-    showImportModal();
-  });
+  if (importBtn) {
+    importBtn.addEventListener('click', () => {
+      if (!currentUser || currentUser.isAnonymous) { openLoginScreen('general'); return; }
+      showImportModal();
+    });
+  }
 })();
 
 function showExportModal() {
@@ -6659,22 +6689,114 @@ function showExportModal() {
   modal.id = 'md-export';
   modal.className = 'mo open';
   modal.innerHTML = `
-    <div class="md" style="max-width:360px;text-align:center">
-      <div style="font-size:36px;margin-bottom:12px">⬇️</div>
-      <div style="font-size:16px;font-weight:600;margin-bottom:6px">Export Journal</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">${trades.length} trade siap di-export</p>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <button class="btn" id="exp-csv" style="width:100%;padding:12px">📊 Export ke CSV (Excel)</button>
-        <button class="btng" id="exp-json" style="width:100%">📋 Export ke JSON</button>
-        <button class="btng" id="exp-close" style="width:100%">Batal</button>
+    <div class="md md-export-inner">
+      <!-- Header -->
+      <div class="exp-modal-header">
+        <div class="exp-modal-icon">
+          <i class="bi bi-download"></i>
+        </div>
+        <div>
+          <div class="exp-modal-title">Export Journal</div>
+          <div class="exp-modal-sub"><span id="exp-trade-count">${trades.length}</span> trade siap di-export</div>
+        </div>
       </div>
+
+      <!-- Format cards -->
+      <div class="exp-format-grid">
+        <button class="exp-format-card" id="exp-csv">
+          <div class="exp-format-icon exp-format-icon-green">
+            <i class="bi bi-filetype-csv"></i>
+          </div>
+          <div class="exp-format-label">CSV / Excel</div>
+          <div class="exp-format-desc">Buka di Excel, Google Sheets, atau Numbers</div>
+        </button>
+        <button class="exp-format-card" id="exp-json">
+          <div class="exp-format-icon exp-format-icon-purple">
+            <i class="bi bi-filetype-json"></i>
+          </div>
+          <div class="exp-format-label">JSON</div>
+          <div class="exp-format-desc">Backup lengkap, bisa di-import ulang</div>
+        </button>
+      </div>
+
+      <!-- Info strip -->
+      <div class="exp-info-strip">
+        <i class="bi bi-shield-check" style="color:var(--green);font-size:13px;flex-shrink:0"></i>
+        <span>File diunduh langsung ke device kamu. Tidak ada data yang dikirim ke server.</span>
+      </div>
+
+      <!-- Cancel -->
+      <button class="exp-cancel-btn" id="exp-close">
+        <i class="bi bi-x"></i> Batal
+      </button>
     </div>`;
   document.body.appendChild(modal);
 
+  // Inject CSS once
+  if (!document.getElementById('exp-modal-css')) {
+    const s = document.createElement('style');
+    s.id = 'exp-modal-css';
+    s.textContent = `
+      .md-export-inner { max-width:380px; text-align:left; padding:28px; }
+      .exp-modal-header { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+      .exp-modal-icon {
+        width:44px; height:44px; border-radius:12px; flex-shrink:0;
+        background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.1));
+        border:1px solid rgba(139,92,246,.3);
+        display:flex; align-items:center; justify-content:center;
+        font-size:20px; color:var(--accent2);
+        box-shadow:0 0 18px rgba(139,92,246,.15);
+      }
+      .exp-modal-title { font-size:17px; font-weight:700; letter-spacing:-.3px; color:var(--text); font-family:var(--font); }
+      .exp-modal-sub { font-size:12px; color:var(--text2); margin-top:3px; font-family:var(--mono); }
+      .exp-format-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+      .exp-format-card {
+        display:flex; flex-direction:column; align-items:flex-start;
+        padding:16px 14px; border-radius:13px;
+        background:rgba(255,255,255,.03);
+        border:1px solid rgba(255,255,255,.07);
+        cursor:pointer; text-align:left;
+        transition:all .22s cubic-bezier(.4,0,.2,1);
+        font-family:var(--font);
+      }
+      .exp-format-card:hover {
+        background:rgba(139,92,246,.08);
+        border-color:rgba(139,92,246,.3);
+        transform:translateY(-2px);
+        box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 0 1px rgba(139,92,246,.15);
+      }
+      .exp-format-icon {
+        width:36px; height:36px; border-radius:9px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:18px; margin-bottom:10px;
+      }
+      .exp-format-icon-green { background:rgba(34,197,94,.12); color:#22c55e; border:1px solid rgba(34,197,94,.2); }
+      .exp-format-icon-purple { background:rgba(139,92,246,.15); color:var(--accent2); border:1px solid rgba(139,92,246,.25); }
+      .exp-format-label { font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; letter-spacing:-.1px; }
+      .exp-format-desc { font-size:10px; color:var(--text3); line-height:1.5; }
+      .exp-info-strip {
+        display:flex; align-items:center; gap:8px;
+        padding:10px 13px; border-radius:9px;
+        background:rgba(34,197,94,.05); border:1px solid rgba(34,197,94,.12);
+        font-size:11px; color:var(--text3); line-height:1.5;
+        margin-bottom:16px;
+      }
+      .exp-cancel-btn {
+        width:100%; padding:10px; border-radius:10px;
+        background:transparent; border:1px solid rgba(255,255,255,.07);
+        color:var(--text3); font-size:12px; font-weight:600;
+        font-family:var(--font); cursor:pointer;
+        transition:all .15s; display:flex; align-items:center; justify-content:center; gap:6px;
+      }
+      .exp-cancel-btn:hover { color:var(--text2); border-color:var(--border2); background:rgba(255,255,255,.04); }
+    `;
+    document.head.appendChild(s);
+  }
+
   modal.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
-  $('exp-close').addEventListener('click', () => modal.classList.remove('open'));
-  $('exp-csv').addEventListener('click', () => { exportCSV(); modal.classList.remove('open'); });
-  $('exp-json').addEventListener('click', () => { exportJSON(); modal.classList.remove('open'); });
+  document.getElementById('exp-close').addEventListener('click', () => modal.classList.remove('open'));
+  document.getElementById('exp-csv').addEventListener('click', () => { exportCSV(); modal.classList.remove('open'); });
+  document.getElementById('exp-json').addEventListener('click', () => { exportJSON(); modal.classList.remove('open'); });
 }
 
 function exportCSV() {
@@ -7874,15 +7996,21 @@ function showImportModal() {
   modal.innerHTML = `
   <div class="md" style="max-width:520px;text-align:left">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div style="font-size:17px;font-weight:700;font-family:var(--font);letter-spacing:-.3px">⬆️ Import Trade</div>
-      <button id="imp-close-x" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;line-height:1;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.28);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--accent2);flex-shrink:0;box-shadow:0 0 14px rgba(139,92,246,.12)"><i class="bi bi-upload"></i></div>
+        <div>
+          <div style="font-size:16px;font-weight:700;font-family:var(--font);letter-spacing:-.3px;color:var(--text)">Import Trade</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px;font-family:var(--mono)">Dari broker atau CSV file</div>
+        </div>
+      </div>
+      <button id="imp-close-x" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:var(--text3);font-size:14px;cursor:pointer;line-height:1;transition:all .15s;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center" onmouseover="this.style.color='var(--text)';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.color='var(--text3)';this.style.background='rgba(255,255,255,.04)'"><i class="bi bi-x-lg" style="font-size:12px"></i></button>
     </div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.6">Import otomatis dari broker atau exchange favoritmu. Data akan langsung masuk ke journal.</p>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.6;padding-left:48px">Import otomatis dari broker atau exchange favoritmu. Data akan langsung masuk ke journal.</p>
 
     <!-- Tabs -->
     <div class="imp-tabs">
-      <button class="imp-tab active" data-tab="csv">📄 Upload CSV</button>
-      <button class="imp-tab" data-tab="api">🔌 API Connect</button>
+      <button class="imp-tab active" data-tab="csv"><i class="bi bi-filetype-csv" style="margin-right:5px"></i>Upload CSV</button>
+      <button class="imp-tab" data-tab="api"><i class="bi bi-plug" style="margin-right:5px"></i>API Connect</button>
     </div>
 
     <!-- CSV PANEL -->
@@ -7893,27 +8021,27 @@ function showImportModal() {
         <div class="imp-label">Pilih Broker / Exchange</div>
         <div class="imp-broker-grid">
           <div class="imp-broker-card selected" data-broker="auto">
-            <div class="ibc-name">🤖 Auto-Detect</div>
+            <div class="ibc-name"><i class="bi bi-cpu" style="color:var(--accent2);margin-right:5px"></i>Auto-Detect</div>
             <div class="ibc-desc">Deteksi format otomatis</div>
           </div>
           <div class="imp-broker-card" data-broker="bybit">
-            <div class="ibc-name">🟡 Bybit</div>
+            <div class="ibc-name"><i class="bi bi-currency-bitcoin" style="color:#f59e0b;margin-right:5px"></i>Bybit</div>
             <div class="ibc-desc">Trade History CSV</div>
           </div>
           <div class="imp-broker-card" data-broker="binance">
-            <div class="ibc-name">🟠 Binance</div>
+            <div class="ibc-name"><i class="bi bi-currency-bitcoin" style="color:#f97316;margin-right:5px"></i>Binance</div>
             <div class="ibc-desc">Trade History CSV</div>
           </div>
           <div class="imp-broker-card" data-broker="exness">
-            <div class="ibc-name">🔵 Exness</div>
+            <div class="ibc-name"><i class="bi bi-globe2" style="color:#3b82f6;margin-right:5px"></i>Exness</div>
             <div class="ibc-desc">Statement CSV</div>
           </div>
           <div class="imp-broker-card" data-broker="mt4">
-            <div class="ibc-name">📊 MT4/MT5</div>
+            <div class="ibc-name"><i class="bi bi-bar-chart-line" style="color:var(--accent2);margin-right:5px"></i>MT4/MT5</div>
             <div class="ibc-desc">FTMO, MyFxBook, dll</div>
           </div>
           <div class="imp-broker-card" data-broker="universal">
-            <div class="ibc-name">📋 Universal</div>
+            <div class="ibc-name"><i class="bi bi-filetype-csv" style="color:var(--green);margin-right:5px"></i>Universal</div>
             <div class="ibc-desc">Format CSV apapun</div>
           </div>
         </div>
@@ -7921,7 +8049,7 @@ function showImportModal() {
 
       <!-- Drop zone -->
       <div class="imp-drop-zone" id="imp-drop-zone">
-        <div class="idz-icon">📂</div>
+        <div class="idz-icon"><i class="bi bi-folder2-open" style="color:var(--text3)"></i></div>
         <div class="idz-title">Drop file CSV di sini</div>
         <div class="idz-sub">atau klik untuk pilih file · .csv, .txt</div>
         <input type="file" id="imp-file-input" accept=".csv,.txt" style="display:none">
@@ -7943,7 +8071,7 @@ function showImportModal() {
           <button id="imp-clear-btn" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer">Batal</button>
         </div>
         <div class="imp-preview" id="imp-preview-list"></div>
-        <button class="btn" id="imp-save-csv-btn" style="width:100%;padding:12px;font-size:14px">💾 Simpan ke Journal</button>
+        <button class="btn" id="imp-save-csv-btn" style="width:100%;padding:12px;font-size:14px"><i class="bi bi-floppy" style="margin-right:6px"></i>Simpan ke Journal</button>
       </div>
     </div>
 
@@ -7953,11 +8081,11 @@ function showImportModal() {
         <div class="imp-label">Pilih Exchange</div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
           <button class="imp-broker-card selected" data-api="bybit" style="flex:1">
-            <div class="ibc-name">🟡 Bybit</div>
+            <div class="ibc-name"><i class="bi bi-currency-bitcoin" style="color:#f59e0b;margin-right:5px"></i>Bybit</div>
             <div class="ibc-desc">Futures & Spot</div>
           </button>
           <button class="imp-broker-card" data-api="binance" style="flex:1">
-            <div class="ibc-name">🟠 Binance</div>
+            <div class="ibc-name"><i class="bi bi-currency-bitcoin" style="color:#f97316;margin-right:5px"></i>Binance</div>
             <div class="ibc-desc">Futures (USDT-M)</div>
           </button>
         </div>
@@ -7981,8 +8109,8 @@ function showImportModal() {
         </select>
       </div>
 
-      <div class="imp-note" style="margin-bottom:14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:10px 12px">
-        <strong style="color:var(--accent2)">🔒 Keamanan API:</strong> API Key hanya diproses di browser kamu secara langsung — tidak disimpan ke server manapun. Selalu gunakan Read-Only key.
+      <div class="imp-note" style="margin-bottom:14px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.18);border-radius:9px;padding:10px 12px">
+        <strong style="color:var(--accent2)"><i class="bi bi-shield-lock" style="margin-right:4px"></i>Keamanan API:</strong> API Key hanya diproses di browser kamu secara langsung — tidak disimpan ke server manapun. Selalu gunakan Read-Only key.
       </div>
 
       <div class="imp-status" id="imp-api-status"></div>
@@ -7993,10 +8121,10 @@ function showImportModal() {
           <button id="imp-api-clear-btn" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer">Batal</button>
         </div>
         <div class="imp-preview" id="imp-api-preview-list"></div>
-        <button class="btn" id="imp-save-api-btn" style="width:100%;padding:12px;font-size:14px">💾 Simpan ke Journal</button>
+        <button class="btn" id="imp-save-api-btn" style="width:100%;padding:12px;font-size:14px"><i class="bi bi-floppy" style="margin-right:6px"></i>Simpan ke Journal</button>
       </div>
 
-      <button class="btn" id="imp-api-fetch-btn" style="width:100%;padding:12px;font-size:14px">🔌 Fetch Trade History</button>
+      <button class="btn" id="imp-api-fetch-btn" style="width:100%;padding:12px;font-size:14px"><i class="bi bi-arrow-repeat" style="margin-right:6px"></i>Fetch Trade History</button>
     </div>
 
     <!-- Progress bar (shared) -->
