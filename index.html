@@ -548,9 +548,6 @@ select.fi option{background:var(--bg3);}
 .calc.win{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.3);color:#00d97e;}
 .calc.loss{background:rgba(255,77,77,.13);border-color:rgba(255,77,77,.25);color:#ff4d4d;}
 .calc.empty{background:transparent;border-color:transparent;pointer-events:none;}
-.calc.today{box-shadow:0 0 0 2px var(--accent),inset 0 0 0 1px rgba(139,92,246,.3);border-color:var(--accent)!important;position:relative;}
-.calc.today::after{content:'';position:absolute;top:3px;right:3px;width:4px;height:4px;border-radius:50%;background:var(--accent);}
-.calc:hover:not(.empty){filter:brightness(1.12);cursor:pointer;}
 .calc-pnl{
   /* Use vw so font scales with screen width automatically */
   font-size:clamp(8px,2.2vw,13px);
@@ -2998,147 +2995,61 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   <!-- CALENDAR -->
   <div class="page" id="page-calendar">
-
-    <!-- Page Header -->
-    <div class="ph" style="margin-bottom:14px">
-      <div>
-        <div class="pt" style="display:flex;align-items:center;gap:8px">
-          <i class="bi bi-calendar3" style="color:var(--accent);font-size:17px"></i>
-          Trading Calendar
-        </div>
-        <div class="ps" id="cal-month-title">Daily P&amp;L heatmap</div>
-      </div>
-      <div style="display:flex;gap:7px;align-items:center">
-        <button class="btng bsm" id="cal-prev" style="display:flex;align-items:center;gap:4px;padding:7px 12px">
-          <i class="bi bi-chevron-left" style="font-size:11px"></i>
-        </button>
-        <button class="btng bsm" id="cal-today-btn" style="font-size:11px;padding:7px 12px;font-weight:600">Hari ini</button>
-        <button class="btng bsm" id="cal-next" style="display:flex;align-items:center;gap:4px;padding:7px 12px">
-          <i class="bi bi-chevron-right" style="font-size:11px"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Month Pill Selector -->
-    <div style="margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none" id="cal-month-pills-wrap">
-      <div style="display:flex;gap:5px;padding-bottom:2px;min-width:max-content" id="cal-month-pills">
-        <!-- Rendered by JS -->
-      </div>
+    <div class="ph">
+      <div><div class="pt">Trading Calendar</div><div class="ps">Daily P&amp;L heatmap</div></div>
+      <div style="display:flex;gap:8px"><button class="btng bsm" id="cal-prev">‹ Prev</button><button class="btng bsm" id="cal-next">Next ›</button></div>
     </div>
 
     <!-- Monthly Summary Stats -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px" id="cal-stats-row">
-      <div class="sc" style="padding:12px 14px">
-        <div class="sl" style="display:flex;align-items:center;gap:5px"><i class="bi bi-graph-up-arrow" style="color:#00d97e;font-size:10px"></i>Monthly P&amp;L</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))" id="cal-stats-row">
+      <div class="sc">
+        <div class="sl">Monthly P&amp;L</div>
         <div class="sv" id="cal-pnl">—</div>
         <div class="sch" id="cal-pnl-sub">bulan ini</div>
       </div>
-      <div class="sc" style="padding:12px 14px">
-        <div class="sl" style="display:flex;align-items:center;gap:5px"><i class="bi bi-bullseye" style="color:#a78bfa;font-size:10px"></i>Win Rate</div>
+      <div class="sc">
+        <div class="sl">Win Rate</div>
         <div class="sv" id="cal-wr">—</div>
         <div class="sch" id="cal-wr-sub">dari total trade</div>
       </div>
-      <div class="sc" style="padding:12px 14px">
-        <div class="sl" style="display:flex;align-items:center;gap:5px"><i class="bi bi-activity" style="color:#38bdf8;font-size:10px"></i>Trades</div>
+      <div class="sc">
+        <div class="sl">Trades Bulan Ini</div>
         <div class="sv" id="cal-trades">0</div>
-        <div class="sch" style="display:flex;gap:5px">
+        <div class="sch" id="cal-trades-sub" style="display:flex;gap:6px">
           <span class="pos" id="cal-wins">0W</span>
           <span class="neg" id="cal-losses">0L</span>
         </div>
       </div>
-      <div class="sc" style="padding:12px 14px">
-        <div class="sl" style="display:flex;align-items:center;gap:5px"><i class="bi bi-bar-chart-fill" style="color:#f59e0b;font-size:10px"></i>Avg / Trade</div>
+      <div class="sc">
+        <div class="sl">Avg P&amp;L / Trade</div>
         <div class="sv" id="cal-avg">—</div>
         <div class="sch neu">per trade bulan ini</div>
       </div>
     </div>
 
-    <!-- Main layout: Calendar + Weekly Sidebar -->
-    <div style="display:grid;grid-template-columns:1fr 220px;gap:12px;align-items:start" id="cal-main-layout">
-
-      <!-- Left: Calendar card -->
-      <div class="cc" style="margin-bottom:0">
-        <div class="ch" style="margin-bottom:10px">
-          <div class="ct" id="callbl" style="font-size:13px"></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div style="display:flex;gap:6px;font-size:10px;color:var(--text3);align-items:center">
-              <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(0,217,126,.22);border:1px solid rgba(0,217,126,.3);display:inline-block"></span>Profit</span>
-              <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(255,77,77,.18);border:1px solid rgba(255,77,77,.28);display:inline-block"></span>Loss</span>
-              <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:inline-block"></span>Flat</span>
-            </div>
-          </div>
-        </div>
-
-        <div id="calcon"></div>
-
-        <!-- Win rate bar -->
-        <div id="cal-wr-bar-wrap" style="margin-top:14px;display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-            <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:4px">
-              <i class="bi bi-trophy" style="font-size:10px;color:var(--text3)"></i> Win Rate Progress
-            </span>
-            <span style="font-size:11px;font-family:var(--mono);color:var(--text2)" id="cal-wr-pct-lbl">0%</span>
-          </div>
-          <div style="height:5px;background:var(--bg4);border-radius:3px;overflow:hidden">
-            <div id="cal-wr-bar" style="height:100%;border-radius:3px;transition:width .6s ease;background:var(--green);width:0%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--text3);font-family:var(--mono)">
-            <span>0%</span><span style="color:var(--text2)">Target 50%</span><span>100%</span>
-          </div>
+    <div class="cc">
+      <div class="ch">
+        <div class="ct" id="callbl"></div>
+        <div style="display:flex;gap:10px;font-size:11px;color:var(--text3)">
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(0,217,126,.2);margin-right:4px"></span>Green</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:rgba(255,77,77,.15);margin-right:4px"></span>Red</span>
         </div>
       </div>
-
-      <!-- Right: Weekly P&L Sidebar -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-
-        <!-- Best / Worst Day -->
-        <div class="cc" style="margin-bottom:0;padding:14px">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px">
-            <i class="bi bi-stars" style="font-size:10px;color:var(--accent)"></i> Hari Terbaik
-          </div>
-          <div id="cal-best-day" style="font-size:18px;font-weight:800;font-family:var(--mono);color:#00d97e;line-height:1;margin-bottom:3px">—</div>
-          <div id="cal-best-day-label" style="font-size:10px;color:var(--text3);font-family:var(--mono)">belum ada trade</div>
-          <div style="height:1px;background:var(--border);margin:10px 0"></div>
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px">
-            <i class="bi bi-exclamation-triangle" style="font-size:10px;color:#ff4d4d"></i> Hari Terburuk
-          </div>
-          <div id="cal-worst-day" style="font-size:18px;font-weight:800;font-family:var(--mono);color:#ff4d4d;line-height:1;margin-bottom:3px">—</div>
-          <div id="cal-worst-day-label" style="font-size:10px;color:var(--text3);font-family:var(--mono)">belum ada trade</div>
+      <div id="calcon"></div>
+      <!-- Win rate progress bar -->
+      <div id="cal-wr-bar-wrap" style="margin-top:16px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Win Rate Progress</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--text2)" id="cal-wr-pct-lbl">0%</span>
         </div>
-
-        <!-- Weekly P&L breakdown -->
-        <div class="cc" style="margin-bottom:0;padding:14px">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px">
-            <i class="bi bi-calendar-week" style="font-size:10px;color:var(--accent)"></i> P&amp;L per Minggu
-          </div>
-          <div id="cal-weekly-list" style="display:flex;flex-direction:column;gap:7px">
-            <!-- Rendered by JS -->
-          </div>
+        <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden">
+          <div id="cal-wr-bar" style="height:100%;border-radius:3px;transition:width .6s ease;background:var(--green);width:0%"></div>
         </div>
-
-        <!-- Day-of-week win rate -->
-        <div class="cc" style="margin-bottom:0;padding:14px">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px">
-            <i class="bi bi-bar-chart-steps" style="font-size:10px;color:var(--accent)"></i> Win Rate per Hari
-          </div>
-          <div id="cal-dow-list" style="display:flex;flex-direction:column;gap:5px">
-            <!-- Rendered by JS -->
-          </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text3);font-family:var(--mono)">
+          <span>0%</span><span style="color:var(--text2)">Target 50%</span><span>100%</span>
         </div>
-
-      </div><!-- /sidebar -->
-    </div><!-- /main layout -->
-
-    <!-- Mobile: sidebar stacks below -->
-    <style>
-      @media(max-width:700px){
-        #cal-main-layout{grid-template-columns:1fr!important;}
-      }
-      @media(max-width:480px){
-        #cal-month-pills-wrap::-webkit-scrollbar{display:none;}
-      }
-    </style>
-
+      </div>
+    </div>
   </div>
 
   <!-- PROPFIRM -->
@@ -6700,72 +6611,21 @@ function renderDeepAna(ft) {
 }
 
 // ── CALENDAR ──────────────────────────────────────────
-// ── CALENDAR ──────────────────────────────────────────
-// Month names
-const CAL_MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-const CAL_MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-
-// Build month pills for current year + 1 year back
-function renderCalMonthPills() {
-  const now = new Date();
-  const curYr = now.getFullYear();
-  const curMo = now.getMonth(); // 0-based
-  const pills = document.getElementById('cal-month-pills');
-  if (!pills) return;
-
-  // Show 18 months: 12 months back + current + 5 forward
-  let html = '';
-  for (let delta = -12; delta <= 5; delta++) {
-    let mo = curMo + delta;
-    let yr = curYr;
-    while (mo < 0)  { mo += 12; yr--; }
-    while (mo > 11) { mo -= 12; yr++; }
-    const isActive = (curYr + calOff === yr && (curMo + calOff + 120) % 12 === mo);
-    // calculate calOff for this pill
-    const pillOff = (yr - curYr) * 12 + (mo - curMo);
-    html += `<button class="cal-mpill${pillOff === calOff ? ' active' : ''}"
-      data-off="${pillOff}"
-      onclick="setCalOff(${pillOff})"
-      style="padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;font-family:var(--font);transition:all .18s;border:1px solid ${pillOff===calOff?'rgba(139,92,246,.5)':'var(--border)'};background:${pillOff===calOff?'rgba(139,92,246,.15)':'var(--bg3)'};color:${pillOff===calOff?'var(--accent2)':'var(--text2)'}">
-      ${CAL_MONTHS[mo]}${yr !== curYr ? ' '+yr : ''}
-    </button>`;
-  }
-  pills.innerHTML = html;
-
-  // Scroll active pill into view
-  setTimeout(() => {
-    const active = pills.querySelector('.cal-mpill.active');
-    if (active) active.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-  }, 50);
-}
-
-window.setCalOff = function(off) {
-  calOff = off;
-  renderCal();
-};
-
 function renderCal(){
   const now=new Date(), d=new Date(now.getFullYear(), now.getMonth()+calOff, 1);
   const yr=d.getFullYear(), mo=d.getMonth();
   const monthStr=`${yr}-${String(mo+1).padStart(2,'0')}`;
 
-  // Update labels
-  const titleEl = $('cal-month-title');
-  if (titleEl) titleEl.textContent = CAL_MONTHS_FULL[mo] + ' ' + yr;
-  $('callbl').textContent = CAL_MONTHS_FULL[mo] + ' ' + yr;
-
-  // Refresh month pills
-  renderCalMonthPills();
+  $('callbl').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 
   // Build daily P&L map
   const dm={};
-  trades.forEach(t=>{ if(!dm[t.date]) dm[t.date]=0; dm[t.date]+=t.pnl; });
+  trades.forEach(t=>{if(!dm[t.date])dm[t.date]=0; dm[t.date]+=t.pnl;});
 
   // ── Monthly stats ──────────────────────────────────
   const monthTrades = trades.filter(t => t.date && t.date.startsWith(monthStr));
   const wins   = monthTrades.filter(t => t.result==='Win').length;
   const losses = monthTrades.filter(t => t.result==='Loss').length;
-  const bes    = monthTrades.filter(t => t.result==='Breakeven').length;
   const total  = monthTrades.length;
   const monthPnl = monthTrades.reduce((s,t) => s+t.pnl, 0);
   const wr = total > 0 ? (wins/total*100) : null;
@@ -6776,13 +6636,10 @@ function renderCal(){
     ? (monthPnl>=0?'+$':'-$') + f2(Math.abs(monthPnl))
     : '—';
   $('cal-pnl').className = 'sv ' + (monthPnl>0?'pos':monthPnl<0?'neg':'');
-  $('cal-pnl-sub').textContent = total > 0
-    ? (monthPnl>=0?'profit bulan ini':'loss bulan ini')
-    : 'bulan ini';
 
   $('cal-wr').textContent = wr !== null ? wr.toFixed(1)+'%' : '—';
   $('cal-wr').className   = 'sv ' + (wr>=50?'pos':wr!==null?'neg':'');
-  $('cal-wr-sub').textContent = total>0 ? `${wins}W / ${losses}L${bes?' / '+bes+'BE':''}` : 'belum ada trade';
+  $('cal-wr-sub').textContent = total>0 ? `${wins} win dari ${total} trade` : 'belum ada trade';
 
   $('cal-trades').textContent = total;
   $('cal-wins').textContent   = wins+'W';
@@ -6793,7 +6650,7 @@ function renderCal(){
     : '—';
   $('cal-avg').className = 'sv ' + (avgPnl>0?'pos':avgPnl<0?'neg':'');
 
-  // Win rate bar
+  // Win rate progress bar
   const barWrap = $('cal-wr-bar-wrap');
   if (total > 0) {
     barWrap.style.display = 'block';
@@ -6806,20 +6663,21 @@ function renderCal(){
   }
 
   // ── Build calendar grid ─────────────────────────────
-  const labels=['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(x=>`<div class="caldl">${x}</div>`).join('');
+  // Day labels row (separate from date grid so they don't affect row height)
+  const labels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="caldl">${x}</div>`).join('');
+
+  // Date cells — each cell wrapped in .calc-wrap (padding-bottom:100%)
+  // so the cell is always square regardless of content
   let cells='';
   const first=new Date(yr,mo,1).getDay();
   for(let i=0;i<first;i++){
     cells+=`<div class="calc-wrap"><div class="calc empty"></div></div>`;
   }
   const dim=new Date(yr,mo+1,0).getDate();
-  const todayStr = new Date().toISOString().slice(0,10);
-
   for(let day=1;day<=dim;day++){
     const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const pnl=dm[ds];
-    const isToday = ds === todayStr;
-    let cls='', inner='', todayCls = isToday ? ' today' : '';
+    let cls='', inner='';
     if(pnl!==undefined){
       cls=pnl>=0?'win':'loss';
       const absVal=Math.abs(pnl);
@@ -6832,165 +6690,11 @@ function renderCal(){
     } else {
       inner=`<span class="dn">${day}</span>`;
     }
-    cells+=`<div class="calc-wrap"><div class="calc ${cls}${todayCls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div></div>`;
+    cells+=`<div class="calc-wrap"><div class="calc ${cls}" title="${ds}${pnl!==undefined?': '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2):''}">${inner}</div></div>`;
   }
 
   $('calcon').innerHTML=`<div class="cal-labels">${labels}</div><div class="calg">${cells}</div>`;
-
-  // ── Weekly P&L Sidebar ──────────────────────────────
-  _renderWeeklySidebar(yr, mo, monthTrades, dm, dim, first);
-  _renderDayOfWeekStats(monthTrades);
-  _renderBestWorstDay(monthStr, dm, monthTrades);
 }
-
-function _renderBestWorstDay(monthStr, dm, monthTrades) {
-  // Find best & worst trading day from daily P&L map
-  let bestPnl = null, worstPnl = null, bestDs = '', worstDs = '';
-  Object.entries(dm).forEach(([ds, pnl]) => {
-    if (!ds.startsWith(monthStr)) return;
-    if (bestPnl === null || pnl > bestPnl) { bestPnl = pnl; bestDs = ds; }
-    if (worstPnl === null || pnl < worstPnl) { worstPnl = pnl; worstDs = ds; }
-  });
-
-  const fmtDs = ds => {
-    if (!ds) return '—';
-    const d = new Date(ds+'T12:00:00');
-    return d.toLocaleDateString('id-ID', { day:'numeric', month:'short' });
-  };
-
-  const bd = $('cal-best-day');
-  const bdl = $('cal-best-day-label');
-  const wd = $('cal-worst-day');
-  const wdl = $('cal-worst-day-label');
-
-  if (bestPnl !== null) {
-    bd.textContent = (bestPnl>=0?'+$':'-$') + f2(Math.abs(bestPnl));
-    bd.style.color = bestPnl>=0 ? '#00d97e' : '#ff4d4d';
-    bdl.textContent = fmtDs(bestDs);
-  } else {
-    bd.textContent = '—'; bdl.textContent = 'belum ada trade';
-  }
-  if (worstPnl !== null && worstDs !== bestDs) {
-    wd.textContent = (worstPnl>=0?'+$':'-$') + f2(Math.abs(worstPnl));
-    wd.style.color = worstPnl < 0 ? '#ff4d4d' : '#00d97e';
-    wdl.textContent = fmtDs(worstDs);
-  } else if (worstPnl !== null) {
-    wd.textContent = '—'; wdl.textContent = 'hanya 1 hari trading';
-  } else {
-    wd.textContent = '—'; wdl.textContent = 'belum ada trade';
-  }
-}
-
-function _renderWeeklySidebar(yr, mo, monthTrades, dm, dim, firstDay) {
-  const container = $('cal-weekly-list');
-  if (!container) return;
-
-  // Group days into weeks (Sun-based)
-  const weeks = [];
-  let week = { days:[], pnl:0, wins:0, losses:0, tradingDays:0 };
-
-  // pad empty days at start
-  for (let i=0; i<firstDay; i++) week.days.push(null);
-
-  for (let day=1; day<=dim; day++) {
-    const ds = `${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    week.days.push(day);
-    if (dm[ds] !== undefined) {
-      week.pnl += dm[ds];
-      week.tradingDays++;
-      if (dm[ds] > 0) week.wins++;
-      else if (dm[ds] < 0) week.losses++;
-    }
-    if (week.days.length === 7) {
-      weeks.push(week);
-      week = { days:[], pnl:0, wins:0, losses:0, tradingDays:0 };
-    }
-  }
-  if (week.days.length > 0) weeks.push(week);
-
-  if (weeks.every(w => w.tradingDays === 0)) {
-    container.innerHTML = `<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Belum ada trade bulan ini</div>`;
-    return;
-  }
-
-  container.innerHTML = weeks.map((w, i) => {
-    const startDay = w.days.find(d=>d!==null);
-    const endDay   = [...w.days].reverse().find(d=>d!==null);
-    if (!startDay) return '';
-    const rangeLabel = `${startDay}–${endDay} ${CAL_MONTHS[mo]}`;
-    const pnlColor = w.pnl > 0 ? '#00d97e' : w.pnl < 0 ? '#ff4d4d' : 'var(--text3)';
-    const pnlStr = w.tradingDays === 0 ? 'No trades'
-      : (w.pnl>=0?'+$':'-$') + f2(Math.abs(w.pnl));
-    const bgColor = w.pnl > 0 ? 'rgba(0,217,126,.06)' : w.pnl < 0 ? 'rgba(255,77,77,.06)' : 'rgba(255,255,255,.02)';
-    const borderColor = w.pnl > 0 ? 'rgba(0,217,126,.18)' : w.pnl < 0 ? 'rgba(255,77,77,.15)' : 'var(--border)';
-
-    return `<div style="background:${bgColor};border:1px solid ${borderColor};border-radius:9px;padding:8px 10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">Minggu ${i+1}</span>
-        <span style="font-size:12px;font-weight:800;font-family:var(--mono);color:${pnlColor}">${pnlStr}</span>
-      </div>
-      <div style="font-size:9px;color:var(--text3)">${rangeLabel}</div>
-      ${w.tradingDays > 0 ? `<div style="display:flex;gap:6px;margin-top:4px">
-        <span style="font-size:9px;color:#00d97e;font-family:var(--mono)">${w.wins}W</span>
-        <span style="font-size:9px;color:#ff4d4d;font-family:var(--mono)">${w.losses}L</span>
-        <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">${w.tradingDays} hari</span>
-      </div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function _renderDayOfWeekStats(monthTrades) {
-  const container = $('cal-dow-list');
-  if (!container) return;
-
-  const DOW = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
-  const stats = DOW.map(() => ({ wins:0, losses:0, pnl:0, n:0 }));
-
-  monthTrades.forEach(t => {
-    if (!t.date) return;
-    const dow = new Date(t.date+'T12:00:00').getDay();
-    stats[dow].n++;
-    stats[dow].pnl += t.pnl;
-    if (t.result==='Win') stats[dow].wins++;
-    else if (t.result==='Loss') stats[dow].losses++;
-  });
-
-  // Skip weekends if no data
-  const tradingDays = [1,2,3,4,5]; // Mon-Fri
-  const anyData = tradingDays.some(i => stats[i].n > 0);
-
-  if (!anyData) {
-    container.innerHTML = `<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0">Belum ada trade</div>`;
-    return;
-  }
-
-  const maxPnl = Math.max(...tradingDays.map(i => Math.abs(stats[i].pnl)), 1);
-
-  container.innerHTML = tradingDays.map(i => {
-    const s = stats[i];
-    const wr = s.n > 0 ? (s.wins/s.n*100).toFixed(0) : null;
-    const barW = Math.min(Math.round(Math.abs(s.pnl)/maxPnl*100), 100);
-    const barColor = s.pnl > 0 ? '#00d97e' : s.pnl < 0 ? '#ff4d4d' : 'var(--text3)';
-    const pnlStr = s.n === 0 ? '—' : (s.pnl>=0?'+$':'-$')+f2(Math.abs(s.pnl));
-    return `<div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-        <span style="font-size:10px;color:var(--text2);font-weight:600;width:28px">${DOW[i]}</span>
-        <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;margin:0 7px;overflow:hidden">
-          <div style="height:100%;width:${barW}%;background:${barColor};border-radius:2px;transition:width .5s ease"></div>
-        </div>
-        <span style="font-size:9px;font-family:var(--mono);color:${s.pnl>0?'#00d97e':s.pnl<0?'#ff4d4d':'var(--text3)'};min-width:52px;text-align:right">${pnlStr}</span>
-      </div>
-      ${s.n > 0 ? `<div style="display:flex;gap:5px;padding-left:28px;margin-bottom:1px">
-        <span style="font-size:8px;color:var(--text3);font-family:var(--mono)">${s.n} trade</span>
-        ${wr !== null ? `<span style="font-size:8px;color:${parseInt(wr)>=50?'#00d97e':'#ff4d4d'};font-family:var(--mono)">${wr}% WR</span>` : ''}
-      </div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-// Today button
-const calTodayBtn = $('cal-today-btn');
-if (calTodayBtn) calTodayBtn.addEventListener('click', () => { calOff=0; renderCal(); });
 
 // ── FTMO ──────────────────────────────────────────────
 function renderFtmo(){
