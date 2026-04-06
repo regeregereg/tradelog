@@ -2327,9 +2327,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="dash-layout">
     <div class="dash-main-col">
 
-    <!-- Trader Identity Card (shown when logged in) -->
+    <!-- Trader Identity Card (shown when logged in) — includes Starting Balance -->
     <div id="trader-card" style="display:none;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(124,58,237,.06));border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(167,139,250,.08),transparent 60%);pointer-events:none"></div>
+      <!-- Row 1: Avatar + Name + Share -->
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative">
         <!-- Avatar -->
         <div id="tc-avatar" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(167,139,250,.3);box-shadow:0 0 20px rgba(139,92,246,.3)"></div>
@@ -2346,6 +2347,16 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <i class="bi bi-share-fill" style="font-size:12px"></i> Share Stats
         </button>
       </div>
+      <!-- Divider -->
+      <div style="height:1px;background:linear-gradient(90deg,rgba(139,92,246,.25),rgba(139,92,246,.06),transparent);margin:14px 0 12px;position:relative"></div>
+      <!-- Row 2: Starting Balance (merged) -->
+      <div id="bbal-wrap" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative">
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px;">Starting Balance</div>
+          <div style="font-size:12px;color:var(--text2)">Modal awal akun trading kamu</div>
+        </div>
+        <div class="bval" id="bal-banner-btn">$<span id="bdisp">—</span><span class="bedit">✎ ubah</span></div>
+      </div>
     </div>
 
     <!-- Guest banner -->
@@ -2356,14 +2367,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="font-size:12px;color:var(--text2)">Kamu sedang melihat sebagai guest. Login untuk mulai mencatat trade dan menyimpan journal kamu.</div>
       </div>
       <button id="guest-banner-login" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.2px">Masuk Sekarang</button>
-    </div>
-
-    <!-- Balance banner -->
-    <div class="bbal" id="bbal-wrap">
-      <div><h3 style="font-size:13px;font-weight:700;margin-bottom:3px;letter-spacing:-.2px">Starting Balance</h3><p style="font-size:12px;color:var(--text2)">Modal awal akun trading kamu</p></div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div class="bval" id="bal-banner-btn">$<span id="bdisp">—</span><span class="bedit">✎ ubah</span></div>
-      </div>
     </div>
 
     <!-- Period Filter Tabs -->
@@ -5263,7 +5266,7 @@ function setAuthUI(loggedIn) {
   $('signout-btn').style.display       = loggedIn ? 'block'        : 'none';
   $('sync-dot').style.display          = loggedIn ? 'inline-block' : 'none';
   $('guest-banner').style.display      = loggedIn ? 'none'         : 'flex';
-  $('bbal-wrap').style.display         = loggedIn ? 'flex'         : 'none';
+  // bbal-wrap now lives inside trader-card — visibility controlled by parent
   $('dash-log-btn').style.opacity      = loggedIn ? '1'            : '0.45';
   $('dash-log-btn').title              = loggedIn ? ''             : 'Login untuk mencatat trade';
   $('trader-card').style.display       = loggedIn ? 'block'        : 'none';
