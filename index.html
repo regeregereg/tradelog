@@ -933,6 +933,18 @@ select.fi option{background:var(--bg3);}
     bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px) !important;
     right: 12px !important;
   }
+  /* Purchase CTA modal: sheet dari bawah, bisa scroll, tombol tidak tenggelam */
+  #md-purchase{
+    align-items: flex-end !important;
+    padding: 0 !important;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  #md-purchase > .md{
+    border-radius: 20px 20px 0 0 !important;
+    max-height: calc(92vh - 64px - env(safe-area-inset-bottom, 0px)) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 /* ── MORE POPUP ── */
@@ -3552,12 +3564,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
 <!-- ══ PURCHASE CONFIRM MODAL ══ -->
 <div class="mo" id="md-purchase">
-  <div class="md" style="max-width:420px;padding:0;overflow:hidden;background:linear-gradient(160deg,#13102a 0%,#0d0b1e 60%,#0a0a14 100%);border:1px solid rgba(139,92,246,.3)">
+  <div class="md" style="max-width:420px;padding:0;overflow-y:auto;background:linear-gradient(160deg,#13102a 0%,#0d0b1e 60%,#0a0a14 100%);border:1px solid rgba(139,92,246,.3)">
 
     <!-- Top gradient bar -->
-    <div style="height:3px;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;animation:gradientShift 3s ease infinite"></div>
+    <div style="height:3px;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;animation:gradientShift 3s ease infinite;position:sticky;top:0;z-index:1"></div>
 
-    <div style="padding:28px 28px 24px;position:relative;overflow:hidden">
+    <div style="padding:28px 28px 24px;position:relative;overflow:visible">
       <!-- Ambient glow -->
       <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%);pointer-events:none"></div>
       <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.08),transparent 70%);pointer-events:none"></div>
