@@ -2059,6 +2059,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:3px;font-weight:600;"></div>
         </div>
       </div>
+
+      <!-- ── Last 3 Trades ── -->
+      <div id="eq-last-trades" style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
+        <div id="eq-best-trades-label" style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;font-weight:600;margin-bottom:8px;">Best Trades — All Time</div>
+        <div id="eq-last-trades-list" style="display:flex;flex-direction:column;gap:5px;">
+          <!-- populated by renderEqLastTrades() -->
+        </div>
+      </div>
     </div>
 
     <!-- ── TRADER DNA RADAR ── -->
@@ -6027,28 +6035,216 @@ function renderEq(){
   g.addColorStop(0.65, `rgba(${colRgb},.04)`);
   g.addColorStop(1, 'rgba(0,0,0,0)');
 
-  // ── Premium scrub plugin: gray overlay right of cursor ──
+  // ── Scrub state ──
   let _scrubIdx = null;
-  const scrubPlugin = {
-    id: 'eqScrub',
-    afterDatasetsDraw(chart) {
-      if (_scrubIdx === null || _scrubIdx >= D.length - 1) return;
+
+  // ── Animation state ──
+  let _drawRaf   = null;
+  let _drawT     = 0;   // 0..1: line reveal progress
+  let _tipGlow   = 1;   // glow intensity at leading dot
+  let _fillAlpha = 0;   // gradient fill fade-in
+  function _easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
+
+  // ── Draw a bezier segment using Chart.js's own control points ──
+  // Each point in meta.data has cp1 (incoming) and cp2 (outgoing) control points
+  function _drawSegments(c, pts, fromIdx, toIdx, tip) {
+    if (!pts.length) return;
+    c.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i <= toIdx; i++) {
+      const prev = pts[i - 1];
+      const cur  = pts[i];
+      // Use Chart.js's computed bezier control points for exact match
+      const cp1x = prev.cp2 ? prev.cp2.x : (prev.x + cur.x) / 2;
+      const cp1y = prev.cp2 ? prev.cp2.y : prev.y;
+      const cp2x = cur.cp1  ? cur.cp1.x  : (prev.x + cur.x) / 2;
+      const cp2y = cur.cp1  ? cur.cp1.y  : cur.y;
+      c.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, cur.x, cur.y);
+    }
+    // Partial segment to tip position
+    if (tip && toIdx < pts.length - 1) {
+      const prev = pts[toIdx];
+      const next = pts[toIdx + 1];
+      // Lerp between toIdx and toIdx+1 based on fractional t
+      const cp1x = prev.cp2 ? prev.cp2.x : (prev.x + next.x) / 2;
+      const cp1y = prev.cp2 ? prev.cp2.y : prev.y;
+      const cp2x = next.cp1 ? next.cp1.x : (prev.x + next.x) / 2;
+      const cp2y = next.cp1 ? next.cp1.y : next.y;
+      // Draw partial cubic via de Casteljau
+      const frac = (_drawT * (pts.length - 1)) - toIdx;
+      const t = frac;
+      const q0x = prev.x + (cp1x - prev.x) * t,  q0y = prev.y + (cp1y - prev.y) * t;
+      const q1x = cp1x  + (cp2x - cp1x) * t,      q1y = cp1y  + (cp2y - cp1y) * t;
+      const q2x = cp2x  + (next.x - cp2x) * t,    q2y = cp2y  + (next.y - cp2y) * t;
+      const r0x = q0x + (q1x - q0x) * t,           r0y = q0y + (q1y - q0y) * t;
+      const r1x = q1x + (q2x - q1x) * t,           r1y = q1y + (q2y - q1y) * t;
+      const ex  = r0x + (r1x - r0x) * t,            ey  = r0y + (r1y - r0y) * t;
+      c.bezierCurveTo(q0x, q0y, r0x, r0y, ex, ey);
+    }
+  }
+
+  // ── Get tip pixel position using de Casteljau ──
+  function _getTip(pts) {
+    const n = pts.length;
+    if (n === 0) return null;
+    if (n === 1 || _drawT <= 0) return { x: pts[0].x, y: pts[0].y };
+    const fi     = _drawT * (n - 1);
+    const toIdx  = Math.min(Math.floor(fi), n - 2);
+    if (_drawT >= 1) return { x: pts[n-1].x, y: pts[n-1].y };
+    const frac   = fi - toIdx;
+    const prev   = pts[toIdx];
+    const next   = pts[toIdx + 1];
+    const cp1x   = prev.cp2 ? prev.cp2.x : (prev.x + next.x) / 2;
+    const cp1y   = prev.cp2 ? prev.cp2.y : prev.y;
+    const cp2x   = next.cp1 ? next.cp1.x : (prev.x + next.x) / 2;
+    const cp2y   = next.cp1 ? next.cp1.y : next.y;
+    const t = frac;
+    const q0x = prev.x + (cp1x - prev.x)*t, q0y = prev.y + (cp1y - prev.y)*t;
+    const q1x = cp1x  + (cp2x - cp1x)*t,    q1y = cp1y  + (cp2y - cp1y)*t;
+    const q2x = cp2x  + (next.x - cp2x)*t,  q2y = cp2y  + (next.y - cp2y)*t;
+    const r0x = q0x + (q1x - q0x)*t,         r0y = q0y + (q1y - q0y)*t;
+    const r1x = q1x + (q2x - q1x)*t,         r1y = q1y + (q2y - q1y)*t;
+    return { x: r0x + (r1x - r0x)*t,          y: r0y + (r1y - r0y)*t };
+  }
+
+  const drawPlugin = {
+    id: 'eqDraw',
+
+    // ── ALWAYS suppress Chart.js native line+fill — we own all drawing ──
+    beforeDatasetsDraw() {
+      return false; // cancel Chart.js dataset render permanently
+    },
+
+    afterDraw(chart) {
       const { ctx: c, chartArea: ca } = chart;
+      if (!ca) return;
+
+      // ── Scrub overlay (always active, sits on top of everything) ──
+      if (_scrubIdx !== null && _scrubIdx < D.length - 1) {
+        const m2 = chart.getDatasetMeta(0);
+        if (m2 && m2.data[_scrubIdx]) {
+          const ptX = m2.data[_scrubIdx].x;
+          if (ptX < ca.right) {
+            c.save();
+            c.fillStyle = 'rgba(20,20,26,0.72)';
+            c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
+            const fadeG = c.createLinearGradient(ptX, 0, ptX + 28, 0);
+            fadeG.addColorStop(0, 'rgba(20,20,26,0.5)');
+            fadeG.addColorStop(1, 'rgba(20,20,26,0)');
+            c.fillStyle = fadeG;
+            c.fillRect(ptX, ca.top, 28, ca.bottom - ca.top);
+            c.restore();
+          }
+        }
+      }
+
       const meta = chart.getDatasetMeta(0);
-      if (!meta || !meta.data[_scrubIdx]) return;
-      const ptX = meta.data[_scrubIdx].x;
-      if (ptX >= ca.right) return;
+      if (!meta || !meta.data.length) return;
+      const pts = meta.data;
+      const n   = pts.length;
+      if (n < 1) return;
+
+      // At _drawT=1, toIdx covers all segments → full line drawn
+      const toIdx = Math.min(n - 2, Math.floor(_drawT * (n - 1)));
+      const tip   = _drawT >= 1 ? null : _getTip(pts); // no tip when fully drawn
+
       c.save();
-      c.fillStyle = 'rgba(20,20,26,0.72)';
-      c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
-      const fadeGrad = c.createLinearGradient(ptX, 0, ptX + 28, 0);
-      fadeGrad.addColorStop(0, 'rgba(20,20,26,0.5)');
-      fadeGrad.addColorStop(1, 'rgba(20,20,26,0)');
-      c.fillStyle = fadeGrad;
-      c.fillRect(ptX, ca.top, 28, ca.bottom - ca.top);
+
+      // ── Clip to revealed area ──
+      const clipRight = _drawT >= 1 ? ca.right + 4 : (tip ? tip.x + 4 : ca.right + 4);
+      c.beginPath();
+      c.rect(ca.left - 2, ca.top - 4, clipRight - ca.left, ca.bottom - ca.top + 8);
+      c.clip();
+
+      // ── Fill (fades in, then stays at full alpha forever) ──
+      if (_fillAlpha > 0 && n >= 2) {
+        c.save();
+        c.globalAlpha = Math.min(1, _fillAlpha);
+        c.fillStyle   = g;
+        c.beginPath();
+        c.moveTo(pts[0].x, ca.bottom);
+        c.lineTo(pts[0].x, pts[0].y);
+        _drawSegments(c, pts, 0, _drawT >= 1 ? n - 1 : toIdx, tip);
+        const lastX = _drawT >= 1 ? pts[n-1].x : (tip ? tip.x : pts[Math.min(toIdx,n-1)].x);
+        c.lineTo(lastX, ca.bottom);
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+
+      // ── Line (same bezier as Chart.js via cp1/cp2) ──
+      if (n >= 2) {
+        c.save();
+        c.beginPath();
+        c.strokeStyle = col;
+        c.lineWidth   = 2.5;
+        c.lineJoin    = 'round';
+        c.lineCap     = 'round';
+        _drawSegments(c, pts, 0, _drawT >= 1 ? n - 1 : toIdx, tip);
+        c.stroke();
+        c.restore();
+      }
+
+      // ── Glowing tip dot (only during animation) ──
+      if (tip && _tipGlow > 0.01) {
+        const gl = _tipGlow;
+        const r  = 20 * gl;
+        c.save();
+        const halo = c.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, r);
+        halo.addColorStop(0,   `rgba(${colRgb},${(0.4*gl).toFixed(3)})`);
+        halo.addColorStop(0.5, `rgba(${colRgb},${(0.15*gl).toFixed(3)})`);
+        halo.addColorStop(1,   `rgba(${colRgb},0)`);
+        c.fillStyle = halo;
+        c.beginPath(); c.arc(tip.x, tip.y, r, 0, Math.PI*2); c.fill();
+        c.shadowColor = col; c.shadowBlur = 16*gl;
+        c.fillStyle = `rgba(${colRgb},${Math.min(1,0.85*gl+0.15).toFixed(3)})`;
+        c.beginPath(); c.arc(tip.x, tip.y, 3.5, 0, Math.PI*2); c.fill();
+        c.shadowBlur = 0;
+        c.fillStyle = `rgba(255,255,255,${(gl*0.7).toFixed(3)})`;
+        c.beginPath(); c.arc(tip.x, tip.y, 1.5, 0, Math.PI*2); c.fill();
+        c.restore();
+      }
+
       c.restore();
     }
   };
+
+  // ── Animation tick ──
+  function _startDrawAnim(chart) {
+    if (_drawRaf) cancelAnimationFrame(_drawRaf);
+    _drawT     = 0;
+    _tipGlow   = 1;
+    _fillAlpha = 0;
+    const T_LINE = 900;
+    const T_GLOW = 520;
+    const T_FILL = 460;
+    let t0 = null, glowT0 = null, fillT0 = null, lineDone = false;
+
+    function tick(now) {
+      if (!t0) t0 = now;
+      const el = now - t0;
+      _drawT = Math.min(1, _easeOut3(el / T_LINE));
+
+      if (_drawT >= 1 && !lineDone) {
+        lineDone = true; glowT0 = now; fillT0 = now;
+      }
+      if (lineDone) {
+        _tipGlow   = Math.max(0, 1 - (now - glowT0) / T_GLOW);
+        _fillAlpha = Math.min(1, _easeOut3((now - fillT0) / T_FILL));
+      }
+
+      if (chart && chart.ctx) chart.draw();
+
+      // Keep ticking until glow+fill are done; after that chart.draw()
+      // is only triggered by user interaction (scrub/resize) — our plugin
+      // keeps drawing at _drawT=1 with full fill on each redraw.
+      if (_drawT < 1 || _tipGlow > 0.005 || _fillAlpha < 0.999) {
+        _drawRaf = requestAnimationFrame(tick);
+      }
+      // No else: animation stops, state (_drawT=1, _fillAlpha=1) remains
+      // and afterDraw will correctly render the complete chart on any future draw()
+    }
+    _drawRaf = requestAnimationFrame(tick);
+  }
 
   if(eqCh) eqCh.destroy();
   eqCh = new Chart(ctx, {
@@ -6066,11 +6262,11 @@ function renderEq(){
         tension: .38,
       }]
     },
-    plugins: [scrubPlugin],
+    plugins: [drawPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 350, easing: 'easeInOutQuart' },
+      animation: { duration: 0 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       interaction: { mode: 'index', intersect: false },
       scales: {
@@ -6091,6 +6287,9 @@ function renderEq(){
       layout: { padding: { top: 6, right: 52, bottom: 0, left: 0 } }
     }
   });
+
+  // Kick off animation once chart layout is computed
+  requestAnimationFrame(() => _startDrawAnim(eqCh));
 
   // ── Smooth scrubbing: continuous crosshair + live header update + auto-restore ──
   const area = $('eq-chart-area');
@@ -6197,6 +6396,82 @@ function renderEq(){
   area.ontouchmove  = (e) => { e.preventDefault(); if(e.touches[0]) doScrub(e.touches[0].clientX); };
   area.ontouchend   = ()  => hideScrub();
   area.ontouchcancel= ()  => hideScrub();
+
+  // ── Render last 3 trades ──
+  renderEqLastTrades(ft);
+}
+// ── renderEqBestTrades: top 3 by P&L within the active equity period ────
+function renderEqLastTrades(ft) {
+  const wrap  = document.getElementById('eq-last-trades-list');
+  const label = document.getElementById('eq-best-trades-label');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  // Update header label to reflect period
+  if (label) {
+    const periodTxt = eqLocalPeriod === 'all' ? 'All Time'
+      : eqLocalPeriod === '7' ? 'Last 7 Days'
+      : eqLocalPeriod === '30' ? 'Last 30 Days'
+      : 'Last 180 Days';
+    label.textContent = 'Best Trades — ' + periodTxt;
+  }
+
+  if (!ft || ft.length === 0) {
+    wrap.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0;font-family:var(--mono);">No trades in this period</div>';
+    return;
+  }
+
+  // Sort by P&L descending → top 3 winners
+  const top3 = ft.slice().sort((a, b) => b.pnl - a.pnl).slice(0, 3);
+
+  top3.forEach((t, i) => {
+    const isWin   = t.pnl >= 0;
+    const pnlCol  = isWin ? '#00d97e' : '#ef4444';
+    const dirCol  = (t.dir||'').toLowerCase() === 'long' ? '#00d97e' : '#ef4444';
+    const pnlSign = isWin ? '+' : '';
+    const dateStr = t.date
+      ? new Date(t.date + 'T00:00:00').toLocaleDateString('id-ID', { day:'2-digit', month:'short' })
+      : '—';
+    const pairStr = t.pair || '—';
+    const rStr    = (t.r != null && t.r !== '')
+      ? (t.r >= 0 ? '+' : '') + parseFloat(t.r).toFixed(1) + 'R'
+      : '';
+    const rankNum = ['01','02','03'][i];
+
+    const row = document.createElement('div');
+    row.style.cssText =
+      'display:flex;align-items:center;gap:12px;padding:9px 0;' +
+      'border-bottom:1px solid var(--border);' +
+      'opacity:0;transform:translateX(-6px);' +
+      'transition:opacity .32s cubic-bezier(.4,0,.2,1) ' + (i*80) + 'ms,' +
+      'transform .32s cubic-bezier(.4,0,.2,1) ' + (i*80) + 'ms;';
+    if (i === top3.length - 1) row.style.borderBottom = 'none';
+
+    row.innerHTML =
+      // Rank number — subtle, monospace
+      '<div style="font-size:10px;font-family:var(--mono);color:var(--text3);width:16px;flex-shrink:0;letter-spacing:.5px;">' + rankNum + '</div>' +
+      // Color bar
+      '<div style="width:2px;height:32px;border-radius:2px;background:' + pnlCol + ';opacity:.7;flex-shrink:0;"></div>' +
+      // Middle: pair + date
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:.3px;margin-bottom:2px;">' + pairStr + '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-size:9px;color:var(--text3);font-family:var(--mono);">' + dateStr + '</span>' +
+          (t.dir ? '<span style="font-size:9px;font-weight:600;color:' + dirCol + ';letter-spacing:.4px;text-transform:uppercase;font-family:var(--mono);">' + t.dir + '</span>' : '') +
+          (rStr  ? '<span style="font-size:9px;color:var(--text3);font-family:var(--mono);">' + rStr + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      // P&L — right aligned
+      '<div style="font-size:12px;font-weight:700;font-family:var(--mono);color:' + pnlCol + ';letter-spacing:-.2px;flex-shrink:0;">' +
+        pnlSign + '$' + Math.abs(t.pnl).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) +
+      '</div>';
+
+    wrap.appendChild(row);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      row.style.opacity   = '1';
+      row.style.transform = 'translateX(0)';
+    }));
+  });
 }
 // ── TRADER DNA RADAR ────────────────────────────────────────────────────
 let dnaCh = null;
