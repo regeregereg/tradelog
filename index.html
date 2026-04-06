@@ -636,53 +636,205 @@ select.fi option{background:var(--bg3);}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 
-/* ── ONBOARDING TOUR ── */
+/* ── ONBOARDING TOUR — FIXED & POLISHED ── */
 #onboard-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.9);
   z-index:2000;display:none;align-items:center;justify-content:center;
-  padding:20px;backdrop-filter:blur(12px);
+  padding:16px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 }
-#onboard-overlay.open{display:flex;}
+#onboard-overlay.open{display:flex;animation:obFadeIn .25s ease forwards;}
+@keyframes obFadeIn{from{opacity:0}to{opacity:1}}
+
 .ob-card{
-  background:linear-gradient(160deg,var(--bg2),var(--bg3));
-  border:1px solid var(--border2);
-  border-radius:22px;width:100%;max-width:440px;
-  overflow:hidden;position:relative;
-  box-shadow:0 32px 80px rgba(0,0,0,.6);
+  width:100%;max-width:800px;
+  background:linear-gradient(155deg,rgba(13,13,18,.99),rgba(10,10,14,.99));
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:28px;overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(139,92,246,.08),0 40px 100px rgba(0,0,0,.8),0 0 120px rgba(139,92,246,.04);
+  max-height:calc(100vh - 32px);display:flex;flex-direction:column;
 }
-.ob-slides{display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1);}
-.ob-slide{
-  min-width:100%;padding:36px 32px 28px;
-  display:flex;flex-direction:column;align-items:center;
-  text-align:center;
+.ob-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:2;
+  background:linear-gradient(90deg,transparent 0%,rgba(0,217,126,.45) 25%,rgba(139,92,246,.5) 60%,rgba(167,139,250,.3) 80%,transparent 100%);
 }
-.ob-icon{font-size:52px;margin-bottom:16px;line-height:1;}
-.ob-title{font-size:20px;font-weight:700;letter-spacing:-.5px;margin-bottom:10px;}
-.ob-body{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px;max-width:340px;}
-.ob-body strong{color:var(--text);}
-.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px;}
-.ob-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--bg4);transition:all .25s;cursor:pointer;
+.ob-card::after{
+  content:'';position:absolute;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 70%);
+  bottom:-100px;right:-60px;pointer-events:none;z-index:0;
 }
-.ob-dot.active{background:var(--accent);width:20px;border-radius:3px;}
-.ob-actions{display:flex;gap:10px;width:100%;}
+
+/* 2-col layout */
+.ob-layout{
+  display:grid;grid-template-columns:208px 1fr;
+  flex:1;min-height:0;position:relative;z-index:1;
+}
+
+/* LEFT nav */
+.ob-nav-col{
+  padding:28px 0 24px;border-right:1px solid rgba(255,255,255,.05);
+  display:flex;flex-direction:column;
+  background:rgba(255,255,255,.012);overflow:hidden;
+}
+.ob-nav-header{
+  padding:0 20px 22px;border-bottom:1px solid rgba(255,255,255,.05);
+  margin-bottom:14px;display:flex;align-items:center;gap:9px;
+}
+.ob-brand-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#00d97e;box-shadow:0 0 10px rgba(0,217,126,.9),0 0 20px rgba(0,217,126,.4);
+  flex-shrink:0;animation:obPulse 2.5s ease-in-out infinite;
+}
+@keyframes obPulse{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.35);}}
+.ob-brand-name{
+  font-size:12px;font-weight:700;letter-spacing:-.1px;
+  background:linear-gradient(135deg,#f4f4f5,rgba(167,139,250,.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.ob-steps-list{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1;overflow:hidden;}
+.ob-step-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:10px;cursor:pointer;
+  transition:all .2s;border:1px solid transparent;user-select:none;
+}
+.ob-step-item:hover{background:rgba(255,255,255,.03);}
+.ob-step-item:hover .ob-step-label{color:rgba(255,255,255,.45);}
+.ob-step-item.active{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.12);}
+.ob-step-item.active .ob-step-label{color:var(--accent2);}
+.ob-step-num{
+  width:22px;height:22px;border-radius:7px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;font-family:var(--mono);
+  color:rgba(255,255,255,.2);flex-shrink:0;transition:all .25s;
+}
+.ob-step-item.active .ob-step-num{
+  background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45);
+  color:var(--accent2);box-shadow:0 0 10px rgba(139,92,246,.25);
+}
+.ob-step-item.done .ob-step-num{
+  background:rgba(0,217,126,.12);border-color:rgba(0,217,126,.3);
+  color:#00d97e;font-size:11px;
+}
+.ob-step-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.22);letter-spacing:.05px;transition:color .2s;}
+.ob-step-item.done .ob-step-label{color:rgba(0,217,126,.5);}
+.ob-progress-bar-wrap{margin:14px 20px 0;height:2px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
+.ob-progress-bar{
+  height:100%;border-radius:2px;
+  background:linear-gradient(90deg,#00d97e 0%,#8b5cf6 100%);
+  transition:width .45s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px rgba(0,217,126,.3);
+}
+
+/* RIGHT content */
+.ob-content-col{
+  padding:28px 32px 24px;display:flex;flex-direction:column;
+  overflow:hidden;min-height:0;
+}
+/* FIX: viewport clips slides so they don't bleed out */
+.ob-slides-viewport{flex:1;overflow:hidden;min-height:0;position:relative;}
+.ob-slides{display:flex;height:100%;transition:transform .38s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.ob-slide{min-width:100%;width:100%;display:flex;flex-direction:column;overflow:hidden;}
+
+.ob-slide-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;font-weight:700;letter-spacing:1.8px;
+  text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:10px;
+}
+.ob-slide-tag-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
+.ob-title{
+  font-size:20px;font-weight:800;letter-spacing:-.6px;
+  background:linear-gradient(130deg,#f4f4f5 0%,rgba(244,244,245,.68) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:5px;line-height:1.2;
+}
+.ob-subtitle{font-size:12px;color:rgba(255,255,255,.32);margin-bottom:18px;line-height:1.6;letter-spacing:.05px;}
+.ob-features{display:flex;flex-direction:column;gap:8px;flex:1;overflow:hidden;}
+.ob-feature{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 13px;border-radius:12px;
+  background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.045);
+  transition:background .2s,border-color .2s,transform .15s;cursor:default;
+}
+.ob-feature:hover{background:rgba(255,255,255,.042);border-color:rgba(255,255,255,.08);transform:translateX(2px);}
+.ob-feature-icon{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  line-height:1;
+}
+.ob-feature-icon i{
+  line-height:1;display:flex;
+  filter:drop-shadow(0 0 6px currentColor);
+  opacity:.9;
+}
+.ob-feature-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.88);margin-bottom:3px;letter-spacing:-.1px;}
+.ob-feature-desc{font-size:11px;color:rgba(255,255,255,.32);line-height:1.55;}
+
+/* Footer */
+.ob-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;
+}
+.ob-footer-left{font-size:10px;color:rgba(255,255,255,.15);font-family:var(--mono);letter-spacing:.5px;}
+.ob-footer-btns{display:flex;gap:8px;align-items:center;}
+
+/* FIX: prev button uses opacity+transform instead of display:none to avoid layout shift */
+.ob-btn-prev{
+  background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 16px;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);letter-spacing:.2px;
+  transition:all .2s;opacity:0;pointer-events:none;transform:translateX(-4px);
+}
+.ob-btn-prev.visible{opacity:1;pointer-events:auto;transform:translateX(0);}
+.ob-btn-prev:hover{color:var(--text);border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.07);}
+.ob-btn-next{
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;border:none;border-radius:10px;padding:8px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.3px;
+  transition:all .2s;box-shadow:0 4px 14px rgba(139,92,246,.35),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.ob-btn-next:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,92,246,.45);}
+
+/* Close btn */
 .ob-close{
-  position:absolute;top:14px;right:16px;
-  background:none;border:none;color:var(--text3);
-  font-size:18px;cursor:pointer;padding:4px;line-height:1;
-  transition:color .15s;z-index:1;
+  position:absolute;top:14px;right:16px;z-index:10;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;color:rgba(255,255,255,.25);
+  font-size:12px;cursor:pointer;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
 }
-.ob-close:hover{color:var(--text);}
-.ob-tag{
-  display:inline-block;font-size:10px;font-weight:700;
-  padding:3px 9px;border-radius:5px;margin-bottom:12px;
-  text-transform:uppercase;letter-spacing:.8px;
+.ob-close:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2);color:rgba(239,68,68,.7);}
+
+/* Slide 5 CTA */
+.ob-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.ob-cta-card{
+  padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);display:flex;flex-direction:column;gap:6px;
+  cursor:pointer;transition:all .2s;
 }
-@media(max-width:480px){
-  .ob-slide{padding:28px 20px 22px;}
-  .ob-icon{font-size:44px;}
+.ob-cta-card:hover{background:rgba(255,255,255,.05);border-color:rgba(139,92,246,.25);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.ob-cta-card.primary{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);}
+.ob-cta-card.primary:hover{background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.4);box-shadow:0 8px 24px rgba(139,92,246,.2);}
+.ob-cta-icon{font-size:22px;line-height:1;display:flex;align-items:center;}.ob-cta-icon i{filter:drop-shadow(0 0 6px currentColor);}
+.ob-cta-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.88);letter-spacing:-.1px;}
+.ob-cta-desc{font-size:10px;color:rgba(255,255,255,.3);line-height:1.5;}
+.ob-cta-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-top:2px;background:rgba(139,92,246,.2);color:var(--accent2);border:1px solid rgba(139,92,246,.25);width:fit-content;}
+
+/* Legacy — hidden, kept for JS compat */
+.ob-dot{display:none;}.ob-dots{display:none;}.ob-actions{display:none;}
+.ob-icon,.ob-body,.ob-tag{display:none;}
+/* Legacy button IDs — keep hidden, replaced by .ob-btn-prev/.ob-btn-next */
+#ob-prev,#ob-next{display:none!important;}
+
+@media(max-width:600px){
+  .ob-card{border-radius:22px;max-height:calc(100vh - 24px);}
+  .ob-layout{grid-template-columns:1fr;}
+  .ob-nav-col{display:none!important;}
+  .ob-content-col{padding:24px 20px 20px;}
   .ob-title{font-size:18px;}
+  .ob-cta-row{grid-template-columns:1fr;}
 }
 
 /* ══ 11. RESPONSIVE / MOBILE ══════════════════════════════ */
@@ -1736,93 +1888,232 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 </head>
 <body>
 
-<!-- ══ ONBOARDING TOUR ══ -->
+<!-- ══ ONBOARDING TOUR — FIXED & POLISHED ══ -->
 <div id="onboard-overlay">
   <div class="ob-card">
-    <button class="ob-close" id="ob-close">✕</button>
+    <button class="ob-close" id="ob-close" aria-label="Tutup">✕</button>
 
-    <!-- Slides wrapper -->
-    <div class="ob-slides" id="ob-slides">
+    <div class="ob-layout">
 
-      <!-- Slide 1: Welcome -->
-      <div class="ob-slide">
-        <div class="ob-icon"><img src="data:image/png;base64,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" alt="RPT" style="width:64px;height:64px;object-fit:contain"></div>
-        <div class="ob-tag" style="background:rgba(124,106,247,.15);color:var(--accent)">Trading Journal</div>
-        <div class="ob-title">Selamat datang di RiskPerTrade</div>
-        <div class="ob-body">
-          Platform pencatatan trading yang dirancang untuk trader serius.<br><br>
-          <strong>Catat trade, analisis performa, dan pantau progress</strong> menuju prop firm — semua dalam satu tempat.
+      <!-- LEFT: Step navigator -->
+      <div class="ob-nav-col">
+        <div class="ob-nav-header">
+          <span class="ob-brand-dot"></span>
+          <span class="ob-brand-name">RiskPerTrade</span>
+        </div>
+        <div class="ob-steps-list" id="ob-steps-list">
+          <div class="ob-step-item" data-slide="0">
+            <div class="ob-step-num" id="sn-0">01</div>
+            <span class="ob-step-label">Selamat Datang</span>
+          </div>
+          <div class="ob-step-item" data-slide="1">
+            <div class="ob-step-num" id="sn-1">02</div>
+            <span class="ob-step-label">Journal Trade</span>
+          </div>
+          <div class="ob-step-item" data-slide="2">
+            <div class="ob-step-num" id="sn-2">03</div>
+            <span class="ob-step-label">Analytics</span>
+          </div>
+          <div class="ob-step-item" data-slide="3">
+            <div class="ob-step-num" id="sn-3">04</div>
+            <span class="ob-step-label">PropFirm Tracker</span>
+          </div>
+          <div class="ob-step-item" data-slide="4">
+            <div class="ob-step-num" id="sn-4">05</div>
+            <span class="ob-step-label">Mulai Sekarang</span>
+          </div>
+        </div>
+        <div class="ob-progress-bar-wrap">
+          <div class="ob-progress-bar" id="ob-progress-bar"></div>
         </div>
       </div>
 
-      <!-- Slide 2: Journal -->
-      <div class="ob-slide">
-        <div class="ob-icon">📝</div>
-        <div class="ob-tag" style="background:rgba(0,217,126,.1);color:#00d97e">Journal</div>
-        <div class="ob-title">Catat Setiap Trade</div>
-        <div class="ob-body">
-          Log trade dengan detail lengkap — pair, direction, session, entry/exit, risk, P&L, dan R-multiple.<br><br>
-          Setiap trade otomatis masuk ke <strong>equity curve</strong> dan <strong>analytics</strong> kamu.
+      <!-- RIGHT: Content area -->
+      <div class="ob-content-col">
+        <div class="ob-slides-viewport">
+          <div class="ob-slides" id="ob-slides">
+
+            <!-- Slide 1: Welcome -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.9);"></div>Trading Journal Platform</div>
+              <div class="ob-title">Selamat Datang 👋</div>
+              <div class="ob-subtitle">Platform jurnal trading yang dirancang untuk trader yang ingin bertumbuh dengan data — bukan sekadar feeling.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-bar-chart-line-fill"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Catat & Analisis</div>
+                    <div class="ob-feature-desc">Log setiap trade secara lengkap — pair, R:R, entry, exit, screenshot, hingga emosi trading kamu.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-hexagon-half"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Trader DNA</div>
+                    <div class="ob-feature-desc">Temukan profil tradingmu — consistency, discipline, dan execution score dihitung otomatis.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.08);color:#f59e0b;font-size:18px;"><i class="bi bi-building-check"></i></div>
+                  <div>
+                    <div class="ob-feature-name">PropFirm Tracker</div>
+                    <div class="ob-feature-desc">Monitor challenge prop firm real-time, dari profit target hingga max drawdown — semua dalam satu layar.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Journal -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.9);"></div>Fitur Utama</div>
+              <div class="ob-title">Catat Setiap Trade</div>
+              <div class="ob-subtitle">Semua detail trade tersimpan rapi dan langsung terhubung ke dashboard & analytics kamu secara otomatis.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-pencil-square"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Input Cepat & Lengkap</div>
+                    <div class="ob-feature-desc">Pair, direction, session, risk %, P&L, R-multiple — semua bisa dilog dalam hitungan detik.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-graph-up-arrow"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Equity Curve Real-time</div>
+                    <div class="ob-feature-desc">Setiap trade langsung masuk ke grafik equity curve dan semua statistik diperbarui saat itu juga.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(255,159,64,.08);color:#fb923c;font-size:18px;"><i class="bi bi-tags-fill"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Tag & Setup Filter</div>
+                    <div class="ob-feature-desc">Tambahkan tag custom untuk setiap setup — filter dan bandingkan performa per strategi dengan mudah.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3: Analytics -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#8b5cf6;box-shadow:0 0 6px rgba(139,92,246,.9);"></div>Analitik</div>
+              <div class="ob-title">Analisis Mendalam</div>
+              <div class="ob-subtitle">Pahami pola tradingmu dengan data — bukan feeling. Filter waktu fleksibel dari 7 hari hingga all-time.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-crosshair2"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Metrik Kunci</div>
+                    <div class="ob-feature-desc">Win rate, profit factor, avg R:R, best pair, best session — semua tersaji dalam satu halaman analytics.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-broadcast-pin"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Trader DNA Radar</div>
+                    <div class="ob-feature-desc">6 dimensi performa: Consistency, Discipline, Aggression, Execution, Endurance, Vision — divisualisasi sebagai radar chart.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.08);color:#f59e0b;font-size:18px;"><i class="bi bi-calendar2-week-fill"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Trading Calendar</div>
+                    <div class="ob-feature-desc">Lihat pola harian dan bulananmu — hari apa paling profit, dan kapan sebaiknya istirahat dari pasar.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 4: PropFirm -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.7);"></div>PropFirm Tracker</div>
+              <div class="ob-title">Track Challenge-mu</div>
+              <div class="ob-subtitle">Monitor semua parameter challenge secara visual — tau kapan kamu terlalu agresif sebelum terlambat.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(239,68,68,.08);color:#ef4444;font-size:18px;"><i class="bi bi-shield-exclamation"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Limit Monitor Real-time</div>
+                    <div class="ob-feature-desc">Daily loss limit, max drawdown, profit target — ditampilkan dengan grafik progress yang jelas dan mudah dibaca.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-activity"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Equity vs Limit Chart</div>
+                    <div class="ob-feature-desc">Equity curve yang overlay langsung dengan batas-batas challenge prop firmmu — lihat seberapa dekat kamu dengan limit.</div>
+                  </div>
+                </div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-layers-fill"></i></div>
+                  <div>
+                    <div class="ob-feature-name">Multi-Challenge</div>
+                    <div class="ob-feature-desc">Kelola beberapa akun challenge sekaligus — switch dengan mudah tanpa perlu setup ulang dari awal.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 5: Get Started -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.9);"></div>Siap Memulai</div>
+              <div class="ob-title">Mulai Trading Lebih Cerdas</div>
+              <div class="ob-subtitle">Pilih cara aksesmu — bebas coba dulu atau langsung simpan ke cloud.</div>
+              <div class="ob-features" style="flex:none;gap:0;margin-bottom:0;">
+                <div class="ob-cta-row">
+                  <div class="ob-cta-card" onclick="closeTour()">
+                    <div class="ob-cta-icon" style="color:rgba(255,255,255,.6);font-size:22px;"><i class="bi bi-eye-fill"></i></div>
+                    <div class="ob-cta-label">Coba Tanpa Daftar</div>
+                    <div class="ob-cta-desc">Eksplorasi langsung tanpa login. Bisa catat hingga 10 trade untuk mencoba semua fitur utama.</div>
+                    <div class="ob-cta-badge">Guest Mode</div>
+                  </div>
+                  <div class="ob-cta-card primary" onclick="closeTour()">
+                    <div class="ob-cta-icon" style="color:#a78bfa;font-size:22px;"><i class="bi bi-unlock-fill"></i></div>
+                    <div class="ob-cta-label">Login &amp; Akses Penuh</div>
+                    <div class="ob-cta-desc">Login dengan Google untuk menyimpan semua data ke cloud — tanpa batas, sync di semua device.</div>
+                    <div class="ob-cta-badge" style="background:rgba(167,139,250,.25);color:#c4b5fd;border-color:rgba(167,139,250,.35);">Cloud Sync ✓</div>
+                  </div>
+                </div>
+                <div class="ob-feature" style="margin-top:8px;border-color:rgba(139,92,246,.12);background:rgba(139,92,246,.04);">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.12);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#a78bfa" stroke="none"/></svg>
+                  </div>
+                  <div>
+                    <div class="ob-feature-name" style="color:#a78bfa;">Butuh Akses Penuh?</div>
+                    <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/journalingtoolsid/" target="_blank" style="color:#a78bfa;font-weight:600;text-decoration:none;">@journalingtoolsid</a> di Instagram untuk mendapatkan undangan akses.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /ob-slides -->
+        </div><!-- /ob-slides-viewport -->
+
+        <!-- Footer actions -->
+        <div class="ob-footer">
+          <span class="ob-footer-left" id="ob-step-counter">1 / 5</span>
+          <div class="ob-footer-btns">
+            <button class="ob-btn-prev" id="ob-btn-prev">← Kembali</button>
+            <button class="ob-btn-next" id="ob-btn-next">Selanjutnya →</button>
+          </div>
         </div>
-      </div>
 
-      <!-- Slide 3: Analytics -->
-      <div class="ob-slide">
-        <div class="ob-icon">📈</div>
-        <div class="ob-tag" style="background:rgba(124,106,247,.15);color:var(--accent)">Analytics</div>
-        <div class="ob-title">Analisis Performa Kamu</div>
-        <div class="ob-body">
-          Lihat <strong>win rate, profit factor, avg R:R</strong>, dan breakdown performa per pair, session, serta setup.<br><br>
-          Filter berdasarkan periode: 7 hari, 30 hari, 6 bulan, atau semua waktu.
+        <!-- Hidden legacy elements for JS compat -->
+        <div class="ob-dots" id="ob-dots" style="display:none">
+          <div class="ob-dot active" data-slide="0"></div>
+          <div class="ob-dot" data-slide="1"></div>
+          <div class="ob-dot" data-slide="2"></div>
+          <div class="ob-dot" data-slide="3"></div>
+          <div class="ob-dot" data-slide="4"></div>
         </div>
-      </div>
+        <div class="ob-actions" style="display:none"></div>
+        <!-- Legacy button stubs (hidden by CSS, kept for any external references) -->
+        <button id="ob-prev" style="display:none" aria-hidden="true"></button>
+        <button id="ob-next" style="display:none" aria-hidden="true"></button>
 
-      <!-- Slide 4: PropFirm -->
-      <div class="ob-slide">
-        <div class="ob-icon">🏢</div>
-        <div class="ob-tag" style="background:rgba(255,77,77,.1);color:#ff4d4d">PropFirm</div>
-        <div class="ob-title">Track Challenge PropFirm</div>
-        <div class="ob-body">
-          Monitor progress challenge prop firm kamu secara real-time — <strong>profit target, daily loss limit, max drawdown,</strong> dan trading days.<br><br>
-          Grafik equity vs limit langsung terlihat kapan kamu terlalu agresif.
-        </div>
-      </div>
-
-      <!-- Slide 5: Get Started -->
-      <div class="ob-slide">
-        <div class="ob-icon">🚀</div>
-        <div class="ob-tag" style="background:rgba(0,217,126,.1);color:#00d97e">Mulai</div>
-        <div class="ob-title">Siap Mulai?</div>
-        <div class="ob-body">
-          Kamu bisa <strong>coba langsung tanpa daftar</strong> (maks 10 trade), atau login dengan Google untuk akses penuh tanpa batas.<br><br>
-          Butuh akses penuh? Hubungi <strong>@journalingtoolsid</strong> di Instagram.
-        </div>
-        <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
-          style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);text-decoration:none;margin-bottom:4px">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-          @journalingtoolsid →
-        </a>
-      </div>
-
-    </div><!-- /ob-slides -->
-
-    <!-- Dots indicator -->
-    <div style="padding:0 32px 24px">
-      <div class="ob-dots" id="ob-dots">
-        <div class="ob-dot active" data-slide="0"></div>
-        <div class="ob-dot" data-slide="1"></div>
-        <div class="ob-dot" data-slide="2"></div>
-        <div class="ob-dot" data-slide="3"></div>
-        <div class="ob-dot" data-slide="4"></div>
-      </div>
-      <div class="ob-actions">
-        <button class="btng" id="ob-prev" style="flex:1;display:none">← Sebelumnya</button>
-        <button class="btn" id="ob-next" style="flex:1">Selanjutnya →</button>
-      </div>
-    </div>
-
-  </div>
-</div>
+      </div><!-- /ob-content-col -->
+    </div><!-- /ob-layout -->
+  </div><!-- /ob-card -->
+</div><!-- /onboard-overlay -->
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
@@ -7938,28 +8229,71 @@ function downloadFile(filename, content, mimeType) {
 // (added to onAuthStateChanged flow via updateAll)
 
 // ══════════════════════════════════════════════════════
-// ── ONBOARDING TOUR ────────────────────────────────────
+// ── ONBOARDING TOUR — FIXED ───────────────────────────
 // ══════════════════════════════════════════════════════
-const OB_KEY    = 'rpt_tour_seen';
-const OB_TOTAL  = 5;
+const OB_KEY   = 'rpt_tour_seen';
+const OB_TOTAL = 5;
 let   obCurrent = 0;
+let   obLocked  = false; // prevent rapid-click animation jank
 
 function obGoTo(idx) {
-  obCurrent = Math.max(0, Math.min(OB_TOTAL - 1, idx));
-  // Slide
+  if (obLocked) return;
+  // FIX: clamp — never go out-of-bounds
+  idx = Math.max(0, Math.min(OB_TOTAL - 1, idx));
+  obCurrent = idx;
+
+  // Animate slides
   $('ob-slides').style.transform = `translateX(-${obCurrent * 100}%)`;
-  // Dots
-  document.querySelectorAll('.ob-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === obCurrent);
+
+  // Progress bar
+  const bar = document.getElementById('ob-progress-bar');
+  if (bar) bar.style.width = ((obCurrent + 1) / OB_TOTAL * 100).toFixed(1) + '%';
+
+  // Step counter
+  const counter = document.getElementById('ob-step-counter');
+  if (counter) counter.textContent = (obCurrent + 1) + ' / ' + OB_TOTAL;
+
+  // Left nav steps
+  document.querySelectorAll('.ob-step-item').forEach((el, i) => {
+    el.classList.remove('active', 'done');
+    if (i === obCurrent) el.classList.add('active');
+    else if (i < obCurrent) el.classList.add('done');
+    const num = el.querySelector('.ob-step-num');
+    if (!num) return;
+    num.textContent = i < obCurrent ? '✓' : String(i + 1).padStart(2, '0');
   });
-  // Buttons
-  $('ob-prev').style.display = obCurrent === 0 ? 'none' : 'block';
-  $('ob-next').textContent   = obCurrent === OB_TOTAL - 1 ? 'Mulai Sekarang ✓' : 'Selanjutnya →';
+
+  // FIX: prev uses visibility class — no layout shift
+  const prevBtn = document.getElementById('ob-btn-prev');
+  if (prevBtn) {
+    if (obCurrent === 0) prevBtn.classList.remove('visible');
+    else prevBtn.classList.add('visible');
+  }
+
+  // Next button: green on last slide
+  const nextBtn = document.getElementById('ob-btn-next');
+  if (nextBtn) {
+    if (obCurrent === OB_TOTAL - 1) {
+      nextBtn.textContent = '✓ Mulai Sekarang';
+      nextBtn.style.background = 'linear-gradient(135deg,#00d97e,#059669)';
+      nextBtn.style.boxShadow = '0 4px 14px rgba(0,217,126,.35),inset 0 1px 0 rgba(255,255,255,.12)';
+    } else {
+      nextBtn.textContent = 'Selanjutnya →';
+      nextBtn.style.background = 'linear-gradient(135deg,var(--accent),#7c3aed)';
+      nextBtn.style.boxShadow = '0 4px 14px rgba(139,92,246,.35),inset 0 1px 0 rgba(255,255,255,.12)';
+    }
+  }
+
+  // Brief lock to prevent animation jank
+  obLocked = true;
+  setTimeout(() => { obLocked = false; }, 400);
 }
 
 function openTour(fromStart = true) {
-  if (fromStart) obGoTo(0);
+  if (fromStart) { obCurrent = -1; } // force re-render
+  obGoTo(fromStart ? 0 : obCurrent);
   $('onboard-overlay').classList.add('open');
+  setTimeout(() => { const b = document.getElementById('ob-btn-next'); if(b) b.focus(); }, 100);
 }
 
 function closeTour() {
@@ -7970,30 +8304,30 @@ function closeTour() {
 // Auto-show on first visit
 try {
   if (!localStorage.getItem(OB_KEY)) {
-    // Slight delay so app renders first
     setTimeout(() => openTour(true), 600);
   }
 } catch(e) {}
 
-// Dot clicks
-document.querySelectorAll('.ob-dot').forEach(d => {
-  d.addEventListener('click', () => obGoTo(parseInt(d.dataset.slide)));
+// Left nav step clicks
+document.querySelectorAll('.ob-step-item').forEach(el => {
+  el.addEventListener('click', () => obGoTo(parseInt(el.dataset.slide)));
 });
 
-// Prev / Next
-$('ob-prev').addEventListener('click', () => obGoTo(obCurrent - 1));
-$('ob-next').addEventListener('click', () => {
-  if (obCurrent === OB_TOTAL - 1) {
-    closeTour();
-  } else {
-    obGoTo(obCurrent + 1);
-  }
-});
+// Prev / Next — new buttons
+(function() {
+  const prevBtn = document.getElementById('ob-btn-prev');
+  const nextBtn = document.getElementById('ob-btn-next');
+  if (prevBtn) prevBtn.addEventListener('click', () => obGoTo(obCurrent - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    if (obCurrent === OB_TOTAL - 1) closeTour();
+    else obGoTo(obCurrent + 1);
+  });
+})();
 
 // Close button
 $('ob-close').addEventListener('click', closeTour);
 
-// Close on overlay click
+// Close on backdrop click
 $('onboard-overlay').addEventListener('click', e => {
   if (e.target === $('onboard-overlay')) closeTour();
 });
@@ -8004,13 +8338,32 @@ $('sb-tour-btn').addEventListener('click', () => {
   if (typeof isMob === 'function' && isMob()) closeSB();
 });
 
-// Keyboard nav
+// Keyboard nav — FIX: prevent default & proper clamping
 document.addEventListener('keydown', e => {
   if (!$('onboard-overlay').classList.contains('open')) return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') obGoTo(obCurrent + 1);
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   obGoTo(obCurrent - 1);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); obGoTo(obCurrent + 1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); obGoTo(obCurrent - 1); }
   if (e.key === 'Escape') closeTour();
 });
+
+// Touch swipe support
+(function() {
+  let startX = 0, startY = 0;
+  const card = document.querySelector('.ob-card');
+  if (!card) return;
+  card.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  card.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) obGoTo(obCurrent + 1);
+      else         obGoTo(obCurrent - 1);
+    }
+  }, { passive: true });
+})();
 
 // ══════════════════════════════════════════════════════
 // ── 📸 SCREENSHOT ATTACH ─────────────────────────────
