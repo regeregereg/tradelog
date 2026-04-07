@@ -365,6 +365,31 @@ body::before{
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* ── SPLASH SCREEN ── */
+#rpt-splash{position:fixed;inset:0;z-index:9999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .5s ease,visibility .5s ease;}
+#rpt-splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-logo{display:flex;align-items:center;gap:10px;}
+.splash-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 20px rgba(139,92,246,.5);}
+.splash-logo-text{font-size:17px;font-weight:700;color:#f4f4f5;letter-spacing:-.3px;font-family:var(--font);}
+.splash-logo-text span{color:#8b5cf6;}
+.splash-bars{display:flex;align-items:flex-end;gap:5px;height:44px;}
+.splash-bar{width:8px;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#8b5cf6,rgba(139,92,246,.3));transform-origin:bottom;animation:splashBarRise .6s cubic-bezier(.34,1.56,.64,1) both;}
+.splash-bar:nth-child(1){height:18px;animation-delay:.00s;}
+.splash-bar:nth-child(2){height:30px;animation-delay:.07s;}
+.splash-bar:nth-child(3){height:22px;animation-delay:.14s;}
+.splash-bar:nth-child(4){height:40px;animation-delay:.21s;background:linear-gradient(180deg,#a78bfa,#7c3aed);}
+.splash-bar:nth-child(5){height:28px;animation-delay:.28s;}
+.splash-bar:nth-child(6){height:36px;animation-delay:.35s;}
+.splash-bar:nth-child(7){height:20px;animation-delay:.42s;}
+@keyframes splashBarRise{from{transform:scaleY(0);opacity:0;}to{transform:scaleY(1);opacity:1;}}
+.splash-sub{font-size:11px;color:rgba(161,161,170,.5);letter-spacing:.5px;font-family:var(--font);animation:fadeInUp .4s .7s both ease;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+/* ── TOP SYNC BAR ── */
+#rpt-sync-bar{position:fixed;top:0;left:0;right:0;height:2px;z-index:800;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .2s ease;}
+#rpt-sync-bar.active{opacity:1;}
+#rpt-sync-bar::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,#8b5cf6,#a78bfa,transparent);animation:syncSlide 1.2s ease-in-out infinite;}
+@keyframes syncSlide{0%{left:-60%;}100%{left:120%;}}
+
 /* ── SIDEBAR ── */
 .sidebar{
   position:fixed;top:0;left:0;height:100vh;width:var(--sbw);
@@ -1903,6 +1928,22 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 </script>
 </head>
 <body>
+
+<!-- ── SPLASH SCREEN ── -->
+<div id="rpt-splash">
+  <div class="splash-logo">
+    <div class="splash-logo-icon">📈</div>
+    <div class="splash-logo-text">Risk<span>Per</span>Trade</div>
+  </div>
+  <div class="splash-bars">
+    <div class="splash-bar"></div><div class="splash-bar"></div>
+    <div class="splash-bar"></div><div class="splash-bar"></div>
+    <div class="splash-bar"></div><div class="splash-bar"></div>
+    <div class="splash-bar"></div>
+  </div>
+  <div class="splash-sub">Loading your journal…</div>
+</div>
+<div id="rpt-sync-bar"></div>
 
 <!-- ══ ONBOARDING TOUR — FIXED & POLISHED ══ -->
 <div id="onboard-overlay">
@@ -5056,9 +5097,29 @@ function getPeriodLabel() {
 }
 
 // ── SYNC INDICATOR ────────────────────────────────────
+// Safety timeout: always dismiss splash after 4s no matter what
+(function() {
+  var _splashTimer = setTimeout(function() {
+    var s = document.getElementById('rpt-splash');
+    if (s) s.classList.add('hidden');
+  }, 4000);
+  window._splashDismiss = function() {
+    clearTimeout(_splashTimer);
+    var s = document.getElementById('rpt-splash');
+    if (s) s.classList.add('hidden');
+  };
+})();
+
 function setSyncState(state) {
   const dot = $('sync-dot');
   dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  // Top sync bar animation
+  const bar = document.getElementById('rpt-sync-bar');
+  if (bar) bar.classList.toggle('active', state === 'syncing');
+  // Dismiss splash on first successful load
+  if (state === 'ok' || state === 'error') {
+    if (window._splashDismiss) window._splashDismiss();
+  }
 }
 
 // ── AUTH ──────────────────────────────────────────────
@@ -5583,6 +5644,11 @@ onAuthStateChanged(auth, async user => {
     const wasLoggedIn = currentUser !== null;
     currentUser = null;
     $('login-loading').style.display = 'none';
+    // Dismiss splash for guest/unauthenticated users
+    const splash = document.getElementById('rpt-splash');
+    if (splash && !splash.classList.contains('hidden')) {
+      setTimeout(() => splash.classList.add('hidden'), 300);
+    }
     if (unsubTrades) { unsubTrades(); unsubTrades = null; }
     setAuthUI(false);
     setFloatCTA(true); // Guest mode: show upgrade CTA
