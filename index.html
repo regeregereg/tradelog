@@ -2341,6 +2341,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="ni" id="nav-analytics"><i class="nic bi bi-bar-chart-line"></i>Analytics</div>
   <div class="ni" id="nav-calendar"><i class="nic bi bi-calendar3"></i>Calendar</div>
   <div class="ni" id="nav-ftmo"><i class="nic bi bi-building-check"></i>PropFirm</div>
+  <div class="ni" id="nav-playbook"><i class="nic bi bi-book-half"></i>Playbook</div>
   <div class="ni" id="nav-finance" style="display:none"><i class="nic bi bi-wallet2"></i>Finance</div>
   <div class="nlbl" style="margin-top:6px">Tools</div>
   <div class="ni" id="nav-daily"><i class="nic bi bi-journal-bookmark-fill"></i>Daily Journal</div>
@@ -3064,6 +3065,192 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <!-- Bottom divider glow -->
   <div class="ana-divider"></div>
 
+  <!-- ══ ADVANCED ANALYTICS SECTION ══ -->
+  <div style="margin-top:4px">
+
+    <!-- Section Header -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.08));border:1px solid rgba(245,158,11,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="bi bi-cpu" style="color:#f59e0b;font-size:14px"></i>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px">Advanced Analytics</div>
+        <div style="font-size:11px;color:var(--text3)">Metrik yang digunakan trader profesional</div>
+      </div>
+      <span style="margin-left:auto;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.22);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.4px">PRO METRICS</span>
+    </div>
+
+    <!-- ── ROW 1: Streak Tracker ── -->
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.08))"><i class="bi bi-fire" style="color:#f59e0b"></i></div>
+          Streak Tracker
+        </div>
+        <span class="ana-card-badge" style="background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.22)">Live</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
+        <div class="ana-stat-card" style="border-color:rgba(0,217,126,.2)">
+          <div class="ana-stat-label" style="color:#00d97e">Current Win Streak</div>
+          <div class="ana-stat-val" id="adv-cur-win-streak" style="color:#00d97e">0</div>
+          <div class="ana-stat-sub">trade berturut menang</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(255,77,77,.2)">
+          <div class="ana-stat-label" style="color:#ff4d4d">Current Loss Streak</div>
+          <div class="ana-stat-val" id="adv-cur-loss-streak" style="color:#ff4d4d">0</div>
+          <div class="ana-stat-sub">trade berturut kalah</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(0,217,126,.15)">
+          <div class="ana-stat-label">Max Win Streak</div>
+          <div class="ana-stat-val pos" id="adv-max-win-streak">0</div>
+          <div class="ana-stat-sub">best streak ever</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(255,77,77,.15)">
+          <div class="ana-stat-label">Max Loss Streak</div>
+          <div class="ana-stat-val neg" id="adv-max-loss-streak">0</div>
+          <div class="ana-stat-sub">worst streak ever</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Avg Win Streak</div>
+          <div class="ana-stat-val pos" id="adv-avg-win-streak">0</div>
+          <div class="ana-stat-sub">rata-rata sebelum kalah</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Avg Loss Streak</div>
+          <div class="ana-stat-val neg" id="adv-avg-loss-streak">0</div>
+          <div class="ana-stat-sub">rata-rata sebelum menang</div>
+        </div>
+      </div>
+      <!-- Streak visualizer bar -->
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:8px">30 Trade Terakhir — Win/Loss Visual</div>
+        <div id="adv-streak-vis" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+      </div>
+    </div>
+
+    <!-- ── ROW 2: MAE/MFE Analysis ── -->
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08))"><i class="bi bi-arrows-expand" style="color:#a78bfa"></i></div>
+          MAE / MFE Analysis
+        </div>
+        <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">SL Optimizer</span>
+      </div>
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.12);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.6">
+        <strong style="color:#a78bfa">MAE</strong> (Maximum Adverse Excursion) = seberapa jauh price melawan kamu sebelum balik.<br>
+        <strong style="color:#00d97e">MFE</strong> (Maximum Favorable Excursion) = seberapa jauh price menguntungkan sebelum exit.<br>
+        <span style="color:var(--text3)">Insight: jika MAE wins kamu kecil, SL kamu sudah bagus. Jika MFE jauh melebihi exit, kamu exit terlalu cepat.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
+        <div class="ana-stat-card" style="border-color:rgba(255,77,77,.2)">
+          <div class="ana-stat-label" style="color:#ff4d4d">Avg MAE — Wins</div>
+          <div class="ana-stat-val" id="adv-mae-win">—</div>
+          <div class="ana-stat-sub">trade yang menang</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(255,77,77,.15)">
+          <div class="ana-stat-label" style="color:#ff4d4d">Avg MAE — Losses</div>
+          <div class="ana-stat-val neg" id="adv-mae-loss">—</div>
+          <div class="ana-stat-sub">trade yang kalah</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(0,217,126,.2)">
+          <div class="ana-stat-label" style="color:#00d97e">Avg MFE — Wins</div>
+          <div class="ana-stat-val pos" id="adv-mfe-win">—</div>
+          <div class="ana-stat-sub">trade yang menang</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(0,217,126,.12)">
+          <div class="ana-stat-label" style="color:#00d97e">Avg MFE — Losses</div>
+          <div class="ana-stat-val" id="adv-mfe-loss">—</div>
+          <div class="ana-stat-sub">trade yang kalah</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">MFE/MAE Ratio</div>
+          <div class="ana-stat-val" id="adv-mfe-mae-ratio" style="color:#a78bfa">—</div>
+          <div class="ana-stat-sub">&gt;2 = SL placement baik</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Efisiensi Exit</div>
+          <div class="ana-stat-val" id="adv-exit-efficiency">—</div>
+          <div class="ana-stat-sub">% dari MFE yang dicapture</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:8px">Interpretasi SL Placement</div>
+        <div id="adv-mae-insight" style="font-size:12px;color:var(--text2);line-height:1.6">
+          — Log lebih banyak trade untuk melihat insight —
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:10px;padding:8px 12px;background:rgba(139,92,246,.04);border-radius:8px;border:1px solid rgba(139,92,246,.1)">
+        💡 <strong style="color:var(--text2)">Catatan:</strong> MAE/MFE dihitung dari field Entry, SL, dan Exit yang kamu isi. Semakin lengkap data trade kamu, semakin akurat analisis ini.
+      </div>
+    </div>
+
+    <!-- ── ROW 3: Holding Time Analysis ── -->
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(56,189,248,.08))"><i class="bi bi-stopwatch" style="color:#38bdf8"></i></div>
+          Holding Time Analysis
+        </div>
+        <span class="ana-card-badge" style="background:rgba(56,189,248,.1);color:#7dd3fc;border:1px solid rgba(56,189,248,.22)">Time Edge</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Avg Hold — Semua</div>
+          <div class="ana-stat-val" id="adv-hold-avg" style="color:#38bdf8">—</div>
+          <div class="ana-stat-sub">menit per trade</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(0,217,126,.15)">
+          <div class="ana-stat-label">Avg Hold — Wins</div>
+          <div class="ana-stat-val pos" id="adv-hold-win">—</div>
+          <div class="ana-stat-sub">menit trade menang</div>
+        </div>
+        <div class="ana-stat-card" style="border-color:rgba(255,77,77,.15)">
+          <div class="ana-stat-label">Avg Hold — Losses</div>
+          <div class="ana-stat-val neg" id="adv-hold-loss">—</div>
+          <div class="ana-stat-sub">menit trade kalah</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Terlama</div>
+          <div class="ana-stat-val" id="adv-hold-max" style="color:#a78bfa">—</div>
+          <div class="ana-stat-sub">holding terlama</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Tercepat</div>
+          <div class="ana-stat-val" id="adv-hold-min" style="color:#f59e0b">—</div>
+          <div class="ana-stat-sub">holding tercepat</div>
+        </div>
+        <div class="ana-stat-card">
+          <div class="ana-stat-label">Hold Ratio W/L</div>
+          <div class="ana-stat-val" id="adv-hold-ratio">—</div>
+          <div class="ana-stat-sub">win hold / loss hold</div>
+        </div>
+      </div>
+      <!-- Holding time insight -->
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:6px">Insight</div>
+        <div id="adv-hold-insight" style="font-size:12px;color:var(--text2);line-height:1.6">
+          — Isi field "Holding Time" saat log trade untuk melihat analisis ini —
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ROW 4: Playbook Win Rate ── -->
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(0,217,126,.15),rgba(0,217,126,.06))"><i class="bi bi-book-half" style="color:#00d97e"></i></div>
+          Win Rate per Playbook
+        </div>
+        <span class="ana-card-badge" style="background:rgba(0,217,126,.1);color:#4ade80;border:1px solid rgba(0,217,126,.22)">Strategy Edge</span>
+      </div>
+      <div id="adv-playbook-wr-list" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">— Hubungkan trade ke Playbook untuk melihat win rate per strategi —</div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- ══ PERFORMANCE SCORE JS ══ -->
 
 
@@ -3125,6 +3312,40 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <span>0%</span><span style="color:var(--text2)">Target 50%</span><span>100%</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- PLAYBOOK -->
+  <div class="page" id="page-playbook">
+    <div class="ph" style="margin-bottom:16px">
+      <div>
+        <div class="pt">📖 Trade Playbook</div>
+        <div class="ps">Strategy library — definisi setup & edge kamu</div>
+      </div>
+      <button class="btn" id="playbook-add-btn"><i class="bi bi-plus-lg" style="font-size:11px"></i> Tambah Strategi</button>
+    </div>
+
+    <!-- Playbook stats bar -->
+    <div id="playbook-stats-bar" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+      <div class="sc"><div class="sl">Total Strategi</div><div class="sv neu" id="pb-total-strats">0</div><div class="sch">playbook aktif</div></div>
+      <div class="sc"><div class="sl">Best WR Strategy</div><div class="sv pos" id="pb-best-wr-name">—</div><div class="sch" id="pb-best-wr-val">0%</div></div>
+      <div class="sc"><div class="sl">Most Used</div><div class="sv neu" id="pb-most-used-name">—</div><div class="sch" id="pb-most-used-val">0 trades</div></div>
+      <div class="sc"><div class="sl">Best Avg R</div><div class="sv pos" id="pb-best-r-name">—</div><div class="sch" id="pb-best-r-val">0R</div></div>
+    </div>
+
+    <!-- Playbook cards list -->
+    <div id="playbook-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Empty state -->
+    <div id="playbook-empty" style="display:none;text-align:center;padding:52px 20px">
+      <div style="font-size:44px;margin-bottom:14px;filter:drop-shadow(0 0 16px rgba(139,92,246,.3))">📖</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px">Playbook kamu masih kosong</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;max-width:340px;margin-left:auto;margin-right:auto">
+        Dokumentasikan setiap setup yang kamu trade — kondisi entry, exit, dan lihat win rate per strategi secara otomatis.
+      </div>
+      <button onclick="document.getElementById('playbook-add-btn').click()" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 16px rgba(139,92,246,.35);transition:all .2s">+ Tambah Strategi Pertama</button>
     </div>
   </div>
 
@@ -4300,6 +4521,33 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <i class="bi bi-pencil" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);pointer-events:none"></i>
           <input class="fi" type="text" id="f-su" placeholder="Custom tag... (pisahkan dengan koma)" style="font-size:12px;padding-left:30px">
         </div>
+      </div>
+
+      <!-- ── STEP 6b: Playbook Link ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-book-half"></i> Link ke Playbook <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px">(opsional)</span></div>
+        <select class="fi" id="f-playbook" style="font-size:12px">
+          <option value="">— Pilih strategi dari playbook —</option>
+        </select>
+        <div style="font-size:10px;color:var(--text3);margin-top:5px">Hubungkan trade ini ke strategi di Playbook untuk tracking win rate per setup</div>
+      </div>
+
+      <!-- ── STEP 6c: Holding Time ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-stopwatch"></i> Holding Time <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px">(opsional)</span></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div style="flex:1">
+            <input class="fi" type="number" id="f-hold-h" placeholder="Jam" min="0" style="font-size:13px" oninput="window._syncHoldingTime && window._syncHoldingTime()">
+            <div style="font-size:10px;color:var(--text3);margin-top:3px;text-align:center">Jam</div>
+          </div>
+          <div style="font-size:18px;color:var(--text3);margin-top:-12px">:</div>
+          <div style="flex:1">
+            <input class="fi" type="number" id="f-hold-m" placeholder="Menit" min="0" max="59" style="font-size:13px" oninput="window._syncHoldingTime && window._syncHoldingTime()">
+            <div style="font-size:10px;color:var(--text3);margin-top:3px;text-align:center">Menit</div>
+          </div>
+          <div style="flex:2;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;font-family:var(--mono);color:var(--text2)" id="f-hold-display">0 menit total</div>
+        </div>
+        <input type="hidden" id="f-hold-total">
       </div>
 
       <!-- ── STEP 7: Emotion ── -->
@@ -5945,6 +6193,8 @@ onAuthStateChanged(auth, async user => {
     }
     // ── Invited email user — proceed ───────────────────
     currentUser = user;
+    window._currentUser = user;
+    window._db = db;
     closeLoginScreen();
     showLoginPanel();
     setAuthUI(true);
@@ -6238,9 +6488,10 @@ function goPage(name) {
   if (name === 'finance')   renderFinance();
   if (name === 'daily')     renderDailyPage();
   if (name === 'riskcalc')  calcRisk();
+  if (name === 'playbook')  renderPlaybook();
   if (isMob()) closeSB();
 }
-['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
+['dashboard','journal','analytics','calendar','ftmo','playbook'].forEach(name => {
   $('nav-' + name).addEventListener('click', () => goPage(name));
 });
 
@@ -6248,7 +6499,7 @@ function goPage(name) {
 function restorePage() {
   try {
     const saved = sessionStorage.getItem('tl_page');
-    if (saved && ['dashboard','journal','analytics','calendar','ftmo','finance','daily','riskcalc'].includes(saved)) {
+    if (saved && ['dashboard','journal','analytics','calendar','ftmo','finance','daily','riskcalc','playbook'].includes(saved)) {
       goPage(saved);
     }
   } catch(e) {}
@@ -6364,6 +6615,11 @@ function _resetTradeModal() {
   document.querySelectorAll('.qpair-btn').forEach(b => b.classList.remove('active'));
   // Reset tag chips
   document.querySelectorAll('.tag-chip.active').forEach(c => c.classList.remove('active'));
+  // Reset playbook select
+  const pbSel = $('f-playbook'); if(pbSel) pbSel.value = '';
+  // Reset holding time
+  ['f-hold-h','f-hold-m','f-hold-total'].forEach(id => { const el=$(id); if(el) el.value=''; });
+  const hd = $('f-hold-display'); if(hd) hd.textContent = '0 menit total';
   // Reset RR
   const rrEl = $('rr-val');
   if (rrEl) { rrEl.textContent = 'Isi entry & SL'; $('rr-display').style.color='var(--text3)'; }
@@ -6418,9 +6674,11 @@ $('trade-save').addEventListener('click', async () => {
     setup:   $('f-su').value.trim(),
     emotion: $('f-em').value,
     notes:   $('f-nt').value.trim(),
+    playbookId: $('f-playbook').value || null,
+    holdingMinutes: parseInt($('f-hold-total').value) || 0,
   };
   if (window._pendingScreenshot) { trade.screenshot = window._pendingScreenshot; window._pendingScreenshot = null; }
-  ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt'].forEach(id => $(id).value='');
+  ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt','f-hold-h','f-hold-m','f-hold-total'].forEach(id => $(id).value='');
   clearScreenshot();
   closeTradeModal();
   await saveTradeToCloud(trade);
@@ -6684,6 +6942,10 @@ $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
 function updateAll() {
   if (!bal) return;
   window._appTrades = trades; // expose for trading calendar widget
+  window._trades = trades;    // expose for playbook + advanced analytics modules
+  window._db = db;            // expose db for playbook module
+  window._currentUser = currentUser; // expose currentUser for playbook module
+  window.updateAll = updateAll; // re-expose in case it was overridden
   if (window.tcalRefresh) window.tcalRefresh();
   updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil();
   if (window._goalsRefresh) window._goalsRefresh();
@@ -6702,7 +6964,10 @@ function updateAll() {
   if (currentUser) updateTraderCard(currentUser);
   // Update anon counter if applicable
   if (currentUser && currentUser.isAnonymous) updateAnonCounter();
+  // Notify advanced analytics and playbook modules
+  if (window._advAnalyticsReady) window.renderAdvancedAnalytics && window.renderAdvancedAnalytics();
 }
+window.updateAll = updateAll; // expose for external modules
 
 // ── STATS ─────────────────────────────────────────────
 function updateStats() {
@@ -7859,6 +8124,7 @@ function renderDeepAna(ft) {
     </div>`;
   }).join('');
 }
+window.renderAna = renderAna; // expose for advanced analytics hook
 
 // ── CALENDAR ──────────────────────────────────────────
 function renderCal(){
@@ -9834,6 +10100,12 @@ riskpertrade.me`;
         <i class="bi bi-chevron-right bmp-arrow"></i>
       </button>
 
+      <button class="bmp-item" id="bmp-playbook" onclick="bnMoreGo('playbook')">
+        <span class="bmp-icon" style="background:rgba(139,92,246,0.15);color:#a78bfa;"><i class="bi bi-book-half"></i></span>
+        <span class="bmp-label">Playbook</span>
+        <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+
     </div>
 
     <!-- Divider -->
@@ -10713,10 +10985,786 @@ function resetImportModal() {
 }
 </script>
 
-<!-- ── Service Worker: cache CDN assets & enable offline ── -->
+<!-- ══ PLAYBOOK ADD/EDIT MODAL ══ -->
+<div class="mo" id="md-playbook">
+  <div class="md" style="max-width:560px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(139,92,246,.02))">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center">
+            <i class="bi bi-book-half" style="color:var(--accent);font-size:15px"></i>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:-.4px" id="playbook-modal-title">Tambah Strategi</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px">Dokumentasikan setup dan edge kamu</div>
+          </div>
+        </div>
+        <button id="playbook-modal-close" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">
+          <i class="bi bi-x-lg" style="font-size:12px"></i>
+        </button>
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+      <input type="hidden" id="pb-edit-id">
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-tag" style="margin-right:4px;color:var(--accent)"></i>Nama Strategi *</label>
+        <input class="fi" type="text" id="pb-name" placeholder="Misal: OB Rejection, BOS + FVG, London Breakout...">
+      </div>
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-palette" style="margin-right:4px;color:var(--accent)"></i>Warna Label</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="pb-color-picker">
+          <button type="button" class="pb-color-btn active" data-color="#8b5cf6" style="width:28px;height:28px;border-radius:8px;background:#8b5cf6;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#00d97e" style="width:28px;height:28px;border-radius:8px;background:#00d97e;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#f59e0b" style="width:28px;height:28px;border-radius:8px;background:#f59e0b;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#ef4444" style="width:28px;height:28px;border-radius:8px;background:#ef4444;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#38bdf8" style="width:28px;height:28px;border-radius:8px;background:#38bdf8;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#fb923c" style="width:28px;height:28px;border-radius:8px;background:#fb923c;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#a3e635" style="width:28px;height:28px;border-radius:8px;background:#a3e635;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+          <button type="button" class="pb-color-btn" data-color="#e879f9" style="width:28px;height:28px;border-radius:8px;background:#e879f9;border:2px solid transparent;cursor:pointer;transition:all .15s;outline:none"></button>
+        </div>
+        <input type="hidden" id="pb-color" value="#8b5cf6">
+      </div>
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-file-text" style="margin-right:4px;color:var(--accent)"></i>Deskripsi Singkat</label>
+        <input class="fi" type="text" id="pb-desc" placeholder="Ringkasan setup ini dalam 1 kalimat...">
+      </div>
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-box-arrow-in-right" style="margin-right:4px;color:#38bdf8"></i>Kondisi Entry</label>
+        <textarea class="ta" id="pb-entry-cond" style="min-height:80px;font-size:12px" placeholder="Apa yang harus terjadi sebelum kamu entry?&#10;Misal: Price break structure → pullback ke OB → konfirmasi rejection di LTF"></textarea>
+      </div>
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-box-arrow-right" style="margin-right:4px;color:#ef4444"></i>Kondisi Exit</label>
+        <textarea class="ta" id="pb-exit-cond" style="min-height:80px;font-size:12px" placeholder="Kapan kamu TP / SL / cut loss?&#10;Misal: TP di BoS berikutnya, SL di bawah OB terakhir, exit jika rejection candle tidak terbentuk"></textarea>
+      </div>
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-shield-check" style="margin-right:4px;color:#00d97e"></i>Rules (Aturan Wajib)</label>
+        <textarea class="ta" id="pb-rules" style="min-height:70px;font-size:12px" placeholder="Aturan yang TIDAK boleh dilanggar saat menggunakan setup ini...&#10;Misal: Jangan trade counter-trend, Min R:R 1:2, Max 1 trade per sesi"></textarea>
+      </div>
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-journals" style="margin-right:4px;color:#f59e0b"></i>Catatan Tambahan</label>
+        <textarea class="ta" id="pb-notes" style="min-height:60px;font-size:12px" placeholder="Nuansa, konteks pasar, timeframe terbaik, dll..."></textarea>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:10px;background:var(--bg2)">
+      <button class="btng" id="playbook-modal-cancel" style="flex:1">Batal</button>
+      <button class="btn" id="playbook-save-btn" style="flex:2;padding:9px;display:flex;align-items:center;justify-content:center;gap:7px">
+        <i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Playbook
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PLAYBOOK DETAIL MODAL ══ -->
+<div class="mo" id="md-playbook-detail">
+  <div class="md" style="max-width:600px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <div id="pb-detail-header" style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div id="pb-detail-dot" style="width:10px;height:10px;border-radius:50%;background:#8b5cf6;flex-shrink:0;box-shadow:0 0 10px currentColor"></div>
+          <div>
+            <div style="font-size:17px;font-weight:700;letter-spacing:-.4px" id="pb-detail-name">—</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px" id="pb-detail-desc">—</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="pb-detail-edit-btn" style="background:rgba(139,92,246,.1);color:var(--accent2);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s">
+            <i class="bi bi-pencil" style="font-size:10px;margin-right:4px"></i>Edit
+          </button>
+          <button id="pb-detail-close" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s">
+            <i class="bi bi-x-lg" style="font-size:12px"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;padding:20px 24px">
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px" id="pb-detail-stats">
+        <div class="sc"><div class="sl">Win Rate</div><div class="sv" id="pb-d-wr">—</div><div class="sch" id="pb-d-trades">0 trades</div></div>
+        <div class="sc"><div class="sl">Avg R</div><div class="sv" id="pb-d-r">—</div><div class="sch neu">per trade</div></div>
+        <div class="sc"><div class="sl">Net P&L</div><div class="sv" id="pb-d-pnl">—</div><div class="sch neu">total</div></div>
+        <div class="sc"><div class="sl">Profit Factor</div><div class="sv" id="pb-d-pf">—</div><div class="sch neu">gross W/L</div></div>
+      </div>
+      <!-- Detail sections -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div id="pb-d-entry-wrap" style="display:none">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px"><i class="bi bi-box-arrow-in-right" style="color:#38bdf8"></i> Kondisi Entry</div>
+          <div id="pb-d-entry" style="font-size:12px;color:var(--text2);line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;white-space:pre-wrap"></div>
+        </div>
+        <div id="pb-d-exit-wrap" style="display:none">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px"><i class="bi bi-box-arrow-right" style="color:#ef4444"></i> Kondisi Exit</div>
+          <div id="pb-d-exit" style="font-size:12px;color:var(--text2);line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;white-space:pre-wrap"></div>
+        </div>
+        <div id="pb-d-rules-wrap" style="display:none">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px"><i class="bi bi-shield-check" style="color:#00d97e"></i> Rules</div>
+          <div id="pb-d-rules" style="font-size:12px;color:var(--text2);line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;white-space:pre-wrap"></div>
+        </div>
+        <div id="pb-d-notes-wrap" style="display:none">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px"><i class="bi bi-journals" style="color:#f59e0b"></i> Catatan</div>
+          <div id="pb-d-notes" style="font-size:12px;color:var(--text2);line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;white-space:pre-wrap"></div>
+        </div>
+        <!-- Trade history for this playbook -->
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="bi bi-journal-text" style="color:var(--accent)"></i> Trade Journal</div>
+          <div id="pb-d-trades-list" style="display:flex;flex-direction:column;gap:6px">
+            <div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Belum ada trade yang dihubungkan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:12px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;background:var(--bg2)">
+      <button id="pb-detail-delete-btn" style="background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .2s">
+        <i class="bi bi-trash" style="font-size:11px;margin-right:4px"></i>Hapus
+      </button>
+      <button class="btng" id="pb-detail-close2" style="padding:8px 20px">Tutup</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- ══════════════════════════════════════════════════════
-     SERVICE WORKER — cache CDN assets, enable offline mode
+     PLAYBOOK + ADVANCED ANALYTICS MODULE
      ══════════════════════════════════════════════════════ -->
+<script type="module">
+// ── Firebase imports (already imported in main module, but we need access here)
+// We use window globals set by the main module
+// ── Wait for main module to expose db and currentUser
+function waitFor(fn, cb, tries=0) {
+  if(fn()) { cb(); }
+  else if(tries < 60) { setTimeout(() => waitFor(fn, cb, tries+1), 300); }
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAYBOOK MODULE
+// ═══════════════════════════════════════════════════════
+let playbooks = []; // cached playbooks for current user
+let _pbSelectedColor = '#8b5cf6';
+let _pbDetailId = null;
+
+// ── Firestore helpers (use window._db exposed by main module)
+async function pbCollection() {
+  // We access db via window._db set by main module
+  const { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+  return { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, setDoc };
+}
+
+async function loadPlaybooks() {
+  if(!window._db || !window._currentUser) return;
+  try {
+    const { collection, getDocs, query, orderBy } = await pbCollection();
+    const q = query(collection(window._db, 'users', window._currentUser.uid, 'playbooks'), orderBy('createdAt','asc'));
+    const snap = await getDocs(q);
+    playbooks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    populatePlaybookDropdown();
+    if(document.getElementById('page-playbook').classList.contains('active')) renderPlaybook();
+  } catch(e) { console.warn('loadPlaybooks error', e); }
+}
+
+async function savePlaybook(data) {
+  if(!window._db || !window._currentUser) return;
+  const { collection, doc, addDoc, updateDoc } = await pbCollection();
+  const col = collection(window._db, 'users', window._currentUser.uid, 'playbooks');
+  if(data.id) {
+    const { id, ...rest } = data;
+    await updateDoc(doc(window._db, 'users', window._currentUser.uid, 'playbooks', id), { ...rest, updatedAt: Date.now() });
+  } else {
+    await addDoc(col, { ...data, createdAt: Date.now(), updatedAt: Date.now() });
+  }
+  await loadPlaybooks();
+}
+
+async function deletePlaybook(id) {
+  if(!window._db || !window._currentUser) return;
+  const { doc, deleteDoc } = await pbCollection();
+  await deleteDoc(doc(window._db, 'users', window._currentUser.uid, 'playbooks', id));
+  await loadPlaybooks();
+}
+
+// ── Populate dropdown in trade modal
+function populatePlaybookDropdown() {
+  const sel = document.getElementById('f-playbook');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Pilih strategi dari playbook —</option>';
+  playbooks.forEach(pb => {
+    const opt = document.createElement('option');
+    opt.value = pb.id;
+    opt.textContent = pb.name;
+    if(cur === pb.id) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Render Playbook page
+window.renderPlaybook = function() {
+  const list = document.getElementById('playbook-list');
+  const empty = document.getElementById('playbook-empty');
+  if(!list) return;
+
+  // Stats aggregation
+  const pbStats = {};
+  (window._trades || []).forEach(t => {
+    if(!t.playbookId) return;
+    if(!pbStats[t.playbookId]) pbStats[t.playbookId] = { total:0, wins:0, losses:0, r:0, pnl:0 };
+    pbStats[t.playbookId].total++;
+    if(t.result==='Win') pbStats[t.playbookId].wins++;
+    if(t.result==='Loss') pbStats[t.playbookId].losses++;
+    pbStats[t.playbookId].r += (t.r||0);
+    pbStats[t.playbookId].pnl += (t.pnl||0);
+  });
+
+  // Update top stats bar
+  const n = playbooks.length;
+  document.getElementById('pb-total-strats').textContent = n;
+  if(n > 0) {
+    let bestWrPb = null, bestWr = -1, mostUsedPb = null, mostUsed = -1, bestRPb = null, bestR = -99;
+    playbooks.forEach(pb => {
+      const s = pbStats[pb.id] || { total:0, wins:0, r:0 };
+      const wr = s.total > 0 ? s.wins/s.total : 0;
+      const avgR = s.total > 0 ? s.r/s.total : 0;
+      if(wr > bestWr || (wr === bestWr && s.total > 0)) { bestWr = wr; bestWrPb = pb; }
+      if(s.total > mostUsed) { mostUsed = s.total; mostUsedPb = pb; }
+      if(avgR > bestR && s.total > 0) { bestR = avgR; bestRPb = pb; }
+    });
+    if(bestWrPb) { document.getElementById('pb-best-wr-name').textContent = bestWrPb.name; document.getElementById('pb-best-wr-val').textContent = Math.round(bestWr*100)+'% WR'; }
+    if(mostUsedPb) { document.getElementById('pb-most-used-name').textContent = mostUsedPb.name; document.getElementById('pb-most-used-val').textContent = mostUsed+' trades'; }
+    if(bestRPb) { document.getElementById('pb-best-r-name').textContent = bestRPb.name; document.getElementById('pb-best-r-val').textContent = bestR.toFixed(2)+'R avg'; }
+  }
+
+  if(playbooks.length === 0) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  list.innerHTML = '';
+  playbooks.forEach(pb => {
+    const s = pbStats[pb.id] || { total:0, wins:0, losses:0, r:0, pnl:0 };
+    const wr = s.total > 0 ? Math.round(s.wins/s.total*100) : null;
+    const avgR = s.total > 0 ? (s.r/s.total).toFixed(2) : null;
+    const col = pb.color || '#8b5cf6';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden';
+    card.onmouseenter = () => { card.style.borderColor = col; card.style.transform='translateY(-2px)'; card.style.boxShadow=`0 8px 24px rgba(0,0,0,.25)`; };
+    card.onmouseleave = () => { card.style.borderColor='var(--border)'; card.style.transform='none'; card.style.boxShadow='none'; };
+    card.onclick = () => openPlaybookDetail(pb.id);
+    card.innerHTML = `
+      <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${col};border-radius:2px 0 0 2px"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;padding-left:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pb.name}</div>
+          <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pb.desc || 'Belum ada deskripsi'}</div>
+        </div>
+        <div style="background:${col}22;color:${col};border:1px solid ${col}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;flex-shrink:0;margin-left:10px;font-family:var(--mono)">${wr !== null ? wr+'% WR' : 'No data'}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-left:8px">
+        <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px">
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text)">${s.total}</div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px">Trades</div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px">
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${avgR !== null && parseFloat(avgR)>=0 ? '#00d97e':'#ff4d4d'}">${avgR !== null ? avgR+'R' : '—'}</div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px">Avg R</div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px">
+          <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${s.pnl >= 0 ? '#00d97e':'#ff4d4d'}">${s.total > 0 ? (s.pnl>=0?'+':'')+'$'+Math.abs(s.pnl).toFixed(0) : '—'}</div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px">Net P&L</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+};
+
+// ── Open playbook detail modal
+function openPlaybookDetail(id) {
+  const pb = playbooks.find(p => p.id === id);
+  if(!pb) return;
+  _pbDetailId = id;
+  const col = pb.color || '#8b5cf6';
+
+  document.getElementById('pb-detail-dot').style.background = col;
+  document.getElementById('pb-detail-dot').style.boxShadow = `0 0 10px ${col}`;
+  document.getElementById('pb-detail-name').textContent = pb.name;
+  document.getElementById('pb-detail-desc').textContent = pb.desc || 'Belum ada deskripsi';
+  document.getElementById('pb-detail-header').style.borderBottom = `1px solid ${col}33`;
+
+  // Sections
+  const setSection = (wrapId, elId, val) => {
+    const wrap = document.getElementById(wrapId);
+    if(val) { wrap.style.display='block'; document.getElementById(elId).textContent = val; }
+    else wrap.style.display = 'none';
+  };
+  setSection('pb-d-entry-wrap','pb-d-entry', pb.entryCondition);
+  setSection('pb-d-exit-wrap','pb-d-exit', pb.exitCondition);
+  setSection('pb-d-rules-wrap','pb-d-rules', pb.rules);
+  setSection('pb-d-notes-wrap','pb-d-notes', pb.notes);
+
+  // Stats
+  const trades = (window._trades || []).filter(t => t.playbookId === id);
+  const wins = trades.filter(t => t.result==='Win');
+  const losses = trades.filter(t => t.result==='Loss');
+  const wr = trades.length > 0 ? Math.round(wins.length/trades.length*100)+'%' : '—';
+  const avgR = trades.length > 0 ? (trades.reduce((s,t)=>s+(t.r||0),0)/trades.length).toFixed(2)+'R' : '—';
+  const pnl = trades.reduce((s,t)=>s+(t.pnl||0),0);
+  const gw = wins.reduce((s,t)=>s+(t.pnl||0),0);
+  const gl = Math.abs(losses.reduce((s,t)=>s+(t.pnl||0),0));
+  const pf = gl > 0 ? (gw/gl).toFixed(2) : gw > 0 ? '∞' : '—';
+
+  const wrEl = document.getElementById('pb-d-wr');
+  wrEl.textContent = wr;
+  wrEl.className = 'sv ' + (trades.length > 0 ? (wins.length/trades.length >= 0.5 ? 'pos':'neg') : '');
+  document.getElementById('pb-d-r').textContent = avgR;
+  document.getElementById('pb-d-trades').textContent = trades.length + ' trades';
+  const pnlEl = document.getElementById('pb-d-pnl');
+  pnlEl.textContent = trades.length > 0 ? (pnl>=0?'+$':'-$')+Math.abs(pnl).toFixed(2) : '—';
+  pnlEl.className = 'sv ' + (pnl >= 0 ? 'pos':'neg');
+  document.getElementById('pb-d-pf').textContent = pf;
+
+  // Trade list
+  const tList = document.getElementById('pb-d-trades-list');
+  if(trades.length === 0) {
+    tList.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Belum ada trade yang dihubungkan ke strategi ini</div>';
+  } else {
+    tList.innerHTML = '';
+    [...trades].sort((a,b) => b.date.localeCompare(a.date)).slice(0,10).forEach(t => {
+      const pnlCol = t.pnl >= 0 ? '#00d97e':'#ff4d4d';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border-radius:8px;font-size:12px';
+      row.innerHTML = `
+        <div style="font-weight:700;font-family:var(--mono);color:var(--text);min-width:70px">${t.pair||'—'}</div>
+        <div style="font-size:10px;color:var(--text3);flex:1">${t.date||''}</div>
+        <div style="font-size:10px;color:var(--text3)">${t.result||''}</div>
+        <div style="font-weight:700;font-family:var(--mono);color:${pnlCol}">${t.pnl>=0?'+':''}$${parseFloat(t.pnl||0).toFixed(2)}</div>
+      `;
+      tList.appendChild(row);
+    });
+    if(trades.length > 10) {
+      const more = document.createElement('div');
+      more.style.cssText = 'text-align:center;font-size:11px;color:var(--text3);padding:6px';
+      more.textContent = `+ ${trades.length-10} trade lainnya`;
+      tList.appendChild(more);
+    }
+  }
+
+  document.getElementById('md-playbook-detail').classList.add('open');
+}
+
+// ── Open add/edit modal
+function openPlaybookModal(id) {
+  const editing = id ? playbooks.find(p => p.id === id) : null;
+  document.getElementById('playbook-modal-title').textContent = editing ? 'Edit Strategi' : 'Tambah Strategi';
+  document.getElementById('pb-edit-id').value = editing ? editing.id : '';
+  document.getElementById('pb-name').value = editing ? editing.name : '';
+  document.getElementById('pb-desc').value = editing ? (editing.desc||'') : '';
+  document.getElementById('pb-entry-cond').value = editing ? (editing.entryCondition||'') : '';
+  document.getElementById('pb-exit-cond').value = editing ? (editing.exitCondition||'') : '';
+  document.getElementById('pb-rules').value = editing ? (editing.rules||'') : '';
+  document.getElementById('pb-notes').value = editing ? (editing.notes||'') : '';
+  _pbSelectedColor = editing ? (editing.color||'#8b5cf6') : '#8b5cf6';
+  document.getElementById('pb-color').value = _pbSelectedColor;
+  document.querySelectorAll('.pb-color-btn').forEach(b => {
+    const isActive = b.dataset.color === _pbSelectedColor;
+    b.style.border = isActive ? `2px solid white` : '2px solid transparent';
+    b.style.transform = isActive ? 'scale(1.2)' : 'scale(1)';
+  });
+  document.getElementById('md-playbook').classList.add('open');
+  setTimeout(() => document.getElementById('pb-name').focus(), 80);
+}
+
+// ── Color picker
+document.querySelectorAll('.pb-color-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    _pbSelectedColor = btn.dataset.color;
+    document.getElementById('pb-color').value = _pbSelectedColor;
+    document.querySelectorAll('.pb-color-btn').forEach(b => {
+      const isActive = b.dataset.color === _pbSelectedColor;
+      b.style.border = isActive ? '2px solid white' : '2px solid transparent';
+      b.style.transform = isActive ? 'scale(1.2)' : 'scale(1)';
+    });
+  });
+});
+
+// ── Modal event handlers
+document.getElementById('playbook-add-btn').addEventListener('click', () => {
+  if(!window._currentUser) { alert('Login dulu untuk menambah playbook'); return; }
+  openPlaybookModal(null);
+});
+document.getElementById('playbook-modal-close').addEventListener('click', () => document.getElementById('md-playbook').classList.remove('open'));
+document.getElementById('playbook-modal-cancel').addEventListener('click', () => document.getElementById('md-playbook').classList.remove('open'));
+document.getElementById('md-playbook').addEventListener('click', e => { if(e.target===document.getElementById('md-playbook')) document.getElementById('md-playbook').classList.remove('open'); });
+
+document.getElementById('pb-detail-close').addEventListener('click', () => document.getElementById('md-playbook-detail').classList.remove('open'));
+document.getElementById('pb-detail-close2').addEventListener('click', () => document.getElementById('md-playbook-detail').classList.remove('open'));
+document.getElementById('md-playbook-detail').addEventListener('click', e => { if(e.target===document.getElementById('md-playbook-detail')) document.getElementById('md-playbook-detail').classList.remove('open'); });
+
+document.getElementById('pb-detail-edit-btn').addEventListener('click', () => {
+  document.getElementById('md-playbook-detail').classList.remove('open');
+  openPlaybookModal(_pbDetailId);
+});
+
+document.getElementById('pb-detail-delete-btn').addEventListener('click', async () => {
+  if(!_pbDetailId) return;
+  const pb = playbooks.find(p => p.id === _pbDetailId);
+  const linkedCount = (window._trades||[]).filter(t => t.playbookId === _pbDetailId).length;
+  const msg = linkedCount > 0
+    ? `Hapus strategi "${pb?.name}"? ${linkedCount} trade yang linked akan kehilangan referensi playbook-nya.`
+    : `Hapus strategi "${pb?.name}"?`;
+  if(!confirm(msg)) return;
+  document.getElementById('md-playbook-detail').classList.remove('open');
+  await deletePlaybook(_pbDetailId);
+  _pbDetailId = null;
+  renderPlaybook();
+});
+
+// ── Save playbook
+document.getElementById('playbook-save-btn').addEventListener('click', async () => {
+  const name = document.getElementById('pb-name').value.trim();
+  if(!name) { document.getElementById('pb-name').style.borderColor='#ff4d4d'; document.getElementById('pb-name').focus(); return; }
+  document.getElementById('pb-name').style.borderColor='';
+  const btn = document.getElementById('playbook-save-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat" style="font-size:14px"></i> Menyimpan...';
+  const data = {
+    name,
+    desc: document.getElementById('pb-desc').value.trim(),
+    entryCondition: document.getElementById('pb-entry-cond').value.trim(),
+    exitCondition: document.getElementById('pb-exit-cond').value.trim(),
+    rules: document.getElementById('pb-rules').value.trim(),
+    notes: document.getElementById('pb-notes').value.trim(),
+    color: _pbSelectedColor,
+  };
+  const editId = document.getElementById('pb-edit-id').value;
+  if(editId) data.id = editId;
+  try {
+    await savePlaybook(data);
+    document.getElementById('md-playbook').classList.remove('open');
+  } catch(e) { console.error(e); alert('Gagal menyimpan playbook'); }
+  btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Playbook';
+});
+
+// ── Expose renderPlaybook globally & hook into updateAll
+window._pbLoaded = false;
+function initPlaybookModule() {
+  loadPlaybooks();
+  window._pbLoaded = true;
+}
+
+// Hook after auth: wait for _currentUser to be set
+waitFor(() => window._db && window._currentUser, initPlaybookModule);
+
+// Also reload playbooks when trades update (for stats)
+const _origUpdateAll = window.updateAll;
+if(typeof _origUpdateAll === 'function') {
+  window.updateAll = function() {
+    _origUpdateAll.apply(this, arguments);
+    // Refresh playbook stats if on playbook page
+    if(document.getElementById('page-playbook')?.classList.contains('active')) {
+      renderPlaybook();
+    }
+    // Refresh adv analytics if on analytics page
+    if(document.getElementById('page-analytics')?.classList.contains('active')) {
+      renderAdvancedAnalytics();
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// ADVANCED ANALYTICS MODULE
+// ═══════════════════════════════════════════════════════
+
+// ── Holding time sync helper (exposed globally for inline oninput)
+window._syncHoldingTime = function() {
+  const h = parseInt(document.getElementById('f-hold-h').value) || 0;
+  const m = parseInt(document.getElementById('f-hold-m').value) || 0;
+  const total = h * 60 + m;
+  document.getElementById('f-hold-total').value = total;
+  document.getElementById('f-hold-display').textContent = total > 0
+    ? `${h > 0 ? h+'j ' : ''}${m > 0 ? m+'m' : (h > 0 ? '0m' : '0 menit')} total`
+    : '0 menit total';
+};
+
+// ── Format minutes helper
+function fmtMin(m) {
+  if(!m || m <= 0) return '—';
+  if(m < 60) return m + 'm';
+  const h = Math.floor(m/60), rem = m%60;
+  return rem > 0 ? `${h}j ${rem}m` : `${h}j`;
+}
+
+// ── Render advanced analytics
+window.renderAdvancedAnalytics = function() {
+  const trades = window._trades || [];
+  if(!trades.length) return;
+
+  // ── 1. STREAK TRACKER ──────────────────────────────
+  let curWin = 0, curLoss = 0, maxWin = 0, maxLoss = 0;
+  let winStreaks = [], lossStreaks = [], tempW = 0, tempL = 0;
+
+  trades.forEach(t => {
+    if(t.result === 'Win') {
+      curWin++; tempW++; tempL = 0;
+      if(tempW > maxWin) maxWin = tempW;
+    } else if(t.result === 'Loss') {
+      curLoss++; tempL++; tempW = 0;
+      if(tempL > maxLoss) maxLoss = tempL;
+    } else {
+      tempW = 0; tempL = 0;
+    }
+  });
+  // current streaks = streak at END of the trade list
+  let curWinStreak = 0, curLossStreak = 0;
+  for(let i = trades.length-1; i >= 0; i--) {
+    const r = trades[i].result;
+    if(curWinStreak === 0 && curLossStreak === 0) {
+      if(r === 'Win') curWinStreak = 1;
+      else if(r === 'Loss') curLossStreak = 1;
+      else break;
+    } else if(curWinStreak > 0) {
+      if(r === 'Win') curWinStreak++;
+      else break;
+    } else if(curLossStreak > 0) {
+      if(r === 'Loss') curLossStreak++;
+      else break;
+    }
+  }
+
+  // Avg streaks
+  let wStreakArr = [], lStreakArr = [], ws=0, ls=0;
+  trades.forEach(t => {
+    if(t.result==='Win') { ws++; if(ls>0){lStreakArr.push(ls);ls=0;} }
+    else if(t.result==='Loss') { ls++; if(ws>0){wStreakArr.push(ws);ws=0;} }
+    else { if(ws>0){wStreakArr.push(ws);ws=0;} if(ls>0){lStreakArr.push(ls);ls=0;} }
+  });
+  if(ws>0) wStreakArr.push(ws);
+  if(ls>0) lStreakArr.push(ls);
+  const avgWS = wStreakArr.length ? (wStreakArr.reduce((a,b)=>a+b,0)/wStreakArr.length).toFixed(1) : '—';
+  const avgLS = lStreakArr.length ? (lStreakArr.reduce((a,b)=>a+b,0)/lStreakArr.length).toFixed(1) : '—';
+
+  document.getElementById('adv-cur-win-streak').textContent = curWinStreak;
+  document.getElementById('adv-cur-loss-streak').textContent = curLossStreak;
+  document.getElementById('adv-max-win-streak').textContent = maxWin;
+  document.getElementById('adv-max-loss-streak').textContent = maxLoss;
+  document.getElementById('adv-avg-win-streak').textContent = avgWS;
+  document.getElementById('adv-avg-loss-streak').textContent = avgLS;
+
+  // Streak visualizer — last 30 trades
+  const vis = document.getElementById('adv-streak-vis');
+  if(vis) {
+    vis.innerHTML = '';
+    const last30 = trades.slice(-30);
+    last30.forEach((t, i) => {
+      const dot = document.createElement('div');
+      const isWin = t.result === 'Win', isBE = t.result === 'Breakeven';
+      dot.style.cssText = `width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;cursor:default;transition:transform .1s;` +
+        (isWin ? 'background:rgba(0,217,126,.2);color:#00d97e;border:1px solid rgba(0,217,126,.3)'
+               : isBE ? 'background:rgba(255,255,255,.06);color:var(--text3);border:1px solid var(--border)'
+               : 'background:rgba(255,77,77,.2);color:#ff4d4d;border:1px solid rgba(255,77,77,.3)');
+      dot.title = `#${trades.length-last30.length+i+1} ${t.pair||''} ${t.result||''}`;
+      dot.textContent = isWin ? 'W' : isBE ? 'B' : 'L';
+      dot.onmouseenter = () => dot.style.transform = 'scale(1.25)';
+      dot.onmouseleave = () => dot.style.transform = 'scale(1)';
+      vis.appendChild(dot);
+    });
+  }
+
+  // ── 2. MAE/MFE ANALYSIS ────────────────────────────
+  // MAE = how far price went against before turning
+  // Approximation: for wins: MAE ≈ |entry - SL| (worst case against direction before winning)
+  //                           but real MAE needs per-bar data. We approximate:
+  //                MAE_approx for wins = SL distance (risk) since we survived to win
+  //                MFE_approx = |exit - entry|
+  // For losses: MAE = |exit - entry| (that's how far it went against = loss distance)
+  //             MFE_approx = TP we set (if set) but usually we don't have that. Use 0.
+  // This is an approximation — noted to user.
+  const wins = trades.filter(t => t.result==='Win' && t.entry && t.exit && t.sl);
+  const losses = trades.filter(t => t.result==='Loss' && t.entry && t.exit);
+
+  const maeWinArr = wins.map(t => Math.abs(t.entry - t.sl));
+  const maeLossArr = losses.map(t => Math.abs(t.entry - t.exit));
+  const mfeWinArr = wins.map(t => Math.abs(t.exit - t.entry));
+  const mfeLossArr = losses.map(t => {
+    // MFE for loss = how far it went favorable before reversing (approx: 0 since we only have final exit)
+    // Use 0 as conservative estimate
+    return 0;
+  });
+
+  const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+  const avgMaeWin = avg(maeWinArr);
+  const avgMaeLoss = avg(maeLossArr);
+  const avgMfeWin = avg(mfeWinArr);
+
+  const fmt4 = v => v !== null ? v.toFixed(v < 0.01 ? 5 : v < 1 ? 4 : 2) : '—';
+  document.getElementById('adv-mae-win').textContent = avgMaeWin !== null ? fmt4(avgMaeWin) : '—';
+  document.getElementById('adv-mae-loss').textContent = avgMaeLoss !== null ? fmt4(avgMaeLoss) : '—';
+  document.getElementById('adv-mfe-win').textContent = avgMfeWin !== null ? fmt4(avgMfeWin) : '—';
+  document.getElementById('adv-mfe-loss').textContent = '—';
+
+  const ratio = (avgMfeWin !== null && avgMaeWin !== null && avgMaeWin > 0) ? avgMfeWin/avgMaeWin : null;
+  const ratioEl = document.getElementById('adv-mfe-mae-ratio');
+  if(ratio !== null) {
+    ratioEl.textContent = ratio.toFixed(2) + 'x';
+    ratioEl.style.color = ratio >= 2 ? '#00d97e' : ratio >= 1 ? '#f59e0b' : '#ff4d4d';
+  } else ratioEl.textContent = '—';
+
+  // Exit efficiency: how much of potential gain did we capture?
+  // MFE/exit ratio
+  const eff = (avgMfeWin !== null && avgMaeWin !== null && avgMfeWin > 0)
+    ? Math.min(100, Math.round((avgMfeWin / (avgMfeWin + avgMaeWin * 0.5)) * 100)) : null;
+  const effEl = document.getElementById('adv-exit-efficiency');
+  if(eff !== null) {
+    effEl.textContent = eff + '%';
+    effEl.style.color = eff >= 70 ? '#00d97e' : eff >= 50 ? '#f59e0b' : '#ff4d4d';
+  } else effEl.textContent = '—';
+
+  // MAE Insight
+  const insightEl = document.getElementById('adv-mae-insight');
+  if(wins.length < 3) {
+    insightEl.textContent = `Butuh minimal 3 trade win dengan data Entry + Exit + SL untuk melihat insight MAE/MFE.`;
+  } else {
+    const slOk = avgMaeWin !== null && avgMaeLoss !== null;
+    let insight = '';
+    if(slOk) {
+      const maeRatio = avgMaeLoss / (avgMaeWin || 1);
+      if(maeRatio > 2) insight = `⚠️ Losses kamu cenderung jauh melebihi SL normal — kemungkinan kamu hold loss terlalu lama atau SL terlalu longgar. Pertimbangkan SL lebih ketat.`;
+      else if(maeRatio < 0.5) insight = `✅ MAE losses kamu kecil — price langsung ke arah berlawanan. SL placement sudah efisien.`;
+      else insight = `📊 MAE terlihat normal. Wins: harga sempat melawan ${fmt4(avgMaeWin)} pip sebelum balik. Losses: harga melawan ${fmt4(avgMaeLoss)} pip.`;
+    }
+    if(ratio !== null && ratio < 1.5) insight += ` ⚠️ MFE/MAE ratio rendah (${ratio?.toFixed(2)}x) — potensi profit belum dimaksimalkan, pertimbangkan trailing stop atau hold lebih lama.`;
+    insightEl.textContent = insight || '— Analisis sedang dikalkulasi —';
+  }
+
+  // ── 3. HOLDING TIME ANALYSIS ────────────────────────
+  const withHold = trades.filter(t => t.holdingMinutes && t.holdingMinutes > 0);
+  const holdWins = withHold.filter(t => t.result === 'Win');
+  const holdLosses = withHold.filter(t => t.result === 'Loss');
+
+  const avgHoldAll = avg(withHold.map(t => t.holdingMinutes));
+  const avgHoldWin = avg(holdWins.map(t => t.holdingMinutes));
+  const avgHoldLoss = avg(holdLosses.map(t => t.holdingMinutes));
+  const maxHold = withHold.length ? Math.max(...withHold.map(t => t.holdingMinutes)) : null;
+  const minHold = withHold.length ? Math.min(...withHold.map(t => t.holdingMinutes)) : null;
+
+  document.getElementById('adv-hold-avg').textContent = fmtMin(Math.round(avgHoldAll));
+  document.getElementById('adv-hold-win').textContent = fmtMin(Math.round(avgHoldWin));
+  document.getElementById('adv-hold-loss').textContent = fmtMin(Math.round(avgHoldLoss));
+  document.getElementById('adv-hold-max').textContent = fmtMin(maxHold);
+  document.getElementById('adv-hold-min').textContent = fmtMin(minHold);
+
+  const holdRatioEl = document.getElementById('adv-hold-ratio');
+  if(avgHoldWin !== null && avgHoldLoss !== null && avgHoldLoss > 0) {
+    const hr = (avgHoldWin/avgHoldLoss).toFixed(2);
+    holdRatioEl.textContent = hr + 'x';
+    holdRatioEl.style.color = parseFloat(hr) > 1 ? '#00d97e' : '#ff4d4d';
+  } else holdRatioEl.textContent = '—';
+
+  // Holding insight
+  const holdInsight = document.getElementById('adv-hold-insight');
+  if(withHold.length < 3) {
+    holdInsight.textContent = 'Isi field "Holding Time" saat log trade untuk melihat analisis ini. Minimal 3 trade.';
+  } else {
+    let hi = '';
+    if(avgHoldWin !== null && avgHoldLoss !== null) {
+      if(avgHoldWin > avgHoldLoss * 1.5) hi = `📈 Trade kamu yang menang rata-rata ditahan lebih lama (${fmtMin(Math.round(avgHoldWin))}) dibanding yang kalah (${fmtMin(Math.round(avgHoldLoss))}). Ini tanda kamu berhasil hold winner — bagus!`;
+      else if(avgHoldLoss > avgHoldWin * 1.5) hi = `⚠️ Trade kalah kamu ditahan lebih lama (${fmtMin(Math.round(avgHoldLoss))}) dari yang menang (${fmtMin(Math.round(avgHoldWin))}). Kemungkinan kamu hold losses terlalu lama. Cut loss lebih cepat.`;
+      else hi = `📊 Holding time antara win (${fmtMin(Math.round(avgHoldWin))}) dan loss (${fmtMin(Math.round(avgHoldLoss))}) cukup seimbang.`;
+    }
+    if(withHold.length >= 5 && avgHoldAll !== null) hi += ` Rata-rata semua trade: ${fmtMin(Math.round(avgHoldAll))}.`;
+    holdInsight.textContent = hi || '— Kalkulasi insight —';
+  }
+
+  // ── 4. PLAYBOOK WIN RATE LIST ────────────────────────
+  const pbList = document.getElementById('adv-playbook-wr-list');
+  if(!pbList) return;
+  const linked = trades.filter(t => t.playbookId);
+  if(!linked.length || !playbooks.length) {
+    pbList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">— Hubungkan trade ke Playbook untuk melihat win rate per strategi —</div>';
+    return;
+  }
+  pbList.innerHTML = '';
+  // Group by playbookId
+  const grouped = {};
+  linked.forEach(t => {
+    if(!grouped[t.playbookId]) grouped[t.playbookId] = [];
+    grouped[t.playbookId].push(t);
+  });
+  // Sort by win rate desc
+  const entries = Object.entries(grouped).map(([id, tArr]) => {
+    const pb = playbooks.find(p => p.id === id);
+    const w = tArr.filter(t => t.result==='Win').length;
+    const l = tArr.filter(t => t.result==='Loss').length;
+    const wr = tArr.length > 0 ? w/tArr.length : 0;
+    const avgR2 = tArr.reduce((s,t)=>s+(t.r||0),0)/tArr.length;
+    const pnl2 = tArr.reduce((s,t)=>s+(t.pnl||0),0);
+    return { id, name: pb?.name || 'Unknown', color: pb?.color||'#8b5cf6', total: tArr.length, wins:w, losses:l, wr, avgR:avgR2, pnl:pnl2 };
+  }).sort((a,b) => b.wr - a.wr);
+
+  entries.forEach(e => {
+    const wrPct = Math.round(e.wr*100);
+    const wrColor = wrPct >= 60 ? '#00d97e' : wrPct >= 50 ? '#f59e0b' : '#ff4d4d';
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;transition:border-color .15s;cursor:pointer';
+    row.onmouseenter = () => row.style.borderColor = e.color;
+    row.onmouseleave = () => row.style.borderColor = 'var(--border)';
+    row.onclick = () => openPlaybookDetail(e.id);
+    row.innerHTML = `
+      <div style="width:8px;height:8px;border-radius:50%;background:${e.color};flex-shrink:0;box-shadow:0 0 6px ${e.color}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.name}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${e.wins}W ${e.losses}L · ${e.total} trades · Avg ${e.avgR.toFixed(2)}R</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${wrColor}">${wrPct}%</div>
+        <div style="font-size:10px;color:${e.pnl>=0?'#00d97e':'#ff4d4d'};font-family:var(--mono)">${e.pnl>=0?'+':''}$${Math.abs(e.pnl).toFixed(0)}</div>
+      </div>
+      <div style="width:60px;flex-shrink:0">
+        <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${wrPct}%;background:${wrColor};border-radius:2px;transition:width .5s ease"></div>
+        </div>
+      </div>
+    `;
+    pbList.appendChild(row);
+  });
+};
+
+// ── Hook renderAdvancedAnalytics into renderAna
+const _origRenderAna = window.renderAna;
+if(typeof _origRenderAna === 'function') {
+  window.renderAna = function() {
+    _origRenderAna.apply(this, arguments);
+    renderAdvancedAnalytics();
+  };
+}
+
+// Signal that advanced analytics module is ready
+window._advAnalyticsReady = true;
+
+// ── Trigger on page switch to analytics (in case renderAna was already wrapped)
+document.addEventListener('DOMContentLoaded', () => {
+  // Listen for when analytics page becomes active via class mutation
+  const anaPage = document.getElementById('page-analytics');
+  if(anaPage && typeof MutationObserver !== 'undefined') {
+    new MutationObserver(() => {
+      if(anaPage.classList.contains('active')) {
+        setTimeout(() => renderAdvancedAnalytics(), 100);
+      }
+    }).observe(anaPage, { attributes: true, attributeFilter: ['class'] });
+  }
+});
+
+// ── Also expose trades and db from main module via shared state
+const _monkeyPatchTrades = setInterval(() => {
+  if(typeof window.updateAll === 'function' && window._db) {
+    clearInterval(_monkeyPatchTrades);
+    // Wrap updateAll to also trigger playbook refresh
+    const _orig = window.updateAll;
+    window.updateAll = function() {
+      _orig.apply(this, arguments);
+      if(document.getElementById('page-playbook')?.classList.contains('active')) {
+        renderPlaybook();
+      }
+    };
+  }
+}, 300);
+
+</script>
+
+<!-- ══ SERVICE WORKER REGISTRATION ══ -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
