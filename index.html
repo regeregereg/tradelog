@@ -544,6 +544,11 @@ tr:hover td{background:rgba(139,92,246,.04);}
 }
 .bdel{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
 .bdel:hover{color:var(--red);background:var(--rd);}
+.bedit-row{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
+.bedit-row:hover{color:var(--accent2);background:var(--ad);}
+.bdup{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
+.bdup:hover{color:var(--gold);background:rgba(245,158,11,.1);}
+.trade-modal-edit-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.35);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--accent2);letter-spacing:.4px;}
 .fsel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:var(--font);outline:none;cursor:pointer;}
 .fsel option{background:var(--bg3);}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:16px;}
@@ -4347,10 +4352,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <i class="bi bi-pencil-square" style="color:var(--accent);font-size:15px"></i>
+            <i class="bi bi-pencil-square" id="trade-modal-icon" style="color:var(--accent);font-size:15px"></i>
           </div>
           <div>
-            <div style="font-size:16px;font-weight:700;letter-spacing:-.4px">Log New Trade</div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:-.4px" id="trade-modal-title">Log New Trade</div>
             <div style="font-size:11px;color:var(--text3);margin-top:1px" id="trade-modal-subtitle">Catat trade baru ke journal kamu</div>
           </div>
         </div>
@@ -4500,6 +4505,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           </button>
         </div>
         <input type="hidden" id="f-res" value="Win">
+        <input type="hidden" id="f-edit-id" value="">
       </div>
 
       <!-- ── STEP 6: Setup Tags ── -->
@@ -4622,7 +4628,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="flex:1;font-size:11px;color:var(--text3);font-family:var(--mono)" id="trade-rr-footer"></div>
       <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="padding:9px 18px;font-size:13px">Batal</button>
       <button class="btn" id="trade-save" style="padding:9px 24px;font-size:13px;display:flex;align-items:center;gap:7px">
-        <i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Trade
+        <i class="bi bi-cloud-check" style="font-size:14px" id="trade-save-icon"></i> <span id="trade-save-label">Simpan Trade</span>
       </button>
     </div>
 
@@ -6625,6 +6631,14 @@ function _resetTradeModal() {
   if (rrEl) { rrEl.textContent = 'Isi entry & SL'; $('rr-display').style.color='var(--text3)'; }
   const footer = $('trade-rr-footer');
   if (footer) footer.textContent = '';
+  // Reset edit mode
+  $('f-edit-id').value = '';
+  $('trade-modal-title').textContent = 'Log New Trade';
+  $('trade-modal-subtitle').textContent = 'Catat trade baru ke journal kamu';
+  $('trade-modal-icon').className = 'bi bi-pencil-square';
+  $('trade-save-label').textContent = 'Simpan Trade';
+  $('trade-save-icon').className = 'bi bi-cloud-check';
+  $('trade-save').style.background = '';
 }
 
 function openTrade() {
@@ -6660,6 +6674,7 @@ $('md-trade').addEventListener('click', e => { if(e.target===$('md-trade')) clos
 $('trade-save').addEventListener('click', async () => {
   const risk = parseFloat($('f-rk').value) || 100;
   const pnl  = parseFloat($('f-pnl').value) || 0;
+  const editId = $('f-edit-id').value || '';
   const trade = {
     date:    $('f-dt').value,
     pair:    $('f-pair').value.trim().toUpperCase() || 'N/A',
@@ -6677,6 +6692,8 @@ $('trade-save').addEventListener('click', async () => {
     playbookId: $('f-playbook').value || null,
     holdingMinutes: parseInt($('f-hold-total').value) || 0,
   };
+  // If editing, carry the firestoreId so saveTradeToCloud uses updateDoc
+  if (editId) trade.firestoreId = editId;
   if (window._pendingScreenshot) { trade.screenshot = window._pendingScreenshot; window._pendingScreenshot = null; }
   ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt','f-hold-h','f-hold-m','f-hold-total'].forEach(id => $(id).value='');
   clearScreenshot();
@@ -6688,6 +6705,126 @@ $('trade-save').addEventListener('click', async () => {
 window.delTrade = async (firestoreId) => {
   if (!confirm('Hapus trade ini?')) return;
   await deleteTradeFromCloud(firestoreId);
+};
+
+// ── EDIT TRADE ────────────────────────────────────────
+window.editTrade = (firestoreId) => {
+  const t = trades.find(x => x.firestoreId === firestoreId);
+  if (!t) return;
+  _resetTradeModal();
+  // Populate all fields
+  $('f-dt').value    = t.date    || new Date().toISOString().slice(0,10);
+  $('f-pair').value  = t.pair    || '';
+  $('f-en').value    = t.entry   || '';
+  $('f-ex').value    = t.exit    || '';
+  $('f-sl').value    = t.sl      || '';
+  $('f-rk').value    = t.risk    || '';
+  $('f-pnl').value   = t.pnl     || '';
+  $('f-su').value    = t.setup   || '';
+  $('f-nt').value    = t.notes   || '';
+  setTradeDir(t.dir  || 'Long');
+  setResult(t.result || 'Win');
+  if (t.emotion) setEmotion(t.emotion);
+  // Session
+  const sesEl = $('f-ses');
+  if (sesEl && t.session) sesEl.value = t.session;
+  // Playbook
+  const pbSel = $('f-playbook');
+  if (pbSel && t.playbookId) pbSel.value = t.playbookId;
+  // Holding time
+  if (t.holdingMinutes) {
+    const h = Math.floor(t.holdingMinutes / 60);
+    const m = t.holdingMinutes % 60;
+    const hEl = $('f-hold-h'), mEl = $('f-hold-m');
+    if (hEl) hEl.value = h || '';
+    if (mEl) mEl.value = m || '';
+    const hdEl = $('f-hold-total');
+    if (hdEl) hdEl.value = t.holdingMinutes;
+    const disp = $('f-hold-display');
+    if (disp) disp.textContent = h > 0 ? `${h}j ${m}m total` : `${m} menit total`;
+  }
+  // Tag chips
+  if (t.setup) {
+    const tags = t.setup.split(',').map(s => s.trim());
+    document.querySelectorAll('.tag-chip').forEach(chip => {
+      if (tags.includes(chip.dataset.tag)) chip.classList.add('active');
+    });
+  }
+  // Quick pair button
+  document.querySelectorAll('.qpair-btn').forEach(b => {
+    if (b.dataset.pair === t.pair) b.classList.add('active');
+  });
+  // Trigger RR recalc
+  if (typeof calcRR === 'function') calcRR();
+  // Set edit ID
+  $('f-edit-id').value = firestoreId;
+  // Update modal header to edit mode
+  $('trade-modal-title').textContent = 'Edit Trade';
+  $('trade-modal-subtitle').textContent = `${t.pair || 'Trade'} · ${t.date || ''}`;
+  $('trade-modal-icon').className = 'bi bi-pencil-fill';
+  $('trade-save-label').textContent = 'Simpan Perubahan';
+  $('trade-save-icon').className = 'bi bi-check2-circle';
+  // Open modal
+  $('md-trade').classList.add('open');
+  const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
+  if (body) body.scrollTop = 0;
+};
+
+// ── DUPLICATE TRADE ───────────────────────────────────
+window.dupTrade = (firestoreId) => {
+  const t = trades.find(x => x.firestoreId === firestoreId);
+  if (!t) return;
+  _resetTradeModal();
+  // Populate all fields (same as edit, but no firestoreId = new trade)
+  $('f-dt').value    = new Date().toISOString().slice(0,10); // today's date for duplicate
+  $('f-pair').value  = t.pair    || '';
+  $('f-en').value    = t.entry   || '';
+  $('f-ex').value    = t.exit    || '';
+  $('f-sl').value    = t.sl      || '';
+  $('f-rk').value    = t.risk    || '';
+  $('f-pnl').value   = t.pnl     || '';
+  $('f-su').value    = t.setup   || '';
+  $('f-nt').value    = t.notes   || '';
+  setTradeDir(t.dir  || 'Long');
+  setResult(t.result || 'Win');
+  if (t.emotion) setEmotion(t.emotion);
+  const sesEl = $('f-ses');
+  if (sesEl && t.session) sesEl.value = t.session;
+  const pbSel = $('f-playbook');
+  if (pbSel && t.playbookId) pbSel.value = t.playbookId;
+  if (t.holdingMinutes) {
+    const h = Math.floor(t.holdingMinutes / 60);
+    const m = t.holdingMinutes % 60;
+    const hEl = $('f-hold-h'), mEl = $('f-hold-m');
+    if (hEl) hEl.value = h || '';
+    if (mEl) mEl.value = m || '';
+    const hdEl = $('f-hold-total');
+    if (hdEl) hdEl.value = t.holdingMinutes;
+    const disp = $('f-hold-display');
+    if (disp) disp.textContent = h > 0 ? `${h}j ${m}m total` : `${m} menit total`;
+  }
+  if (t.setup) {
+    const tags = t.setup.split(',').map(s => s.trim());
+    document.querySelectorAll('.tag-chip').forEach(chip => {
+      if (tags.includes(chip.dataset.tag)) chip.classList.add('active');
+    });
+  }
+  document.querySelectorAll('.qpair-btn').forEach(b => {
+    if (b.dataset.pair === t.pair) b.classList.add('active');
+  });
+  if (typeof calcRR === 'function') calcRR();
+  // NO edit ID — saves as new trade
+  $('f-edit-id').value = '';
+  // Update modal header
+  $('trade-modal-title').textContent = 'Duplikat Trade';
+  $('trade-modal-subtitle').textContent = `Salinan dari ${t.pair || 'Trade'} · ${t.date || ''}`;
+  $('trade-modal-icon').className = 'bi bi-copy';
+  $('trade-save-label').textContent = 'Simpan Duplikat';
+  $('trade-save-icon').className = 'bi bi-cloud-plus';
+  $('trade-save').style.background = 'linear-gradient(135deg,#b45309,#92400e)';
+  $('md-trade').classList.add('open');
+  const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
+  if (body) body.scrollTop = 0;
 };
 
 // ── BALANCE MODAL ─────────────────────────────────────
@@ -7922,7 +8059,11 @@ function renderTable(){
       <td><span class="b ${rb}">${t.result||'—'}</span></td>
       <td style="color:var(--text2)">${t.setup||'—'}</td>
       <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${t.notes||''}">${t.notes||'—'}</td>
-      <td><button class="bdel" onclick="window.delTrade('${fid}')">✕</button></td>
+      <td style="white-space:nowrap">
+        <button class="bedit-row" onclick="window.editTrade('${fid}')" title="Edit trade"><i class="bi bi-pencil"></i></button>
+        <button class="bdup" onclick="window.dupTrade('${fid}')" title="Duplikat trade"><i class="bi bi-copy"></i></button>
+        <button class="bdel" onclick="window.delTrade('${fid}')" title="Hapus trade">✕</button>
+      </td>
     </tr>`;
   }).join('');
 }
