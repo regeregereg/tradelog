@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function(){
 :root{
   --bg:#09090b;--bg2:#111114;--bg3:#18181c;--bg4:#222227;
   --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
-  --text:#f4f4f5;--text2:#71717a;--text3:#3f3f46;
+  --text:#f4f4f5;--text2:#a1a1aa;--text3:#71717a;
   --green:#22c55e;--gd:rgba(34,197,94,0.1);
   --red:#ef4444;--rd:rgba(239,68,68,0.1);
   --accent:#8b5cf6;--ad:rgba(139,92,246,0.12);
@@ -4020,9 +4020,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
 /* Period selector */
 .rc-period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.rc-period-btn{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#71717a;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.4px;transition:all .2s;}
+.rc-period-btn{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#a1a1aa;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.4px;transition:all .2s;}
 .rc-period-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.45);color:#a78bfa;}
-.rc-period-label{font-size:10px;color:#3f3f46;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-right:4px;}
+.rc-period-label{font-size:10px;color:#71717a;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-right:4px;}
 
 /* THE CARD */
 .rpc-card{
@@ -4060,9 +4060,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .rpc-stat{flex:1;padding:0 18px 0 0;border-right:1px solid rgba(255,255,255,.05);}
 .rpc-stat:first-child{padding-left:0;}
 .rpc-stat:last-child{border-right:none;}
-.rpc-stat-lbl{font-size:9px;color:#3f3f46;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:5px;}
+.rpc-stat-lbl{font-size:9px;color:#71717a;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:5px;}
 .rpc-stat-val{font-size:clamp(16px,2.8vw,22px);font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px;line-height:1;}
-.rpc-stat-sub{font-size:9px;color:#3f3f46;margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.rpc-stat-sub{font-size:9px;color:#71717a;margin-top:3px;font-family:'JetBrains Mono',monospace;}
 .rpc-val-pos{color:#22c55e;}.rpc-val-neg{color:#ef4444;}.rpc-val-pur{color:#a78bfa;}.rpc-val-neu{color:#f4f4f5;}
 
 /* Mini equity bars */
@@ -4072,7 +4072,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 /* Footer */
 .rpc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.04);}
 .rpc-footer-l{font-size:9px;color:#27272a;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
-.rpc-footer-r{font-size:9px;color:#3f3f46;font-family:'JetBrains Mono',monospace;}
+.rpc-footer-r{font-size:9px;color:#71717a;font-family:'JetBrains Mono',monospace;}
 
 /* Action row */
 .rc-actions{display:flex;gap:10px;flex-wrap:wrap;}
@@ -4081,7 +4081,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .rc-act-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5);}
 .rc-act-secondary{background:rgba(255,255,255,.05);color:#a78bfa;border:1px solid rgba(139,92,246,.3);}
 .rc-act-secondary:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.5);}
-.rc-act-ghost{background:rgba(255,255,255,.03);color:#71717a;border:1px solid rgba(255,255,255,.08);}
+.rc-act-ghost{background:rgba(255,255,255,.03);color:#a1a1aa;border:1px solid rgba(255,255,255,.08);}
 .rc-act-ghost:hover{background:rgba(255,255,255,.06);color:#a1a1aa;}
 .rc-copy-toast{font-size:11px;color:#22c55e;font-family:'JetBrains Mono',monospace;display:none;align-items:center;gap:6px;padding:8px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;}
 </style>
@@ -4093,9 +4093,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
       <div>
         <div style="font-size:16px;font-weight:700;color:#f4f4f5;letter-spacing:-.3px;margin-bottom:3px;">Report Card</div>
-        <div style="font-size:11px;color:#52525b;font-family:'JetBrains Mono',monospace;">Bagikan performa trading kamu</div>
+        <div style="font-size:11px;color:#a1a1aa;font-family:'JetBrains Mono',monospace;">Bagikan performa trading kamu</div>
       </div>
-      <button id="rc-close-btn" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#71717a;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:sans-serif;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,.09)';this.style.color='#f4f4f5'" onmouseout="this.style.background='rgba(255,255,255,.05)';this.style.color='#71717a'">✕</button>
+      <button id="rc-close-btn" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#71717a;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:sans-serif;transition:all .15s;flex-shrink:0;" onmouseover="this.style.background='rgba(255,255,255,.09)';this.style.color='#f4f4f5'" onmouseout="this.style.background='rgba(255,255,255,.05)';this.style.color='#a1a1aa'">✕</button>
     </div>
 
     <!-- Period picker -->
@@ -4726,30 +4726,30 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             </div>
             <div style="text-align:right">
               <div style="font-size:10px;font-weight:800;color:#8b5cf6;letter-spacing:1.5px;text-transform:uppercase">RiskPerTrade</div>
-              <div style="font-size:8px;color:#3f3f46;font-family:'JetBrains Mono',monospace;margin-top:2px">riskpertrade.me</div>
+              <div style="font-size:8px;color:#71717a;font-family:'JetBrains Mono',monospace;margin-top:2px">riskpertrade.me</div>
             </div>
           </div>
 
           <!-- Main stat: P&L -->
           <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:18px 20px;margin-bottom:12px;position:relative;overflow:hidden">
             <div style="position:absolute;right:0;top:0;bottom:0;width:4px;border-radius:0 14px 14px 0" id="sp-pnl-bar" style="background:#00d97e"></div>
-            <div style="font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Total P&amp;L</div>
+            <div style="font-size:9px;color:#a1a1aa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Total P&amp;L</div>
             <div id="sp-pnl" style="font-size:30px;font-weight:900;font-family:'JetBrains Mono',monospace;color:#00d97e;line-height:1;letter-spacing:-1px">$0</div>
-            <div id="sp-period" style="font-size:9px;color:#52525b;margin-top:6px;font-family:'JetBrains Mono',monospace">All time</div>
+            <div id="sp-period" style="font-size:9px;color:#a1a1aa;margin-top:6px;font-family:'JetBrains Mono',monospace">All time</div>
           </div>
 
           <!-- Stats row -->
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
             <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 10px">
-              <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Win Rate</div>
+              <div style="font-size:8px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Win Rate</div>
               <div id="sp-wr" style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f4f4f5;line-height:1">—</div>
             </div>
             <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 10px">
-              <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Trades</div>
+              <div style="font-size:8px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Trades</div>
               <div id="sp-trades" style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f4f4f5;line-height:1">0</div>
             </div>
             <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;padding:12px 10px">
-              <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Prof. Factor</div>
+              <div style="font-size:8px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:600">Prof. Factor</div>
               <div id="sp-pf" style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#f4f4f5;line-height:1">—</div>
             </div>
           </div>
@@ -4758,12 +4758,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div style="display:flex;align-items:center;gap:8px">
             <div style="flex:1;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:10px">
               <div>
-                <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Avg R:R</div>
+                <div style="font-size:8px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Avg R:R</div>
                 <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#a78bfa">—</div>
               </div>
               <div style="width:1px;height:24px;background:rgba(255,255,255,.07)"></div>
               <div>
-                <div style="font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Best Streak</div>
+                <div style="font-size:8px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Best Streak</div>
                 <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#00d97e">—</div>
               </div>
             </div>
@@ -7398,7 +7398,7 @@ function renderEq(){
           position: 'right',
           grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
           ticks: {
-            color: '#3f3f46',
+            color: '#71717a',
             font: { size: 10, family: "'JetBrains Mono','Courier New',monospace" },
             maxTicksLimit: 5,
             callback: v => '$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))
@@ -7780,8 +7780,8 @@ function renderPnl(){
         }
       },
       scales:{
-        x:{grid:{display:false},ticks:{color:'#3f3f46',font:{size:9}},border:{display:false}},
-        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3f3f46',font:{family:'JetBrains Mono',size:9},callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))},border:{display:false}}
+        x:{grid:{display:false},ticks:{color:'#71717a',font:{size:9}},border:{display:false}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#71717a',font:{family:'JetBrains Mono',size:9},callback:v=>'$'+(Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))},border:{display:false}}
       }
     }
   });
