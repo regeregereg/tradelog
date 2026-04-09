@@ -5547,7 +5547,7 @@ import { getAuth, signOut, onAuthStateChanged,
          EmailAuthProvider,
          sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, collection,
+import { getFirestore, doc, getDoc, getDocs, setDoc, collection,
          addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -6945,6 +6945,9 @@ function updateAll() {
   window._trades = trades;    // expose for playbook + advanced analytics modules
   window._db = db;            // expose db for playbook module
   window._currentUser = currentUser; // expose currentUser for playbook module
+  // Expose Firestore SDK functions so other modules reuse the SAME version (10.12.0)
+  // This prevents "Expected first argument to collection() to be a CollectionReference" error
+  if (!window._fs) window._fs = { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy };
   window.updateAll = updateAll; // re-expose in case it was overridden
   if (window.tcalRefresh) window.tcalRefresh();
   updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil();
@@ -11140,17 +11143,18 @@ let playbooks = []; // cached playbooks for current user
 let _pbSelectedColor = '#8b5cf6';
 let _pbDetailId = null;
 
-// ── Firestore helpers (use window._db exposed by main module)
-async function pbCollection() {
-  // We access db via window._db set by main module
-  const { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-  return { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, setDoc };
+// ── Firestore helpers — reuse functions from main module (same SDK version!)
+// DO NOT re-import firebase-firestore here; it would create a version mismatch
+// causing "Expected first argument to collection() to be a CollectionReference"
+function getFs() {
+  if (!window._fs) throw new Error('Firebase belum siap. Coba beberapa detik lagi.');
+  return window._fs;
 }
 
 async function loadPlaybooks() {
   if(!window._db || !window._currentUser) return;
   try {
-    const { collection, getDocs, query, orderBy } = await pbCollection();
+    const { collection, getDocs, query, orderBy } = getFs();
     const q = query(collection(window._db, 'users', window._currentUser.uid, 'playbooks'), orderBy('createdAt','asc'));
     const snap = await getDocs(q);
     playbooks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -11160,8 +11164,16 @@ async function loadPlaybooks() {
 }
 
 async function savePlaybook(data) {
-  if(!window._db || !window._currentUser) return;
-  const { collection, doc, addDoc, updateDoc } = await pbCollection();
+  // Wait up to 10s for db and auth to be ready
+  let waited = 0;
+  while ((!window._db || !window._currentUser || !window._fs) && waited < 100) {
+    await new Promise(r => setTimeout(r, 100));
+    waited++;
+  }
+  if(!window._db || !window._currentUser) {
+    throw new Error('Tidak terkoneksi ke cloud. Pastikan kamu sudah login dan coba lagi.');
+  }
+  const { collection, doc, addDoc, updateDoc } = getFs();
   const col = collection(window._db, 'users', window._currentUser.uid, 'playbooks');
   if(data.id) {
     const { id, ...rest } = data;
@@ -11174,7 +11186,7 @@ async function savePlaybook(data) {
 
 async function deletePlaybook(id) {
   if(!window._db || !window._currentUser) return;
-  const { doc, deleteDoc } = await pbCollection();
+  const { doc, deleteDoc } = getFs();
   await deleteDoc(doc(window._db, 'users', window._currentUser.uid, 'playbooks', id));
   await loadPlaybooks();
 }
@@ -11418,6 +11430,9 @@ document.getElementById('playbook-save-btn').addEventListener('click', async () 
   const name = document.getElementById('pb-name').value.trim();
   if(!name) { document.getElementById('pb-name').style.borderColor='#ff4d4d'; document.getElementById('pb-name').focus(); return; }
   document.getElementById('pb-name').style.borderColor='';
+
+  if(!window._currentUser) { alert('Kamu harus login dulu sebelum menyimpan strategi.'); return; }
+
   const btn = document.getElementById('playbook-save-btn');
   btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat" style="font-size:14px"></i> Menyimpan...';
   const data = {
@@ -11434,7 +11449,10 @@ document.getElementById('playbook-save-btn').addEventListener('click', async () 
   try {
     await savePlaybook(data);
     document.getElementById('md-playbook').classList.remove('open');
-  } catch(e) { console.error(e); alert('Gagal menyimpan playbook'); }
+  } catch(e) {
+    console.error('savePlaybook error:', e);
+    alert('Gagal menyimpan strategi: ' + (e.message || 'Coba lagi atau periksa koneksi internet kamu.'));
+  }
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Playbook';
 });
 
@@ -11445,8 +11463,8 @@ function initPlaybookModule() {
   window._pbLoaded = true;
 }
 
-// Hook after auth: wait for _currentUser to be set
-waitFor(() => window._db && window._currentUser, initPlaybookModule);
+// Hook after auth: wait for _currentUser and _fs (Firestore functions) to be set
+waitFor(() => window._db && window._currentUser && window._fs, initPlaybookModule);
 
 // Also reload playbooks when trades update (for stats)
 const _origUpdateAll = window.updateAll;
