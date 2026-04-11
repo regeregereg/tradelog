@@ -1,21 +1,87 @@
 <!DOCTYPE html>
 <!--
-  ╔══════════════════════════════════════════════════════════════╗
-  ║              RiskPerTrade — index.html                       ║
-  ║──────────────────────────────────────────────────────────────║
-  ║  Single-file SPA: HTML + CSS + JS (Firebase/Firestore)       ║
-  ║  Deployment: Vercel  |  Domain: riskpertrade.me              ║
-  ║──────────────────────────────────────────────────────────────║
-  ║  Script load order:                                          ║
-  ║  1. Critical CSS + favicon (head, blocking)                  ║
-  ║  2. Chart.js CDN (head, blocking — needed by module)         ║
-  ║  3. Global Stubs — non-module, onclick bridge (head)         ║
-  ║  4. PWA Manifest inject (body)                               ║
-  ║  5. Page Scripts — UI interactions (body, before module)     ║
-  ║  6. Main Module — Firebase, auth, trade CRUD (body, module)  ║
-  ║  7. Import Module — CSV/API parsers (body)                   ║
-  ║  8. Service Worker register (body, last)                     ║
-  ╚══════════════════════════════════════════════════════════════╝
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  RiskPerTrade — index.html                                           ║
+  ║  Single-file SPA: HTML + CSS + JS  |  riskpertrade.me               ║
+  ║  Deployment: Vercel  |  Backend: Firebase (Auth + Firestore)         ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  SCRIPT LOAD ORDER (baca sebelum edit):                              ║
+  ║  1. Critical CSS + favicon (head, blocking)                          ║
+  ║  2. Chart.js CDN (head, blocking — harus ada sebelum module)         ║
+  ║  3. Global Stubs — non-module, jembatan untuk onclick= attrs         ║
+  ║  4. Master Stylesheet (head, <style>)                                ║
+  ║  5. PWA Manifest inject (body, sebelum konten)                       ║
+  ║  6. Page Scripts — UI interactions (body, sebelum module)            ║
+  ║  7. Main Module — Firebase, auth, trade CRUD (body, type=module)     ║
+  ║  8. Import Module — CSV/API parsers (body, type=module)              ║
+  ║  9. Playbook Module (body, type=module)                              ║
+  ║  10. Service Worker register (body, paling akhir)                    ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  DAFTAR ISI — gunakan Ctrl+F dengan kode berikut untuk navigasi:     ║
+  ║                                                                      ║
+  ║  [HEAD]                                                              ║
+  ║  §HEAD-SEO      — Meta tags, OG, Twitter Card                        ║
+  ║  §HEAD-FAVICON  — Favicon lazy-loader script                         ║
+  ║  §HEAD-VERCEL   — Speed Insights + Analytics                         ║
+  ║  §HEAD-JSON-LD  — Structured data (schema.org)                       ║
+  ║  §HEAD-CSS-CRIT — Critical CSS (anti-flash)                          ║
+  ║  §HEAD-DNS      — DNS prefetch + preconnect                          ║
+  ║  §HEAD-FONTS    — Google Fonts + Bootstrap Icons                     ║
+  ║  §HEAD-CHARTJS  — Chart.js CDN                                       ║
+  ║  §HEAD-STUBS    — Global onclick stubs + crosshair plugin             ║
+  ║                                                                      ║
+  ║  [CSS — Master Stylesheet]                                           ║
+  ║  §CSS-VARS      — CSS variables & reset                              ║
+  ║  §CSS-LAYOUT    — Sidebar, main area, pages, topbar                  ║
+  ║  §CSS-COMPONENTS— Cards, buttons, forms, tables, badges              ║
+  ║  §CSS-JOURNAL   — Journal page + trade list items                    ║
+  ║  §CSS-DASHBOARD — Dashboard stat cards, equity widget                ║
+  ║  §CSS-ANALYTICS — Analytics page + Trader DNA                        ║
+  ║  §CSS-PREMIUM   — Premium analytics card styles                      ║
+  ║  §CSS-FLOAT-CTA — Floating CTA widget                                ║
+  ║  §CSS-IMPORT    — Import modal styles                                 ║
+  ║  §CSS-RESPONSIVE— Media queries + mobile layout                      ║
+  ║                                                                      ║
+  ║  [BODY — HTML Struktur]                                              ║
+  ║  §PWA-MANIFEST  — Inline PWA manifest inject                         ║
+  ║  §SPLASH        — Splash screen + sync bar                           ║
+  ║  §ONBOARDING    — Onboarding tour overlay                            ║
+  ║  §LOGIN         — Login screen (Google + Email + Anon)               ║
+  ║  §TOPBAR        — Mobile top navigation bar                          ║
+  ║  §BOTTOM-NAV    — Mobile bottom navigation                           ║
+  ║  §SIDEBAR       — Desktop sidebar navigation                         ║
+  ║                                                                      ║
+  ║  [PAGES — div.page]                                                  ║
+  ║  §PAGE-DASHBOARD   — Dashboard (stats, equity, calendar)             ║
+  ║  §PAGE-JOURNAL     — Trade journal list                              ║
+  ║  §PAGE-ANALYTICS   — Analytics + Trader DNA + Advanced Stats         ║
+  ║  §PAGE-CALENDAR    — Trading calendar view                           ║
+  ║  §PAGE-PLAYBOOK    — Playbook (setup strategies)                     ║
+  ║  §PAGE-FTMO        — PropFirm tracker                                ║
+  ║  §PAGE-FINANCE     — Business finance module                         ║
+  ║  §PAGE-DAILY       — Daily journal (bias + psikologi)                ║
+  ║  §PAGE-RISKCALC    — Risk calculator                                 ║
+  ║                                                                      ║
+  ║  [MODALS & OVERLAYS]                                                 ║
+  ║  §MODAL-FLOAT-CTA  — Floating CTA (guest users)                      ║
+  ║  §MODAL-PURCHASE   — Purchase confirm modal                          ║
+  ║  §MODAL-REPORTCARD — Report card / share stats modal                 ║
+  ║  §MODAL-GOALS      — Goals set modal                                 ║
+  ║  §MODAL-ANON-LIMIT — Anonymous limit modal                           ║
+  ║  §MODAL-TRADE      — Add/Edit trade modal                            ║
+  ║  §MODAL-AI-REVIEW  — AI trade review modal                           ║
+  ║  §MODAL-REMINDER   — Daily reminder modal                            ║
+  ║  §MODAL-MORE       — Mobile "more" popup menu                        ║
+  ║  §MODAL-PLAYBOOK   — Playbook add/edit + detail modals               ║
+  ║  §MODAL-IMPORT     — Import trades modal (CSV + API)                 ║
+  ║                                                                      ║
+  ║  [SCRIPTS]                                                           ║
+  ║  §SCRIPT-PAGE-UI   — Page interactions, chart renders, UI logic      ║
+  ║  §SCRIPT-MAIN      — Firebase auth + Firestore CRUD (type=module)    ║
+  ║  §SCRIPT-IMPORT    — CSV/API import parsers (type=module)            ║
+  ║  §SCRIPT-PLAYBOOK  — Playbook module (type=module)                   ║
+  ║  §SCRIPT-SW        — Service Worker registration                     ║
+  ╚══════════════════════════════════════════════════════════════════════╝
 -->
 <html lang="en">
 <head>
@@ -23,7 +89,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>RiskPerTrade — Tools Journaling Trading</title>
 
-<!-- ── SEO Meta Tags ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-SEO — Meta Tags, Open Graph, Twitter Card
+     ════════════════════════════════════════════════════════════ -->
+<!-- ── Meta Tags ── -->
 <meta name="description" content="RiskPerTrade adalah trading journal gratis untuk trader. Catat trade, analisis win rate, profit factor, dan pantau progress challenge PropFirm dalam satu platform.">
 <meta name="keywords" content="trading journal, jurnal trading, prop firm tracker, FTMO tracker, trading analytics, catat trade, win rate, profit factor, forex journal, crypto journal, trading tools indonesia">
 <meta name="author" content="RiskPerTrade">
@@ -45,7 +114,9 @@
 <meta name="twitter:description" content="Trading journal gratis untuk trader serius. Track trade, analisis performa, PropFirm tracker.">
 <meta name="twitter:image" content="https://riskpertrade.me/og-image.png">
 
-<!-- ── Favicon & Icons ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-FAVICON — Lazy-load favicons setelah render selesai
+     ════════════════════════════════════════════════════════════ -->
 <script>
 // ── Lazy load favicons setelah halaman render ──
 // Favicon tidak perlu ada di head blocking; di-inject setelah load
@@ -64,13 +135,16 @@ window.addEventListener('load', function() {
 </script>
 <meta name="theme-color" content="#0e0e10">
 
-<!-- ── Vercel Speed Insights ── -->
-<!-- ── Vercel Speed Insights + Analytics ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-VERCEL — Speed Insights + Analytics
+     ════════════════════════════════════════════════════════════ -->
 <script>window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 
-<!-- ── Structured Data (JSON-LD) for Google ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-JSON-LD — Structured Data (schema.org) untuk Google
+     ════════════════════════════════════════════════════════════ -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -95,7 +169,9 @@ window.addEventListener('load', function() {
 }
 </script>
 
-<!-- ── Critical CSS: painted instantly before any external resource loads ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-CSS-CRIT — Critical CSS: cegah white flash
+     ════════════════════════════════════════════════════════════ -->
 <style>
 /* Prevent white flash - set bg color immediately */
 html{background:#09090b;color:#f4f4f5;}
@@ -103,7 +179,10 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 /* Hide all content until app JS initializes (avoids layout flash) */
 #onboard-overlay,#login-screen{display:none;}
 </style>
-<!-- ── DNS prefetch + preconnect untuk Firebase & external services ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-DNS — DNS Prefetch + Preconnect
+     Firebase, Google Fonts, CDN
+     ════════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://tradelog-regy.firebaseapp.com">
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
@@ -112,32 +191,35 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 <link rel="dns-prefetch" href="https://googleapis.com">
 <link rel="dns-prefetch" href="https://tradelog-regy.firebasestorage.app">
 <link rel="dns-prefetch" href="https://securetoken.googleapis.com">
-<!-- ── Preconnect untuk resource penting ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-FONTS — Google Fonts + Bootstrap Icons (non-blocking)
+     ════════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
-<!-- ── Google Fonts: digabung jadi 1 request, kurangi weight yang tidak dipakai ── -->
-<!-- ── Google Fonts: non-blocking load dengan preload trick ── -->
+<!-- Google Fonts: non-blocking dengan preload + media trick -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
 
-<!-- ── Bootstrap Icons: non-blocking dengan media trick ── -->
+<!-- Bootstrap Icons: non-blocking -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
 
-<!-- ── Chart.js: preload + defer agar browser download lebih awal tapi tidak blocking render ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-CHARTJS — Chart.js (blocking, dibutuhkan sebelum module)
+     ════════════════════════════════════════════════════════════ -->
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" as="script">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
-<!-- ── html2canvas: DIHAPUS dari sini, di-lazy load saat dibutuhkan ── -->
+<!-- html2canvas: di-lazy load saat dibutuhkan (tidak di sini) -->
 
-<!-- ══════════════════════════════════════════════════════
-     GLOBAL STUBS — must be non-module so inline onclick= resolves
-     (Bottom Nav, Chart crosshair, lazy script loader)
-     ══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════
+     §HEAD-STUBS — Global onclick stubs, crosshair plugin, lazy loader
+     Harus non-module agar inline onclick= attribute bisa resolve.
+     ════════════════════════════════════════════════════════════ -->
 <script>
 // ── BOTTOM NAV GLOBAL STUBS ──
 // Must live in a non-module script so inline onclick= attributes resolve immediately.
@@ -220,24 +302,14 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 </script>
+<!-- ════════════════════════════════════════════════════════════
+     §CSS — Master Stylesheet
+     Cari §CSS-VARS / §CSS-LAYOUT / §CSS-COMPONENTS / dst.
+     ════════════════════════════════════════════════════════════ -->
 <style>
-/* ══════════════════════════════════════════════════════════════
-   RiskPerTrade — Master Stylesheet
-   ──────────────────────────────────────────────────────────────
-   Sections (search by ══ to jump):
-   1. RESET & CSS VARIABLES
-   2. BASE LAYOUT (sidebar, pages, nav)
-   3. COMPONENTS (cards, buttons, modals, forms, charts)
-   4. JOURNAL & TRADE LIST
-   5. DASHBOARD & STATS
-   6. ANALYTICS / TRADER DNA
-   7. ECONOMIC NEWS WIDGET
-   8. ANALYTICS PAGE — PREMIUM
-   9. FLOAT CTA
-  10. IMPORT MODAL
-  11. RESPONSIVE / MOBILE
-   ══════════════════════════════════════════════════════════════ */
-
+/* ════════════════════════════════════════════════════════════
+   §CSS-VARS — Reset & CSS Variables
+   ════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#09090b;--bg2:#111114;--bg3:#18181c;--bg4:#222227;
@@ -256,15 +328,19 @@ document.addEventListener('DOMContentLoaded', function(){
 html,body{height:100%;overflow-x:hidden;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
 
-/* ══ 2. BASE LAYOUT ══════════════════════════════════════ */
-/* ── NOISE TEXTURE OVERLAY on body ── */
+/* ════════════════════════════════════════════════════════════
+   §CSS-LAYOUT — Base Layout: Sidebar, Main, Pages, Nav
+   ════════════════════════════════════════════════════════════ */
+/* ── Noise texture overlay pada body ── */
 body::before{
   content:'';position:fixed;inset:0;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events:none;z-index:0;opacity:.4;
 }
 
-/* ══ 3. COMPONENTS ══════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   §CSS-COMPONENTS — Cards, Buttons, Forms, Tables, Badges
+   ════════════════════════════════════════════════════════════ */
 /* ── Tag Chips ── */
 .tag-chip{
   padding:5px 11px;border-radius:20px;border:1px solid var(--border2);
@@ -398,7 +474,7 @@ body::before{
   z-index:400;overflow-y:auto;
   transition:transform .28s cubic-bezier(.4,0,.2,1);
   backdrop-filter:blur(20px);
-;will-change:transform;}
+  will-change:transform;}
 .sidebar.off{transform:translateX(-100%);contain:strict;}
 .sb-btn{position:fixed;top:20px;left:calc(var(--sbw) - 14px);width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:left .28s cubic-bezier(.4,0,.2,1),background .15s;z-index:500;}
 .sb-btn:hover{background:var(--bg4);color:var(--text);}
@@ -867,7 +943,9 @@ select.fi option{background:var(--bg3);}
   .ob-cta-row{grid-template-columns:1fr;}
 }
 
-/* ══ 11. RESPONSIVE / MOBILE ══════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   §CSS-RESPONSIVE — Media Queries & Mobile Layout
+   ════════════════════════════════════════════════════════════ */
 @media(max-width:768px){
   .topbar{display:flex;}
   .sb-btn{display:none;}
@@ -1206,12 +1284,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   }
 }
 
-/* ══════════════════════════════════════════════════════
-   ── ANALYTICS / TRADER DNA ──
-   ══════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════
-   ── DNA ANALYSIS — PREMIUM REDESIGN ──
-   ══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   §CSS-ANALYTICS — Analytics Page & Trader DNA Card
+   ════════════════════════════════════════════════════════════ */
     #trader-dna-card{
       margin-bottom:16px;padding:0;overflow:hidden;position:relative;
       background:linear-gradient(145deg,rgba(10,10,13,0.98),rgba(13,13,17,0.95));
@@ -1394,9 +1469,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       display:none;padding-top:4px;
     }
 
-/* ══════════════════════════════════════════════════════
-   ── ECONOMIC NEWS WIDGET ──
-   ══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   §CSS-NEWS — Economic News Widget
+   ════════════════════════════════════════════════════════════ */
 .enews-widget{
         background:linear-gradient(160deg,var(--bg2),var(--bg3));
         border:1px solid var(--border);border-radius:var(--radius);
@@ -1493,10 +1568,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       }
       .enews-ftab.active{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.35);color:var(--accent2);}
 
-/* ══════════════════════════════════════════════════════
-   ── ANALYTICS PAGE — PREMIUM ──
-   ══════════════════════════════════════════════════════ */
-/* ══ RESET & AMBIENT ══ */
+/* ════════════════════════════════════════════════════════════
+   §CSS-PREMIUM — Analytics Page Premium Styles
+   ════════════════════════════════════════════════════════════ */
+/* ── Ambient background ── */
   #page-analytics { position:relative; }
   #page-analytics::after {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:-1;
@@ -1840,9 +1915,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     background:linear-gradient(90deg, transparent, rgba(139,92,246,.3), rgba(34,197,94,.15), transparent);
   }
 
-/* ══════════════════════════════════════════════════════
-   ── FLOAT CTA ──
-   ══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   §CSS-FLOAT-CTA — Floating CTA Widget (guest users)
+   ════════════════════════════════════════════════════════════ */
 @keyframes floatIn {
   from { opacity:0; transform:translateY(20px) scale(.92); }
   to   { opacity:1; transform:translateY(0) scale(1); }
@@ -1861,10 +1936,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   #float-cta > div:last-child { width:240px; }
 }
 
-/* ══════════════════════════════════════════════════════
-   ── IMPORT MODAL ──
-   ══════════════════════════════════════════════════════ */
-/* ── Import Modal Styles ── */
+/* ════════════════════════════════════════════════════════════
+   §CSS-IMPORT — Import Modal Styles
+   ════════════════════════════════════════════════════════════ */
 #md-import .md { max-width: 520px; text-align: left; }
 .imp-tabs { display:flex; gap:4px; background:rgba(255,255,255,.04); border-radius:10px; padding:4px; margin-bottom:20px; border:1px solid var(--border); }
 .imp-tab { flex:1; text-align:center; padding:8px 6px; font-size:12px; font-weight:600; font-family:var(--font); color:var(--text2); cursor:pointer; border-radius:7px; border:none; background:transparent; transition:all .2s; }
@@ -1906,9 +1980,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .imp-map-select { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:7px 10px; color:var(--text); font-size:12px; font-family:var(--body); outline:none; width:100%; }
 </style>
 
-<!-- ══════════════════════════════════════════════════════
-     PWA MANIFEST — injected inline to avoid extra network request
-     ══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════
+     §PWA-MANIFEST — Inline manifest inject (hindari extra network request)
+     ════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
   var manifest = {
@@ -1934,7 +2008,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 </head>
 <body>
 
-<!-- ── SPLASH SCREEN ── -->
+<!-- ════════════════════════════════════════════════════════════
+     §SPLASH — Splash Screen + Top Sync Bar
+     ════════════════════════════════════════════════════════════ -->
 <div id="rpt-splash">
   <div class="splash-logo">
     <div class="splash-logo-icon">📈</div>
@@ -1950,7 +2026,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 </div>
 <div id="rpt-sync-bar"></div>
 
-<!-- ══ ONBOARDING TOUR — FIXED & POLISHED ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §ONBOARDING — Tour Overlay (5 slides)
+     ════════════════════════════════════════════════════════════ -->
 <div id="onboard-overlay">
   <div class="ob-card">
     <button class="ob-close" id="ob-close" aria-label="Tutup">✕</button>
@@ -2177,7 +2255,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div><!-- /ob-card -->
 </div><!-- /onboard-overlay -->
 
-<!-- ══ LOGIN SCREEN ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §LOGIN — Login Screen (Google, Email Magic Link, Anonymous)
+     ════════════════════════════════════════════════════════════ -->
 <div id="login-screen">
   <!-- Panel A: Email Magic Link login -->
   <div class="login-card" id="login-panel">
@@ -2288,7 +2368,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ══ MOBILE TOPBAR ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §TOPBAR — Mobile Top Navigation Bar
+     ════════════════════════════════════════════════════════════ -->
 <div class="topbar">
   <button class="hbg" id="mob-hbg"><i class="bi bi-list"></i></button>
   <div class="tlogo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAOw0lEQVR42u2ce5BU1Z3Hv+ece28/Zqa7h3lAIgiIwuoWsmGr1toFjSsmRmW3rBVX/CcbTDZmqd0F3UJ8pVajjpQIIVUJGhNEY7IuwsSQkJSazfooLYNhNVbtGkAEBEQZ5tHd0+++5/z2j3v7Tvc8G2WAIb8vdWpgqu89j885v/P7/c5pBAAC66yV5CFgwCwGzGLALAbMYsAsBsxiwAyYxYBZDJjFgFkMmMWAWQyYAbMYMIsBsxgwiwGzGDCLAbMYMANmMWAWA2YxYBYDZjFgFgNmwCwGzGLALAbMYsAsBsxiwAyYxYBZE1PWeL5cCAEhxAk/R0Q1P8ezvhOt65P2qZ52nGh/62ovzuD/CE1KCSEEjDHj0vnBdUkpYYyBMeasWcHjCrh1UisaGxuhtfZqqrOqUqmE7p5eaO0Gv1PK9t4TyNSsKgCIxWJIJOIwWoMgRu108BZj0JdMIpfLVdVlwRhdNakkAAOlJNrbJ8O2LBCZQW/6xGsXUlpIpdNIpVL+e89wwEopaK3x2KMb8ZWvLEM6nYRSqgbKaCbQLZdx5MOj2Ld/P36541fYvn07kskUhFAAKqZsoNmWZcF1XaxevRr33XcvUqk+KGtk90JQrWns7unF/v0H8NJLL2Pr1q04ePCDYFUbYyCEBJFBJBLBG2+8jvPPm4F8oQAp5aceftfViMcn4Vv334+OjgeDvkyIPTgUshAKhxF1wz7gOve5aATz2lrxufl/jhuW3Ii9e9/FmjVrsXnzk1UDP/RdlmUhFAojGonCssVoi6ZmQsUTccyZMxtXX30tVq26Dd/buBFrHnoYxWIJljVgOYgI0WgY0YYohBKQ4tP7qK5rEAqHYNtq4nnRWnurTetKMXUV19XIZ/PIpNJIJ3sxa+YsPPHEZjz11JOIRqM1ZrnWUfH2aqM1jGtGLoPqKuZLyKQzSCd7EWuM4d5/vx+/+e9fY+bMGXDdMqRUAWDt+s+6pu7+jF7ccXOwxh2wEBWvk/wigkKGQJpAGv5PvxhAkOfwSEvAshXyhRxSyW58+cv/gCc2/RAC0nfAhjfxEKZSOSCEZ2KNgNEEowGjB+oGCUgpIJVXl6vLSCWPY8FfXYafPdeJttYWEOlg6RvSVe2uLn7bhazpp/dv5e/3uravmmCM9pzIcXLsxtVEj6bGWJNfPVU5K97eWi7lUSgUfbNe8XAFkn3HcePSm7Bz55v49oYNwV4/lgwZNDRFAeEM2SaMLiGbzQYeuxACtu0g2XccF8+bj0cf/S6W3HBTACseb4YdjsIOhwatDwFAI5fNDGtZbNuGE4oPZ6QBqMAynRWApZR44YUX0NV1HEopUGXQCYjH45g7dy6mTz8Pmf6+KkdGwLIsFPL9uPPOVejs7MThI0fGdHSICJZt45VXX8OhQ4cCX4AIcEIOZp03C/Pnz0exkIfruoHpdxwH/eleXL/k77F48dPYseNXkFKis/OnmDylDeVSOfisEIDWBrFYDIsWXQFZZVqIDCzbxtGjH+G1116HlKJmihlNaGhoxNtv/R4CYlxMNZ3sopQiALTph98nIqJ0qoeymSRlM0nK9PdRuZSjefPmjvh8e3s7fWfDetJukTL9fcGz2UySUsnjRER0xx2rCQBZlkWWZREAuuuuO4mIKJU8Hnw+neohIqJrrr5m2Lps26avfnUZ9fZ0UT7XX1NfOtlDxmjavr3T75c1ar+nTPkM9fX1UD6XCt6TTnUTkaFnt/zHmOMmPf/+pJZTkqocmJQUrMbGhkYopeA4DpRSNaWrqwsrVt6G737vMTQ0JmriYS9k0bj88s/7jpyuaw5Ho54n74QcKGugLtd1sWnTZnz9luVwnFCNCZdKoljI4rJLL8OM6edCaxeWZQ1pr23bUEqhqakBGBIfe5GoZVt+f0NDnldKQUoBMw4pidOWizbGQGs9bPE6LLFmzUM4duwoHMcJTJeUAkaXMH36dESjERBRXanDkeoDANu2sW3bNrz66iuIRhuDTJYQAuWyi0RzCy686MIBT3qEdo822cZ6briwbwIDFmPA8DzLY8e68OGRwzWAK8mBlpZJiMViJy0HLITAiy++CCHtQalKzwmc1Nw8YnhWT9cqfgad4sTwGXiaJII0oxfyyGFHzZiTHztms7lRsnMWJqJOU6tphKnvgVRSgUijraUVU8+ZhlJpwLslIliWhe7ubqRSKf93J5ATJuGVQW0gIsycOXMkm4KMD58+4T4pMOBx/xEA9kKlioNRYe4bMWhdBgDcvnoV2idPQX+6N/gcEUEqG/v370ehUKw7HyyECE6MqnPZSimUy2UkEnEsWXI9SsVczTulFHDdIo4ePTry3OQVPHQ+53K5ER2T9vZ23HrrSqxY8a/IZpJQStY4S0Io7NixI5go9Yx6oVDwjwJLQ5wvpRQ2bFiPqVOnob8/FUwmYwzC4Qj27t6Nd955B/CPLhnwWKdFbgmPrFuL7u4eL9FB5AcThESiGXPmzMa0aTOQzSRrTJoxBpFoA97ftwdbt26DEML3uq1R6zNG44ILzsdFF10Ix3E8SESwHRszZszAyhUrsPDShcj0pwcsih+CWXYYz/3s58jn81CWVROyMeARXExjDK644vIRqtcoFYs1Zrna23WcCFbfcTf6+pJVqUoadSso5LPo6HgAHR0P1HjBUko4oTBABpn+dJVpJhhjEAqHcbzrYzz2/R/4+XMzTFWi1gmkenMCZ/kenOnPjOgFV/bnwQPZFJuE9evXobOzs+48dK1pFzUnN1prlEolgLykRq2HLhAON+KWry/HkSNHTvo57VkPeKS7TcMfAxJsJ4yOBx/A3fd80z+jdU+4viCqrapD1OSNvWSE44QRjjTgnrvuwo+efjrIeH3aePuPyou2LXtgcMmLyF3XDVZa9T7YFEugo6MDd9/zTShlQesTu6MlguTJ4JOrqhBGCDiOg4bGBHp7erBi5a14/PEfeJbC6EFZDIGBUzBRR+0CddvwswGwEEBfMomSfyIj4B3pNTcnYFkWtNZVJzUC2i1j0aJFeOihNcjnCyc8SIYIDY1NgLBH/VzXsY+w/Uc/xsNrH8G+ffuglITWxs8HEYSQwd0yMjKIkSv5orGSL+JUL99TBbi6X56jFMKyZTdj55u7YFkKIKDsurh04UJs2/YstNYg8p6TUiKXzeCSS/4S3/inW/DI2vWwbRuuW991V8+8O/j1b/4L7+/bD9tyYKri4HK5jMOHjuAPu3dj587f4uOPj3kDU7PnSkjpWYHK3JIiDIIObpFUQrFSuYRoNDLUdfQv8XkXAExdbZ/QJrq7uxu9vb01v/v5L36Bzs6fYulNS5FO9cKyvBUnlUKhkMHtt6/C1me34YMPDp2Qc+U4Eaxf9x08//wLdSVgiFAF1zvINwaIRycj4rTC1QV097/vT94QAC8xUywWUSqVIWXtHu+W87j44nmIRhuQy2VPbULp9KQovVsTQniH+N5Pb0++99770N+fgWUP3L4QQqBcKqGttR0bvr0Ora0tiMdiiMficBzHM51jqLGhwb+U58CyrCFFKRXcwQ6O/IQABCCVg2v/7GHc9qXf4Z+veg0rrtmJf7z8ObQ1zQRR0VvhQiGVSmHfe+9BWU6QEJFSoFAoYM7sOXjqqU2Ydd5MJOIJtDS3IOSEzzbAA45HJVypFNd1IaXCnr178ejGjYhGY3DdgTBIKYVsJo2/WXwtfv/2LuzatRN79u7BF77wRZTL5bpWsuu6cLWGq13v71XF2xaoZmgEBARJ/N1frMPiuasQo88iVEogWm7B56Zch2VXbEMs0gYiDWUpGGPwk588AznoREpKhVw2gyVLrsebb76BXbt+i917d+Oqq74Y9G1CA653qyEykFLi4bWP4MjhDxAKhf39csDc5QsFtLW1Ydq0qZg8eTLC4ep7VnTS7EzlLvS5LZdg4fTlyKdLMAaAKoCMQSZbwLmN83HJBV/zEyMaQkhs2bIVf/i//0VTU7wmtBJCoD+dRjQawTnnfAatra0IR+yzdQWPtMoIUkr09PTgwY4HEQo3QLtuzcqSUqJcLqNYLIJIe47PSZdCxepPbZ0HISVcKUCWAcGCkYCwFMglnD95IQDp36gUyGQzWL78X1AoFBEOh+GWy8G885IzBqVS2bNcGhMbsNF+bOv694hd716xcfUwy9rzbL3cssTjj2/Ck09uRjzRCqGEZ0b99xj/uqnWumbRGkOBua2+B+26GoZqqhk9bq3a07Uw/sUmAZAFkIKA8f4QDVypFV6blFJ4+dWXcePSpcjly4glWr1+ua43WTVAWvix/AQPkxqborAsC4mWRFVVXoJAjXCTn4hg/NVw881fw3vv7cWqVf+GRKJ10CddABYcxwl+E4169TVPaqmqTwNQNZ8bWxpkPPN5uOt3MG4ZyiiQcCGUhDACdlnDiYSw56OXqmJhCa0JSins2PFLLFiwAPd/6z5cu/gaRBujNe8HFJyQNTEBV0zqSy+/AoJELp+Bqnw7AATbstHVdXzEWLD6K50dHWuwZcuzuO66v8WcP5kD2w+dyBAikQYcOHAweO6tt97Cfz7zDHK5TJBbNsYgEmnEwYMH64w9CSACwYUQCh/2vo3X92/AX89ZBTcvUaYShLDQ2BTF7uRO7Nz346A9lYxV5V7Zu+++i+uX3IB58y7GlVdeidmzL4Dt2N5XYCJRvH/gwLjHw2f010eHJhxG2GeEd9d4rIGqHDbUPzIy+HbG5/90JRbM/AaaQs0o6hJ2H38eO/7nbqRzH0FAgob5Yl3lMv2JHIpMKMCVDo4UttQ72AM3MYZ6ytXvEVLWXDr/pPUNHSKv3pAVR7zps8gXMujPH/YnjRzzK5+1N0lORpvOohV8+iX8VCXB0MB5sBDSN+V0xreeAdc7TEIMrGeiidRyVn1DJYaEdQyYdVrF/40SA2YxYBYDZjFgFgNmMWAWA2bALAbMYsAsBsxiwCwGzGLADJjFgFkMmMWAWQyYxYBZDJjFgBkwiwGzGDCLAbMYMIsBsxgwA2YxYBYDZjFgFgNmMWAWA2bALAbMYsAsBsxiwKyTq/8HLEpLh0GURCQAAAAASUVORK5CYII=" alt="RPT" style="width:22px;height:22px;object-fit:contain">RiskPerTrade</div>
@@ -2300,7 +2382,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 <div class="ovl" id="ovl"></div>
 <div class="sb-btn" id="sb-btn">◀</div>
 
-<!-- ══ BOTTOM NAV (mobile) ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §BOTTOM-NAV — Mobile Bottom Navigation
+     ════════════════════════════════════════════════════════════ -->
 <div id="bottom-nav">
   <div class="bnav-inner">
     <button class="bn-item active" id="bn-dashboard" onclick="bnGo('dashboard')">
@@ -2326,7 +2410,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ══ SIDEBAR ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §SIDEBAR — Desktop Sidebar Navigation
+     ════════════════════════════════════════════════════════════ -->
 <nav class="sidebar off" id="sb">
   <div class="logo"><img src="data:image/png;base64,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" alt="RPT" style="width:28px;height:28px;object-fit:contain;flex-shrink:0"><span style="background:linear-gradient(135deg,#f4f4f5 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">RiskPerTrade</span></div>
 
@@ -2378,10 +2464,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </nav>
 
-<!-- ══ MAIN ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MAIN — Main Content Area (semua div.page ada di sini)
+     ════════════════════════════════════════════════════════════ -->
 <main class="main off" id="main">
 
-  <!-- DASHBOARD -->
+  <!-- ── §PAGE-DASHBOARD ──────────────────────────────────── -->
   <div class="page active" id="page-dashboard">
     <div class="ph">
       <div><div class="pt">Dashboard</div><div class="ps" id="dash-date"></div></div>
@@ -2687,9 +2775,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
     <!-- DNA tilt interaction -->
 
-
     <!-- ── TRADING CALENDAR SCRIPT ── -->
-
 
     <!-- Bottom Charts -->
     <div class="g2">
@@ -2800,13 +2886,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- Economic News Script -->
 
-
     </div><!-- end .dash-cal-col -->
 
     </div><!-- end .dash-layout -->
   </div>
 
-  <!-- JOURNAL -->
+  <!-- ── §PAGE-JOURNAL ───────────────────────────────────── -->
   <div class="page" id="page-journal">
     <div class="ph" style="margin-bottom:16px">
       <div><div class="pt">Trade Journal</div><div class="ps" id="journal-ps">Full history</div></div>
@@ -2869,7 +2954,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
   </div>
 
-  <!-- ANALYTICS -->
+  <!-- ── §PAGE-ANALYTICS ─────────────────────────────────── -->
   <div class="page" id="page-analytics">
 
   <!-- ══ PREMIUM ANALYTICS CSS v2 ══ -->
@@ -3258,10 +3343,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   <!-- ══ PERFORMANCE SCORE JS ══ -->
 
-
   </div>
 
-  <!-- CALENDAR -->
+  <!-- ── §PAGE-CALENDAR ──────────────────────────────────── -->
   <div class="page" id="page-calendar">
     <div class="ph">
       <div><div class="pt">Trading Calendar</div><div class="ps">Daily P&amp;L heatmap</div></div>
@@ -3320,7 +3404,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
   </div>
 
-  <!-- PLAYBOOK -->
+  <!-- ── §PAGE-PLAYBOOK ──────────────────────────────────── -->
   <div class="page" id="page-playbook">
     <div class="ph" style="margin-bottom:16px">
       <div>
@@ -3354,7 +3438,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
   </div>
 
-  <!-- PROPFIRM -->
+  <!-- ── §PAGE-FTMO (PropFirm Tracker) ───────────────────── -->
   <div class="page" id="page-ftmo">
     <div class="ph">
       <div><div class="pt">PropFirm Tracker</div><div class="ps" id="prop-ps">Challenge progress</div></div>
@@ -3380,7 +3464,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="cc"><div class="ch"><div class="ct" id="prop-chart-title">Equity vs PropFirm Limits</div></div><div style="position:relative;height:200px"><canvas id="ftC"></canvas></div></div>
   </div>
 
-  <!-- ══ FINANCE PAGE ══ -->
+  <!-- ── §PAGE-FINANCE ───────────────────────────────────── -->
   <div class="page" id="page-finance">
     <div class="ph">
       <div>
@@ -3486,7 +3570,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
   </div>
 
-  <!-- ══ DAILY JOURNAL PAGE ══ -->
+  <!-- ── §PAGE-DAILY (Bias & Psikologi) ──────────────────── -->
   <div class="page" id="page-daily">
 
     <!-- Page header -->
@@ -3697,7 +3781,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   </div>
 
-  <!-- ══ RISK CALCULATOR PAGE ══ -->
+  <!-- ── §PAGE-RISKCALC ──────────────────────────────────── -->
   <div class="page" id="page-riskcalc">
     <div class="ph">
       <div>
@@ -3847,7 +3931,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
 </main>
 
-<!-- ══ FLOATING CTA — shown only to guests (not logged in) ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-FLOAT-CTA — Floating upgrade widget (guest users only)
+     ════════════════════════════════════════════════════════════ -->
 <div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:300;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:bottom .25s">
 
   <!-- Dismiss button -->
@@ -3917,7 +4003,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ══ PURCHASE CONFIRM MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-PURCHASE — Purchase / upgrade confirm modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-purchase">
   <div class="md" style="max-width:420px;padding:0;overflow-y:auto;background:linear-gradient(160deg,#13102a 0%,#0d0b1e 60%,#0a0a14 100%);border:1px solid rgba(139,92,246,.3)">
 
@@ -4014,10 +4102,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════════
-     REPORT CARD MODAL — Premium Share Card v2
-     ══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-REPORTCARD CSS — Report Card modal styles
+     ════════════════════════════════════════════════════════════ -->
 <style>
 #md-reportcard{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
 #md-reportcard.open{display:flex;}
@@ -4091,6 +4178,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .rc-copy-toast{font-size:11px;color:#22c55e;font-family:'JetBrains Mono',monospace;display:none;align-items:center;gap:6px;padding:8px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;}
 </style>
 
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-REPORTCARD — Report Card / Share Stats modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-reportcard">
   <div class="rc-shell">
 
@@ -4200,7 +4290,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ══ GOALS SET MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-GOALS — Goals set modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-goals">
   <div class="md" style="max-width:420px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
@@ -4248,7 +4340,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ══ ANON LIMIT MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-ANON-LIMIT — Anonymous user trade limit modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-anon-limit">
   <div class="md" style="max-width:380px;text-align:center">
     <div style="font-size:44px;margin-bottom:14px">🔓</div>
@@ -4343,7 +4437,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- LOG TRADE MODAL -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-TRADE — Add / Edit Trade modal (multi-step form)
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-trade">
   <div class="md" id="md-trade-inner" style="width:580px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
 
@@ -4889,7 +4985,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- FINANCE ADD MODAL -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-FINANCE — Finance transaction add modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-finance">
   <div class="md">
     <div class="mdt" id="fin-modal-title">Tambah Transaksi</div>
@@ -4941,17 +5039,16 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ══ FIREBASE SDK ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §FIREBASE-SDK — Firebase loaded via ESM imports (in module scripts below)
+     ════════════════════════════════════════════════════════════ -->
 
-
-<!-- ══════════════════════════════════════════════════════
-     PAGE SCRIPTS — inline UI interactions extracted from HTML
-     (DNA tilt, Trading Calendar, Economic News, Performance Score)
-     ══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-PAGE-UI — UI interactions: DNA tilt, Calendar,
+     Economic News, Performance Score banner
+     ════════════════════════════════════════════════════════════ -->
 <script>
-// ══════════════════════════════════════════════════════
-// DNA TILT INTERACTION
-// ══════════════════════════════════════════════════════
+// ── DNA TILT INTERACTION ──────────────────────────────────────
 (function(){
       function initDnaTilt(){
         var scene=document.getElementById('dnaScene');
@@ -4994,9 +5091,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       else initDnaTilt();
     })();
 
-// ══════════════════════════════════════════════════════
-// TRADING CALENDAR
-// ══════════════════════════════════════════════════════
+// ── TRADING CALENDAR ──────────────────────────────────
 (function(){
       var tcalYear, tcalMonth;
       var MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
@@ -5139,9 +5234,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       window.tcalRefresh = render;
     })();
 
-// ══════════════════════════════════════════════════════
-// ECONOMIC NEWS WIDGET
-// ══════════════════════════════════════════════════════
+// ── ECONOMIC NEWS WIDGET ──────────────────────────────
 (function(){
 
         // ── TIMEZONE ──────────────────────────────────────────
@@ -5458,9 +5551,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         else init();
       })();
 
-// ══════════════════════════════════════════════════════
-// PERFORMANCE SCORE BANNER
-// ══════════════════════════════════════════════════════
+// ── PERFORMANCE SCORE BANNER ──────────────────────────
 (function(){
     // Update the performance score banner whenever analytics renders
     function updateScoreBanner(){
@@ -5541,10 +5632,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
 </script>
 
-<!-- ══════════════════════════════════════════════════════
-     MAIN APPLICATION MODULE
-     Firebase Auth + Firestore + All App Logic
-     ══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-MAIN — Main Application Module
+     Firebase Auth + Firestore + semua app logic
+     ════════════════════════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signOut, onAuthStateChanged,
@@ -7074,7 +7165,6 @@ document.querySelectorAll('[data-pperiod]').forEach(btn => {
 $('cal-prev').addEventListener('click', () => { calOff--; renderCal(); });
 $('cal-next').addEventListener('click', () => { calOff++; renderCal(); });
 
-
 // ── UPDATE ALL ────────────────────────────────────────
 function updateAll() {
   if (!bal) return;
@@ -8408,10 +8498,7 @@ function renderFtmo(){
   ]},options:ftOpts});
 }
 
-// ══════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════
-// ── FINANCE MODULE — Manual Input ──────────────────────
-// ══════════════════════════════════════════════════════
+// ── FINANCE MODULE — Manual Input ────────────────────────────
 
 // ── CONFIG ────────────────────────────────────────────
 const OWNER_UID = 'PASTE_YOUR_UID_HERE'; // ← Ganti dengan UID di Firebase Console → Auth → Users
@@ -8630,9 +8717,7 @@ $('fin-filter-kat').addEventListener('change', renderFinance);
 // ── WIRE NAV ──────────────────────────────────────────
 $('nav-finance').addEventListener('click', () => goPage('finance'));
 
-// ══════════════════════════════════════════════════════
-// ── DAILY JOURNAL MODULE ───────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── DAILY JOURNAL MODULE ─────────────────────────────── ─────
 
 let dailyData   = {};  // { 'YYYY-MM-DD': { bias, pairs, preplan, review, lessons, mood, mental, rating, checklist } }
 let dailyDate   = new Date().toISOString().slice(0,10);
@@ -8804,9 +8889,7 @@ document.querySelectorAll('.mood-btn').forEach(btn => {
 });
 $('nav-daily').addEventListener('click', () => goPage('daily'));
 
-// ══════════════════════════════════════════════════════
-// ── RISK CALCULATOR MODULE ─────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── RISK CALCULATOR MODULE ───────────────────────────── ─────
 
 // Pip value config per instrument (value per 1 lot per 1 pip/point in USD)
 const PIP_CONFIG = {
@@ -8928,9 +9011,7 @@ $('rc-log-btn').addEventListener('click', () => {
 // Init on load
 $('rc-balance').placeholder = bal ? bal.toLocaleString() : '10000';
 
-// ══════════════════════════════════════════════════════
-// ── EXPORT MODULE ──────────────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── EXPORT MODULE ────────────────────────────────────── ─────
 
 // Wire up export + import buttons (already in HTML)
 (function addExportBtn() {
@@ -9108,9 +9189,7 @@ function downloadFile(filename, content, mimeType) {
 // ── Wire listenDaily after login ──────────────────────
 // (added to onAuthStateChanged flow via updateAll)
 
-// ══════════════════════════════════════════════════════
-// ── ONBOARDING TOUR — FIXED ───────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── ONBOARDING TOUR — FIXED ─────────────────────────── ─────
 const OB_KEY   = 'rpt_tour_seen';
 const OB_TOTAL = 5;
 let   obCurrent = 0;
@@ -9245,9 +9324,7 @@ document.addEventListener('keydown', e => {
   }, { passive: true });
 })();
 
-// ══════════════════════════════════════════════════════
-// ── 📸 SCREENSHOT ATTACH ─────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── 📸 SCREENSHOT ATTACH ───────────────────────────── ─────
 window._pendingScreenshot = null;
 
 function handleScreenshotFile(file) {
@@ -9283,9 +9360,7 @@ function clearScreenshot() {
   if (dz) dz.style.borderColor = 'var(--border2)';
 }
 
-// ══════════════════════════════════════════════════════
-// ── 🤖 AI TRADE REVIEW ───────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── 🤖 AI TRADE REVIEW ─────────────────────────────── ─────
 let _aiContent = '';
 let _aiTradeId = null;
 
@@ -9416,9 +9491,7 @@ $('ai-save-notes-btn').addEventListener('click', async () => {
   setTimeout(() => { $('ai-save-notes-btn').textContent = '💾 Simpan ke Notes'; }, 2500);
 });
 
-// ══════════════════════════════════════════════════════
-// ── 🔔 DAILY REMINDER ────────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── 🔔 DAILY REMINDER ──────────────────────────────── ─────
 const RPT_REM_KEY = 'rpt_reminder';
 let _remSettings = { enabled: false, time: '09:00', pnl: true, wr: true, streak: true, motivasi: false };
 let _remTimer = null;
@@ -9531,9 +9604,7 @@ $('md-reminder').addEventListener('click', e => { if(e.target===$('md-reminder')
 loadRemSettings();
 scheduleReminder();
 
-// ══════════════════════════════════════════════════════
-// ── BOTTOM NAV (mobile) ───────────────────────────────
-// ══════════════════════════════════════════════════════
+// ── ── BOTTOM NAV (mobile) ─────────────────────────────── ─────
 // ── BOTTOM NAV SYNC (inside module) ──
 const BN_PAGES = ['dashboard', 'journal', 'analytics'];
 
@@ -9653,9 +9724,7 @@ window.goPage = function(name) {
   if (activeItem) activeItem.classList.add('active-page');
 };
 
-// ══════════════════════════════════════════════════════
-// GOALS & STREAK SYSTEM — Monthly goals + journal streak
-// ══════════════════════════════════════════════════════
+// ── GOALS & STREAK SYSTEM — Monthly goals + journal streak ─────
 (function() {
 
   let _goals = { pnl: 0, wr: 0, tr: 0 }; // current month goals
@@ -9884,9 +9953,7 @@ window.goPage = function(name) {
 
 })();
 
-// ══════════════════════════════════════════════════════
-// REPORT CARD v2 — Premium Share Card with Firestore data
-// ══════════════════════════════════════════════════════
+// ── REPORT CARD v2 — Premium Share Card with Firestore data ─────
 (function() {
   let _rcPeriod = 'all';
 
@@ -10137,7 +10204,9 @@ riskpertrade.me`;
 
 })();
 </script>
-<!-- ══ AI TRADE REVIEW MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-AI-REVIEW — AI trade review modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-ai-review">
   <div class="md" style="max-width:540px;max-height:88vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -10172,7 +10241,9 @@ riskpertrade.me`;
   </div>
 </div>
 
-<!-- ══ DAILY REMINDER MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-REMINDER — Daily journaling reminder modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-reminder">
   <div class="md" style="max-width:420px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -10212,8 +10283,9 @@ riskpertrade.me`;
   </div>
 </div>
 
-
-<!-- ══ MORE POPUP (mobile bottom nav) ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-MORE — Mobile bottom nav "more" popup
+     ════════════════════════════════════════════════════════════ -->
 <div id="bn-more-popup" style="display:none;position:fixed;bottom:72px;right:10px;z-index:600;width:220px;">
   <!-- backdrop tap-to-close -->
   <div id="bn-more-backdrop" onclick="bnMoreClose()" style="position:fixed;inset:0;z-index:-1;"></div>
@@ -10313,18 +10385,12 @@ riskpertrade.me`;
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════════
-     IMPORT MODULE — CSV & API Trade Importers
-     Supports: Bybit API, Binance API, CSV (Exness / MT4 / MT5 / Universal)
-     ══════════════════════════════════════════════════════ -->
-
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-IMPORT — Import Module
+     CSV & API trade importers: Bybit, Binance, Exness, MT4/MT5
+     ════════════════════════════════════════════════════════════ -->
 
 <script>
-// ══════════════════════════════════════════════════════
-// IMPORT MODULE
-// ══════════════════════════════════════════════════════
-
 // ── Detect session from time ──
 function detectSession(dateStr) {
   if (!dateStr) return 'Other';
@@ -10366,7 +10432,7 @@ function pnlToResult(pnl) {
   return 'be';
 }
 
-// ══ PARSER: Bybit Trade History CSV ══
+// ── PARSER: Bybit Trade History CSV ──────────────────────
 // Format: Date(UTC),Symbol,Side,Quantity,Price,Realized P&L,Fee,...
 function parseBybitCSV(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
@@ -10418,7 +10484,7 @@ function parseBybitCSV(text) {
   return results;
 }
 
-// ══ PARSER: Binance Trade History CSV ══
+// ── PARSER: Binance Trade History CSV ────────────────────
 // Format: Date(UTC),Pair,Side,Price,Executed,Amount,Fee,Fee Coin,Total
 function parseBinanceCSV(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
@@ -10468,7 +10534,7 @@ function parseBinanceCSV(text) {
   return results;
 }
 
-// ══ PARSER: MT4/MT5 Statement HTML/CSV (Exness, FTMO, dll) ══
+// ── PARSER: MT4/MT5 Statement HTML/CSV (Exness, FTMO, dll) ──
 // MT4 CSV format: #,Time,Type,Size,Item,Price,S/L,T/P,Price,Commission,Swap,Profit
 function parseMT4CSV(text) {
   const lines = text.trim().split('\n').filter(l => l.trim());
@@ -10528,7 +10594,7 @@ function parseMT4CSV(text) {
   return results;
 }
 
-// ══ PARSER: Exness CSV ══
+// ── PARSER: Exness CSV ────────────────────────────────────
 // Exness format slightly different from MT4 standard
 function parseExnessCSV(text) {
   // Exness sometimes exports with semicolons
@@ -10585,7 +10651,7 @@ function parseExnessCSV(text) {
   return results;
 }
 
-// ══ BYBIT API IMPORT ══
+// ── BYBIT API IMPORT ──────────────────────────────────────
 async function fetchBybitTrades(apiKey, apiSecret, days = 30) {
   // Bybit V5 API: GET /v5/execution/list
   // Note: API secret signing must be done client-side via HMAC-SHA256
@@ -10647,7 +10713,7 @@ async function fetchBybitTrades(apiKey, apiSecret, days = 30) {
   });
 }
 
-// ══ BINANCE API IMPORT ══
+// ── BINANCE API IMPORT ────────────────────────────────────
 async function fetchBinanceTrades(apiKey, apiSecret, days = 30) {
   // Binance: GET /api/v3/myTrades — requires symbol, so we use recent trades approach
   // For futures: GET /fapi/v1/userTrades
@@ -10766,9 +10832,7 @@ async function batchSaveImportedTrades(tradeList, onProgress) {
   return saved;
 }
 
-// ══════════════════════════════════════════════════════
-// IMPORT MODAL UI
-// ══════════════════════════════════════════════════════
+// ── IMPORT MODAL UI ───────────────────────────────────
 function showImportModal() {
   const existing = document.getElementById('md-import');
   if (existing) { existing.classList.add('open'); resetImportModal(); return; }
@@ -11129,7 +11193,9 @@ function resetImportModal() {
 }
 </script>
 
-<!-- ══ PLAYBOOK ADD/EDIT MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-PLAYBOOK-FORM — Playbook add / edit modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-playbook">
   <div class="md" style="max-width:560px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
     <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(139,92,246,.02))">
@@ -11198,7 +11264,9 @@ function resetImportModal() {
   </div>
 </div>
 
-<!-- ══ PLAYBOOK DETAIL MODAL ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-PLAYBOOK-DETAIL — Playbook detail view modal
+     ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-playbook-detail">
   <div class="md" style="max-width:600px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
     <div id="pb-detail-header" style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0">
@@ -11264,10 +11332,9 @@ function resetImportModal() {
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════════
-     PLAYBOOK + ADVANCED ANALYTICS MODULE
-     ══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-PLAYBOOK — Playbook + Advanced Analytics Module
+     ════════════════════════════════════════════════════════════ -->
 <script type="module">
 // ── Firebase imports (already imported in main module, but we need access here)
 // We use window globals set by the main module
@@ -11277,9 +11344,7 @@ function waitFor(fn, cb, tries=0) {
   else if(tries < 60) { setTimeout(() => waitFor(fn, cb, tries+1), 300); }
 }
 
-// ═══════════════════════════════════════════════════════
-// PLAYBOOK MODULE
-// ═══════════════════════════════════════════════════════
+// ── PLAYBOOK MODULE ───────────────────────────────────
 let playbooks = []; // cached playbooks for current user
 let _pbSelectedColor = '#8b5cf6';
 let _pbDetailId = null;
@@ -11623,9 +11688,7 @@ if(typeof _origUpdateAll === 'function') {
   };
 }
 
-// ═══════════════════════════════════════════════════════
-// ADVANCED ANALYTICS MODULE
-// ═══════════════════════════════════════════════════════
+// ── ADVANCED ANALYTICS MODULE ─────────────────────────
 
 // ── Holding time sync helper (exposed globally for inline oninput)
 window._syncHoldingTime = function() {
@@ -11923,7 +11986,9 @@ const _monkeyPatchTrades = setInterval(() => {
 
 </script>
 
-<!-- ══ SERVICE WORKER REGISTRATION ══ -->
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-SW — Service Worker Registration
+     ════════════════════════════════════════════════════════════ -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
