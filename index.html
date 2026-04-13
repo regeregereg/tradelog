@@ -2567,63 +2567,74 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </button>
       </div>
 
-      <!-- Goals grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px" id="goals-grid">
-        <!-- P&L Goal -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px">Target P&L</div>
-          <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
-            <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text)" id="goal-pnl-cur">—</div>
-            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">/</div>
-            <div style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="goal-pnl-target">—</div>
+      <!-- Goals grid — SVG Progress Rings -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px" id="goals-grid">
+
+        <!-- P&L Goal Ring -->
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(34,197,94,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
+            <circle id="goal-pnl-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+            <defs><linearGradient id="ring-green" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#4ade80"/></linearGradient></defs>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;font-weight:800;font-family:var(--mono);fill:#22c55e" id="goal-pnl-cur">—</text>
+            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-pnl-target">—</text>
+          </svg>
+          <div style="text-align:center">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(34,197,94,.6)">Target P&L</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-pnl-pct">—</div>
           </div>
-          <div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
-            <div id="goal-pnl-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .6s cubic-bezier(.4,0,.2,1);width:0%"></div>
-          </div>
-          <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--mono)" id="goal-pnl-pct">0%</div>
+          <input type="hidden" id="goal-pnl-bar">
         </div>
 
-        <!-- Win Rate Goal -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px">Target Win Rate</div>
-          <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
-            <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text)" id="goal-wr-cur">—</div>
-            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">/</div>
-            <div style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="goal-wr-target">—</div>
+        <!-- Win Rate Goal Ring -->
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
+            <circle id="goal-wr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-purple)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+            <defs><linearGradient id="ring-purple" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;font-weight:800;font-family:var(--mono);fill:#a78bfa" id="goal-wr-cur">—</text>
+            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-wr-target">—</text>
+          </svg>
+          <div style="text-align:center">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(139,92,246,.7)">Win Rate</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-wr-pct">—</div>
           </div>
-          <div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
-            <div id="goal-wr-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#8b5cf6,#a78bfa);transition:width .6s cubic-bezier(.4,0,.2,1);width:0%"></div>
-          </div>
-          <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--mono)" id="goal-wr-pct">0%</div>
+          <input type="hidden" id="goal-wr-bar">
         </div>
 
-        <!-- Trades Goal -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px">Target Trades</div>
-          <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">
-            <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text)" id="goal-tr-cur">—</div>
-            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">/</div>
-            <div style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="goal-tr-target">—</div>
+        <!-- Trades Goal Ring -->
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(245,158,11,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
+            <circle id="goal-tr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-amber)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+            <defs><linearGradient id="ring-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:14px;font-weight:800;font-family:var(--mono);fill:#f59e0b" id="goal-tr-cur">—</text>
+            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-tr-target">—</text>
+          </svg>
+          <div style="text-align:center">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(245,158,11,.7)">Trades</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-tr-pct">—</div>
           </div>
-          <div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
-            <div id="goal-tr-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,#f59e0b,#fbbf24);transition:width .6s cubic-bezier(.4,0,.2,1);width:0%"></div>
-          </div>
-          <div style="font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--mono)" id="goal-tr-pct">0%</div>
+          <input type="hidden" id="goal-tr-bar">
         </div>
 
-        <!-- Journal Streak -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px">Journal Streak</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <div style="font-size:22px;font-weight:700;font-family:var(--mono);color:#f59e0b;line-height:1" id="goal-streak-cur">0</div>
-            <div style="font-size:11px;color:var(--text3)">hari berturut</div>
+        <!-- Journal Streak Ring -->
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(245,158,11,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
+            <circle id="goal-streak-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-fire)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+            <defs><linearGradient id="ring-fire" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fb923c"/></linearGradient></defs>
+            <text x="40" y="34" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;font-weight:800;font-family:var(--mono);fill:#f59e0b" id="goal-streak-cur">0</text>
+            <text x="40" y="50" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.3);font-family:var(--mono)">hari</text>
+          </svg>
+          <div style="text-align:center">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(245,158,11,.7)">Streak</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-streak-best">Best: 0</div>
           </div>
-          <!-- 7-dot streak visualizer -->
-          <div style="display:flex;gap:4px" id="streak-dots">
-            <!-- Injected by JS -->
-          </div>
-          <div style="font-size:9px;color:var(--text3);margin-top:5px;font-family:var(--mono)" id="goal-streak-best">Best: 0 hari</div>
+          <!-- Hidden: keep streak-dots for JS compat -->
+          <div id="streak-dots" style="display:none"></div>
         </div>
+
       </div>
 
       <!-- Month progress bar -->
@@ -3421,6 +3432,38 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div id="rating-insight-container">
         <div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;font-family:var(--mono)">— Isi rating saat input trade untuk melihat korelasi kualitas eksekusi vs profit —</div>
       </div>
+    </div>
+
+    <!-- Planned RR vs Actual RR Card -->
+    <div class="premium-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.06));border:1px solid rgba(56,189,248,.2)"><i class="bi bi-bullseye" style="color:#38bdf8"></i></div>
+          Planned RR vs Actual RR
+        </div>
+        <span class="ana-card-badge" style="background:rgba(56,189,248,.1);color:#7dd3fc;border:1px solid rgba(56,189,248,.22)">Execution Discipline</span>
+      </div>
+      <!-- Summary stats row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px" id="rr-compare-stats">
+        <div style="text-align:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 6px">
+          <div style="font-size:18px;font-weight:800;color:#38bdf8;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-avg-planned">—</div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Avg Planned</div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 6px">
+          <div style="font-size:18px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-avg-actual">—</div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Avg Actual</div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 6px">
+          <div style="font-size:18px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-capture-rate">—</div>
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Capture Rate</div>
+        </div>
+      </div>
+      <!-- Insight text -->
+      <div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px" id="rrc-insight">
+        — Isi "Planned RR" saat log trade untuk melihat seberapa sering kamu mencapai target sendiri. —
+      </div>
+      <!-- Per-trade scatter list -->
+      <div id="rrc-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
 
   </div>
@@ -4662,6 +4705,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div style="position:relative">
               <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
               <input class="fi" type="number" id="f-pnl" placeholder="+250 atau -100" step="any" style="padding-left:22px" oninput="autoSetResult()">
+            </div>
+          </div>
+          <div class="fgg">
+            <label class="fl"><i class="bi bi-bullseye" style="margin-right:3px;color:#38bdf8"></i>Planned RR <span style="font-weight:400;color:var(--text3);font-size:10px">(target)</span></label>
+            <div style="position:relative">
+              <input class="fi" type="number" id="f-planned-rr" placeholder="2.0" step="0.1" min="0" style="padding-right:28px">
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);font-family:var(--mono)">R</span>
             </div>
           </div>
         </div>
@@ -6945,6 +6995,8 @@ function _resetTradeModal() {
   $('f-mistakes').value = '';
   document.querySelectorAll('.mistake-chip.active').forEach(c => c.classList.remove('active'));
   const ms = $('mistake-section'); if (ms) ms.style.display = 'none';
+  // Reset planned RR
+  const prr = $('f-planned-rr'); if (prr) prr.value = '';
 }
 
 function openTrade() {
@@ -6998,12 +7050,13 @@ $('trade-save').addEventListener('click', async () => {
     playbookId: $('f-playbook').value || null,
     holdingMinutes: parseInt($('f-hold-total').value) || 0,
     rating: parseInt($('f-rating').value) || 0,
+    plannedRR: parseFloat($('f-planned-rr').value) || 0,
     mistakes: $('f-mistakes').value || '',
   };
   // If editing, carry the firestoreId so saveTradeToCloud uses updateDoc
   if (editId) trade.firestoreId = editId;
   if (window._pendingScreenshot) { trade.screenshot = window._pendingScreenshot; window._pendingScreenshot = null; }
-  ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt','f-hold-h','f-hold-m','f-hold-total','f-rating','f-mistakes'].forEach(id => $(id).value='');
+  ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt','f-hold-h','f-hold-m','f-hold-total','f-rating','f-mistakes','f-planned-rr'].forEach(id => $(id).value='');
   clearScreenshot();
   closeTradeModal();
   await saveTradeToCloud(trade);
@@ -7062,6 +7115,8 @@ window.editTrade = (firestoreId) => {
     });
     $('f-mistakes').value = t.mistakes;
   }
+  // Planned RR
+  const prrEl = $('f-planned-rr'); if (prrEl && t.plannedRR) prrEl.value = t.plannedRR;
   // Tag chips
   if (t.setup) {
     const tags = t.setup.split(',').map(s => s.trim());
@@ -8703,6 +8758,7 @@ function renderDeepAna(ft) {
 
   // ── RATING vs PNL CORRELATION ─────────────────────
   _renderRatingInsight(ft);
+  _renderRRComparison(ft);
 }
 window.renderAna = renderAna; // expose for advanced analytics hook
 
@@ -8800,6 +8856,72 @@ function _renderRatingInsight(ft) {
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono);min-width:22px;text-align:right">${d.total}×</div>
       </div>`;
     }).join('')}`;
+}
+
+// ── PLANNED RR vs ACTUAL RR ───────────────────────────
+function _renderRRComparison(ft) {
+  const statsCont  = document.getElementById('rrc-avg-planned');
+  const insightEl  = document.getElementById('rrc-insight');
+  const listEl     = document.getElementById('rrc-list');
+  if (!statsCont || !insightEl || !listEl) return;
+
+  const withPlan = ft.filter(t => t.plannedRR && t.plannedRR > 0 && typeof t.r === 'number');
+  if (withPlan.length < 3) {
+    insightEl.textContent = '— Isi "Planned RR" saat log trade untuk melihat seberapa sering kamu mencapai target sendiri. —';
+    listEl.innerHTML = '';
+    ['rrc-avg-planned','rrc-avg-actual','rrc-capture-rate'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = '—'; el.style.color = 'var(--text3)'; }
+    });
+    return;
+  }
+
+  const avgPlanned = withPlan.reduce((s, t) => s + t.plannedRR, 0) / withPlan.length;
+  const avgActual  = withPlan.reduce((s, t) => s + t.r, 0) / withPlan.length;
+  const captured   = withPlan.filter(t => t.r >= t.plannedRR * 0.9).length; // within 10%
+  const captureRate = Math.round(captured / withPlan.length * 100);
+
+  // Stats
+  const apEl = document.getElementById('rrc-avg-planned');
+  const aaEl = document.getElementById('rrc-avg-actual');
+  const crEl = document.getElementById('rrc-capture-rate');
+  if (apEl) { apEl.textContent = avgPlanned.toFixed(1) + 'R'; apEl.style.color = '#38bdf8'; }
+  if (aaEl) { aaEl.textContent = (avgActual >= 0 ? '+' : '') + avgActual.toFixed(1) + 'R'; aaEl.style.color = avgActual >= avgPlanned * 0.8 ? '#00d97e' : '#ff4d4d'; }
+  if (crEl) { crEl.textContent = captureRate + '%'; crEl.style.color = captureRate >= 60 ? '#00d97e' : captureRate >= 40 ? '#f59e0b' : '#ff4d4d'; }
+
+  // Insight
+  let msg = '';
+  const ratio = avgActual / avgPlanned;
+  if (ratio >= 0.9)      msg = `✅ Eksekusi sangat disiplin — kamu rata-rata mencapai ${(ratio*100).toFixed(0)}% dari target RR yang direncanakan.`;
+  else if (ratio >= 0.6) msg = `📊 Capture rate ${(ratio*100).toFixed(0)}% — ada ruang untuk hold winner lebih lama. ${captureRate}% trade mencapai target.`;
+  else if (ratio >= 0.3) msg = `⚠️ Kamu sering exit terlalu cepat — actual RR hanya ${avgActual.toFixed(1)}R dari target ${avgPlanned.toFixed(1)}R. Pertimbangkan trailing stop.`;
+  else                   msg = `🚨 Actual RR jauh di bawah planned (${avgActual.toFixed(1)}R vs ${avgPlanned.toFixed(1)}R). Review apakah target RR kamu realistis atau apakah kamu panic-exit terlalu awal.`;
+
+  // Check for early exit pattern
+  const earlyExits = withPlan.filter(t => t.r < t.plannedRR * 0.5 && t.result === 'Win').length;
+  if (earlyExits > withPlan.length * 0.3) msg += ` Terdeteksi ${earlyExits} trade menang tapi exit jauh dari target.`;
+  insightEl.textContent = msg;
+
+  // Per-trade list — last 10 trades with plannedRR
+  const recent = [...withPlan].sort((a, b) => (b.date || '') > (a.date || '') ? 1 : -1).slice(0, 10);
+  listEl.innerHTML = recent.map(t => {
+    const pct = Math.min(100, Math.max(0, (t.r / t.plannedRR) * 100));
+    const achieved = t.r >= t.plannedRR * 0.9;
+    const barColor = achieved ? '#00d97e' : t.r > 0 ? '#f59e0b' : '#ff4d4d';
+    const targetX  = Math.min(95, (t.plannedRR / Math.max(t.plannedRR, t.r) * 100));
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text);min-width:58px">${t.pair || '—'}</div>
+      <div style="flex:1;position:relative">
+        <div style="background:rgba(255,255,255,.05);border-radius:3px;height:6px;overflow:visible;position:relative">
+          <div style="height:100%;width:${Math.max(2,pct)}%;background:${barColor};border-radius:3px;transition:width .6s ease;min-width:2px"></div>
+          <!-- Target marker -->
+          <div style="position:absolute;top:-3px;left:${targetX}%;width:2px;height:12px;background:rgba(56,189,248,.6);border-radius:1px" title="Target RR: ${t.plannedRR}R"></div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-family:var(--mono);min-width:36px;text-align:right;color:${t.r >= 0 ? '#00d97e' : '#ff4d4d'};font-weight:600">${t.r >= 0 ? '+' : ''}${t.r.toFixed(1)}R</div>
+      <div style="font-size:10px;font-family:var(--mono);min-width:32px;text-align:right;color:rgba(56,189,248,.6)">/${t.plannedRR}R</div>
+    </div>`;
+  }).join('');
 }
 
 function hexToRgb(hex) {
@@ -10284,39 +10406,45 @@ window.goPage = function(name) {
     const curWr  = n > 0 ? (W.length / n * 100) : 0;
     const curTr  = n;
 
+    // Helper: set SVG ring fill (pct 0-100)
+    function _setRing(id, pct) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const circumference = 201; // 2π×32
+      const offset = circumference - (Math.min(100, Math.max(0, pct)) / 100) * circumference;
+      el.style.strokeDashoffset = offset;
+    }
+
     // ── P&L goal ──
     const pnlCurEl  = document.getElementById('goal-pnl-cur');
     const pnlTgtEl  = document.getElementById('goal-pnl-target');
-    const pnlBarEl  = document.getElementById('goal-pnl-bar');
     const pnlPctEl  = document.getElementById('goal-pnl-pct');
     if (pnlCurEl) pnlCurEl.textContent = (curPnl >= 0 ? '+$' : '-$') + f2(Math.abs(curPnl));
-    if (pnlCurEl) pnlCurEl.style.color = curPnl >= 0 ? '#22c55e' : '#ef4444';
-    if (pnlTgtEl) pnlTgtEl.textContent = hasGoals && _goals.pnl ? '$' + f2(_goals.pnl) : '—';
+    if (pnlCurEl) pnlCurEl.setAttribute('fill', curPnl >= 0 ? '#22c55e' : '#ef4444');
+    if (pnlTgtEl) pnlTgtEl.textContent = hasGoals && _goals.pnl ? '/$' + f2(_goals.pnl) : '';
     const pnlRatio = (hasGoals && _goals.pnl) ? Math.min(100, Math.max(0, (curPnl / _goals.pnl) * 100)) : 0;
-    if (pnlBarEl) pnlBarEl.style.width = pnlRatio + '%';
-    if (pnlBarEl) pnlBarEl.style.background = curPnl < 0 ? 'linear-gradient(90deg,#ef4444,#f87171)' : 'linear-gradient(90deg,#22c55e,#4ade80)';
+    _setRing('goal-pnl-ring', hasGoals && _goals.pnl ? pnlRatio : 0);
+    if (document.getElementById('goal-pnl-ring')) document.getElementById('goal-pnl-ring').setAttribute('stroke', curPnl < 0 ? 'url(#ring-red)' : 'url(#ring-green)');
     if (pnlPctEl) pnlPctEl.textContent = hasGoals && _goals.pnl ? Math.round(pnlRatio) + '% tercapai' : 'Belum diset';
 
     // ── WR goal ──
     const wrCurEl  = document.getElementById('goal-wr-cur');
     const wrTgtEl  = document.getElementById('goal-wr-target');
-    const wrBarEl  = document.getElementById('goal-wr-bar');
     const wrPctEl  = document.getElementById('goal-wr-pct');
-    if (wrCurEl) { wrCurEl.textContent = n > 0 ? curWr.toFixed(1) + '%' : '—'; wrCurEl.style.color = curWr >= (hasGoals && _goals.wr ? _goals.wr : 50) ? '#a78bfa' : '#ef4444'; }
-    if (wrTgtEl) wrTgtEl.textContent = hasGoals && _goals.wr ? _goals.wr + '%' : '—';
+    if (wrCurEl) { wrCurEl.textContent = n > 0 ? curWr.toFixed(1) + '%' : '—'; wrCurEl.setAttribute('fill', curWr >= (hasGoals && _goals.wr ? _goals.wr : 50) ? '#a78bfa' : '#ef4444'); }
+    if (wrTgtEl) wrTgtEl.textContent = hasGoals && _goals.wr ? '/' + _goals.wr + '%' : '';
     const wrRatio = (hasGoals && _goals.wr) ? Math.min(100, Math.max(0, (curWr / _goals.wr) * 100)) : 0;
-    if (wrBarEl) wrBarEl.style.width = wrRatio + '%';
+    _setRing('goal-wr-ring', hasGoals && _goals.wr ? wrRatio : 0);
     if (wrPctEl) wrPctEl.textContent = hasGoals && _goals.wr ? Math.round(wrRatio) + '% tercapai' : 'Belum diset';
 
     // ── Trades goal ──
     const trCurEl = document.getElementById('goal-tr-cur');
     const trTgtEl = document.getElementById('goal-tr-target');
-    const trBarEl = document.getElementById('goal-tr-bar');
     const trPctEl = document.getElementById('goal-tr-pct');
     if (trCurEl) trCurEl.textContent = curTr;
-    if (trTgtEl) trTgtEl.textContent = hasGoals && _goals.tr ? _goals.tr : '—';
+    if (trTgtEl) trTgtEl.textContent = hasGoals && _goals.tr ? '/' + _goals.tr : '';
     const trRatio = (hasGoals && _goals.tr) ? Math.min(100, (curTr / _goals.tr) * 100) : 0;
-    if (trBarEl) trBarEl.style.width = trRatio + '%';
+    _setRing('goal-tr-ring', hasGoals && _goals.tr ? trRatio : 0);
     if (trPctEl) trPctEl.textContent = hasGoals && _goals.tr ? Math.round(trRatio) + '% tercapai' : 'Belum diset';
 
     // ── Streak ──
@@ -10324,22 +10452,11 @@ window.goPage = function(name) {
     const skBestEl  = document.getElementById('goal-streak-best');
     const skBadge   = document.getElementById('streak-badge');
     const skBadgeN  = document.getElementById('streak-badge-num');
-    const dotsEl    = document.getElementById('streak-dots');
-    if (skCurEl) { skCurEl.textContent = _streak; skCurEl.style.color = _streak >= 7 ? '#f59e0b' : _streak >= 3 ? '#fbbf24' : 'var(--text2)'; }
-    if (skBestEl) skBestEl.textContent = 'Best: ' + _bestStreak + ' hari';
+    if (skCurEl) { skCurEl.textContent = _streak; skCurEl.setAttribute('fill', _streak >= 7 ? '#f59e0b' : _streak >= 3 ? '#fbbf24' : 'rgba(255,255,255,.4)'); }
+    if (skBestEl) skBestEl.textContent = 'Best: ' + _bestStreak;
     if (skBadge) { skBadge.style.display = _streak >= 3 ? 'flex' : 'none'; if(skBadgeN) skBadgeN.textContent = _streak; }
-
-    // 7-day dot visualizer
-    if (dotsEl) {
-      dotsEl.innerHTML = '';
-      for (let i = 0; i < 7; i++) {
-        const d = document.createElement('div');
-        const filled = i < Math.min(_streak, 7);
-        d.style.cssText = `width:14px;height:14px;border-radius:4px;transition:all .3s;` +
-          (filled ? `background:linear-gradient(135deg,#f59e0b,#fbbf24);box-shadow:0 0 6px rgba(245,158,11,.4);` : `background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);`);
-        dotsEl.appendChild(d);
-      }
-    }
+    // Drive streak ring: cap at 30 days for full ring
+    _setRing('goal-streak-ring', Math.min(100, (_streak / 30) * 100));
 
     // ── Month progress bar ──
     const now = new Date();
@@ -11877,6 +11994,62 @@ window.renderPlaybook = function() {
     pbStats[t.playbookId].pnl += (t.pnl||0);
   });
 
+  // ── Build monthly WR trend per strategy (last 6 months) ──
+  const pbMonthly = {}; // { pbId: { "2026-01": {w,n}, ... } }
+  const now6 = new Date();
+  const monthKeys = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now6.getFullYear(), now6.getMonth() - i, 1);
+    monthKeys.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  (window._trades || []).forEach(t => {
+    if (!t.playbookId || !t.date) return;
+    const mk = t.date.slice(0, 7);
+    if (!monthKeys.includes(mk)) return;
+    if (!pbMonthly[t.playbookId]) pbMonthly[t.playbookId] = {};
+    if (!pbMonthly[t.playbookId][mk]) pbMonthly[t.playbookId][mk] = { w: 0, n: 0 };
+    pbMonthly[t.playbookId][mk].n++;
+    if (t.result === 'Win') pbMonthly[t.playbookId][mk].w++;
+  });
+
+  // Helper: build SVG sparkline for WR trend
+  function _buildSparkline(pbId, color) {
+    const monthly = pbMonthly[pbId] || {};
+    const vals = monthKeys.map(mk => monthly[mk] && monthly[mk].n >= 1 ? (monthly[mk].w / monthly[mk].n) * 100 : null);
+    const hasData = vals.some(v => v !== null);
+    if (!hasData) return `<div style="font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px 0">Belum ada data tren</div>`;
+
+    const W = 120, H = 32;
+    const filled = vals.map((v, i) => v !== null ? { i, v } : null).filter(Boolean);
+    if (filled.length < 2) return `<div style="font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px 0">${filled.length === 1 ? Math.round(filled[0].v)+'% WR bulan ini' : 'Butuh data 2 bulan+'}</div>`;
+
+    const xStep = W / (monthKeys.length - 1);
+    const pts = filled.map(({ i, v }) => `${(i * xStep).toFixed(1)},${(H - (v / 100) * H).toFixed(1)}`).join(' ');
+    const firstPt = filled[0];
+    const lastPt  = filled[filled.length - 1];
+    const trend   = lastPt.v - firstPt.v;
+    const trendColor = trend > 2 ? '#00d97e' : trend < -2 ? '#ff4d4d' : '#f59e0b';
+    const trendArrow = trend > 2 ? '↑' : trend < -2 ? '↓' : '→';
+    const lastWR = Math.round(lastPt.v);
+    const monthAbbr = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const curMo = monthAbbr[now6.getMonth()];
+
+    return `
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:8px">
+        <div style="flex:1">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:600">Win Rate Trend · 6 Bulan</div>
+          <svg width="${W}" height="${H+4}" viewBox="0 0 ${W} ${H+4}" style="overflow:visible;display:block">
+            <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+            ${filled.map(({ i, v }) => `<circle cx="${(i*xStep).toFixed(1)}" cy="${(H-(v/100)*H).toFixed(1)}" r="2.5" fill="${color}" opacity=".9"/>`).join('')}
+          </svg>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:14px;font-weight:800;font-family:var(--mono);color:${trendColor};line-height:1">${trendArrow} ${lastWR}%</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px">${curMo}</div>
+        </div>
+      </div>`;
+  }
+
   // Update top stats bar
   const n = playbooks.length;
   document.getElementById('pb-total-strats').textContent = n;
@@ -11931,6 +12104,10 @@ window.renderPlaybook = function() {
           <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${s.pnl >= 0 ? '#00d97e':'#ff4d4d'}">${s.total > 0 ? (s.pnl>=0?'+':'')+'$'+Math.abs(s.pnl).toFixed(0) : '—'}</div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px">Net P&L</div>
         </div>
+      </div>
+      <!-- Sparkline trend -->
+      <div style="padding-left:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
+        ${_buildSparkline(pb.id, col)}
       </div>
     `;
     list.appendChild(card);
