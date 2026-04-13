@@ -349,6 +349,13 @@ body::before{
 }
 .tag-chip:hover{border-color:var(--accent);color:var(--accent2);background:rgba(139,92,246,.08);}
 .tag-chip.active{background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.12));color:var(--accent2);border-color:rgba(139,92,246,.5);box-shadow:0 0 8px rgba(139,92,246,.2);}
+.mistake-chip{padding:5px 10px;border-radius:20px;border:1.5px solid rgba(255,77,77,.25);background:rgba(255,77,77,.06);cursor:pointer;font-family:var(--font);font-size:11px;font-weight:600;color:rgba(255,100,100,.8);transition:all .15s;white-space:nowrap;}
+.mistake-chip.active{border-color:#ff4d4d;background:rgba(255,77,77,.18);color:#ff6e6e;}
+.mistake-chip:hover{border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.12);}
+.star-btn{user-select:none;background:none;border:none;cursor:pointer;font-size:22px;padding:2px 4px;transition:transform .15s;color:var(--text3);}
+.star-btn.lit{color:#f59e0b!important;}
+.star-btn:hover{transform:scale(1.2);}
+
 
 /* ── DEEP ANALYTICS CARDS (base — overridden by premium analytics CSS) ── */
 .ana-deep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
@@ -2627,6 +2634,28 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
 
+    <!-- Best & Worst Trade of Month -->
+    <div id="bw-trade-widget" style="display:none;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <!-- Best -->
+        <div id="bw-best" style="background:linear-gradient(135deg,rgba(0,217,126,.08),rgba(0,217,126,.03));border:1px solid rgba(0,217,126,.2);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;cursor:pointer" onclick="window._bwOpenTrade && window._bwOpenTrade('best')">
+          <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(0,217,126,.1),transparent 70%);pointer-events:none"></div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(0,217,126,.6);margin-bottom:8px">🏆 Best Trade — Bulan Ini</div>
+          <div id="bw-best-pair" style="font-size:15px;font-weight:700;color:#00d97e;font-family:var(--mono);margin-bottom:2px">—</div>
+          <div id="bw-best-pnl" style="font-size:20px;font-weight:700;color:#00d97e;font-family:var(--mono);line-height:1;margin-bottom:6px">+$0</div>
+          <div id="bw-best-meta" style="font-size:10px;color:var(--text3);font-family:var(--mono)">—</div>
+        </div>
+        <!-- Worst -->
+        <div id="bw-worst" style="background:linear-gradient(135deg,rgba(255,77,77,.08),rgba(255,77,77,.03));border:1px solid rgba(255,77,77,.2);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;cursor:pointer" onclick="window._bwOpenTrade && window._bwOpenTrade('worst')">
+          <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(255,77,77,.1),transparent 70%);pointer-events:none"></div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,77,77,.6);margin-bottom:8px">📉 Worst Trade — Bulan Ini</div>
+          <div id="bw-worst-pair" style="font-size:15px;font-weight:700;color:#ff4d4d;font-family:var(--mono);margin-bottom:2px">—</div>
+          <div id="bw-worst-pnl" style="font-size:20px;font-weight:700;color:#ff4d4d;font-family:var(--mono);line-height:1;margin-bottom:6px">-$0</div>
+          <div id="bw-worst-meta" style="font-size:10px;color:var(--text3);font-family:var(--mono)">—</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Equity Curve (Bybit-style) -->
     <div class="cc" style="padding:16px 18px;">
       <div class="ch" style="margin-bottom:10px;align-items:flex-start;">
@@ -3336,6 +3365,34 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
       <div id="adv-playbook-wr-list" style="display:flex;flex-direction:column;gap:8px">
         <div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">— Hubungkan trade ke Playbook untuk melihat win rate per strategi —</div>
+      </div>
+    </div>
+
+    <!-- Mistake Breakdown Card -->
+    <div class="premium-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(255,77,77,.15),rgba(255,77,77,.06))"><i class="bi bi-exclamation-triangle" style="color:#ff4d4d"></i></div>
+          Top Penyebab Loss
+        </div>
+        <span class="ana-card-badge" style="background:rgba(255,77,77,.1);color:#ff6e6e;border:1px solid rgba(255,77,77,.22)">Mistake Analysis</span>
+      </div>
+      <div id="mistake-breakdown-container">
+        <div style="text-align:center;padding:12px;color:var(--text3);font-size:12px">— Tandai penyebab loss saat input trade untuk melihat pola kesalahan kamu —</div>
+      </div>
+    </div>
+
+    <!-- Rating vs Result Card -->
+    <div class="premium-card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="ana-card-title">
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.06))"><i class="bi bi-star-half" style="color:#f59e0b"></i></div>
+          Kualitas Eksekusi vs Hasil
+        </div>
+        <span class="ana-card-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.22)">Execution Quality</span>
+      </div>
+      <div id="rating-insight-container">
+        <div style="text-align:center;padding:12px;color:var(--text3);font-size:12px">— Isi rating saat input trade untuk melihat korelasi kualitas eksekusi vs profit —</div>
       </div>
     </div>
 
@@ -4602,6 +4659,36 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
         <input type="hidden" id="f-res" value="Win">
         <input type="hidden" id="f-edit-id" value="">
+      </div>
+
+      <!-- ── STEP 5b: Self Rating ── -->
+      <div class="tm-section" style="margin-bottom:18px">
+        <div class="tm-section-label"><i class="bi bi-star-half"></i> Kualitas Eksekusi <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px">(opsional)</span></div>
+        <div style="display:flex;gap:6px;align-items:center" id="rating-stars">
+          <button type="button" class="star-btn" data-r="1" onclick="setTradeRating(1)" title="Buruk" style="background:none;border:none;cursor:pointer;font-size:22px;padding:2px 4px;transition:transform .15s;color:var(--text3)">★</button>
+          <button type="button" class="star-btn" data-r="2" onclick="setTradeRating(2)" title="Di bawah rata-rata" style="background:none;border:none;cursor:pointer;font-size:22px;padding:2px 4px;transition:transform .15s;color:var(--text3)">★</button>
+          <button type="button" class="star-btn" data-r="3" onclick="setTradeRating(3)" title="Rata-rata" style="background:none;border:none;cursor:pointer;font-size:22px;padding:2px 4px;transition:transform .15s;color:var(--text3)">★</button>
+          <button type="button" class="star-btn" data-r="4" onclick="setTradeRating(4)" title="Bagus" style="background:none;border:none;cursor:pointer;font-size:22px;padding:2px 4px;transition:transform .15s;color:var(--text3)">★</button>
+          <button type="button" class="star-btn" data-r="5" onclick="setTradeRating(5)" title="Eksekusi sempurna" style="background:none;border:none;cursor:pointer;font-size:22px;padding:2px 4px;transition:transform .15s;color:var(--text3)">★</button>
+          <span id="rating-label" style="font-size:11px;color:var(--text3);margin-left:4px;font-family:var(--mono)">— belum diisi</span>
+        </div>
+        <input type="hidden" id="f-rating" value="0">
+      </div>
+
+      <!-- ── STEP 5c: Mistake Tags (muncul saat Loss) ── -->
+      <div class="tm-section" id="mistake-section" style="margin-bottom:18px;display:none">
+        <div class="tm-section-label"><i class="bi bi-exclamation-triangle"></i> Penyebab Loss <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px;margin-left:4px">(opsional)</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="mistake-chips">
+          <button type="button" class="mistake-chip" data-mk="FOMO" onclick="toggleMistake(this)">⚡ FOMO</button>
+          <button type="button" class="mistake-chip" data-mk="Revenge Trading" onclick="toggleMistake(this)">🔥 Revenge Trading</button>
+          <button type="button" class="mistake-chip" data-mk="Oversize" onclick="toggleMistake(this)">📈 Oversize Lot</button>
+          <button type="button" class="mistake-chip" data-mk="No SL" onclick="toggleMistake(this)">🚫 No Stop Loss</button>
+          <button type="button" class="mistake-chip" data-mk="Early Exit" onclick="toggleMistake(this)">🏃 Exit Terlalu Cepat</button>
+          <button type="button" class="mistake-chip" data-mk="Late Entry" onclick="toggleMistake(this)">⏰ Entry Terlambat</button>
+          <button type="button" class="mistake-chip" data-mk="Wrong Analysis" onclick="toggleMistake(this)">❌ Analisis Salah</button>
+          <button type="button" class="mistake-chip" data-mk="News Ignored" onclick="toggleMistake(this)">📰 Abaikan News</button>
+        </div>
+        <input type="hidden" id="f-mistakes" value="">
       </div>
 
       <!-- ── STEP 6: Setup Tags ── -->
@@ -6539,7 +6626,56 @@ async function saveTradeToCloud(trade) {
       await addDoc(collection(db, 'users', currentUser.uid, 'trades'), data);
     }
     setSyncState('ok');
+    // ── Consecutive Loss Alert ──
+    if (!trade.firestoreId) _checkConsecutiveLoss(trade);
   } catch(e) { setSyncState('error'); }
+}
+
+// ── CONSECUTIVE LOSS ALERT ────────────────────────────
+function _checkConsecutiveLoss(newTrade) {
+  try {
+    const sorted = [...trades, newTrade].sort((a,b) => (a.date||'') > (b.date||'') ? 1 : -1);
+    let streak = 0;
+    for (let i = sorted.length - 1; i >= 0; i--) {
+      if (sorted[i].result === 'Loss') streak++;
+      else break;
+    }
+    if (streak >= 3) _showLossAlert(streak);
+  } catch(e) {}
+}
+
+function _showLossAlert(streak) {
+  // Remove any existing alert
+  const old = document.getElementById('consec-loss-alert');
+  if (old) old.remove();
+  const msgs = {
+    3: 'Kamu sudah loss 3x berturut-turut.',
+    4: 'Loss 4 kali beruntun. Pasar mungkin tidak sesuai kondisi kamu hari ini.',
+    5: '5 loss beruntun. Pertimbangkan berhenti trading hari ini.',
+  };
+  const msg = msgs[streak] || `${streak} loss berturut-turut. Jaga psikologi kamu.`;
+  const el = document.createElement('div');
+  el.id = 'consec-loss-alert';
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <span style="font-size:20px;flex-shrink:0">⚠️</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px;color:#ffb347">${msg}</div>
+        <div style="font-size:12px;color:rgba(255,179,71,.75);line-height:1.5">Istirahat sejenak, review journal, dan tunggu setup yang valid sebelum entry berikutnya.</div>
+      </div>
+      <button onclick="this.closest('#consec-loss-alert').remove()" style="background:none;border:none;color:rgba(255,179,71,.5);cursor:pointer;font-size:16px;padding:0;flex-shrink:0;line-height:1">✕</button>
+    </div>`;
+  el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(30,20,0,.95);border:1px solid rgba(255,165,0,.35);border-radius:14px;padding:14px 18px;max-width:420px;width:calc(100% - 40px);box-shadow:0 8px 32px rgba(0,0,0,.5);backdrop-filter:blur(8px);animation:_lossAlertIn .3s ease';
+  document.body.appendChild(el);
+  // Auto dismiss after 10s
+  setTimeout(() => { if (el.parentNode) el.style.opacity='0'; el.style.transition='opacity .5s'; setTimeout(()=>el.remove(),500); }, 10000);
+}
+// Keyframe for alert
+if (!document.getElementById('_lossAlertStyle')) {
+  const s = document.createElement('style');
+  s.id = '_lossAlertStyle';
+  s.textContent = '@keyframes _lossAlertIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+  document.head.appendChild(s);
 }
 
 async function deleteTradeFromCloud(firestoreId) {
@@ -6643,6 +6779,32 @@ window.setEmotion = function(em) {
   });
 };
 
+// ── TRADE SELF RATING ─────────────────────────────────
+const _RATING_LABELS = ['','😞 Buruk','😐 Di bawah rata-rata','😊 Rata-rata','👍 Bagus','⭐ Eksekusi sempurna'];
+window.setTradeRating = function(r) {
+  $('f-rating').value = r;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('lit', parseInt(b.dataset.r) <= r);
+  });
+  const lbl = $('rating-label');
+  if (lbl) lbl.textContent = _RATING_LABELS[r] || '— belum diisi';
+};
+
+// ── MISTAKE TAGS ──────────────────────────────────────
+window.toggleMistake = function(el) {
+  el.classList.toggle('active');
+  const active = [...document.querySelectorAll('.mistake-chip.active')].map(c => c.dataset.mk);
+  $('f-mistakes').value = active.join(',');
+};
+
+// ── SHOW/HIDE MISTAKE SECTION based on result ─────────
+const _origSetResult = window.setResult;
+window.setResult = function(r) {
+  if (_origSetResult) _origSetResult(r);
+  const ms = $('mistake-section');
+  if (ms) ms.style.display = (r === 'Loss') ? 'block' : 'none';
+};
+
 // Quick pair buttons
 document.querySelectorAll('.qpair-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -6730,6 +6892,14 @@ function _resetTradeModal() {
   $('trade-save-label').textContent = 'Simpan Trade';
   $('trade-save-icon').className = 'bi bi-cloud-check';
   $('trade-save').style.background = '';
+  // Reset rating
+  $('f-rating').value = '0';
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('lit'));
+  const rl = $('rating-label'); if (rl) rl.textContent = '— belum diisi';
+  // Reset mistakes
+  $('f-mistakes').value = '';
+  document.querySelectorAll('.mistake-chip.active').forEach(c => c.classList.remove('active'));
+  const ms = $('mistake-section'); if (ms) ms.style.display = 'none';
 }
 
 function openTrade() {
@@ -6782,11 +6952,13 @@ $('trade-save').addEventListener('click', async () => {
     notes:   $('f-nt').value.trim(),
     playbookId: $('f-playbook').value || null,
     holdingMinutes: parseInt($('f-hold-total').value) || 0,
+    rating: parseInt($('f-rating').value) || 0,
+    mistakes: $('f-mistakes').value || '',
   };
   // If editing, carry the firestoreId so saveTradeToCloud uses updateDoc
   if (editId) trade.firestoreId = editId;
   if (window._pendingScreenshot) { trade.screenshot = window._pendingScreenshot; window._pendingScreenshot = null; }
-  ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt','f-hold-h','f-hold-m','f-hold-total'].forEach(id => $(id).value='');
+  ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt','f-hold-h','f-hold-m','f-hold-total','f-rating','f-mistakes'].forEach(id => $(id).value='');
   clearScreenshot();
   closeTradeModal();
   await saveTradeToCloud(trade);
@@ -6833,6 +7005,17 @@ window.editTrade = (firestoreId) => {
     if (hdEl) hdEl.value = t.holdingMinutes;
     const disp = $('f-hold-display');
     if (disp) disp.textContent = h > 0 ? `${h}j ${m}m total` : `${m} menit total`;
+  }
+  // Rating
+  if (t.rating) window.setTradeRating(t.rating);
+  // Mistakes
+  if (t.mistakes && t.result === 'Loss') {
+    const ms = $('mistake-section'); if (ms) ms.style.display = 'block';
+    const mkList = t.mistakes.split(',').map(s => s.trim());
+    document.querySelectorAll('.mistake-chip').forEach(c => {
+      if (mkList.includes(c.dataset.mk)) { c.classList.add('active'); }
+    });
+    $('f-mistakes').value = t.mistakes;
   }
   // Tag chips
   if (t.setup) {
@@ -7196,8 +7379,98 @@ function updateAll() {
   if (currentUser && currentUser.isAnonymous) updateAnonCounter();
   // Notify advanced analytics and playbook modules
   if (window._advAnalyticsReady) window.renderAdvancedAnalytics && window.renderAdvancedAnalytics();
+  // Best & Worst trade widget
+  _renderBestWorst();
+  // Consecutive loss check on load (for streak tracking)
+  _updateWeeklySummaryBadge();
 }
 window.updateAll = updateAll; // expose for external modules
+
+// ── BEST & WORST TRADE OF THE MONTH ───────────────────
+function _renderBestWorst() {
+  const widget = document.getElementById('bw-trade-widget');
+  if (!widget) return;
+  const now = new Date();
+  const ym = now.toISOString().slice(0, 7); // "2026-04"
+  const thisMonth = trades.filter(t => (t.date || '').startsWith(ym));
+  if (thisMonth.length < 2) { widget.style.display = 'none'; return; }
+  widget.style.display = 'block';
+  const best  = thisMonth.reduce((a, b) => b.pnl > a.pnl ? b : a);
+  const worst = thisMonth.reduce((a, b) => b.pnl < a.pnl ? b : a);
+  const fmt = (t) => {
+    const r = t.r ? (t.r >= 0 ? `+${t.r}R` : `${t.r}R`) : '';
+    const d = t.date ? t.date.slice(5).replace('-','/') : '';
+    return `${t.session||''} · ${d}${r ? ' · ' + r : ''}`;
+  };
+  document.getElementById('bw-best-pair').textContent  = best.pair  || '—';
+  document.getElementById('bw-best-pnl').textContent   = (best.pnl  >= 0 ? '+$' : '-$') + Math.abs(best.pnl).toFixed(2);
+  document.getElementById('bw-best-meta').textContent  = fmt(best);
+  document.getElementById('bw-worst-pair').textContent = worst.pair  || '—';
+  document.getElementById('bw-worst-pnl').textContent  = (worst.pnl >= 0 ? '+$' : '-$') + Math.abs(worst.pnl).toFixed(2);
+  document.getElementById('bw-worst-meta').textContent = fmt(worst);
+  // Click to open edit modal
+  window._bwOpenTrade = function(type) {
+    const t = type === 'best' ? best : worst;
+    if (t && t.firestoreId) window.editTrade(t.firestoreId);
+  };
+}
+
+// ── WEEKLY SUMMARY BADGE ──────────────────────────────
+function _updateWeeklySummaryBadge() {
+  try {
+    const key = 'rpt_last_weekly_shown';
+    const lastShown = localStorage.getItem(key);
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 1 = Monday
+    const todayStr = now.toISOString().slice(0, 10);
+    if (dayOfWeek !== 1) return; // only on Monday
+    if (lastShown === todayStr) return; // already shown today
+    if (!trades.length) return;
+    // Get last week's trades
+    const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekAgoStr = weekAgo.toISOString().slice(0, 10);
+    const lastWeek = trades.filter(t => t.date >= weekAgoStr && t.date < todayStr);
+    if (!lastWeek.length) return;
+    localStorage.setItem(key, todayStr);
+    setTimeout(() => _showWeeklySummary(lastWeek), 1500);
+  } catch(e) {}
+}
+
+function _showWeeklySummary(wTrades) {
+  const old = document.getElementById('weekly-summary-toast');
+  if (old) old.remove();
+  const pnl   = wTrades.reduce((s, t) => s + t.pnl, 0);
+  const wins  = wTrades.filter(t => t.result === 'Win').length;
+  const wr    = Math.round(wins / wTrades.length * 100);
+  const bestT = wTrades.reduce((a, b) => b.pnl > a.pnl ? b : a);
+  const pnlColor = pnl >= 0 ? '#00d97e' : '#ff4d4d';
+  const pnlStr   = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
+  const el = document.createElement('div');
+  el.id = 'weekly-summary-toast';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">📊 Ringkasan Minggu Lalu</div>
+      <button onclick="this.closest('#weekly-summary-toast').remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0;line-height:1">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+      <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:8px 4px">
+        <div style="font-size:16px;font-weight:700;color:${pnlColor};font-family:var(--mono)">${pnlStr}</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">P&L</div>
+      </div>
+      <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:8px 4px">
+        <div style="font-size:16px;font-weight:700;color:var(--accent2);font-family:var(--mono)">${wr}%</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">Win Rate</div>
+      </div>
+      <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:8px 4px">
+        <div style="font-size:16px;font-weight:700;color:var(--text);font-family:var(--mono)">${wTrades.length}</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">Trades</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3)">Best trade: <span style="color:#00d97e;font-weight:600;font-family:var(--mono)">${bestT.pair||'—'} +$${bestT.pnl.toFixed(2)}</span></div>`;
+  el.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9998;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px 18px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,.45);animation:_lossAlertIn .4s ease';
+  document.body.appendChild(el);
+  setTimeout(() => { if (el.parentNode) { el.style.transition='opacity .6s'; el.style.opacity='0'; setTimeout(()=>el.remove(),600); }}, 12000);
+}
 
 // ── STATS ─────────────────────────────────────────────
 function updateStats() {
@@ -8357,8 +8630,81 @@ function renderDeepAna(ft) {
       <div style="font-size:9px;color:rgba(255,255,255,.18);font-family:var(--mono)">${cnt||''}</div>
     </div>`;
   }).join('');
+
+  // ── MISTAKE TAGS BREAKDOWN ─────────────────────────
+  _renderMistakeBreakdown(ft);
+
+  // ── RATING vs PNL CORRELATION ─────────────────────
+  _renderRatingInsight(ft);
 }
 window.renderAna = renderAna; // expose for advanced analytics hook
+
+// ── MISTAKE BREAKDOWN RENDERER ────────────────────────
+function _renderMistakeBreakdown(ft) {
+  const el = document.getElementById('mistake-breakdown-container');
+  if (!el) return;
+  const losses = ft.filter(t => t.result === 'Loss' && t.mistakes);
+  if (!losses.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px">— Belum ada data mistake tags. Tandai penyebab loss saat input trade. —</div>';
+    return;
+  }
+  const mkCount = {};
+  losses.forEach(t => {
+    t.mistakes.split(',').forEach(m => {
+      const key = m.trim(); if (!key) return;
+      mkCount[key] = (mkCount[key] || 0) + 1;
+    });
+  });
+  const sorted = Object.entries(mkCount).sort((a,b) => b[1]-a[1]);
+  const max = sorted[0][1];
+  el.innerHTML = sorted.map(([mk, n]) => {
+    const pct = Math.round(n/max*100);
+    const lossPct = Math.round(n/losses.length*100);
+    return `<div style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--text2);font-weight:600">${mk}</span>
+        <span style="font-size:11px;color:rgba(255,77,77,.8);font-family:var(--mono)">${n}x (${lossPct}% of losses)</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,rgba(255,77,77,.7),rgba(255,77,77,.4));border-radius:4px;transition:width .6s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RATING vs RESULT INSIGHT ──────────────────────────
+function _renderRatingInsight(ft) {
+  const el = document.getElementById('rating-insight-container');
+  if (!el) return;
+  const rated = ft.filter(t => t.rating > 0);
+  if (rated.length < 3) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px">— Isi rating saat input trade untuk melihat korelasi kualitas eksekusi vs hasil. —</div>';
+    return;
+  }
+  // Group by rating
+  const byRating = {};
+  rated.forEach(t => {
+    if (!byRating[t.rating]) byRating[t.rating] = {wins:0,total:0,pnl:0};
+    byRating[t.rating].total++;
+    byRating[t.rating].pnl += t.pnl;
+    if (t.result === 'Win') byRating[t.rating].wins++;
+  });
+  const stars = ['★','★★','★★★','★★★★','★★★★★'];
+  const labels = ['Buruk','Di bawah rata-rata','Rata-rata','Bagus','Sempurna'];
+  el.innerHTML = [1,2,3,4,5].filter(r => byRating[r]).map(r => {
+    const d = byRating[r];
+    const wr = Math.round(d.wins/d.total*100);
+    const avgPnl = d.pnl/d.total;
+    const color = wr >= 60 ? '#00d97e' : wr >= 40 ? '#f59e0b' : '#ff4d4d';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="min-width:70px;font-size:12px;color:#f59e0b;letter-spacing:1px">${stars[r-1]}</div>
+      <div style="flex:1;font-size:11px;color:var(--text3)">${labels[r-1]}</div>
+      <div style="font-size:12px;font-weight:700;color:${color};font-family:var(--mono);min-width:38px;text-align:right">${wr}%</div>
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono);min-width:56px;text-align:right">${avgPnl>=0?'+$':'-$'}${Math.abs(avgPnl).toFixed(0)} avg</div>
+      <div style="font-size:10px;color:var(--text3);min-width:24px;text-align:right">${d.total}x</div>
+    </div>`;
+  }).join('');
+}
 
 // ── CALENDAR ──────────────────────────────────────────
 function renderCal(){
