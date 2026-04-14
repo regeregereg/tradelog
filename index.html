@@ -2694,6 +2694,52 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
 
+    <!-- Auto Pattern Detector + Trader Type Widget -->
+    <div id="pattern-widget" style="display:none;margin-bottom:16px">
+
+      <!-- Section header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Profil & Insight Kamu</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="pattern-trade-count"></div>
+      </div>
+
+      <!-- Trader Type card — full premium treatment -->
+      <div id="trader-type-card" style="background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:18px;padding:18px 20px;margin-bottom:10px;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s"
+        onmouseover="this.style.boxShadow='0 8px 32px rgba(0,0,0,.3)'" onmouseout="this.style.boxShadow=''">
+        <!-- Ambient glow — updated by JS -->
+        <div id="tt-glow" style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 65%);pointer-events:none;transition:background .4s"></div>
+        <!-- Scan line texture -->
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.008) 3px,rgba(255,255,255,.008) 4px);pointer-events:none"></div>
+
+        <div style="display:flex;align-items:center;gap:14px;position:relative">
+          <!-- Icon box -->
+          <div id="tt-icon-box" style="width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)">
+            <span id="tt-icon">⚡</span>
+          </div>
+          <!-- Text -->
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
+              <div style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.4px" id="tt-type">—</div>
+              <div id="tt-badge" style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.7px;border:1px solid">—</div>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:6px" id="tt-desc">—</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="tt-meta">—</div>
+          </div>
+          <!-- Right: Profile label -->
+          <div style="flex-shrink:0;text-align:right;display:none" id="tt-right-col">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px">Trader Profile</div>
+            <div id="tt-conf-bar" style="width:60px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-left:auto">
+              <div id="tt-conf-fill" style="height:100%;border-radius:2px;background:var(--accent);width:0%;transition:width .8s ease"></div>
+            </div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:3px" id="tt-conf-label">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pattern Insights grid -->
+      <div id="pattern-insights-list" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+
     <!-- Equity Curve (Bybit-style) -->
     <div class="cc" style="padding:16px 18px;">
       <div class="ch" style="margin-bottom:10px;align-items:flex-start;">
@@ -4303,6 +4349,29 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .rc-act-ghost{background:rgba(255,255,255,.03);color:#a1a1aa;border:1px solid rgba(255,255,255,.08);}
 .rc-act-ghost:hover{background:rgba(255,255,255,.06);color:#a1a1aa;}
 .rc-copy-toast{font-size:11px;color:#22c55e;font-family:'JetBrains Mono',monospace;display:none;align-items:center;gap:6px;padding:8px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;}
+
+/* Trader type pill on report card */
+#rpc-trader-type {
+  transition: all .3s;
+  backdrop-filter: blur(4px);
+}
+
+/* Pattern widget insight cards entrance */
+@keyframes patternSlideIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+#pattern-insights-list > div {
+  animation: patternSlideIn .28s ease both;
+}
+
+/* Trader type card icon hover pop */
+#tt-icon-box {
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
+}
+#trader-type-card:hover #tt-icon-box {
+  transform: scale(1.08);
+}
 </style>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -4344,7 +4413,11 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div class="rpc-brand-dot"></div>
             <span class="rpc-brand-name">RiskPerTrade</span>
           </div>
-          <div class="rpc-badge" id="rpc-badge">All Time</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <!-- Trader type pill -->
+            <div id="rpc-trader-type" style="display:none;padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;border:1px solid"></div>
+            <div class="rpc-badge" id="rpc-badge">All Time</div>
+          </div>
         </div>
 
         <!-- Middle: name + stats -->
@@ -4357,7 +4430,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div class="rpc-bars" id="rpc-bars"></div>
         </div>
 
-        <!-- Stats row -->
+        <!-- Stats row — extended -->
         <div>
           <div class="rpc-stats" id="rpc-stats-row">
             <div class="rpc-stat">
@@ -4379,6 +4452,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="rpc-stat-lbl">Win Streak</div>
               <div class="rpc-stat-val rpc-val-pur" id="rpc-streak">—</div>
               <div class="rpc-stat-sub" id="rpc-expectancy">Exp: —</div>
+            </div>
+            <!-- Extra stat: Best Session -->
+            <div class="rpc-stat" id="rpc-extra-stat" style="display:none">
+              <div class="rpc-stat-lbl" id="rpc-extra-lbl">Best Session</div>
+              <div class="rpc-stat-val rpc-val-pur" id="rpc-extra-val">—</div>
+              <div class="rpc-stat-sub" id="rpc-extra-sub">—</div>
             </div>
           </div>
 
@@ -7481,10 +7560,240 @@ function updateAll() {
   if (window._advAnalyticsReady) window.renderAdvancedAnalytics && window.renderAdvancedAnalytics();
   // Best & Worst trade widget
   _renderBestWorst();
+  _renderPatternWidget();
   // Consecutive loss check on load (for streak tracking)
   _updateWeeklySummaryBadge();
 }
 window.updateAll = updateAll; // expose for external modules
+
+// ── TRADER TYPE PROFILING ─────────────────────────────
+function _detectTraderType(tArr) {
+  if (!tArr || tArr.length < 5) return null;
+  const withHold = tArr.filter(t => t.holdingMinutes > 0);
+  const avgHold  = withHold.length
+    ? withHold.reduce((s, t) => s + t.holdingMinutes, 0) / withHold.length : null;
+
+  // Session dominance
+  const sesCount = {};
+  tArr.forEach(t => { if (t.session) sesCount[t.session] = (sesCount[t.session] || 0) + 1; });
+  const topSes = Object.entries(sesCount).sort((a,b) => b[1]-a[1])[0];
+  const topSesPct = topSes ? topSes[1] / tArr.length : 0;
+
+  // Pair concentration
+  const pairCount = {};
+  tArr.forEach(t => { if (t.pair) pairCount[t.pair] = (pairCount[t.pair] || 0) + 1; });
+  const topPair = Object.entries(pairCount).sort((a,b) => b[1]-a[1])[0];
+  const topPairPct = topPair ? topPair[1] / tArr.length : 0;
+
+  // Trading frequency (avg trades/week)
+  const dates = [...new Set(tArr.map(t => t.date).filter(Boolean))].sort();
+  let freqPerWeek = 0;
+  if (dates.length >= 2) {
+    const spanDays = (new Date(dates[dates.length-1]) - new Date(dates[0])) / 86400000 + 1;
+    freqPerWeek = (tArr.length / spanDays) * 7;
+  }
+
+  // Classify
+  if (avgHold !== null && avgHold < 30) {
+    return { label: 'Scalper', icon: '⚡', color: '#f59e0b', desc: 'Hold time sangat singkat, high-frequency execution', meta: `~${Math.round(avgHold)}m avg hold · ${tArr.length} trades` };
+  }
+  if (avgHold !== null && avgHold > 240) {
+    return { label: 'Swing Trader', icon: '🌊', color: '#38bdf8', desc: 'Hold posisi berjam-jam, sabar menunggu target', meta: `~${Math.round(avgHold/60)}j avg hold · ${tArr.length} trades` };
+  }
+  if (topSesPct >= 0.6 && topSes) {
+    const sesName = topSes[0].split(' ')[0];
+    return { label: `${sesName} Trader`, icon: '🕐', color: '#00d97e', desc: `Mayoritas trading di sesi ${topSes[0]}`, meta: `${Math.round(topSesPct*100)}% trades di ${sesName} · ${tArr.length} total` };
+  }
+  if (topPairPct >= 0.6 && topPair) {
+    return { label: 'Specialist', icon: '🎯', color: '#a78bfa', desc: `Fokus pada ${topPair[0]} — edge yang terdefinisi`, meta: `${Math.round(topPairPct*100)}% trades di ${topPair[0]} · ${tArr.length} total` };
+  }
+  if (freqPerWeek >= 10) {
+    return { label: 'Active Trader', icon: '📊', color: '#fb923c', desc: 'Frekuensi tinggi, aktif mengambil peluang', meta: `~${freqPerWeek.toFixed(1)} trades/minggu` };
+  }
+  if (freqPerWeek <= 2 && tArr.length >= 5) {
+    return { label: 'Position Trader', icon: '🧘', color: '#818cf8', desc: 'Sabar, selektif — hanya ambil setup terbaik', meta: `~${freqPerWeek.toFixed(1)} trades/minggu · ${tArr.length} total` };
+  }
+  return { label: 'Intraday Trader', icon: '📈', color: '#8b5cf6', desc: 'Mix holding time, balanced approach', meta: `${tArr.length} trades logged` };
+}
+
+// ── AUTO PATTERN DETECTOR ─────────────────────────────
+function _detectPatterns(tArr) {
+  if (!tArr || tArr.length < 5) return [];
+  const insights = [];
+
+  // 1. Best session × pair combo
+  const combos = {};
+  tArr.forEach(t => {
+    if (!t.session || !t.pair) return;
+    const k = `${t.pair}|${t.session}`;
+    if (!combos[k]) combos[k] = { w: 0, n: 0, pnl: 0 };
+    combos[k].n++;
+    combos[k].pnl += t.pnl || 0;
+    if (t.result === 'Win') combos[k].w++;
+  });
+  const bestCombo = Object.entries(combos)
+    .filter(([, d]) => d.n >= 3)
+    .map(([k, d]) => ({ k, wr: d.w / d.n, ...d }))
+    .sort((a, b) => b.wr - a.wr)[0];
+  if (bestCombo && bestCombo.wr >= 0.6) {
+    const [pair, ses] = bestCombo.k.split('|');
+    insights.push({
+      icon: '🎯', color: '#00d97e',
+      title: `${pair} di ${ses} — Edge kamu`,
+      desc: `${Math.round(bestCombo.wr*100)}% win rate dari ${bestCombo.n} trade. P&L: ${bestCombo.pnl >= 0 ? '+' : ''}$${bestCombo.pnl.toFixed(0)}`,
+    });
+  }
+
+  // 2. Worst day of week
+  const dowMap = {}, dowCount = {};
+  tArr.forEach(t => {
+    if (!t.date) return;
+    const d = new Date(t.date + 'T00:00:00').getDay();
+    dowMap[d] = (dowMap[d] || 0) + (t.pnl || 0);
+    dowCount[d] = (dowCount[d] || 0) + 1;
+  });
+  const dowNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const worstDay = Object.entries(dowMap).filter(([d]) => dowCount[d] >= 3).sort((a,b) => a[1]-b[1])[0];
+  const bestDay  = Object.entries(dowMap).filter(([d]) => dowCount[d] >= 3).sort((a,b) => b[1]-a[1])[0];
+  if (worstDay && worstDay[1] < -50) {
+    insights.push({
+      icon: '⚠️', color: '#f59e0b',
+      title: `Hindari trading hari ${dowNames[worstDay[0]]}`,
+      desc: `Total P&L ${worstDay[1] >= 0?'+':''}$${parseFloat(worstDay[1]).toFixed(0)} dari ${dowCount[worstDay[0]]} trade. Hari terburuk kamu.`,
+    });
+  }
+  if (bestDay && bestDay[1] > 50 && bestDay[0] !== worstDay?.[0]) {
+    insights.push({
+      icon: '📅', color: '#a78bfa',
+      title: `${dowNames[bestDay[0]]} — Hari terbaik kamu`,
+      desc: `+$${parseFloat(bestDay[1]).toFixed(0)} total dari ${dowCount[bestDay[0]]} trade. Jadikan prioritas.`,
+    });
+  }
+
+  // 3. Emotion vs result pattern
+  const emMap = {};
+  tArr.filter(t => t.emotion).forEach(t => {
+    if (!emMap[t.emotion]) emMap[t.emotion] = { w: 0, n: 0 };
+    emMap[t.emotion].n++;
+    if (t.result === 'Win') emMap[t.emotion].w++;
+  });
+  const bestEm = Object.entries(emMap).filter(([, d]) => d.n >= 3).map(([em, d]) => ({ em, wr: d.w/d.n, ...d })).sort((a,b) => b.wr-a.wr)[0];
+  const worstEm = Object.entries(emMap).filter(([, d]) => d.n >= 3).map(([em, d]) => ({ em, wr: d.w/d.n, ...d })).sort((a,b) => a.wr-b.wr)[0];
+  if (bestEm && bestEm.wr >= 0.6 && worstEm && worstEm.em !== bestEm.em) {
+    insights.push({
+      icon: '🧠', color: '#38bdf8',
+      title: `${bestEm.em} = ${Math.round(bestEm.wr*100)}% WR vs ${worstEm.em} = ${Math.round(worstEm.wr*100)}% WR`,
+      desc: `Trade saat ${bestEm.em} jauh lebih baik. ${worstEm.em} menurunkan performa secara signifikan.`,
+    });
+  }
+
+  // 4. Holding time vs result
+  const holdWins = tArr.filter(t => t.result==='Win' && t.holdingMinutes > 0);
+  const holdLoss = tArr.filter(t => t.result==='Loss' && t.holdingMinutes > 0);
+  if (holdWins.length >= 3 && holdLoss.length >= 3) {
+    const avgW = holdWins.reduce((s,t) => s+t.holdingMinutes, 0) / holdWins.length;
+    const avgL = holdLoss.reduce((s,t) => s+t.holdingMinutes, 0) / holdLoss.length;
+    if (avgL > avgW * 1.6) {
+      const fmt = m => m >= 60 ? `${Math.round(m/60)}j` : `${Math.round(m)}m`;
+      insights.push({
+        icon: '⏱️', color: '#ff4d4d',
+        title: 'Kamu hold losers terlalu lama',
+        desc: `Rata-rata hold loss: ${fmt(avgL)} vs win: ${fmt(avgW)}. Cut loss lebih cepat bisa meningkatkan performa.`,
+      });
+    }
+  }
+
+  return insights.slice(0, 4); // max 4 insights
+}
+
+// ── RENDER PATTERN WIDGET ─────────────────────────────
+function _renderPatternWidget() {
+  const widget = document.getElementById('pattern-widget');
+  if (!widget || !trades || trades.length < 5) {
+    if (widget) widget.style.display = 'none';
+    return;
+  }
+  widget.style.display = 'block';
+
+  // Trade count label
+  const countEl = document.getElementById('pattern-trade-count');
+  if (countEl) countEl.textContent = trades.length + ' trades dianalisis';
+
+  // ── Trader Type ──────────────────────────────────────
+  const tt = _detectTraderType(trades);
+  if (tt) {
+    const iconEl    = document.getElementById('tt-icon');
+    const iconBox   = document.getElementById('tt-icon-box');
+    const typeEl    = document.getElementById('tt-type');
+    const badgeEl   = document.getElementById('tt-badge');
+    const descEl    = document.getElementById('tt-desc');
+    const metaEl    = document.getElementById('tt-meta');
+    const glowEl    = document.getElementById('tt-glow');
+    const card      = document.getElementById('trader-type-card');
+    const confBar   = document.getElementById('tt-conf-fill');
+    const confLabel = document.getElementById('tt-conf-label');
+    const rightCol  = document.getElementById('tt-right-col');
+
+    if (iconEl) iconEl.textContent = tt.icon;
+    if (iconBox) {
+      iconBox.style.background = tt.color + '18';
+      iconBox.style.borderColor = tt.color + '40';
+      iconBox.style.boxShadow = `0 4px 20px ${tt.color}20`;
+    }
+    if (typeEl) typeEl.textContent = tt.label;
+    if (badgeEl) {
+      badgeEl.textContent = tt.label;
+      badgeEl.style.color = tt.color;
+      badgeEl.style.background = tt.color + '18';
+      badgeEl.style.borderColor = tt.color + '45';
+    }
+    if (descEl) descEl.textContent = tt.desc;
+    if (metaEl) metaEl.textContent = tt.meta;
+    if (glowEl) glowEl.style.background = `radial-gradient(circle,${tt.color}18,transparent 65%)`;
+    if (card) {
+      card.style.borderColor = tt.color + '35';
+    }
+    // Confidence bar — based on trade count
+    if (confBar && confLabel && rightCol) {
+      const conf = Math.min(100, Math.round((trades.length / 30) * 100));
+      confBar.style.width = conf + '%';
+      confBar.style.background = tt.color;
+      confLabel.textContent = conf + '% confident';
+      rightCol.style.display = 'block';
+    }
+  }
+
+  // ── Pattern Insights ──────────────────────────────────
+  const patterns = _detectPatterns(trades);
+  const listEl = document.getElementById('pattern-insights-list');
+  if (!listEl) return;
+
+  if (!patterns.length) {
+    listEl.innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center">
+        <div style="font-size:12px;color:var(--text3);font-family:var(--mono)">— Log lebih banyak trade untuk melihat pola performa kamu —</div>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = patterns.map((p, i) => {
+    const animDelay = i * 60;
+    return `
+      <div style="background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:flex-start;gap:11px;transition:all .2s;cursor:default;animation:anaSlideIn .3s ${animDelay}ms ease both"
+        onmouseover="this.style.borderColor='${p.color}45';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.25)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow=''">
+        <!-- Icon box -->
+        <div style="width:32px;height:32px;border-radius:10px;background:${p.color}15;border:1px solid ${p.color}30;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)">${p.icon}</div>
+        <!-- Content -->
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-.1px">${p.title}</div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.55">${p.desc}</div>
+        </div>
+        <!-- Color accent strip -->
+        <div style="width:2px;border-radius:2px;background:${p.color};opacity:.5;align-self:stretch;flex-shrink:0;min-height:32px"></div>
+      </div>`;
+  }).join('');
+}
 
 // ── BEST & WORST TRADE OF THE MONTH ───────────────────
 function _renderBestWorst() {
@@ -10558,9 +10867,28 @@ window.goPage = function(name) {
     // Best pair by P&L
     const pairMap = {};
     ft.forEach(t => { if (!t.pair) return; pairMap[t.pair] = (pairMap[t.pair] || 0) + (t.pnl || 0); });
-    let bestPair = '—';
-    let bestPairPnl = -Infinity;
+    let bestPair = '—', bestPairPnl = -Infinity;
     Object.keys(pairMap).forEach(p => { if (pairMap[p] > bestPairPnl) { bestPairPnl = pairMap[p]; bestPair = p; } });
+
+    // Best session by win rate (min 3 trades)
+    const sesMap = {};
+    ft.forEach(t => {
+      if (!t.session) return;
+      if (!sesMap[t.session]) sesMap[t.session] = { w: 0, n: 0 };
+      sesMap[t.session].n++;
+      if (t.result === 'Win') sesMap[t.session].w++;
+    });
+    let bestSession = null, bestSessionWR = -1;
+    Object.entries(sesMap).forEach(([ses, d]) => {
+      if (d.n >= 2) { const wr2 = d.w / d.n; if (wr2 > bestSessionWR) { bestSessionWR = wr2; bestSession = { name: ses, wr: Math.round(wr2 * 100), n: d.n }; } }
+    });
+
+    // Top mistake (most common)
+    const mkMap = {};
+    ft.filter(t => t.mistakes).forEach(t => {
+      t.mistakes.split(',').forEach(m => { const k = m.trim(); if (k) mkMap[k] = (mkMap[k] || 0) + 1; });
+    });
+    const topMistake = Object.entries(mkMap).sort((a,b) => b[1]-a[1])[0]?.[0] || null;
 
     // Expectancy
     const avgW = W.length > 0 ? gw / W.length : 0;
@@ -10568,14 +10896,17 @@ window.goPage = function(name) {
     const wrRatio = n > 0 ? W.length / n : 0;
     const expectancy = n > 0 ? ((wrRatio * avgW) - ((1 - wrRatio) * avgL)).toFixed(2) : '—';
 
-    // Tagline
+    // Tagline — more nuanced
     let tagline = 'Konsisten adalah kunci';
-    if (n === 0) tagline = 'Perjalanan dimulai';
-    else if (tot > 0 && W.length / n >= 0.65) tagline = `${(W.length / n * 100).toFixed(0)}% WR — On fire 🔥`;
-    else if (tot > 0) tagline = `+$${tot.toFixed(0)} — Keep going!`;
-    else if (tot < 0) tagline = 'Every loss is a lesson';
+    const wrNum = parseFloat(wr);
+    if (n === 0) tagline = 'Perjalanan dimulai ✨';
+    else if (tot > 0 && wrNum >= 65) tagline = `${wrNum.toFixed(0)}% WR — Staying sharp 🔥`;
+    else if (tot > 0 && wrNum >= 50) tagline = `Profitable — Keep building the edge 📈`;
+    else if (tot > 0) tagline = `+$${tot.toFixed(0)} — In the green, stay disciplined`;
+    else if (tot < -100) tagline = 'Every loss is data. Keep journaling 💪';
+    else tagline = 'Process over results. Stay consistent.';
 
-    // Equity mini-bar data: group by date → cumulative
+    // Equity mini-bar data
     const dateMap = {};
     ft.forEach(t => { if (!t.date) return; dateMap[t.date] = (dateMap[t.date] || 0) + (t.pnl || 0); });
     const dates = Object.keys(dateMap).sort();
@@ -10583,7 +10914,7 @@ window.goPage = function(name) {
     const barData = dates.map(d => { cum += dateMap[d]; return cum; });
 
     return { n, wr, pf, rr, tot, pnlStr: (tot >= 0 ? '+$' : '-$') + f2(Math.abs(tot)),
-      bestStreak, bestPair, expectancy, tagline, barData,
+      bestStreak, bestPair, expectancy, tagline, barData, bestSession, topMistake,
       name: currentUser?.displayName || 'Trader' };
   }
 
@@ -10604,6 +10935,24 @@ window.goPage = function(name) {
     // Badge
     const badge = document.getElementById('rpc-badge');
     if (badge) badge.textContent = _rcBadgeLabel(_rcPeriod);
+
+    // Trader type pill on card
+    const ttPill = document.getElementById('rpc-trader-type');
+    if (ttPill) {
+      const tt = _detectTraderType(trades); // always from all trades
+      if (tt && trades.length >= 5) {
+        ttPill.style.display = 'inline-flex';
+        ttPill.style.alignItems = 'center';
+        ttPill.style.gap = '5px';
+        ttPill.innerHTML = `<span style="font-size:11px">${tt.icon}</span><span>${tt.label}</span>`;
+        ttPill.style.color = tt.color;
+        ttPill.style.borderColor = tt.color + '55';
+        ttPill.style.background = tt.color + '18';
+        ttPill.style.boxShadow = `0 0 12px ${tt.color}20`;
+      } else {
+        ttPill.style.display = 'none';
+      }
+    }
 
     // Name & tagline
     const nameEl = document.getElementById('rpc-name');
@@ -10641,6 +10990,23 @@ window.goPage = function(name) {
     const expEl = document.getElementById('rpc-expectancy');
     if (expEl) expEl.textContent = 'Exp: ' + (s.expectancy !== '—' ? '$' + s.expectancy : '—');
 
+    // Extra stat: best session + top mistake
+    const extraStat = document.getElementById('rpc-extra-stat');
+    if (extraStat) {
+      if (s.bestSession) {
+        extraStat.style.display = 'flex';
+        extraStat.style.flexDirection = 'column';
+        const lbl = document.getElementById('rpc-extra-lbl');
+        const val = document.getElementById('rpc-extra-val');
+        const sub = document.getElementById('rpc-extra-sub');
+        if (lbl) lbl.textContent = 'Best Session';
+        if (val) { val.textContent = s.bestSession.name.split(' ')[0]; val.className = 'rpc-stat-val rpc-val-pur'; }
+        if (sub) sub.textContent = s.bestSession.wr + '% WR · ' + s.bestSession.n + 'x';
+      } else {
+        extraStat.style.display = 'none';
+      }
+    }
+
     // Footer date
     const fdEl = document.getElementById('rpc-footer-date');
     if (fdEl) fdEl.textContent = 'Generated ' + new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -10649,10 +11015,8 @@ window.goPage = function(name) {
     const barsEl = document.getElementById('rpc-bars');
     if (barsEl) {
       barsEl.innerHTML = '';
-      const barData = s.barData.slice(-14); // last 14 data points
-      if (barData.length === 0) {
-        barsEl.innerHTML = '';
-      } else {
+      const barData = s.barData.slice(-14);
+      if (barData.length > 0) {
         const minV = Math.min(...barData, 0);
         const maxV = Math.max(...barData, 0.01);
         const range = maxV - minV || 1;
