@@ -6794,6 +6794,8 @@ async function saveTradeToCloud(trade) {
     setSyncState('ok');
     // ── Consecutive Loss Alert ──
     if (!trade.firestoreId) _checkConsecutiveLoss(trade);
+    // ── Post-trade personal insight ──
+    if (!trade.firestoreId) setTimeout(() => _showPostTradeInsight(trade), 800);
   } catch(e) { setSyncState('error'); }
 }
 
@@ -6845,6 +6847,96 @@ if (!document.getElementById('_lossAlertStyle')) {
   s.id = '_lossAlertStyle';
   s.textContent = '@keyframes _lossAlertIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
   document.head.appendChild(s);
+}
+
+// ── POST-TRADE PERSONAL INSIGHT ───────────────────────
+function _showPostTradeInsight(newTrade) {
+  // Don't show if consecutive loss alert already shown
+  if (document.getElementById('consec-loss-alert')) return;
+  // Need at least 5 historical trades for meaningful insight
+  if (!trades || trades.length < 5) return;
+
+  const hist = trades.filter(t => t.firestoreId !== newTrade.firestoreId);
+  let msg = null, color = '#a78bfa', icon = '💡';
+
+  // Check: how does user do with this pair historically?
+  if (newTrade.pair) {
+    const pairHist = hist.filter(t => t.pair === newTrade.pair);
+    if (pairHist.length >= 3) {
+      const wr = pairHist.filter(t => t.result==='Win').length / pairHist.length;
+      const pnl = pairHist.reduce((s,t) => s+(t.pnl||0), 0);
+      if (wr >= 0.65) {
+        msg = `${newTrade.pair} adalah pair terkuat kamu — ${Math.round(wr*100)}% WR historis dari ${pairHist.length} trade.`;
+        color = '#00d97e'; icon = '🎯';
+      } else if (wr <= 0.35 && pairHist.length >= 4) {
+        msg = `Heads up: win rate kamu di ${newTrade.pair} hanya ${Math.round(wr*100)}% (${pairHist.length} trade, ${pnl>=0?'+':''}$${pnl.toFixed(0)}). Review setup kamu.`;
+        color = '#f59e0b'; icon = '⚠️';
+      }
+    }
+  }
+
+  // Check: session performance
+  if (!msg && newTrade.session) {
+    const sesHist = hist.filter(t => t.session === newTrade.session);
+    if (sesHist.length >= 4) {
+      const wr = sesHist.filter(t=>t.result==='Win').length / sesHist.length;
+      if (wr >= 0.65) {
+        msg = `Sesi ${newTrade.session} adalah waktu terbaik kamu — ${Math.round(wr*100)}% WR dari ${sesHist.length} trade historis.`;
+        color = '#00d97e'; icon = '🕐';
+      } else if (wr <= 0.35) {
+        msg = `Kamu kurang perform di sesi ${newTrade.session} (${Math.round(wr*100)}% WR). Pertimbangkan fokus di sesi lain.`;
+        color = '#f59e0b'; icon = '🕐';
+      }
+    }
+  }
+
+  // Check: emotion pattern
+  if (!msg && newTrade.emotion && ['FOMO','Revenge','Impatient'].includes(newTrade.emotion)) {
+    const emHist = hist.filter(t => t.emotion === newTrade.emotion);
+    if (emHist.length >= 3) {
+      const wr = emHist.filter(t=>t.result==='Win').length / emHist.length;
+      if (wr <= 0.4) {
+        msg = `Kamu log "${newTrade.emotion}" — histori kamu: ${Math.round(wr*100)}% WR saat emosi ini (${emHist.length} trade). Stay sharp.`;
+        color = '#ff4d4d'; icon = '🧠';
+      }
+    }
+  }
+
+  // Check: same setup recently losing
+  if (!msg && newTrade.setup) {
+    const setupKey = newTrade.setup.split(',')[0].trim();
+    if (setupKey) {
+      const recent = hist.slice(-20).filter(t => (t.setup||'').includes(setupKey));
+      if (recent.length >= 3) {
+        const recentWr = recent.filter(t=>t.result==='Win').length / recent.length;
+        if (recentWr <= 0.3) {
+          msg = `Setup "${setupKey}" sedang dalam run buruk — ${Math.round(recentWr*100)}% WR di ${recent.length} trade terakhir. Evaluasi kondisi market.`;
+          color = '#fb923c'; icon = '📊';
+        }
+      }
+    }
+  }
+
+  if (!msg) return;
+
+  const old = document.getElementById('post-trade-insight');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'post-trade-insight';
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <div style="width:30px;height:30px;border-radius:9px;background:${color}18;border:1px solid ${color}35;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Insight dari journal kamu</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.5">${msg}</div>
+      </div>
+      <button onclick="this.closest('#post-trade-insight').remove()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);cursor:pointer;font-size:11px;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">✕</button>
+    </div>`;
+  el.style.cssText = `position:fixed;bottom:28px;right:24px;z-index:9997;background:rgba(14,14,18,.97);border:1px solid ${color}35;border-radius:16px;padding:14px 16px;width:320px;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03);backdrop-filter:blur(12px);animation:_lossAlertIn .4s cubic-bezier(.34,1.56,.64,1)`;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    if (el.parentNode) { el.style.transition='opacity .5s,transform .5s'; el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(),500); }
+  }, 9000);
 }
 
 async function deleteTradeFromCloud(firestoreId) {
@@ -7621,14 +7713,13 @@ function _detectPatterns(tArr) {
   if (!tArr || tArr.length < 5) return [];
   const insights = [];
 
-  // 1. Best session × pair combo
+  // ── 1. Best session × pair combo ─────────────────────
   const combos = {};
   tArr.forEach(t => {
     if (!t.session || !t.pair) return;
     const k = `${t.pair}|${t.session}`;
     if (!combos[k]) combos[k] = { w: 0, n: 0, pnl: 0 };
-    combos[k].n++;
-    combos[k].pnl += t.pnl || 0;
+    combos[k].n++; combos[k].pnl += t.pnl || 0;
     if (t.result === 'Win') combos[k].w++;
   });
   const bestCombo = Object.entries(combos)
@@ -7638,72 +7729,187 @@ function _detectPatterns(tArr) {
   if (bestCombo && bestCombo.wr >= 0.6) {
     const [pair, ses] = bestCombo.k.split('|');
     insights.push({
-      icon: '🎯', color: '#00d97e',
-      title: `${pair} di ${ses} — Edge kamu`,
-      desc: `${Math.round(bestCombo.wr*100)}% win rate dari ${bestCombo.n} trade. P&L: ${bestCombo.pnl >= 0 ? '+' : ''}$${bestCombo.pnl.toFixed(0)}`,
+      icon: '🎯', color: '#00d97e', priority: 10,
+      title: `${pair} di ${ses} — Edge terkuat kamu`,
+      desc: `${Math.round(bestCombo.wr*100)}% WR dari ${bestCombo.n} trade · P&L: ${bestCombo.pnl >= 0 ? '+' : ''}$${bestCombo.pnl.toFixed(0)}`,
     });
   }
 
-  // 2. Worst day of week
-  const dowMap = {}, dowCount = {};
+  // ── 2. Worst pair (money pit) ─────────────────────────
+  const pairPnl = {};
+  tArr.forEach(t => { if (!t.pair) return; pairPnl[t.pair] = (pairPnl[t.pair] || {w:0,n:0,pnl:0}); pairPnl[t.pair].n++; pairPnl[t.pair].pnl += t.pnl||0; if(t.result==='Win') pairPnl[t.pair].w++; });
+  const worstPair = Object.entries(pairPnl).filter(([,d]) => d.n >= 3 && d.pnl < -50).sort((a,b) => a[1].pnl - b[1].pnl)[0];
+  if (worstPair) {
+    const [p, d] = worstPair;
+    insights.push({
+      icon: '🚫', color: '#ff4d4d', priority: 9,
+      title: `${p} menguras akun kamu`,
+      desc: `${d.pnl < 0 ? '' : '+'}$${d.pnl.toFixed(0)} dari ${d.n} trade (${Math.round(d.w/d.n*100)}% WR). Pertimbangkan untuk skip pair ini.`,
+    });
+  }
+
+  // ── 3. Day of week: worst & best ─────────────────────
+  const dowPnl = {}, dowN = {}, dowW = {};
   tArr.forEach(t => {
     if (!t.date) return;
     const d = new Date(t.date + 'T00:00:00').getDay();
-    dowMap[d] = (dowMap[d] || 0) + (t.pnl || 0);
-    dowCount[d] = (dowCount[d] || 0) + 1;
+    dowPnl[d] = (dowPnl[d]||0) + (t.pnl||0);
+    dowN[d]   = (dowN[d]||0) + 1;
+    if (t.result==='Win') dowW[d] = (dowW[d]||0) + 1;
   });
   const dowNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  const worstDay = Object.entries(dowMap).filter(([d]) => dowCount[d] >= 3).sort((a,b) => a[1]-b[1])[0];
-  const bestDay  = Object.entries(dowMap).filter(([d]) => dowCount[d] >= 3).sort((a,b) => b[1]-a[1])[0];
-  if (worstDay && worstDay[1] < -50) {
+  const worstDay = Object.entries(dowPnl).filter(([d]) => dowN[d] >= 3).sort((a,b) => a[1]-b[1])[0];
+  const bestDay  = Object.entries(dowPnl).filter(([d]) => dowN[d] >= 3).sort((a,b) => b[1]-a[1])[0];
+  if (worstDay && worstDay[1] < -30) {
+    const wr = Math.round((dowW[worstDay[0]]||0) / dowN[worstDay[0]] * 100);
     insights.push({
-      icon: '⚠️', color: '#f59e0b',
-      title: `Hindari trading hari ${dowNames[worstDay[0]]}`,
-      desc: `Total P&L ${worstDay[1] >= 0?'+':''}$${parseFloat(worstDay[1]).toFixed(0)} dari ${dowCount[worstDay[0]]} trade. Hari terburuk kamu.`,
+      icon: '📛', color: '#f59e0b', priority: 7,
+      title: `Jangan trading hari ${dowNames[worstDay[0]]}`,
+      desc: `$${parseFloat(worstDay[1]).toFixed(0)} P&L · ${wr}% WR dari ${dowN[worstDay[0]]} trade. Hari paling merugikan kamu.`,
     });
   }
-  if (bestDay && bestDay[1] > 50 && bestDay[0] !== worstDay?.[0]) {
+  if (bestDay && bestDay[1] > 30 && bestDay[0] !== worstDay?.[0]) {
+    const wr = Math.round((dowW[bestDay[0]]||0) / dowN[bestDay[0]] * 100);
     insights.push({
-      icon: '📅', color: '#a78bfa',
-      title: `${dowNames[bestDay[0]]} — Hari terbaik kamu`,
-      desc: `+$${parseFloat(bestDay[1]).toFixed(0)} total dari ${dowCount[bestDay[0]]} trade. Jadikan prioritas.`,
+      icon: '📅', color: '#a78bfa', priority: 6,
+      title: `${dowNames[bestDay[0]]} — Hari paling profitable`,
+      desc: `+$${parseFloat(bestDay[1]).toFixed(0)} · ${wr}% WR dari ${dowN[bestDay[0]]} trade. Prioritaskan hari ini.`,
     });
   }
 
-  // 3. Emotion vs result pattern
-  const emMap = {};
+  // ── 4. Emotion vs result ──────────────────────────────
+  const emStats = {};
   tArr.filter(t => t.emotion).forEach(t => {
-    if (!emMap[t.emotion]) emMap[t.emotion] = { w: 0, n: 0 };
-    emMap[t.emotion].n++;
-    if (t.result === 'Win') emMap[t.emotion].w++;
+    if (!emStats[t.emotion]) emStats[t.emotion] = { w:0, n:0, pnl:0 };
+    emStats[t.emotion].n++; emStats[t.emotion].pnl += t.pnl||0;
+    if (t.result==='Win') emStats[t.emotion].w++;
   });
-  const bestEm = Object.entries(emMap).filter(([, d]) => d.n >= 3).map(([em, d]) => ({ em, wr: d.w/d.n, ...d })).sort((a,b) => b.wr-a.wr)[0];
-  const worstEm = Object.entries(emMap).filter(([, d]) => d.n >= 3).map(([em, d]) => ({ em, wr: d.w/d.n, ...d })).sort((a,b) => a.wr-b.wr)[0];
-  if (bestEm && bestEm.wr >= 0.6 && worstEm && worstEm.em !== bestEm.em) {
+  const emArr = Object.entries(emStats).filter(([,d]) => d.n >= 3).map(([em,d]) => ({ em, wr:d.w/d.n, ...d }));
+  const bestEm  = emArr.sort((a,b) => b.wr-a.wr)[0];
+  const worstEm = emArr.sort((a,b) => a.wr-b.wr)[0];
+  if (bestEm && worstEm && bestEm.em !== worstEm.em && bestEm.wr - worstEm.wr > 0.2) {
     insights.push({
-      icon: '🧠', color: '#38bdf8',
-      title: `${bestEm.em} = ${Math.round(bestEm.wr*100)}% WR vs ${worstEm.em} = ${Math.round(worstEm.wr*100)}% WR`,
-      desc: `Trade saat ${bestEm.em} jauh lebih baik. ${worstEm.em} menurunkan performa secara signifikan.`,
+      icon: '🧠', color: '#38bdf8', priority: 8,
+      title: `${bestEm.em} = ${Math.round(bestEm.wr*100)}% WR — ${worstEm.em} = ${Math.round(worstEm.wr*100)}% WR`,
+      desc: `Emosi sangat mempengaruhi hasil kamu. Trading saat ${bestEm.em} jauh lebih baik (${bestEm.n} trade).`,
     });
   }
 
-  // 4. Holding time vs result
-  const holdWins = tArr.filter(t => t.result==='Win' && t.holdingMinutes > 0);
-  const holdLoss = tArr.filter(t => t.result==='Loss' && t.holdingMinutes > 0);
-  if (holdWins.length >= 3 && holdLoss.length >= 3) {
-    const avgW = holdWins.reduce((s,t) => s+t.holdingMinutes, 0) / holdWins.length;
-    const avgL = holdLoss.reduce((s,t) => s+t.holdingMinutes, 0) / holdLoss.length;
-    if (avgL > avgW * 1.6) {
-      const fmt = m => m >= 60 ? `${Math.round(m/60)}j` : `${Math.round(m)}m`;
+  // ── 5. Holding time anomaly ───────────────────────────
+  const holdW = tArr.filter(t => t.result==='Win' && t.holdingMinutes > 0);
+  const holdL = tArr.filter(t => t.result==='Loss' && t.holdingMinutes > 0);
+  if (holdW.length >= 3 && holdL.length >= 3) {
+    const avgWH = holdW.reduce((s,t) => s+t.holdingMinutes,0) / holdW.length;
+    const avgLH = holdL.reduce((s,t) => s+t.holdingMinutes,0) / holdL.length;
+    const fmt   = m => m >= 60 ? `${(m/60).toFixed(1)}j` : `${Math.round(m)}m`;
+    if (avgLH > avgWH * 1.5) {
       insights.push({
-        icon: '⏱️', color: '#ff4d4d',
-        title: 'Kamu hold losers terlalu lama',
-        desc: `Rata-rata hold loss: ${fmt(avgL)} vs win: ${fmt(avgW)}. Cut loss lebih cepat bisa meningkatkan performa.`,
+        icon: '⏱️', color: '#ff4d4d', priority: 8,
+        title: `Hold losers ${(avgLH/avgWH).toFixed(1)}× lebih lama dari winners`,
+        desc: `Avg loss hold: ${fmt(avgLH)} vs win: ${fmt(avgWH)}. Tanda revenge holding — cut loss lebih cepat.`,
+      });
+    } else if (avgWH > avgLH * 1.5) {
+      insights.push({
+        icon: '⏱️', color: '#00d97e', priority: 5,
+        title: `Kamu sudah bisa hold winners`,
+        desc: `Avg win hold: ${fmt(avgWH)} vs loss: ${fmt(avgLH)}. Good discipline — winners ditahan lebih lama.`,
       });
     }
   }
 
-  return insights.slice(0, 4); // max 4 insights
+  // ── 6. Session win rate comparison ───────────────────
+  const sesStats = {};
+  tArr.forEach(t => {
+    if (!t.session) return;
+    if (!sesStats[t.session]) sesStats[t.session] = { w:0, n:0, pnl:0 };
+    sesStats[t.session].n++; sesStats[t.session].pnl += t.pnl||0;
+    if (t.result==='Win') sesStats[t.session].w++;
+  });
+  const sesArr = Object.entries(sesStats).filter(([,d]) => d.n >= 3).map(([ses,d]) => ({ ses, wr:d.w/d.n, ...d }));
+  if (sesArr.length >= 2) {
+    sesArr.sort((a,b) => b.wr-a.wr);
+    const topSes = sesArr[0], botSes = sesArr[sesArr.length-1];
+    if (topSes.wr - botSes.wr > 0.2) {
+      insights.push({
+        icon: '🕐', color: '#00d97e', priority: 7,
+        title: `${topSes.ses.split('-')[0]} (${Math.round(topSes.wr*100)}% WR) jauh lebih baik dari ${botSes.ses.split('-')[0]} (${Math.round(botSes.wr*100)}%)`,
+        desc: `Fokus trading di ${topSes.ses.split('-')[0]} — $${topSes.pnl >= 0?'+':''}${topSes.pnl.toFixed(0)} P&L dari ${topSes.n} trade.`,
+      });
+    }
+  }
+
+  // ── 7. Risk consistency ───────────────────────────────
+  const risks = tArr.filter(t => t.risk > 0).map(t => t.risk);
+  if (risks.length >= 5) {
+    const avgRisk = risks.reduce((a,b)=>a+b,0)/risks.length;
+    const maxRisk = Math.max(...risks);
+    const oversize = tArr.filter(t => t.risk > avgRisk * 2 && t.result === 'Loss');
+    if (oversize.length >= 2 && maxRisk > avgRisk * 2.5) {
+      insights.push({
+        icon: '📐', color: '#fb923c', priority: 8,
+        title: `${oversize.length} loss dari oversize position`,
+        desc: `Risk normal kamu $${avgRisk.toFixed(0)}, tapi ${oversize.length} trade loss pakai risk $${maxRisk.toFixed(0)}+. Oversize saat loss = danger.`,
+      });
+    }
+  }
+
+  // ── 8. Streak momentum ───────────────────────────────
+  let curWin=0, curLoss=0;
+  for (let i=tArr.length-1; i>=0; i--) {
+    const r = tArr[i].result;
+    if (curWin===0 && curLoss===0) { if(r==='Win') curWin=1; else if(r==='Loss') curLoss=1; else break; }
+    else if (curWin>0) { if(r==='Win') curWin++; else break; }
+    else { if(r==='Loss') curLoss++; else break; }
+  }
+  if (curWin >= 4) {
+    insights.push({
+      icon: '🔥', color: '#f59e0b', priority: 10,
+      title: `${curWin} win streak — Jaga momentum!`,
+      desc: `Kamu sedang hot. Tetap disiplin pada size dan setup, jangan overconfident.`,
+    });
+  } else if (curLoss >= 3 && insights.every(x => !x.title.includes('Loss'))) {
+    insights.push({
+      icon: '❄️', color: '#818cf8', priority: 10,
+      title: `${curLoss} loss beruntun — Review sebelum lanjut`,
+      desc: `Istirahat sejenak, review trade terakhir. Jangan buru-buru recovery dengan oversize.`,
+    });
+  }
+
+  // ── 9. MAE/MFE: exit too early ───────────────────────
+  const withMFE = tArr.filter(t => t.result==='Win' && t.entry && t.exit && t.sl && t.plannedRR > 0);
+  if (withMFE.length >= 4) {
+    const earlyExit = withMFE.filter(t => Math.abs(t.r||0) < t.plannedRR * 0.7).length;
+    if (earlyExit / withMFE.length > 0.4) {
+      insights.push({
+        icon: '✂️', color: '#f59e0b', priority: 7,
+        title: `${Math.round(earlyExit/withMFE.length*100)}% trade menang — exit sebelum target`,
+        desc: `Kamu sering cut profit terlalu awal. Actual RR lebih rendah dari planned. Coba trailing stop.`,
+      });
+    }
+  }
+
+  // ── 10. Setup yang selalu kalah ───────────────────────
+  const setupStats = {};
+  tArr.forEach(t => {
+    if (!t.setup) return;
+    t.setup.split(',').forEach(s => {
+      const k = s.trim(); if (!k || k === 'Other') return;
+      if (!setupStats[k]) setupStats[k] = { w:0, n:0 };
+      setupStats[k].n++; if (t.result==='Win') setupStats[k].w++;
+    });
+  });
+  const worstSetup = Object.entries(setupStats).filter(([,d]) => d.n >= 3 && d.w/d.n < 0.35).sort((a,b)=>a[1].w/a[1].n - b[1].w/b[1].n)[0];
+  if (worstSetup) {
+    const [setup, d] = worstSetup;
+    insights.push({
+      icon: '⚠️', color: '#ff4d4d', priority: 7,
+      title: `Setup "${setup}" win rate hanya ${Math.round(d.w/d.n*100)}%`,
+      desc: `Dari ${d.n} trade dengan setup ini, hanya ${d.w} yang menang. Evaluasi kembali kondisi entry kamu.`,
+    });
+  }
+
+  // Sort by priority desc, return top 5
+  return insights.sort((a,b) => (b.priority||0)-(a.priority||0)).slice(0, 5);
 }
 
 // ── RENDER PATTERN WIDGET ─────────────────────────────
@@ -8841,6 +9047,25 @@ function renderTable(){
     const rc=t.r>0?'pos':t.r<0?'neg':'neu';
     const rb=t.result==='Win'?'bw':t.result==='Loss'?'bo':'bbe';
     const fid=t.firestoreId||'';
+
+    // ── micro-badges ──
+    let badges = '';
+    // Rating stars
+    if (t.rating > 0) {
+      const starColor = t.rating >= 4 ? '#a78bfa' : t.rating >= 3 ? '#f59e0b' : '#71717a';
+      badges += `<span title="${['','Buruk','Di bawah rata-rata','Rata-rata','Bagus','Sempurna'][t.rating]||''}" style="font-size:10px;color:${starColor};letter-spacing:0">${'★'.repeat(t.rating)}</span>`;
+    }
+    // Mistake tag dot
+    if (t.mistakes) {
+      const mkCount = t.mistakes.split(',').filter(Boolean).length;
+      badges += ` <span title="Mistake: ${t.mistakes}" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,77,77,.2);border:1px solid rgba(255,77,77,.3);font-size:8px;color:#ff4d4d;font-weight:700;font-family:var(--mono)">${mkCount}</span>`;
+    }
+    // Emotion indicator
+    const emColors={'FOMO':'#a78bfa','Revenge':'#ff4d4d','Impatient':'#fb923c','Anxious':'#f59e0b','Calm':'#00d97e','Confident':'#38bdf8'};
+    if (t.emotion && emColors[t.emotion]) {
+      badges += ` <span title="${t.emotion}" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${emColors[t.emotion]};flex-shrink:0;vertical-align:middle"></span>`;
+    }
+
     return`<tr>
       <td style="color:var(--text3)">${idx}</td><td>${t.date||'—'}</td>
       <td style="font-weight:500;color:var(--text)">${t.pair||'—'}</td>
@@ -8854,6 +9079,7 @@ function renderTable(){
       <td style="color:var(--text2)">${t.setup||'—'}</td>
       <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${t.notes||''}">${t.notes||'—'}</td>
       <td style="white-space:nowrap">
+        ${badges ? `<span style="margin-right:4px">${badges}</span>` : ''}
         <button class="bedit-row" onclick="window.editTrade('${fid}')" title="Edit trade"><i class="bi bi-pencil"></i></button>
         <button class="bdup" onclick="window.dupTrade('${fid}')" title="Duplikat trade"><i class="bi bi-copy"></i></button>
         <button class="bdel" onclick="window.delTrade('${fid}')" title="Hapus trade">✕</button>
