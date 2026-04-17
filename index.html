@@ -1225,6 +1225,127 @@ select.fi option{background:var(--bg3);}
 .tcal-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);}
 .tcal-leg-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
 
+/* ════════════════════════════════════════════════════════════
+   DASHBOARD LAYOUT SWITCHER
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Layout Switcher Button Bar ── */
+.dash-layout-bar {
+  display:flex;align-items:center;justify-content:flex-end;
+  gap:6px;margin-bottom:14px;
+}
+.dash-layout-lbl {
+  font-size:10px;color:var(--text3);text-transform:uppercase;
+  letter-spacing:.8px;font-weight:600;margin-right:4px;
+}
+.dll-btn {
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:5px 10px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text3);font-size:11px;font-weight:600;
+  font-family:var(--font);cursor:pointer;transition:all .18s;
+  white-space:nowrap;letter-spacing:.2px;
+}
+.dll-btn svg { flex-shrink:0; }
+.dll-btn:hover { border-color:var(--border2);color:var(--text); }
+.dll-btn.active {
+  background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));
+  border-color:rgba(139,92,246,.45);color:var(--accent2);
+  box-shadow:0 0 0 1px rgba(139,92,246,.12),0 2px 8px rgba(139,92,246,.15);
+}
+
+/* ── LAYOUT: default (sidebar calendar) ── */
+#page-dashboard.layout-default .dash-layout {
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:16px;
+  align-items:start;
+}
+#page-dashboard.layout-default .dash-cal-col {
+  display:block !important;
+  position:sticky;top:20px;
+}
+
+/* ── LAYOUT: focus (full width, no sidebar calendar) ── */
+#page-dashboard.layout-focus .dash-layout {
+  display:block !important;
+}
+#page-dashboard.layout-focus .dash-main-col {
+  width:100%;
+}
+#page-dashboard.layout-focus .dash-cal-col {
+  display:none !important;
+}
+/* In focus mode: show inline mini calendar inside main col */
+#page-dashboard.layout-focus #focus-cal-inline {
+  display:block !important;
+}
+#focus-cal-inline { display:none; }
+
+/* ── LAYOUT: compact (wide stats, calendar below) ── */
+#page-dashboard.layout-compact .dash-layout {
+  display:block !important;
+}
+#page-dashboard.layout-compact .dash-main-col {
+  width:100%;
+}
+#page-dashboard.layout-compact .dash-cal-col {
+  display:block !important;
+  position:static !important;
+  margin-top:16px;
+}
+#page-dashboard.layout-compact .stats {
+  grid-template-columns:repeat(5,1fr) !important;
+}
+#page-dashboard.layout-compact .sc .sv {
+  font-size:28px !important;
+}
+/* compact: place cal-col below main as full-width row */
+#page-dashboard.layout-compact .dash-cal-col > * {
+  max-width:100%;
+}
+#page-dashboard.layout-compact .dash-cal-col .tcal-grid {
+  /* More columns space in compact/wide mode */
+  grid-template-columns:repeat(7,1fr) !important;
+}
+#page-dashboard.layout-compact .enews-widget {
+  margin-top:16px;
+}
+#page-dashboard.layout-compact .tcal-widget,
+#page-dashboard.layout-compact .enews-widget {
+  max-width:720px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Responsive overrides */
+@media(max-width:900px){
+  #page-dashboard.layout-default .dash-layout {
+    grid-template-columns:1fr !important;
+  }
+  #page-dashboard.layout-default .dash-cal-col {
+    position:static !important;
+  }
+}
+@media(max-width:768px){
+  .dash-layout-bar { justify-content:flex-start; }
+  #page-dashboard.layout-compact .stats {
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  #page-dashboard.layout-compact .sc .sv {
+    font-size:22px !important;
+  }
+}
+
+/* ── Inline focus-mode calendar strip ── */
+.focus-cal-strip {
+  background:linear-gradient(160deg,var(--bg2),var(--bg3));
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;margin-bottom:16px;
+}
+.focus-cal-strip .tcal-header {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
 /* ── AMBIENT BACKGROUND GLOW ── */
 #page-dashboard::before{
   content:'';position:fixed;top:-200px;right:-200px;
@@ -2652,6 +2773,23 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="ph">
       <div><div class="pt">Dashboard</div><div class="ps" id="dash-date"></div></div>
       <button class="btn" id="dash-log-btn">+ Log Trade</button>
+    </div>
+
+    <!-- ── LAYOUT SWITCHER ── -->
+    <div class="dash-layout-bar" id="dash-layout-bar">
+      <span class="dash-layout-lbl">Layout</span>
+      <button class="dll-btn active" id="dll-default" onclick="setDashLayout('default')" title="Default: stats + sidebar calendar">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="currentColor" opacity=".7"/><rect x="10" y="1" width="3" height="5" rx="1" fill="currentColor" opacity=".5"/><rect x="10" y="8" width="3" height="5" rx="1" fill="currentColor" opacity=".5"/></svg>
+        Default
+      </button>
+      <button class="dll-btn" id="dll-focus" onclick="setDashLayout('focus')" title="Focus: full-width tanpa sidebar">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" fill="currentColor" opacity=".7"/><rect x="3" y="3.5" width="8" height="1.5" rx=".75" fill="var(--bg)" opacity=".7"/><rect x="3" y="6.5" width="6" height="1.5" rx=".75" fill="var(--bg)" opacity=".5"/></svg>
+        Focus
+      </button>
+      <button class="dll-btn" id="dll-compact" onclick="setDashLayout('compact')" title="Compact: stats besar + calendar di bawah">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="3.5" rx="1" fill="currentColor" opacity=".7"/><rect x="1" y="6" width="5.5" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="7.5" y="6" width="5.5" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="10.5" width="12" height="2.5" rx="1" fill="currentColor" opacity=".3"/></svg>
+        Compact
+      </button>
     </div>
     <div class="dash-layout">
     <div class="dash-main-col">
@@ -13478,6 +13616,196 @@ const _monkeyPatchTrades = setInterval(() => {
   }
 }, 300);
 
+</script>
+
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-LAYOUT — Dashboard Layout Switcher
+     ════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  var LAYOUT_KEY = 'rpt_dash_layout';
+  var LAYOUTS = ['default', 'focus', 'compact'];
+  var currentLayout = 'default';
+
+  // Layout descriptions shown as tooltip/subtitle
+  var LAYOUT_INFO = {
+    default: 'Sidebar kalender kanan + main content',
+    focus:   'Full-width, kalender terintegrasi',
+    compact: 'Stats besar, kalender di bawah'
+  };
+
+  function applyLayout(name) {
+    var page = document.getElementById('page-dashboard');
+    if (!page) return;
+    // Remove all layout classes
+    LAYOUTS.forEach(function(l) { page.classList.remove('layout-' + l); });
+    page.classList.add('layout-' + name);
+    currentLayout = name;
+
+    // Update button states
+    LAYOUTS.forEach(function(l) {
+      var btn = document.getElementById('dll-' + l);
+      if (btn) btn.classList.toggle('active', l === name);
+    });
+
+    // In focus mode: inject inline mini calendar strip if not already there
+    if (name === 'focus') {
+      _ensureFocusCalStrip();
+    }
+
+    // In compact mode: move cal-col below main-col in DOM order
+    _reorderDashLayout(name);
+
+    // Save preference
+    try { localStorage.setItem(LAYOUT_KEY, name); } catch(e) {}
+
+    // Trigger calendar refresh since layout changed (column widths changed)
+    setTimeout(function() {
+      if (window.tcalRefresh) window.tcalRefresh();
+    }, 50);
+  }
+
+  function _ensureFocusCalStrip() {
+    if (document.getElementById('focus-cal-inline')) return;
+
+    var mainCol = document.querySelector('#page-dashboard .dash-main-col');
+    if (!mainCol) return;
+
+    var strip = document.createElement('div');
+    strip.id = 'focus-cal-inline';
+    strip.className = 'focus-cal-strip';
+    strip.style.display = 'none'; // hidden by default, shown via CSS
+    strip.innerHTML = [
+      '<div class="tcal-header">',
+        '<div class="tcal-title">📅 Trading Calendar</div>',
+        '<div class="tcal-nav">',
+          '<button class="tcal-nav-btn" id="fcal-prev">‹</button>',
+          '<div class="tcal-month-label" id="fcal-month-label">—</div>',
+          '<button class="tcal-nav-btn" id="fcal-next">›</button>',
+        '</div>',
+      '</div>',
+      '<div class="tcal-day-labels">',
+        '<div class="tcal-dl">Min</div><div class="tcal-dl">Sen</div>',
+        '<div class="tcal-dl">Sel</div><div class="tcal-dl">Rab</div>',
+        '<div class="tcal-dl">Kam</div><div class="tcal-dl">Jum</div>',
+        '<div class="tcal-dl">Sab</div>',
+      '</div>',
+      '<div class="tcal-grid" id="fcal-grid"></div>',
+      '<div class="tcal-legend" style="margin-top:10px">',
+        '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(0,217,126,.4);border:1px solid rgba(0,217,126,.5)"></div>Win</div>',
+        '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(255,77,77,.35);border:1px solid rgba(255,77,77,.45)"></div>Loss</div>',
+        '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)"></div>BE</div>',
+      '</div>',
+    ].join('');
+
+    // Insert before the stats section (after layout bar + trader/guest cards)
+    var statsEl = mainCol.querySelector('.stats');
+    if (statsEl) mainCol.insertBefore(strip, statsEl);
+    else mainCol.insertBefore(strip, mainCol.firstChild);
+
+    // Wire focus calendar nav (mirrors main calendar)
+    var focusYear, focusMonth;
+    var now = new Date();
+    focusYear = now.getFullYear(); focusMonth = now.getMonth();
+    var MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    function renderFocusCal() {
+      var grid = document.getElementById('fcal-grid');
+      var lbl  = document.getElementById('fcal-month-label');
+      if (!grid || !lbl) return;
+      lbl.textContent = MONTHS_ID[focusMonth].slice(0,3) + ' ' + focusYear;
+
+      var trades = window._appTrades || window._trades || [];
+      var map = {};
+      trades.forEach(function(t) {
+        if (!t.date) return;
+        var d = t.date.substring(0, 10);
+        if (!map[d]) map[d] = { wins:0, losses:0, be:0, pnl:0 };
+        var pnl = parseFloat(t.pnl) || 0;
+        var r = (t.result || '').toLowerCase();
+        if (r === 'win') map[d].wins++;
+        else if (r === 'loss') map[d].losses++;
+        else map[d].be++;
+        map[d].pnl += pnl;
+      });
+
+      var todayStr = new Date().toISOString().slice(0,10);
+      var first = new Date(focusYear, focusMonth, 1).getDay();
+      var dim = new Date(focusYear, focusMonth+1, 0).getDate();
+      var html = '';
+      for (var e = 0; e < first; e++) html += '<div class="tcal-cell tcal-empty"></div>';
+      for (var day = 1; day <= dim; day++) {
+        var ds = focusYear + '-' + String(focusMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+        var data = map[ds];
+        var cls = 'tcal-cell';
+        var inner = '';
+        if (ds === todayStr) cls += ' tcal-today';
+        if (data) {
+          if (data.wins > data.losses) cls += ' tcal-win';
+          else if (data.losses > data.wins) cls += ' tcal-loss';
+          else cls += ' tcal-be';
+          var absV = Math.abs(data.pnl);
+          var pnlStr = (data.pnl >= 0 ? '+' : '-') + '$' + (absV >= 1000 ? (absV/1000).toFixed(1)+'k' : absV.toFixed(0));
+          inner = '<span class="tcal-dn">' + day + '</span><span class="tcal-pnl">' + pnlStr + '</span>';
+        } else {
+          inner = '<span class="tcal-dn-def">' + day + '</span>';
+        }
+        html += '<div class="' + cls + '">' + inner + '</div>';
+      }
+      grid.innerHTML = html;
+    }
+
+    var fpBtn = document.getElementById('fcal-prev');
+    var fnBtn = document.getElementById('fcal-next');
+    if (fpBtn) fpBtn.addEventListener('click', function() { focusMonth--; if(focusMonth<0){focusMonth=11;focusYear--;} renderFocusCal(); });
+    if (fnBtn) fnBtn.addEventListener('click', function() { focusMonth++; if(focusMonth>11){focusMonth=0;focusYear++;} renderFocusCal(); });
+
+    renderFocusCal();
+    // Re-render when trades update
+    document.addEventListener('tradesUpdated', renderFocusCal);
+    setInterval(renderFocusCal, 5000);
+  }
+
+  function _reorderDashLayout(name) {
+    var dashLayout = document.querySelector('#page-dashboard .dash-layout');
+    if (!dashLayout) return;
+    var mainCol = dashLayout.querySelector('.dash-main-col');
+    var calCol  = dashLayout.querySelector('.dash-cal-col');
+    if (!mainCol || !calCol) return;
+
+    if (name === 'compact') {
+      // Make sure main comes first, cal comes second in DOM
+      if (dashLayout.children[0] !== mainCol) {
+        dashLayout.insertBefore(mainCol, dashLayout.firstChild);
+      }
+    } else if (name === 'default') {
+      // Restore: main first, cal second
+      if (dashLayout.children[0] !== mainCol) {
+        dashLayout.insertBefore(mainCol, dashLayout.firstChild);
+      }
+    }
+  }
+
+  // Expose globally so onclick= can reach it
+  window.setDashLayout = applyLayout;
+
+  // Init: restore saved layout
+  document.addEventListener('DOMContentLoaded', function() {
+    var saved;
+    try { saved = localStorage.getItem(LAYOUT_KEY); } catch(e) {}
+    var layout = (saved && LAYOUTS.indexOf(saved) >= 0) ? saved : 'default';
+    applyLayout(layout);
+  });
+
+  // Also apply on SPA page switch (in case goPage re-renders)
+  var _checkLayout = setInterval(function() {
+    var page = document.getElementById('page-dashboard');
+    if (page && !page.classList.contains('layout-' + currentLayout)) {
+      applyLayout(currentLayout);
+    }
+  }, 1000);
+
+})();
 </script>
 
 <!-- ════════════════════════════════════════════════════════════
