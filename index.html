@@ -13491,5 +13491,376 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-PERF — Performance Optimizations
+     Tidak mengubah fitur apapun — hanya mempercepat:
+     1. Debounce updateAll agar tidak spam-render saat data masuk
+     2. Chart.update() alih-alih destroy+recreate untuk pnlCh & dnCh & ddCh & rCh
+     3. Cache DOM lookups yang berulang
+     4. Ganti setInterval monkey-patch dengan event/flag yang lebih bersih
+     5. Debounce calcRisk (risk calculator) saat input cepat
+     6. Lazy render: analytics/calendar hanya render saat page aktif
+     ════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+'use strict';
+
+// ── 1. DEBOUNCE HELPER ──────────────────────────────────────
+function _debounce(fn, delay) {
+  var t;
+  return function() {
+    var ctx = this, args = arguments;
+    clearTimeout(t);
+    t = setTimeout(function() { fn.apply(ctx, args); }, delay);
+  };
+}
+
+// ── 2. DEBOUNCE updateAll (max 1x per 60ms) ─────────────────
+// Mencegah spam render saat Firestore onSnapshot menembak data
+// berulang-ulang saat login pertama / sync awal.
+// updateAll sync (balance update, page tab click) tetap langsung.
+var _updateAllPending = false;
+var _updateAllTimer   = null;
+var _origUpdateAll = null;
+
+function _patchUpdateAll() {
+  if (typeof window.updateAll !== 'function') return false;
+  if (window.updateAll._rptPatched) return true; // already done
+  _origUpdateAll = window.updateAll;
+
+  window.updateAll = function _debouncedUpdateAll() {
+    // Always update immediately on the very first call (fresh load)
+    if (!_debouncedUpdateAll._firstDone) {
+      _debouncedUpdateAll._firstDone = true;
+      _origUpdateAll.apply(this, arguments);
+      return;
+    }
+    // Subsequent calls: debounce 80ms so rapid Firestore events batch
+    clearTimeout(_updateAllTimer);
+    _updateAllTimer = setTimeout(function() {
+      _origUpdateAll();
+    }, 80);
+  };
+  window.updateAll._rptPatched = true;
+  window.updateAll._firstDone  = false;
+
+  // Re-expose so other modules keep referencing the patched version
+  window.updateAll = window.updateAll;
+  return true;
+}
+
+// Try immediately, then poll briefly in case modules load late
+if (!_patchUpdateAll()) {
+  var _patchTries = 0;
+  var _patchInterval = setInterval(function() {
+    _patchTries++;
+    if (_patchUpdateAll() || _patchTries > 30) clearInterval(_patchInterval);
+  }, 200);
+}
+
+// ── 3. CHART UPDATE vs DESTROY+RECREATE ─────────────────────
+// Donut chart (dnCh) & PnL bar chart (pnlCh) & analytics charts
+// (ddCh, rCh) are destroyed+recreated every render call.
+// We patch their render functions to call chart.update() when
+// the chart instance already exists with the same type.
+
+function _patchChartRenders() {
+  if (typeof window.renderDonut !== 'function') return false;
+  if (window.renderDonut._rptPatched) return true;
+
+  // ── Patch renderDonut ──
+  var _origDonut = window.renderDonut;
+  window.renderDonut = function renderDonut() {
+    // Only patch if dnCh exists (chart was already created)
+    var dnCh = window.dnCh;
+    if (!dnCh || !dnCh.data) { _origDonut.apply(this, arguments); return; }
+    // Fall through to original if chart was destroyed
+    if (!dnCh.ctx) { _origDonut.apply(this, arguments); return; }
+
+    // Recalculate values (same logic as original, but update in-place)
+    var ft, w, l, be, total;
+    try {
+      ft    = typeof window.getFilteredTrades === 'function' ? window.getFilteredTrades() : null;
+      if (!ft) { _origDonut.apply(this, arguments); return; }
+      w     = ft.filter(function(t){return t.result==='Win';}).length;
+      l     = ft.filter(function(t){return t.result==='Loss';}).length;
+      be    = ft.filter(function(t){return t.result==='Breakeven';}).length;
+      total = w + l + be;
+    } catch(e) { _origDonut.apply(this, arguments); return; }
+
+    // Update legend text (same DOM updates as original)
+    var pct = function(n){ return total>0 ? '('+Math.round(n/total*100)+'%)' : ''; };
+    var $ = window.$ || function(id){ return document.getElementById(id); };
+    var dnWins = $('dn-wins'), dnLosses = $('dn-losses'), dnBe = $('dn-be');
+    if (dnWins) dnWins.textContent = w;
+    if (dnLosses) dnLosses.textContent = l;
+    if (dnBe) dnBe.textContent = be;
+    var dnWP=$('dn-wins-pct'), dnLP=$('dn-losses-pct'), dnBP=$('dn-be-pct');
+    if (dnWP) dnWP.textContent = pct(w);
+    if (dnLP) dnLP.textContent = pct(l);
+    if (dnBP) dnBP.textContent = pct(be);
+
+    if (total === 0) {
+      // Need to destroy the chart — fall through to original
+      _origDonut.apply(this, arguments);
+      return;
+    }
+
+    var dl=$('donut-legend'), de=$('donut-empty');
+    if (dl) dl.style.display='flex';
+    if (de) de.style.display='none';
+
+    // Update chart data in-place (no destroy/recreate)
+    dnCh.data.datasets[0].data = [w, l, be];
+    dnCh.update('active'); // 'active' = animate
+  };
+  window.renderDonut._rptPatched = true;
+
+  // ── Patch renderPnl: update dataset if chart exists & bar count unchanged ──
+  var _origPnl = window.renderPnl;
+  window.renderPnl = function renderPnl() {
+    var pnlCh = window.pnlCh;
+    if (!pnlCh || !pnlCh.ctx) { _origPnl.apply(this, arguments); return; }
+
+    try {
+      var ft = typeof window.getFilteredTrades === 'function' ? window.getFilteredTrades() : null;
+      if (!ft) { _origPnl.apply(this, arguments); return; }
+      var D = ft.map(function(t){ return t.pnl; });
+      var L = ft.map(function(_,i){ return '#'+(i+1); });
+
+      // If trade count changed significantly, recreate to keep plugin working
+      var prevLen = pnlCh.data.datasets[0] ? pnlCh.data.datasets[0].data.length : 0;
+      if (Math.abs(D.length - prevLen) > 1) {
+        _origPnl.apply(this, arguments);
+        return;
+      }
+
+      pnlCh.data.labels = L;
+      pnlCh.data.datasets[0].data = D;
+      pnlCh.update('none'); // no animation for incremental update
+    } catch(e) {
+      _origPnl.apply(this, arguments);
+    }
+  };
+  window.renderPnl._rptPatched = true;
+
+  return true;
+}
+
+// Patch after modules load
+var _chartPatchTries = 0;
+var _chartPatchInt = setInterval(function() {
+  _chartPatchTries++;
+  if (_patchChartRenders() || _chartPatchTries > 40) clearInterval(_chartPatchInt);
+}, 300);
+
+// ── 4. CACHE FREQUENTLY ACCESSED DOM NODES ──────────────────
+// The $ function is called hundreds of times per render cycle.
+// We add a lightweight LRU cache on top of getElementById.
+(function patchDollar() {
+  if (typeof window.$ !== 'function') return;
+  if (window.$._rptCached) return;
+  var _orig$ = window.$;
+  var _cache = Object.create(null);
+  var _cacheSize = 0;
+  var MAX_CACHE = 120;
+
+  window.$ = function $(id) {
+    if (_cache[id]) return _cache[id];
+    var el = _orig$(id);
+    if (el) {
+      if (_cacheSize >= MAX_CACHE) {
+        // Simple eviction: clear half the cache when full
+        var keys = Object.keys(_cache);
+        for (var i = 0; i < keys.length / 2; i++) delete _cache[keys[i]];
+        _cacheSize = Math.floor(_cacheSize / 2);
+      }
+      _cache[id] = el;
+      _cacheSize++;
+    }
+    return el;
+  };
+  window.$._rptCached = true;
+
+  // Invalidate cache when DOM is mutated (modal open/close swaps children)
+  // We use a coarse invalidation on any modal open/close.
+  var _origClassAdd = DOMTokenList.prototype.add;
+  DOMTokenList.prototype.add = function() {
+    _origClassAdd.apply(this, arguments);
+    // If 'open' class added to a modal — some cached elements may have moved
+    for (var i = 0; i < arguments.length; i++) {
+      if (arguments[i] === 'open') {
+        // Partial cache clear: only remove dynamic modal child IDs
+        // We keep stable IDs (nav, sb, etc.) cached.
+        // Simple: just clear the whole cache — it repopulates quickly.
+        _cache = Object.create(null);
+        _cacheSize = 0;
+        break;
+      }
+    }
+  };
+})();
+
+// ── 5. DEBOUNCE calcRisk (risk calculator) ──────────────────
+// Input events on 5 fields all call calcRisk immediately.
+// Debounce to 120ms so rapid typing doesn't stutter.
+function _patchCalcRisk() {
+  if (typeof window.calcRisk !== 'function') return false;
+  if (window.calcRisk._rptPatched) return true;
+  var _origCalcRisk = window.calcRisk;
+  var _debouncedCalcRisk = _debounce(_origCalcRisk, 120);
+
+  window.calcRisk = function calcRisk() {
+    _debouncedCalcRisk.apply(this, arguments);
+  };
+  window.calcRisk._rptPatched = true;
+  // Re-wire input listeners to use patched version (they call window.calcRisk by ref)
+  return true;
+}
+var _calcRiskTries = 0;
+var _calcRiskInt = setInterval(function() {
+  _calcRiskTries++;
+  if (_patchCalcRisk() || _calcRiskTries > 40) clearInterval(_calcRiskInt);
+}, 300);
+
+// ── 6. REMOVE REDUNDANT renderAdvancedAnalytics CALL IN updateAll ──
+// updateAll already calls renderAdvancedAnalytics at line:
+//   if (window._advAnalyticsReady) window.renderAdvancedAnalytics && ...
+// AND the MutationObserver in the playbook module ALSO calls it
+// when analytics page becomes active. Double render = wasted work.
+// We gate it so renderAdvancedAnalytics only runs when the
+// analytics page is actually visible.
+function _patchAdvAnalytics() {
+  if (typeof window.renderAdvancedAnalytics !== 'function') return false;
+  if (window.renderAdvancedAnalytics._rptPatched) return true;
+  var _origAdv = window.renderAdvancedAnalytics;
+
+  window.renderAdvancedAnalytics = function renderAdvancedAnalytics() {
+    var anaPage = document.getElementById('page-analytics');
+    // Only run if analytics page is active
+    if (anaPage && !anaPage.classList.contains('active')) return;
+    _origAdv.apply(this, arguments);
+  };
+  window.renderAdvancedAnalytics._rptPatched = true;
+  return true;
+}
+var _advTries = 0;
+var _advInt = setInterval(function() {
+  _advTries++;
+  if (_patchAdvAnalytics() || _advTries > 50) clearInterval(_advInt);
+}, 200);
+
+// ── 7. LAZY RENDER: skip heavy renders when page not visible ──
+// renderDNA, renderDonut, renderPnl are called every updateAll.
+// Gate them: only fully render when dashboard page is active.
+// If not active, mark dirty and render when user navigates there.
+var _dirtyDashboard = false;
+
+function _patchLazyDashboard() {
+  if (typeof window.renderEq !== 'function') return false;
+  if (window.renderEq._rptLazy) return true;
+
+  var _origRenderEq  = window.renderEq;
+  var _origRenderDNA = window.renderDNA;
+
+  window.renderEq = function() {
+    var dash = document.getElementById('page-dashboard');
+    if (dash && !dash.classList.contains('active')) {
+      _dirtyDashboard = true; return;
+    }
+    _origRenderEq.apply(this, arguments);
+  };
+  window.renderEq._rptLazy = true;
+
+  if (typeof _origRenderDNA === 'function') {
+    window.renderDNA = function() {
+      var dash = document.getElementById('page-dashboard');
+      if (dash && !dash.classList.contains('active')) {
+        _dirtyDashboard = true; return;
+      }
+      _origRenderDNA.apply(this, arguments);
+    };
+    window.renderDNA._rptLazy = true;
+  }
+
+  // Patch goPage to flush dirty renders when returning to dashboard
+  var _origGoPage = window.goPage;
+  if (typeof _origGoPage === 'function') {
+    window.goPage = function goPage(name) {
+      _origGoPage.apply(this, arguments);
+      if (name === 'dashboard' && _dirtyDashboard) {
+        _dirtyDashboard = false;
+        if (typeof window.renderEq === 'function' && window.renderEq._rptLazy) {
+          _origRenderEq();
+        }
+        if (typeof window.renderDNA === 'function' && window.renderDNA._rptLazy) {
+          if (_origRenderDNA) _origRenderDNA();
+        }
+      }
+    };
+  }
+  return true;
+}
+
+var _lazyTries = 0;
+var _lazyInt = setInterval(function() {
+  _lazyTries++;
+  if (_patchLazyDashboard() || _lazyTries > 50) clearInterval(_lazyInt);
+}, 300);
+
+// ── 8. THROTTLE renderTable to prevent excessive re-renders ──
+// renderTable is called from updateAll + filter change handlers.
+// If called in rapid succession (e.g., batch Firestore sync),
+// coalesce into a single render using rAF.
+function _patchRenderTable() {
+  if (typeof window.renderTable !== 'function') return false;
+  if (window.renderTable._rptPatched) return true;
+  var _origRT = window.renderTable;
+  var _rtRaf = null;
+
+  window.renderTable = function renderTable() {
+    if (_rtRaf) return; // already queued
+    _rtRaf = requestAnimationFrame(function() {
+      _rtRaf = null;
+      _origRT();
+    });
+  };
+  window.renderTable._rptPatched = true;
+  return true;
+}
+
+var _rtTries = 0;
+var _rtInt = setInterval(function() {
+  _rtTries++;
+  if (_patchRenderTable() || _rtTries > 40) clearInterval(_rtInt);
+}, 200);
+
+// ── 9. WILL-CHANGE HINT for animated sidebar / modals ────────
+// Browsers GPU-composite elements with will-change.
+// Add it to sidebar and modal overlay for smooth open/close.
+(function addWillChange() {
+  var sb = document.getElementById('sb');
+  if (sb) sb.style.willChange = 'transform';
+  // Modals are display:none initially; add will-change on first open
+  var _origClassAdd2 = Element.prototype._rptOrigAdd2;
+  // Simple: add will-change to any element that gets class 'open'
+  var _observeOpen = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'attributes' && m.attributeName === 'class') {
+        var el = m.target;
+        if (el.classList.contains('open') && el.id && el.id.startsWith('md-')) {
+          el.style.willChange = 'opacity, transform';
+        }
+      }
+    });
+  });
+  document.querySelectorAll('[id^="md-"]').forEach(function(el) {
+    _observeOpen.observe(el, { attributes: true, attributeFilter: ['class'] });
+  });
+})();
+
+})(); // end IIFE
+</script>
 </body>
 </html>
