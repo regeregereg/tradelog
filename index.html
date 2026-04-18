@@ -1017,16 +1017,24 @@ select.fi option{background:var(--bg3);}
   align-items: center;
   padding: 0 24px;
   gap: 12px;
-  background: rgba(9,9,11,0.85);
+  background: rgba(9,9,11,0.88);
   backdrop-filter: blur(24px) saturate(1.5);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border-bottom: 1px solid rgba(139,92,246,0.2);
-  box-shadow: 0 2px 24px rgba(0,0,0,0.4), 0 1px 0 rgba(139,92,246,0.1);
+  border-bottom: 1px solid rgba(139,92,246,0.22);
+  box-shadow: 0 4px 28px rgba(0,0,0,0.45), 0 1px 0 rgba(139,92,246,0.12);
   transform: translateY(-110%);
   opacity: 0;
   pointer-events: none;
-  transition: transform 0.42s cubic-bezier(0.34,1.22,0.64,1), opacity 0.28s ease;
+  /* match sidebar transition timing */
+  transition: transform 0.42s cubic-bezier(0.34,1.22,0.64,1),
+              opacity   0.28s ease,
+              left      0.28s cubic-bezier(.4,0,.2,1);
   will-change: transform, opacity;
+}
+/* When sidebar is collapsed on desktop, bar stretches full width */
+.main.off ~ #sticky-profile-bar,
+body.sb-off #sticky-profile-bar {
+  left: 0;
 }
 #sticky-profile-bar::before {
   content: '';
@@ -7493,6 +7501,9 @@ function toggleSB() {
   $('sb-btn').textContent = sbOpen ? '◀' : '▶';
   if (isMob()) $('ovl').classList.toggle('open', sbOpen);
   else $('main').classList.toggle('off', !sbOpen);
+  // Sync sticky profile bar left edge with sidebar state
+  var spb = document.getElementById('sticky-profile-bar');
+  if (spb && !isMob()) spb.style.left = sbOpen ? 'var(--sbw)' : '0';
 }
 function closeSB() {
   sbOpen = false;
@@ -14314,138 +14325,168 @@ var _rtInt = setInterval(function() {
 }, 200);
 
 
+
+
 // ══════════════════════════════════════════════════════════════
 // §STICKY-PROFILE-BAR — Scroll-triggered sticky mini navbar
-// Shows when #trader-card scrolls out of view on dashboard page
+// Appears when dashboard header area scrolls out of view
 // ══════════════════════════════════════════════════════════════
-(function initStickyProfileBar() {
+(function() {
+  'use strict';
 
-  const bar       = document.getElementById('sticky-profile-bar');
-  const traderCard = document.getElementById('trader-card');
-  const mainEl    = document.getElementById('main');
-  if (!bar) return;
+  var bar      = null;
+  var visible  = false;
+  var ticking  = false;
 
-  let _isVisible  = false;
-  let _ticking    = false;
-  let _dashActive = false;
+  // Threshold: how many px user must scroll before bar appears (px from top of .main content)
+  var THRESHOLD = 100;
 
-  /* ── Sync data into bar ─────────────────────────────── */
-  function _syncBarData() {
-    // Avatar
-    const srcAvatar = document.getElementById('tc-avatar');
-    const dstAvatar = document.getElementById('spb-avatar');
-    if (srcAvatar && dstAvatar) {
-      if (srcAvatar.querySelector('img')) {
-        dstAvatar.innerHTML = srcAvatar.innerHTML;
-      } else {
-        dstAvatar.textContent = srcAvatar.textContent || '';
-        dstAvatar.style.fontSize = '12px';
+  /* ── populate bar with live data ── */
+  function syncData() {
+    // Avatar: clone text/content from tc-avatar
+    var src = document.getElementById('tc-avatar');
+    var dst = document.getElementById('spb-avatar');
+    if (src && dst) {
+      dst.textContent = src.textContent || '';
+      var img = src.querySelector('img');
+      if (img) {
+        dst.innerHTML = '<img src="' + img.src + '" style="width:100%;height:100%;object-fit:cover;border-radius:7px">';
       }
     }
+
     // Name
-    const name = document.getElementById('tc-name');
-    const spbName = document.getElementById('spb-name');
-    if (name && spbName) spbName.textContent = name.textContent || 'Trader';
+    var nameEl = document.getElementById('tc-name');
+    var spbName = document.getElementById('spb-name');
+    if (nameEl && spbName) {
+      spbName.textContent = nameEl.textContent || 'Trader';
+    }
 
-    // P&L from stat cards
-    const pnlEl  = document.getElementById('st-pnl');
-    const wrEl   = document.getElementById('st-wr');
-    const pfEl   = document.getElementById('st-pf');
-    const nEl    = document.getElementById('st-n');
-
-    const spbPnl    = document.getElementById('spb-pnl');
-    const spbWr     = document.getElementById('spb-wr');
-    const spbPf     = document.getElementById('spb-pf');
-    const spbTrades = document.getElementById('spb-trades');
-
-    if (pnlEl && spbPnl) {
-      spbPnl.textContent  = pnlEl.textContent || '—';
-      spbPnl.className    = 'spb-pill-val ' + (pnlEl.classList.contains('pos') ? 'pos' : pnlEl.classList.contains('neg') ? 'neg' : 'neu');
+    // Stats — read from existing stat card elements
+    function copyStatEl(srcId, dstId) {
+      var s = document.getElementById(srcId);
+      var d = document.getElementById(dstId);
+      if (!s || !d) return;
+      d.textContent = s.textContent || '—';
+      // copy color class
+      d.className = 'spb-pill-val' +
+        (s.classList.contains('pos') ? ' pos' :
+         s.classList.contains('neg') ? ' neg' : ' neu');
     }
-    if (wrEl && spbWr) {
-      spbWr.textContent = wrEl.textContent || '—';
-      spbWr.className   = 'spb-pill-val ' + (wrEl.classList.contains('pos') ? 'pos' : wrEl.classList.contains('neg') ? 'neg' : 'neu');
-    }
-    if (pfEl && spbPf) {
-      spbPf.textContent = pfEl.textContent || '—';
-      spbPf.className   = 'spb-pill-val ' + (pfEl.classList.contains('pos') ? 'pos' : pfEl.classList.contains('neg') ? 'neg' : 'neu');
-    }
-    if (nEl && spbTrades) {
-      spbTrades.textContent = nEl.textContent || '0';
-    }
+    copyStatEl('st-pnl',  'spb-pnl');
+    copyStatEl('st-wr',   'spb-wr');
+    copyStatEl('st-pf',   'spb-pf');
+    copyStatEl('st-n',    'spb-trades');
   }
 
-  /* ── Show / hide the bar ────────────────────────────── */
-  function _showBar() {
-    if (_isVisible) return;
-    _syncBarData();
-    _isVisible = true;
+  /* ── show / hide ── */
+  function showBar() {
+    if (visible) { syncData(); return; }
+    syncData();
+    visible = true;
     bar.classList.add('spb-visible');
   }
 
-  function _hideBar() {
-    if (!_isVisible) return;
-    _isVisible = false;
+  function hideBar() {
+    if (!visible) return;
+    visible = false;
     bar.classList.remove('spb-visible');
   }
 
-  /* ── Scroll handler ─────────────────────────────────── */
-  function _onScroll() {
-    if (!_dashActive) { _hideBar(); return; }
-    if (_ticking) return;
-    _ticking = true;
-    requestAnimationFrame(() => {
-      _ticking = false;
-      // Use the trader-card if visible, else fall back to page scroll position
-      const card = traderCard;
-      if (card && card.offsetParent !== null && getComputedStyle(card).display !== 'none') {
-        const rect = card.getBoundingClientRect();
-        // Show bar when bottom of trader-card goes above viewport top
-        if (rect.bottom < 0) {
-          _showBar();
-        } else {
-          _hideBar();
-        }
+  /* ── decide based on scroll position ── */
+  function checkScroll() {
+    // Only active on dashboard page
+    var dash = document.getElementById('page-dashboard');
+    if (!dash || !dash.classList.contains('active')) {
+      hideBar();
+      return;
+    }
+
+    // Scroll position: body scrolls, not #main
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+    // If trader-card is visible (logged in user), use its bottom edge as trigger
+    var card = document.getElementById('trader-card');
+    if (card && card.style.display !== 'none' && card.offsetHeight > 0) {
+      // offsetTop relative to page
+      var cardBottom = card.offsetTop + card.offsetHeight;
+      if (scrollY > cardBottom - 20) {
+        showBar();
       } else {
-        // No trader card (guest) — show after scrolling > 120px
-        const scrollTop = (mainEl || document.documentElement).scrollTop;
-        if (scrollTop > 120) _showBar(); else _hideBar();
+        hideBar();
       }
+      return;
+    }
+
+    // Guest fallback: use guest-banner bottom
+    var banner = document.getElementById('guest-banner');
+    if (banner && banner.offsetHeight > 0) {
+      var bannerBottom = banner.offsetTop + banner.offsetHeight;
+      if (scrollY > bannerBottom - 20) {
+        showBar();
+      } else {
+        hideBar();
+      }
+      return;
+    }
+
+    // Final fallback: simple threshold
+    if (scrollY > THRESHOLD) {
+      showBar();
+    } else {
+      hideBar();
+    }
+  }
+
+  /* ── throttled scroll handler via rAF ── */
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function() {
+      ticking = false;
+      checkScroll();
     });
   }
 
-  /* ── Observe dashboard page activation ─────────────── */
-  function _checkDashActive() {
-    const dash = document.getElementById('page-dashboard');
-    _dashActive = !!(dash && dash.classList.contains('active'));
-    if (!_dashActive) _hideBar();
+  /* ── init after DOM ready ── */
+  function init() {
+    bar = document.getElementById('sticky-profile-bar');
+    if (!bar) return;
+
+    // Listen to window scroll (body scrolls on this app)
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', onScroll, { passive: true });
+
+    // Also check on page navigation (goPage patches)
+    var _origGoPage = window.goPage;
+    if (typeof _origGoPage === 'function') {
+      window.goPage = function(name) {
+        _origGoPage.apply(this, arguments);
+        // Small delay for page class to update
+        setTimeout(checkScroll, 50);
+        // Hide when leaving dashboard
+        if (name !== 'dashboard') hideBar();
+      };
+    }
+
+    // Hook into updateAll to refresh stats while bar is visible
+    var _origUpdateAll = window.updateAll;
+    if (typeof _origUpdateAll === 'function') {
+      window.updateAll = function() {
+        _origUpdateAll.apply(this, arguments);
+        if (visible) setTimeout(syncData, 80);
+      };
+    }
+
+    // Initial check
+    checkScroll();
   }
 
-  // MutationObserver watches page class changes
-  const pageObs = new MutationObserver(_checkDashActive);
-  document.querySelectorAll('.page').forEach(p => {
-    pageObs.observe(p, { attributes: true, attributeFilter: ['class'] });
-  });
-
-  // Scroll listener — attach to .main and window for safety
-  const scrollTarget = mainEl || window;
-  scrollTarget.addEventListener('scroll', _onScroll, { passive: true });
-  window.addEventListener('scroll', _onScroll, { passive: true });
-
-  // Refresh bar data whenever stats update (hook into updateAll)
-  const _origUpdateAll = window.updateAll;
-  window.updateAll = function() {
-    if (typeof _origUpdateAll === 'function') _origUpdateAll.apply(this, arguments);
-    // Slight delay to let DOM update first
-    setTimeout(_syncBarData, 60);
-  };
-
-  // Initial state
-  _checkDashActive();
-
-  // Expose for manual refresh
-  window._stickyBarSync = _syncBarData;
-  window._stickyBarCheck = _onScroll;
+  // Run after existing scripts finish
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 0);
+  }
 
 })();
 
