@@ -1334,32 +1334,120 @@ body.sb-off #sticky-profile-bar { left: 0; }
 }
 
 /* ── MORE POPUP ── */
-@keyframes morePopIn{
-  from{opacity:0;transform:scale(0.88) translateY(10px);}
-  to{opacity:1;transform:scale(1) translateY(0);}
+/* ══════════════════════════════════════
+   MORE POPUP — liquid glass bottom sheet
+   ══════════════════════════════════════ */
+@keyframes morePopIn {
+  from { opacity:0; transform: translateY(12px) scale(0.95); }
+  to   { opacity:1; transform: translateY(0)    scale(1);    }
 }
-.bmp-item{
-  display:flex;align-items:center;gap:10px;
-  width:100%;border:none;background:none;
-  padding:9px 10px;border-radius:12px;
-  cursor:pointer;text-align:left;
-  transition:background .15s;
-  -webkit-tap-highlight-color:transparent;
+
+/* Wrapper — bottom right, above bottom nav (posisi asli) */
+#bn-more-popup {
+  display: none;
+  position: fixed !important;
+  bottom: 78px !important;
+  right: 10px !important;
+  left: auto !important;
+  transform: none !important;
+  width: 230px !important;
+  max-width: 230px !important;
+  z-index: 600;
 }
-.bmp-item:active,.bmp-item:hover{background:rgba(255,255,255,0.05);}
-.bmp-item.active-page{background:rgba(139,92,246,0.12);}
-.bmp-icon{
-  width:32px;height:32px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;flex-shrink:0;
+
+/* Glass card */
+#bn-more-popup > div:last-child {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255,255,255,0.11) !important;
+  border-bottom: 1px solid rgba(139,92,246,0.18) !important;
+
+  /* liquid glass */
+  background: linear-gradient(
+    150deg,
+    rgba(30,22,44,0.42) 0%,
+    rgba(10,8,14,0.58) 55%,
+    rgba(24,16,36,0.46) 100%
+  ) !important;
+  backdrop-filter: blur(44px) saturate(1.9) brightness(0.78) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(1.9) brightness(0.78) !important;
+
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.68),
+    0 8px 24px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.11),
+    inset 0 -1px 0 rgba(120,80,220,0.11) !important;
+
+  animation: morePopIn .26s cubic-bezier(0.22,1,0.36,1) !important;
 }
-.bmp-label{
-  font-size:13px;font-weight:600;color:#e4e4e7;
-  font-family:'Syne',sans-serif;flex:1;
+
+/* Sheen overlay */
+#bn-more-popup > div:last-child::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.00) 45%,
+    rgba(139,92,246,0.07) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
 }
-.bmp-arrow{
-  font-size:10px;color:rgba(255,255,255,0.18);
-  flex-shrink:0;
+#bn-more-popup > div:last-child > * { position: relative; z-index: 1; }
+
+/* Sembunyikan panah bawah (tidak relevan saat centered) */
+#bn-more-popup > div:last-child > div:last-child[style*="bottom:-8px"] {
+  display: none !important;
+}
+
+/* Section header */
+.bmp-section-lbl {
+  padding: 11px 16px 6px;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase; letter-spacing: 1.3px;
+  font-family: var(--font);
+}
+
+/* Divider */
+.bmp-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 0 12px;
+}
+
+/* Menu items */
+.bmp-item {
+  display: flex; align-items: center; gap: 11px;
+  width: 100%; border: none; background: none;
+  padding: 9px 12px; border-radius: 12px;
+  cursor: pointer; text-align: left;
+  transition: background .14s;
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+}
+.bmp-item:active, .bmp-item:hover {
+  background: rgba(255,255,255,0.07);
+}
+.bmp-item.active-page {
+  background: rgba(139,92,246,0.14);
+}
+.bmp-icon {
+  width: 33px; height: 33px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.bmp-label {
+  font-size: 13px; font-weight: 600; color: #e4e4e7;
+  font-family: var(--font); flex: 1;
+}
+.bmp-arrow {
+  font-size: 10px; color: rgba(255,255,255,0.16);
+  flex-shrink: 0;
 }
 
 /* ── DASHBOARD TWO-COLUMN LAYOUT ── */
@@ -12119,22 +12207,13 @@ riskpertrade.me`;
 <!-- ════════════════════════════════════════════════════════════
      §MODAL-MORE — Mobile bottom nav "more" popup
      ════════════════════════════════════════════════════════════ -->
-<div id="bn-more-popup" style="display:none;position:fixed;bottom:72px;right:10px;z-index:600;width:220px;">
+<div id="bn-more-popup" style="display:none;">
   <!-- backdrop tap-to-close -->
   <div id="bn-more-backdrop" onclick="bnMoreClose()" style="position:fixed;inset:0;z-index:-1;"></div>
-  <div style="
-    background:linear-gradient(160deg,#1e1e24 0%,#141418 100%);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:18px;
-    box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 0 0.5px rgba(255,255,255,0.06);
-    overflow:hidden;
-    animation:morePopIn .22s cubic-bezier(.34,1.56,.64,1);
-  ">
-
-    <!-- Header label -->
-    <div style="padding:12px 16px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;">Menu</div>
+  <div>
 
     <!-- Menu section -->
+    <div class="bmp-section-lbl">Menu</div>
     <div style="padding:0 8px 6px;display:flex;flex-direction:column;gap:2px;">
 
       <button class="bmp-item" id="bmp-calendar" onclick="bnMoreGo('calendar')">
@@ -12158,10 +12237,10 @@ riskpertrade.me`;
     </div>
 
     <!-- Divider -->
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 8px;"></div>
+    <div class="bmp-divider"></div>
 
     <!-- Tools section -->
-    <div style="padding:6px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;padding-left:16px;padding-top:10px;">Tools</div>
+    <div class="bmp-section-lbl">Tools</div>
     <div style="padding:0 8px 6px;display:flex;flex-direction:column;gap:2px;">
 
       <button class="bmp-item" id="bmp-daily" onclick="bnMoreGo('daily')">
@@ -12199,7 +12278,7 @@ riskpertrade.me`;
     </div>
 
     <!-- Divider -->
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 8px;"></div>
+    <div class="bmp-divider"></div>
 
     <!-- Cara Penggunaan -->
     <div style="padding:6px 8px 10px;">
@@ -12213,8 +12292,6 @@ riskpertrade.me`;
       </button>
     </div>
 
-    <!-- Bottom arrow pointer -->
-    <div style="position:absolute;bottom:-8px;right:28px;width:16px;height:16px;background:linear-gradient(135deg,transparent 50%,#141418 50%);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:rotate(45deg);"></div>
   </div>
 </div>
 
