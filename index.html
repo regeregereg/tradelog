@@ -798,6 +798,12 @@ select.fi option{background:var(--bg3);}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 
+/* ── Hide scrollbar on mobile ── */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar { display: none; }
+  html, body { scrollbar-width: none; -ms-overflow-style: none; }
+}
+
 /* ── ONBOARDING TOUR — FIXED & POLISHED ── */
 #onboard-overlay{
   position:fixed;inset:0;
