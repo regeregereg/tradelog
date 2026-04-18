@@ -1006,121 +1006,220 @@ select.fi option{background:var(--bg3);}
 /* ════════════════════════════════════════════════════════════
    §CSS-STICKY-PROFILE — Sticky Mini Profile Navbar
    ════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════
+   STICKY PROFILE BAR — desktop baseline
+   ══════════════════════════════════════ */
 #sticky-profile-bar {
   position: fixed;
   top: 0;
   left: var(--sbw);
   right: 0;
-  height: 52px;
+  height: 50px;
   z-index: 250;
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  gap: 12px;
-  background: rgba(9,9,11,0.88);
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border-bottom: 1px solid rgba(139,92,246,0.22);
-  box-shadow: 0 4px 28px rgba(0,0,0,0.45), 0 1px 0 rgba(139,92,246,0.12);
-  transform: translateY(-110%);
+  padding: 0 28px;
+  gap: 14px;
+  background: rgba(9,9,11,0.82);
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+  box-shadow: 0 1px 0 rgba(139,92,246,0.10), 0 8px 32px rgba(0,0,0,0.35);
+  transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
-  /* match sidebar transition timing */
-  transition: transform 0.42s cubic-bezier(0.34,1.22,0.64,1),
-              opacity   0.28s ease,
+  transition: transform 0.36s cubic-bezier(0.32,1.18,0.58,1),
+              opacity   0.22s ease,
               left      0.28s cubic-bezier(.4,0,.2,1);
   will-change: transform, opacity;
 }
-/* When sidebar is collapsed on desktop, bar stretches full width */
 .main.off ~ #sticky-profile-bar,
-body.sb-off #sticky-profile-bar {
-  left: 0;
-}
-#sticky-profile-bar::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, var(--accent), #7c3aed);
-  border-radius: 0 2px 2px 0;
-}
+body.sb-off #sticky-profile-bar { left: 0; }
+
 #sticky-profile-bar.spb-visible {
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
 }
-#sticky-profile-bar.spb-visible::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(167,139,250,0.07) 50%, transparent 100%);
-  animation: spbShimmer 0.6s ease 0.05s both;
-  pointer-events: none;
-}
-@keyframes spbShimmer {
-  from { transform: translateX(-100%); opacity: 1; }
-  to   { transform: translateX(200%); opacity: 0; }
-}
+
+/* ── Avatar ── */
 #spb-avatar {
-  width: 30px; height: 30px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: #fff;
+  font-size: 11px; font-weight: 700; color: #fff;
   flex-shrink: 0;
-  border: 1.5px solid rgba(167,139,250,0.35);
-  box-shadow: 0 0 12px rgba(139,92,246,0.4);
+  border: 1px solid rgba(167,139,250,0.25);
   overflow: hidden;
 }
-#spb-info { flex: 1; min-width: 0; }
+
+/* ── Name + tagline ── */
+#spb-info { flex: 1; min-width: 0; line-height: 1; }
 #spb-name {
   font-size: 12px; font-weight: 700; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  letter-spacing: -.2px; line-height: 1.2;
+  letter-spacing: -.25px;
 }
 #spb-tagline {
-  font-size: 10px; color: var(--accent2);
-  font-family: var(--mono); opacity: 0.7;
+  font-size: 9.5px; color: var(--text3);
+  font-family: var(--mono);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 2px;
+  letter-spacing: .1px;
 }
-#spb-stats { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+/* ── Stat pills ── */
+#spb-stats { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 .spb-pill {
   display: flex; flex-direction: column; align-items: center;
-  padding: 3px 10px;
-  background: rgba(255,255,255,0.04);
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px; min-width: 52px;
-  transition: background 0.2s, border-color 0.2s;
+  border-radius: 8px;
+  min-width: 50px;
+  transition: background 0.18s, border-color 0.18s;
   cursor: default;
+  line-height: 1;
 }
-.spb-pill:hover { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.25); }
+.spb-pill:hover { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.20); }
 .spb-pill-val {
-  font-size: 12px; font-weight: 700;
-  font-family: var(--mono); color: var(--text); line-height: 1;
+  font-size: 11.5px; font-weight: 700;
+  font-family: var(--mono); color: var(--text);
 }
 .spb-pill-val.pos { color: var(--green); }
 .spb-pill-val.neg { color: var(--red); }
 .spb-pill-val.neu { color: var(--text2); }
 .spb-pill-lbl {
-  font-size: 9px; color: var(--text3); text-transform: uppercase;
-  letter-spacing: .5px; margin-top: 2px; font-weight: 600;
+  font-size: 8.5px; color: var(--text3); text-transform: uppercase;
+  letter-spacing: .6px; margin-top: 3px; font-weight: 600;
+  font-family: var(--font);
 }
+
+/* ── Log Trade btn ── */
 #spb-log-btn {
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  background: var(--accent);
   color: #fff; border: none; border-radius: 8px;
-  padding: 6px 14px; font-size: 11px; font-weight: 700;
-  cursor: pointer; font-family: var(--font); letter-spacing: .3px;
-  box-shadow: 0 2px 10px rgba(139,92,246,0.35);
-  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  padding: 7px 14px; font-size: 11px; font-weight: 700;
+  cursor: pointer; font-family: var(--font); letter-spacing: .2px;
+  transition: background 0.15s, transform 0.15s;
 }
-#spb-log-btn:hover { opacity:.88; transform:translateY(-1px); box-shadow:0 4px 16px rgba(139,92,246,.5); }
-#spb-log-btn:active { transform:translateY(0); }
+#spb-log-btn:hover { background: #7c3aed; transform: translateY(-1px); }
+#spb-log-btn:active { transform: translateY(0); }
 @media (max-width: 768px) {
-  #sticky-profile-bar { left: 0; top: 54px; padding: 0 14px; height: 46px; }
-  .spb-pill { min-width: 44px; padding: 2px 7px; }
+  /* ── Mobile: liquid glass popup — menyatu dengan topbar ── */
+  #sticky-profile-bar {
+    left: 8px !important;
+    right: 8px !important;
+    /* tepat di bawah topbar (54px) + 4px gap */
+    top: 58px !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    padding: 9px 13px !important;
+    border-radius: 0 0 14px 14px !important;
+
+    /* ── Liquid glass effect ── */
+    /* Layer 1: deep black base */
+    background:
+      linear-gradient(
+        160deg,
+        rgba(28,24,36,0.72) 0%,
+        rgba(10,10,14,0.88) 55%,
+        rgba(20,16,28,0.78) 100%
+      ) !important;
+    backdrop-filter: blur(48px) saturate(1.8) brightness(0.75) !important;
+    -webkit-backdrop-filter: blur(48px) saturate(1.8) brightness(0.75) !important;
+
+    /* Border: top menyatu dg topbar, sisi bawah lebih terang */
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-top: 1px solid rgba(255,255,255,0.04) !important;
+    border-bottom: 1px solid rgba(139,92,246,0.18) !important;
+
+    /* Shadow: dalam ke bawah, langsung drop */
+    box-shadow:
+      0 12px 40px rgba(0,0,0,0.7),
+      0 4px 12px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      inset 0 -1px 0 rgba(139,92,246,0.10) !important;
+
+    flex-wrap: nowrap;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    /* slide down dari topbar */
+    transform: translateY(-6px) !important;
+    transition: transform 0.30s cubic-bezier(0.22,1,0.36,1),
+                opacity 0.22s ease !important;
+    will-change: transform, opacity;
+    overflow: hidden;
+  }
+
+  /* Liquid sheen — pseudo overlay */
+  #sticky-profile-bar::before {
+    display: block !important;
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255,255,255,0.045) 0%,
+      rgba(255,255,255,0.00) 50%,
+      rgba(139,92,246,0.05) 100%
+    );
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 0;
+  }
+
+  /* Semua child di atas pseudo */
+  #sticky-profile-bar > * { position: relative; z-index: 1; }
+
+  #sticky-profile-bar::after { display: none !important; }
+
+  #sticky-profile-bar.spb-visible {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Avatar */
+  #spb-avatar {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: none;
+  }
+
+  /* Info */
+  #spb-name { font-size: 12px; letter-spacing: -.2px; }
+  #spb-tagline { font-size: 9px; color: var(--text3); margin-top: 2px; opacity: 1; }
+
+  /* Pills */
+  .spb-pill {
+    min-width: 42px;
+    padding: 3px 9px;
+    border-radius: 7px;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.07);
+  }
   .spb-pill-val { font-size: 11px; }
+  .spb-pill-lbl { font-size: 8px; margin-top: 2px; }
   .spb-hide-xs { display: none !important; }
+
+  /* Log Trade btn */
+  #spb-log-btn {
+    padding: 7px 12px;
+    font-size: 11px;
+    border-radius: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: var(--accent);
+    box-shadow: none;
+    letter-spacing: .1px;
+  }
 }
 
 @media(max-width:768px){
