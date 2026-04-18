@@ -90,6 +90,67 @@
 <title>RiskPerTrade — Tools Journaling Trading</title>
 
 <!-- ════════════════════════════════════════════════════════════
+     §HEAD-SECURITY — Security Headers & CSP
+     Melindungi pengguna dari XSS, clickjacking, data injection,
+     dan serangan MITM. Semua resource eksternal dibatasi whitelist.
+     ════════════════════════════════════════════════════════════ -->
+<!-- Content Security Policy: izinkan hanya sumber tepercaya -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline'
+    https://www.gstatic.com
+    https://cdnjs.cloudflare.com
+    https://cdn.jsdelivr.net
+    https://*.vercel-insights.com
+    https://*.vercel-analytics.com
+    /_vercel/;
+  style-src 'self' 'unsafe-inline'
+    https://fonts.googleapis.com
+    https://cdn.jsdelivr.net;
+  font-src 'self'
+    https://fonts.gstatic.com
+    https://cdn.jsdelivr.net;
+  img-src 'self' data: blob:
+    https://*.googleapis.com
+    https://*.googleusercontent.com
+    https://riskpertrade.me;
+  connect-src 'self'
+    https://*.googleapis.com
+    https://*.firebaseapp.com
+    https://*.firebaseio.com
+    https://firestore.googleapis.com
+    https://identitytoolkit.googleapis.com
+    https://securetoken.googleapis.com
+    https://www.gstatic.com
+    https://*.vercel-insights.com
+    https://*.vercel-analytics.com;
+  frame-src 'none';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  upgrade-insecure-requests;
+">
+<!-- Cegah clickjacking -->
+<meta http-equiv="X-Frame-Options" content="DENY">
+<!-- Cegah MIME sniffing -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<!-- Kontrol referrer — jangan bocorkan URL ke situs lain -->
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- Matikan DNS prefetch pihak ketiga yang tidak perlu -->
+<meta http-equiv="x-dns-prefetch-control" content="off">
+<!-- Permissions Policy: batasi akses ke hardware sensitif -->
+<meta http-equiv="Permissions-Policy" content="
+  camera=(),
+  microphone=(),
+  geolocation=(),
+  payment=(),
+  usb=(),
+  accelerometer=(),
+  gyroscope=(),
+  magnetometer=()
+">
+
+<!-- ════════════════════════════════════════════════════════════
      §HEAD-SEO — Meta Tags, Open Graph, Twitter Card
      ════════════════════════════════════════════════════════════ -->
 <!-- ── Meta Tags ── -->
@@ -6474,6 +6535,7 @@ function showSentStep(email) {
 
 // ── SEND BUTTON ────────────────────────────────────────
 async function handleSendMagic() {
+  if (!_checkAuthRateLimit()) return;
   const email = $('magic-email-input').value.trim().toLowerCase();
   if (!email || !email.includes('@')) {
     $('login-err').style.display  = 'block';
@@ -6542,8 +6604,33 @@ $('try-other-btn').addEventListener('click', () => {
 });
 $('notinvited-skip').addEventListener('click', closeLoginScreen);
 
+// ── RATE LIMITER untuk login — cegah brute force ──────
+const _authAttempts = { count: 0, firstAt: 0, lockedUntil: 0 };
+function _checkAuthRateLimit() {
+  const now = Date.now();
+  if (now < _authAttempts.lockedUntil) {
+    const secs = Math.ceil((_authAttempts.lockedUntil - now) / 1000);
+    $('login-err').style.display = 'block';
+    $('login-err').textContent = `Terlalu banyak percobaan. Coba lagi dalam ${secs} detik.`;
+    return false;
+  }
+  // Reset jendela 1 menit
+  if (now - _authAttempts.firstAt > 60000) {
+    _authAttempts.count = 0; _authAttempts.firstAt = now;
+  }
+  _authAttempts.count++;
+  if (_authAttempts.count > 5) {
+    _authAttempts.lockedUntil = now + 60000; // kunci 60 detik
+    $('login-err').style.display = 'block';
+    $('login-err').textContent = 'Terlalu banyak percobaan. Coba lagi dalam 60 detik.';
+    return false;
+  }
+  return true;
+}
+
 // ── GOOGLE LOGIN ──────────────────────────────────────
 $('google-login-btn').addEventListener('click', async () => {
+  if (!_checkAuthRateLimit()) return;
   $('login-err').style.display = 'none';
   $('login-loading').style.display = 'block';
   $('google-login-btn').disabled = true;
@@ -6806,7 +6893,11 @@ function updateTraderCard(user) {
   $('tc-greeting').textContent = greet;
   // Avatar
   if (user.photoURL) {
-    $('tc-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+    // Gunakan DOM API bukan innerHTML untuk mencegah XSS
+    const tcImg = makeAvatarImg(user.photoURL, '');
+    $('tc-avatar').textContent = '';
+    if (tcImg) $('tc-avatar').appendChild(tcImg);
+    else $('tc-avatar').textContent = name[0].toUpperCase();
   } else {
     $('tc-avatar').textContent = name[0].toUpperCase();
   }
@@ -6823,7 +6914,10 @@ function updateTraderCard(user) {
   // Also populate share preview
   $('sp-name').textContent = name;
   if (user.photoURL) {
-    $('sp-avatar').innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+    const spImg = makeAvatarImg(user.photoURL, '');
+    $('sp-avatar').textContent = '';
+    if (spImg) $('sp-avatar').appendChild(spImg);
+    else $('sp-avatar').textContent = name[0].toUpperCase();
   } else {
     $('sp-avatar').textContent = name[0].toUpperCase();
   }
@@ -6835,10 +6929,14 @@ $('signout-btn').addEventListener('click', () => {
   if (currentUser) {
     $('logout-name').textContent = currentUser.displayName || 'Trader';
     $('logout-email').textContent = currentUser.email || '';
+    const logoutAv = $('logout-avatar');
+    logoutAv.textContent = '';
     if (currentUser.photoURL) {
-      $('logout-avatar').innerHTML = '<img src="' + currentUser.photoURL + '" style="width:100%;height:100%;object-fit:cover" alt="">';
+      const img = makeAvatarImg(currentUser.photoURL, '');
+      if (img) logoutAv.appendChild(img);
+      else logoutAv.textContent = (currentUser.displayName || 'T')[0].toUpperCase();
     } else {
-      $('logout-avatar').textContent = (currentUser.displayName || 'T')[0].toUpperCase();
+      logoutAv.textContent = (currentUser.displayName || 'T')[0].toUpperCase();
     }
   }
   $('md-logout').classList.add('open');
@@ -7106,15 +7204,53 @@ function showApp() {
 showApp();
 updateGuestUI();
 
+// ── SECURITY HELPERS ──────────────────────────────────
+// Sanitasi teks agar aman dimasukkan ke innerHTML
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+// Validasi URL foto dari Google saja (mencegah javascript: injection)
+function isSafePhotoUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  try {
+    const u = new URL(url);
+    return (u.protocol === 'https:') &&
+      (u.hostname.endsWith('.googleusercontent.com') ||
+       u.hostname.endsWith('.googleapis.com') ||
+       u.hostname === 'lh3.googleusercontent.com');
+  } catch (e) { return false; }
+}
+// Buat elemen img dengan aman (tanpa innerHTML dari URL eksternal)
+function makeAvatarImg(photoURL, alt) {
+  if (!isSafePhotoUrl(photoURL)) return null;
+  const img = document.createElement('img');
+  img.src = photoURL;
+  img.alt = alt || 'avatar';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+  img.onerror = function() { this.parentElement.textContent = '?'; };
+  return img;
+}
+
 // ── LOAD USER PROFILE ─────────────────────────────────
 async function loadUserProfile(user) {
   // Update UI
   $('user-name').textContent = user.displayName || 'Trader';
   $('user-email').textContent = user.email || '';
+  const avatarEl = $('user-avatar');
+  avatarEl.textContent = '';
   if (user.photoURL) {
-    $('user-avatar').innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
+    const img = makeAvatarImg(user.photoURL, 'avatar');
+    if (img) avatarEl.appendChild(img);
+    else avatarEl.textContent = (user.displayName || 'T')[0].toUpperCase();
   } else {
-    $('user-avatar').textContent = (user.displayName || 'T')[0].toUpperCase();
+    avatarEl.textContent = (user.displayName || 'T')[0].toUpperCase();
   }
   // Populate trader card
   updateTraderCard(user);
@@ -7168,12 +7304,47 @@ function listenTrades(uid) {
   }, () => setSyncState('error'));
 }
 
+// ── SANITASI DATA TRADE — cegah data kotor masuk Firestore ──
+function _sanitizeTrade(trade) {
+  const ALLOWED_RESULTS  = ['Win', 'Loss', 'BE'];
+  const ALLOWED_DIRS     = ['Long', 'Short'];
+  const ALLOWED_EMOTIONS = ['FOMO','Revenge','Impatient','Anxious','Calm','Confident',''];
+  const MAX_STR = 200; // karakter maksimum untuk field teks bebas
+  const clamp  = (v, min, max) => Math.min(max, Math.max(min, Number(v)||0));
+  const clean  = (v, maxLen) => typeof v === 'string' ? v.trim().slice(0, maxLen) : '';
+  const allow  = (v, list)   => list.includes(v) ? v : '';
+
+  return {
+    date:    clean(trade.date, 10),
+    pair:    clean(trade.pair, 20).replace(/[^A-Za-z0-9./\-_]/g, ''),
+    dir:     allow(trade.dir, ALLOWED_DIRS),
+    session: clean(trade.session, 40),
+    entry:   clamp(trade.entry, -1e8, 1e8),
+    exit:    clamp(trade.exit,  -1e8, 1e8),
+    risk:    clamp(trade.risk,  0, 1e6),
+    pnl:     clamp(trade.pnl,  -1e6, 1e6),
+    r:       clamp(trade.r,    -100, 100),
+    result:  allow(trade.result, ALLOWED_RESULTS),
+    setup:   clean(trade.setup,  60),
+    notes:   clean(trade.notes,  MAX_STR),
+    emotion: allow(trade.emotion, ALLOWED_EMOTIONS),
+    rating:  clamp(trade.rating, 0, 5),
+    mistakes: clean(trade.mistakes, 200),
+    holdingMinutes: clamp(trade.holdingMinutes, 0, 1e5),
+    // Pertahankan field opsional lainnya jika ada
+    ...(trade.playbookId  ? { playbookId:  clean(trade.playbookId,  60) } : {}),
+    ...(trade.screenshot  ? { screenshot:  clean(trade.screenshot,  500) } : {}),
+    ...(trade.commission  ? { commission:  clamp(trade.commission,  -1e4, 1e4) } : {}),
+  };
+}
+
 // ── SAVE TRADE TO FIRESTORE ───────────────────────────
 async function saveTradeToCloud(trade) {
   if (!currentUser) return;
   setSyncState('syncing');
   try {
-    const { firestoreId, ...data } = trade;
+    const { firestoreId, ...rawData } = trade;
+    const data = _sanitizeTrade(rawData); // sanitasi sebelum simpan ke cloud
     if (firestoreId) {
       await updateDoc(doc(db, 'users', currentUser.uid, 'trades', firestoreId), data);
     } else {
@@ -9434,38 +9605,50 @@ function renderTable(){
     const pc=t.pnl>0?'pos':t.pnl<0?'neg':'neu';
     const rc=t.r>0?'pos':t.r<0?'neg':'neu';
     const rb=t.result==='Win'?'bw':t.result==='Loss'?'bo':'bbe';
-    const fid=t.firestoreId||'';
+    // Sanitasi firestoreId — hanya izinkan karakter alfanumerik
+    const fid=(t.firestoreId||'').replace(/[^a-zA-Z0-9_-]/g,'');
 
-    // ── micro-badges ──
+    // ── micro-badges — semua data user di-escape sebelum masuk HTML ──
     let badges = '';
-    // Rating stars
+    const starLabels=['','Buruk','Di bawah rata-rata','Rata-rata','Bagus','Sempurna'];
     if (t.rating > 0) {
       const starColor = t.rating >= 4 ? '#a78bfa' : t.rating >= 3 ? '#f59e0b' : '#71717a';
-      badges += `<span title="${['','Buruk','Di bawah rata-rata','Rata-rata','Bagus','Sempurna'][t.rating]||''}" style="font-size:10px;color:${starColor};letter-spacing:0">${'★'.repeat(t.rating)}</span>`;
+      const rInt = Math.min(5, Math.max(1, parseInt(t.rating)||0));
+      badges += `<span title="${escHtml(starLabels[rInt]||'')}" style="font-size:10px;color:${starColor};letter-spacing:0">${'★'.repeat(rInt)}</span>`;
     }
-    // Mistake tag dot
     if (t.mistakes) {
-      const mkCount = t.mistakes.split(',').filter(Boolean).length;
-      badges += ` <span title="Mistake: ${t.mistakes}" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,77,77,.2);border:1px solid rgba(255,77,77,.3);font-size:8px;color:#ff4d4d;font-weight:700;font-family:var(--mono)">${mkCount}</span>`;
+      const mkCount = String(t.mistakes).split(',').filter(Boolean).length;
+      badges += ` <span title="Mistake: ${escHtml(String(t.mistakes))}" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,77,77,.2);border:1px solid rgba(255,77,77,.3);font-size:8px;color:#ff4d4d;font-weight:700;font-family:var(--mono)">${mkCount}</span>`;
     }
-    // Emotion indicator
     const emColors={'FOMO':'#a78bfa','Revenge':'#ff4d4d','Impatient':'#fb923c','Anxious':'#f59e0b','Calm':'#00d97e','Confident':'#38bdf8'};
     if (t.emotion && emColors[t.emotion]) {
-      badges += ` <span title="${t.emotion}" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${emColors[t.emotion]};flex-shrink:0;vertical-align:middle"></span>`;
+      badges += ` <span title="${escHtml(t.emotion)}" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${emColors[t.emotion]};flex-shrink:0;vertical-align:middle"></span>`;
     }
 
+    // Semua field dari Firestore di-escape sebelum masuk innerHTML
+    const sPair   = escHtml(t.pair  || '—');
+    const sDir    = escHtml((t.dir  || '—').toUpperCase());
+    const sDirCls = t.dir==='Long'?'bl':'bs';
+    const sSess   = escHtml((t.session||'—').split('-')[0]);
+    const sEntry  = escHtml(String(t.entry||'—'));
+    const sExit   = escHtml(String(t.exit ||'—'));
+    const sSetup  = escHtml(t.setup || '—');
+    const sNotes  = escHtml(t.notes || '—');
+    const sResult = escHtml(t.result|| '—');
+    const sDate   = escHtml(t.date  || '—');
+
     return`<tr>
-      <td style="color:var(--text3)">${idx}</td><td>${t.date||'—'}</td>
-      <td style="font-weight:500;color:var(--text)">${t.pair||'—'}</td>
-      <td><span class="b ${t.dir==='Long'?'bl':'bs'}">${(t.dir||'—').toUpperCase()}</span></td>
-      <td style="color:var(--text2)">${(t.session||'—').split('-')[0]}</td>
-      <td>${t.entry||'—'}</td><td>${t.exit||'—'}</td>
+      <td style="color:var(--text3)">${idx}</td><td>${sDate}</td>
+      <td style="font-weight:500;color:var(--text)">${sPair}</td>
+      <td><span class="b ${sDirCls}">${sDir}</span></td>
+      <td style="color:var(--text2)">${sSess}</td>
+      <td>${sEntry}</td><td>${sExit}</td>
       <td>$${(t.risk||0).toFixed(0)}</td>
       <td class="${pc}">${t.pnl>=0?'+':''}$${(t.pnl||0).toFixed(2)}</td>
       <td class="${rc}">${t.r>=0?'+':''}${t.r||0}R</td>
-      <td><span class="b ${rb}">${t.result||'—'}</span></td>
-      <td style="color:var(--text2)">${t.setup||'—'}</td>
-      <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${t.notes||''}">${t.notes||'—'}</td>
+      <td><span class="b ${rb}">${sResult}</span></td>
+      <td style="color:var(--text2)">${sSetup}</td>
+      <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${sNotes}">${sNotes}</td>
       <td style="white-space:nowrap">
         ${badges ? `<span style="margin-right:4px">${badges}</span>` : ''}
         <button class="bedit-row" onclick="window.editTrade('${fid}')" title="Edit trade"><i class="bi bi-pencil"></i></button>
