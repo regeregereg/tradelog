@@ -86,7 +86,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- iOS PWA & UX meta -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RiskPerTrade">
+<meta name="format-detection" content="telephone=no, email=no, address=no">
 <title>RiskPerTrade — Tools Journaling Trading</title>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -311,6 +316,10 @@ document.addEventListener('DOMContentLoaded', function(){
    §CSS-VARS — Reset & CSS Variables
    ════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+/* iOS: disable callout on long-press, no tap flash */
+a,button,input,select,textarea,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+img,svg{-webkit-user-drag:none;user-select:none;}
+input,textarea,select{-webkit-appearance:none;border-radius:0;}
 :root{
   --bg:#09090b;--bg2:#111114;--bg3:#18181c;--bg4:#222227;
   --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
@@ -325,7 +334,8 @@ document.addEventListener('DOMContentLoaded', function(){
   --radius:14px;
   --glow:0 0 0 1px rgba(139,92,246,0.15),0 4px 24px rgba(139,92,246,0.08);
 }
-html,body{height:100%;overflow-x:hidden;}
+html,body{height:100%;overflow-x:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:touch;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
 
 /* ════════════════════════════════════════════════════════════
@@ -14700,3 +14710,241 @@ var _rtInt = setInterval(function() {
 </script>
 </body>
 </html>
+
+<!-- ════════════════════════════════════════════════════════════
+     §IOS-OPTIMIZATIONS — CSS + JS patches untuk iOS/PWA
+     Tidak mengubah fitur atau layout apapun
+     ════════════════════════════════════════════════════════════ -->
+<style>
+/* ══════════════════════════════════════════════════════════════
+   1. SAFE AREA — Notch, Dynamic Island, Home Indicator
+   ══════════════════════════════════════════════════════════════ */
+.topbar {
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(54px + env(safe-area-inset-top, 0px));
+}
+/* Bottom nav: tinggi + home indicator */
+#bottom-nav {
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* Main content: jangan tertutup bottom nav */
+@media (max-width: 768px) {
+  .main {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  /* Popup profile: turun sesuai tinggi topbar + safe area */
+  #sticky-profile-bar {
+    top: calc(66px + env(safe-area-inset-top, 0px)) !important;
+  }
+  /* More popup: naik sesuai tinggi bottom nav */
+  #bn-more-popup {
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. PERFORMANCE — GPU hints, reduce paint
+   ══════════════════════════════════════════════════════════════ */
+/* Spesifikkan transition property — hindari 'all' yang trigger layout */
+.tag-chip        { transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.tag-filter-chip { transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.mistake-chip    { transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.ptab            { transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s; }
+.hbg             { transition: color 0.15s, border-color 0.15s; }
+.ni              { transition: color 0.18s, background 0.18s, border-left-color 0.18s; }
+.fi, .ta         { transition: border-color 0.15s, box-shadow 0.15s; }
+.btn, .bsm       { transition: background 0.15s, opacity 0.15s, transform 0.15s; }
+.btng, .btns     { transition: background 0.2s, border-color 0.2s, color 0.2s; }
+.qpair-btn       { transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.bdel, .bedit-row, .bdup { transition: background 0.15s, color 0.15s; }
+.bmp-item        { transition: background 0.14s; }
+.bn-icon         { transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), color 0.2s; }
+.bn-label        { transition: color 0.15s; }
+
+/* contain: layout — isolasi paint area untuk komponen fixed */
+.topbar, #bottom-nav, #sticky-profile-bar, #bn-more-popup {
+  contain: layout style;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. SCROLL — momentum, no bounce pada parent, hapus glow iOS
+   ══════════════════════════════════════════════════════════════ */
+.main, .md, .sidebar {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+/* Hilangkan default iOS blue outline pada focus */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.5);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. INPUT — prevent iOS zoom on focus (font-size >= 16px)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important; /* iOS tidak zoom kalau >= 16px */
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. MODAL — prevent body scroll saat modal terbuka
+   ══════════════════════════════════════════════════════════════ */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. BUTTON / INTERACTIVE — active state yang natural di iOS
+   ══════════════════════════════════════════════════════════════ */
+button, [role="button"] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* no 300ms delay */
+}
+/* Hapus double-tap zoom pada elemen interaktif */
+a { touch-action: manipulation; }
+
+/* ══════════════════════════════════════════════════════════════
+   7. FONT RENDERING — subpixel di Retina
+   ══════════════════════════════════════════════════════════════ */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+</style>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   IOS JS OPTIMIZATIONS
+   ══════════════════════════════════════════════════════════════ */
+(function() {
+'use strict';
+
+/* 1. BODY LOCK — cegah scroll di balik modal di iOS
+   iOS tidak support overflow:hidden pada body dengan benar,
+   perlu position:fixed + simpan scroll position */
+var _scrollY = 0;
+function lockBody() {
+  _scrollY = window.scrollY;
+  document.body.style.top = '-' + _scrollY + 'px';
+  document.body.classList.add('modal-open');
+}
+function unlockBody() {
+  document.body.classList.remove('modal-open');
+  document.body.style.top = '';
+  window.scrollTo(0, _scrollY);
+}
+window._iosLockBody   = lockBody;
+window._iosUnlockBody = unlockBody;
+
+/* Hook ke open/close modal yang sudah ada */
+var _origOpen  = window.openModal  || null;
+var _origClose = window.closeModal || null;
+if (typeof _origOpen === 'function' && !_origOpen._iosHooked) {
+  window.openModal = function() { lockBody(); return _origOpen.apply(this, arguments); };
+  window.openModal._iosHooked = true;
+}
+if (typeof _origClose === 'function' && !_origClose._iosHooked) {
+  window.closeModal = function() { unlockBody(); return _origClose.apply(this, arguments); };
+  window.closeModal._iosHooked = true;
+}
+
+/* 2. PREVENT RUBBER-BAND pada elemen non-scroll
+   iOS 13+ rubber-band scroll pada seluruh page — cegah hanya
+   jika target bukan scrollable container */
+document.addEventListener('touchmove', function(e) {
+  var el = e.target;
+  var isScrollable = false;
+  while (el && el !== document.body) {
+    var style = window.getComputedStyle(el);
+    var overflow = style.overflow + style.overflowY;
+    if (/auto|scroll/.test(overflow) && el.scrollHeight > el.clientHeight) {
+      isScrollable = true;
+      break;
+    }
+    el = el.parentElement;
+  }
+  if (!isScrollable && e.cancelable) e.preventDefault();
+}, { passive: false });
+
+/* 3. FAST TAP — hapus 300ms delay legacy iOS
+   Modern iOS sudah tidak perlu ini jika touch-action:manipulation,
+   tapi ini fallback untuk iOS < 13 */
+(function fastTap() {
+  if (!('ontouchstart' in window)) return;
+  var lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    var now = Date.now();
+    if (now - lastTap < 300 && e.target.tagName !== 'INPUT') {
+      e.preventDefault();
+      e.target.click();
+    }
+    lastTap = now;
+  }, { passive: false });
+})();
+
+/* 4. VIEWPORT HEIGHT FIX — iOS Safari 100vh bug
+   100vh di iOS Safari include address bar → gunakan window.innerHeight */
+function setVh() {
+  var vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', vh + 'px');
+}
+setVh();
+window.addEventListener('resize', setVh, { passive: true });
+window.addEventListener('orientationchange', function() {
+  setTimeout(setVh, 200); /* delay untuk tunggu Safari resize */
+}, { passive: true });
+
+/* 5. ORIENTATION CHANGE — paksa relayout elemen fixed
+   iOS kadang tidak reflow fixed elements setelah rotate */
+window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
+    var fixed = document.querySelectorAll(
+      '#bottom-nav, .topbar, #sticky-profile-bar, #bn-more-popup'
+    );
+    fixed.forEach(function(el) {
+      el.style.display = 'none';
+      el.offsetHeight; /* trigger reflow */
+      el.style.display = '';
+    });
+  }, 300);
+}, { passive: true });
+
+/* 6. IMAGE DECODE — async decode supaya tidak block paint */
+window.addEventListener('load', function() {
+  document.querySelectorAll('img').forEach(function(img) {
+    if (img.decode && !img.complete) {
+      img.decode().catch(function() {});
+    }
+  });
+}, { passive: true, once: true });
+
+/* 7. PASSIVE SCROLL LISTENERS — pastikan semua listener scroll pasif
+   Ini mencegah jank saat scroll di iOS */
+var _origAEL = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = function(type, fn, opts) {
+  if (type === 'scroll' || type === 'touchstart' || type === 'wheel') {
+    if (typeof opts === 'boolean') opts = { capture: opts, passive: true };
+    else if (!opts) opts = { passive: true };
+    else if (opts.passive === undefined) opts.passive = true;
+  }
+  return _origAEL.call(this, type, fn, opts);
+};
+
+})();
+</script>
