@@ -1646,84 +1646,69 @@ body.sb-off #sticky-profile-bar { left: 0; }
   }
 }
 
-/* ── LAYOUT: pro (mobile-optimized, custom widget order) ── */
-#page-dashboard.layout-pro .dash-layout {
-  display:block !important;
-}
-#page-dashboard.layout-pro .dash-main-col {
-  width:100%;
-}
-#page-dashboard.layout-pro .dash-cal-col {
-  display:none !important;
-}
-/* Pro layout: reorder container holds widgets in mobile-optimal order */
-#pro-layout-container {
-  display:none;
-}
-#page-dashboard.layout-pro #pro-layout-container {
-  display:block !important;
-}
-/* In pro layout, hide the original positions of reordered widgets */
-#page-dashboard.layout-pro .dash-main-col > .cc,
-#page-dashboard.layout-pro .dash-main-col > .g2,
-#page-dashboard.layout-pro .dash-main-col > #goals-widget,
-#page-dashboard.layout-pro .dash-main-col > #bw-trade-widget,
-#page-dashboard.layout-pro .dash-main-col > #pattern-widget,
-#page-dashboard.layout-pro .dash-main-col > .stats,
-#page-dashboard.layout-pro .dash-main-col > .period-tabs-wrap {
-  display:none !important;
-}
-/* Stat cards in pro layout: 2x3 grid, compact */
-#page-dashboard.layout-pro .pro-stats-row {
-  display:grid !important;
-  grid-template-columns:repeat(2,1fr) !important;
-  gap:8px !important;
-  margin-bottom:12px !important;
-}
-#page-dashboard.layout-pro .pro-stats-row .sc .sv {
-  font-size:20px !important;
-}
-/* Pro layout badge on button */
-.dll-btn[id="dll-pro"] .dll-pro-badge {
-  display:inline-flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#8b5cf6,#6366f1);
-  color:#fff;font-size:8px;font-weight:800;letter-spacing:.4px;
-  border-radius:4px;padding:1px 4px;text-transform:uppercase;
-  margin-left:2px;
-}
-/* Pro calendar inline */
-#pro-cal-container {
-  margin-bottom:12px;
-}
-#pro-cal-container .tcal-widget {
-  background:linear-gradient(160deg,var(--bg2),var(--bg3));
-  border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px;
-}
-/* Hide Pro layout button on desktop — it's a mobile feature */
-@media(min-width:769px){
-  #dll-pro { display:none !important; }
-  #page-dashboard.layout-pro .dash-main-col > .cc,
-  #page-dashboard.layout-pro .dash-main-col > .g2,
-  #page-dashboard.layout-pro .dash-main-col > #goals-widget,
-  #page-dashboard.layout-pro .dash-main-col > #bw-trade-widget,
-  #page-dashboard.layout-pro .dash-main-col > #pattern-widget,
-  #page-dashboard.layout-pro .dash-main-col > .stats,
-  #page-dashboard.layout-pro .dash-main-col > .period-tabs-wrap {
+/* ── LAYOUT: pro (mobile-optimized, flexbox reorder) ── */
+/* Only meaningful on mobile — hidden on desktop */
+@media(max-width:768px){
+  #page-dashboard.layout-pro .dash-layout {
     display:block !important;
-  }
-  #page-dashboard.layout-pro #pro-layout-container {
-    display:none !important;
   }
   #page-dashboard.layout-pro .dash-cal-col {
     display:none !important;
   }
-  #page-dashboard.layout-pro .dash-layout {
-    display:block !important;
+  #page-dashboard.layout-pro .dash-main-col {
+    display:flex !important;
+    flex-direction:column !important;
+    width:100%;
   }
+  /* Assign order to each widget */
+  /* 1. Equity Curve */
+  #page-dashboard.layout-pro #dash-eq-card          { order:1; }
+  /* 2. Stat cards (PnL, WR, PF, AvgRR, Trades) */
+  #page-dashboard.layout-pro .stats                  { order:2; }
+  /* Period tabs: keep right above stats */
+  #page-dashboard.layout-pro #dash-period-wrap       { order:2; }
+  /* 3. Trading Calendar — inject inline via JS */
+  #page-dashboard.layout-pro #pro-inline-cal         { order:3; display:block !important; }
+  /* 4. P&L per Trade + Win vs Loss */
+  #page-dashboard.layout-pro .g2                     { order:4; }
+  /* 5. Trader DNA */
+  #page-dashboard.layout-pro #trader-dna-card        { order:5; }
+  /* 6. Highlight Bulan Ini */
+  #page-dashboard.layout-pro #bw-trade-widget        { order:6; }
+  /* 7. Monthly Goals */
+  #page-dashboard.layout-pro #goals-widget           { order:7; }
+  /* 8. Profil & Insight */
+  #page-dashboard.layout-pro #pattern-widget         { order:8; }
+  /* Trader card + guest banner stay at top */
+  #page-dashboard.layout-pro #trader-card            { order:0; }
+  #page-dashboard.layout-pro #guest-banner           { order:0; }
+  /* focus-cal-inline stays hidden in pro */
+  #page-dashboard.layout-pro #focus-cal-inline       { display:none !important; }
 }
 
-/* ── Inline focus-mode calendar strip ── */
+/* Pro inline calendar widget */
+#pro-inline-cal {
+  display:none;
+  margin-bottom:16px;
+}
+#pro-inline-cal .tcal-widget {
+  background:linear-gradient(160deg,var(--bg2),var(--bg3));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+}
+
+/* Pro button: hide on desktop */
+@media(min-width:769px){
+  #dll-pro { display:none !important; }
+}
+/* Pro badge chip */
+.dll-pro-badge {
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#8b5cf6,#6366f1);
+  color:#fff;font-size:8px;font-weight:800;letter-spacing:.4px;
+  border-radius:4px;padding:1px 5px;margin-left:3px;
+}
 .focus-cal-strip {
   background:linear-gradient(160deg,var(--bg2),var(--bg3));
   border:1px solid var(--border);border-radius:var(--radius);
@@ -3309,7 +3294,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         Compact
       </button>
       <button class="dll-btn" id="dll-pro" onclick="setDashLayout('pro')" title="Pro: urutan widget optimal untuk HP">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="2.5" rx="1" fill="currentColor" opacity=".8"/><rect x="1" y="5" width="12" height="2.5" rx="1" fill="currentColor" opacity=".65"/><rect x="1" y="9" width="7" height="2.5" rx="1" fill="currentColor" opacity=".5"/><rect x="9.5" y="9" width="3.5" height="2.5" rx="1" fill="currentColor" opacity=".35"/></svg>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="2.2" rx="1" fill="currentColor" opacity=".85"/><rect x="1" y="4.8" width="12" height="2.2" rx="1" fill="currentColor" opacity=".65"/><rect x="1" y="8.6" width="7.5" height="2.2" rx="1" fill="currentColor" opacity=".5"/><circle cx="12" cy="9.7" r="1.8" fill="currentColor" opacity=".4"/></svg>
         Pro <span class="dll-pro-badge">HP</span>
       </button>
     </div>
@@ -3398,7 +3383,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Period Filter Tabs -->
-    <div style="margin-bottom:16px">
+    <div id="dash-period-wrap" style="margin-bottom:16px">
       <div class="period-tabs" id="period-tabs">
         <button class="ptab active" data-period="all">Overview</button>
         <button class="ptab" data-period="7">7 Hari</button>
@@ -3609,7 +3594,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Equity Curve (Bybit-style) -->
-    <div class="cc" style="padding:16px 18px;">
+    <div class="cc" id="dash-eq-card" style="padding:16px 18px;">
       <div class="ch" style="margin-bottom:10px;align-items:flex-start;">
         <div>
           <div class="ct" style="margin-bottom:5px;">Equity Curve</div>
@@ -14186,9 +14171,9 @@ const _monkeyPatchTrades = setInterval(() => {
       _ensureFocusCalStrip();
     }
 
-    // In pro mode: build the pro layout container
+    // In pro mode: inject inline calendar into main col
     if (name === 'pro') {
-      _ensureProLayout();
+      _ensureProInlineCal();
     }
 
     // In compact mode: move cal-col below main-col in DOM order
@@ -14200,7 +14185,6 @@ const _monkeyPatchTrades = setInterval(() => {
     // Trigger calendar refresh since layout changed (column widths changed)
     setTimeout(function() {
       if (window.tcalRefresh) window.tcalRefresh();
-      if (name === 'pro') _refreshProLayout();
     }, 50);
   }
 
@@ -14305,272 +14289,118 @@ const _monkeyPatchTrades = setInterval(() => {
     setInterval(renderFocusCal, 5000);
   }
 
-  function _ensureProLayout() {
-    if (document.getElementById('pro-layout-container')) return;
+  function _ensureProInlineCal() {
+    if (document.getElementById('pro-inline-cal')) return;
 
     var mainCol = document.querySelector('#page-dashboard .dash-main-col');
     if (!mainCol) return;
 
-    // Build the pro layout container with cloned/referenced widgets
-    var container = document.createElement('div');
-    container.id = 'pro-layout-container';
+    var MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    var proYear = new Date().getFullYear();
+    var proMonth = new Date().getMonth();
 
-    // Helper: clone a widget node safely
-    function cloneWidget(id) {
-      var el = document.getElementById(id);
-      if (!el) return null;
-      var clone = el.cloneNode(true);
-      // Give cloned IDs a "pro-" prefix to avoid ID conflicts
-      clone.id = 'pro-' + id;
-      // Also remap nested IDs
-      clone.querySelectorAll('[id]').forEach(function(child) {
-        child.id = 'pro-' + child.id;
+    var wrap = document.createElement('div');
+    wrap.id = 'pro-inline-cal';
+    wrap.innerHTML = [
+      '<div class="tcal-widget">',
+        '<div class="tcal-header">',
+          '<div class="tcal-title"><i class="bi bi-calendar3" style="margin-right:5px"></i> Trading Calendar</div>',
+          '<div class="tcal-nav">',
+            '<button class="tcal-nav-btn" id="pcal-prev">‹</button>',
+            '<div class="tcal-month-label" id="pcal-month-label">—</div>',
+            '<button class="tcal-nav-btn" id="pcal-next">›</button>',
+          '</div>',
+        '</div>',
+        '<div class="tcal-day-labels">',
+          '<div class="tcal-dl">Min</div><div class="tcal-dl">Sen</div>',
+          '<div class="tcal-dl">Sel</div><div class="tcal-dl">Rab</div>',
+          '<div class="tcal-dl">Kam</div><div class="tcal-dl">Jum</div>',
+          '<div class="tcal-dl">Sab</div>',
+        '</div>',
+        '<div class="tcal-grid" id="pcal-grid"></div>',
+        '<div class="tcal-legend" style="margin-top:10px">',
+          '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(0,217,126,.4);border:1px solid rgba(0,217,126,.5)"></div>Win</div>',
+          '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(255,77,77,.35);border:1px solid rgba(255,77,77,.45)"></div>Loss</div>',
+          '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)"></div>BE</div>',
+        '</div>',
+        '<div class="tcal-summary">',
+          '<div class="tcal-sum-item"><div class="tcal-sum-label">P&L Bulan</div><div class="tcal-sum-val" id="pcal-monthly-pnl">—</div></div>',
+          '<div class="tcal-sum-item"><div class="tcal-sum-label">Trading Days</div><div class="tcal-sum-val" id="pcal-trading-days">—</div></div>',
+          '<div class="tcal-sum-item"><div class="tcal-sum-label">Win Rate</div><div class="tcal-sum-val" id="pcal-winrate">—</div></div>',
+          '<div class="tcal-sum-item"><div class="tcal-sum-label">Best Day</div><div class="tcal-sum-val pos" id="pcal-best-day">—</div></div>',
+        '</div>',
+      '</div>'
+    ].join('');
+
+    mainCol.appendChild(wrap);
+
+    function renderProCal() {
+      var grid = document.getElementById('pcal-grid');
+      var lbl  = document.getElementById('pcal-month-label');
+      if (!grid || !lbl) return;
+      lbl.textContent = MONTHS_ID[proMonth].slice(0,3) + ' ' + proYear;
+
+      var trades = window._appTrades || window._trades || [];
+      var map = {};
+      trades.forEach(function(t) {
+        if (!t.date) return;
+        var d = t.date.substring(0,10);
+        if (!map[d]) map[d] = { wins:0, losses:0, be:0, pnl:0 };
+        var pnl = parseFloat(t.pnl) || 0;
+        var r = (t.result||'').toLowerCase();
+        if (r==='win') map[d].wins++;
+        else if (r==='loss') map[d].losses++;
+        else map[d].be++;
+        map[d].pnl += pnl;
       });
-      return clone;
-    }
 
-    // Helper: create a section label
-    function sectionLabel(text) {
-      var d = document.createElement('div');
-      d.style.cssText = 'font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-left:2px;';
-      d.textContent = text;
-      return d;
-    }
-
-    // ── 1. Equity Curve (clone the .cc that contains eqC canvas)
-    var eqCard = document.querySelector('#page-dashboard .dash-main-col .cc');
-    if (eqCard) {
-      var eqClone = eqCard.cloneNode(true);
-      eqClone.classList.add('pro-eq-card');
-      eqClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(eqClone);
-    }
-
-    // ── 2. Stat Cards (P&L, WinRate, PF, AvgRR, Trades)
-    var statsOrig = mainCol.querySelector('.stats');
-    if (statsOrig) {
-      var statsClone = statsOrig.cloneNode(true);
-      statsClone.classList.add('pro-stats-row');
-      statsClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(statsClone);
-    }
-
-    // ── 3. Trading Calendar (inline)
-    var calWrap = document.createElement('div');
-    calWrap.id = 'pro-cal-container';
-    var calOrig = document.querySelector('#page-dashboard .tcal-widget');
-    if (calOrig) {
-      var calClone = calOrig.cloneNode(true);
-      calClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      calWrap.appendChild(calClone);
-    }
-    container.appendChild(calWrap);
-
-    // ── 4. P&L per Trade + Win vs Loss (g2 grid)
-    var g2Orig = mainCol.querySelector('.g2');
-    if (g2Orig) {
-      var g2Clone = g2Orig.cloneNode(true);
-      g2Clone.style.cssText = 'display:flex;flex-direction:column;gap:12px;margin-bottom:16px;';
-      g2Clone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(g2Clone);
-    }
-
-    // ── 5. Trader DNA
-    var dnaOrig = document.getElementById('trader-dna-card');
-    if (dnaOrig) {
-      var dnaClone = dnaOrig.cloneNode(true);
-      dnaClone.id = 'pro-trader-dna-card';
-      dnaClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(dnaClone);
-    }
-
-    // ── 6. Highlight Bulan Ini (bw-trade-widget)
-    var bwOrig = document.getElementById('bw-trade-widget');
-    if (bwOrig) {
-      var bwClone = bwOrig.cloneNode(true);
-      bwClone.id = 'pro-bw-trade-widget';
-      bwClone.style.display = '';
-      bwClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(bwClone);
-    }
-
-    // ── 7. Monthly Goals (goals-widget)
-    var goalsOrig = document.getElementById('goals-widget');
-    if (goalsOrig) {
-      var goalsClone = goalsOrig.cloneNode(true);
-      goalsClone.id = 'pro-goals-widget';
-      goalsClone.style.display = '';
-      goalsClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(goalsClone);
-    }
-
-    // ── 8. Profil & Insight (pattern-widget)
-    var patternOrig = document.getElementById('pattern-widget');
-    if (patternOrig) {
-      var patternClone = patternOrig.cloneNode(true);
-      patternClone.id = 'pro-pattern-widget';
-      patternClone.style.display = '';
-      patternClone.querySelectorAll('[id]').forEach(function(el){ el.id = 'pro-' + el.id; });
-      container.appendChild(patternClone);
-    }
-
-    // Append container into mainCol, after layout bar
-    mainCol.appendChild(container);
-  }
-
-  function _refreshProLayout() {
-    // Sync visibility of cloned widgets based on their original visibility
-    var syncPairs = [
-      ['bw-trade-widget', 'pro-bw-trade-widget'],
-      ['goals-widget', 'pro-goals-widget'],
-      ['pattern-widget', 'pro-pattern-widget']
-    ];
-    syncPairs.forEach(function(pair) {
-      var orig = document.getElementById(pair[0]);
-      var clone = document.getElementById(pair[1]);
-      if (orig && clone) {
-        var origVisible = orig.style.display !== 'none';
-        clone.style.display = origVisible ? '' : 'none';
-      }
-    });
-
-    // Sync stat card values from original to pro clone
-    var statIds = ['st-bal','st-pnl','st-wr','st-wrs','st-pf','st-rr','st-n','st-sk'];
-    statIds.forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        clone.className = orig.className;
-      }
-    });
-
-    // Sync equity curve values
-    var eqIds = ['eqBal','eqPct','eqs','eqn','eq-high','eq-low','eq-maxdd','eq-trades'];
-    eqIds.forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        clone.style.cssText = orig.style.cssText;
-        clone.className = orig.className;
-      }
-    });
-
-    // Sync DNA bars and values
-    for (var i = 0; i < 6; i++) {
-      ['dna-b','dna-v'].forEach(function(prefix) {
-        var orig = document.getElementById(prefix + i);
-        var clone = document.getElementById('pro-' + prefix + i);
-        if (orig && clone) {
-          clone.innerHTML = orig.innerHTML;
-          clone.style.cssText = orig.style.cssText;
+      var todayStr = new Date().toISOString().slice(0,10);
+      var first = new Date(proYear, proMonth, 1).getDay();
+      var dim   = new Date(proYear, proMonth+1, 0).getDate();
+      var html  = '';
+      var monthPnl=0, tradingDays=0, bestDay=-Infinity, bestDayPnl=0, winDays=0, totalDays=0;
+      for (var e=0; e<first; e++) html += '<div class="tcal-cell tcal-empty"></div>';
+      for (var day=1; day<=dim; day++) {
+        var ds = proYear+'-'+String(proMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+        var data = map[ds];
+        var cls='tcal-cell', inner='';
+        if (ds===todayStr) cls+=' tcal-today';
+        if (data) {
+          tradingDays++; totalDays++;
+          monthPnl += data.pnl;
+          if (data.pnl > bestDay) { bestDay=data.pnl; bestDayPnl=data.pnl; }
+          if (data.wins>data.losses) { cls+=' tcal-win'; winDays++; }
+          else if (data.losses>data.wins) cls+=' tcal-loss';
+          else cls+=' tcal-be';
+          var absV=Math.abs(data.pnl);
+          var pnlStr=(data.pnl>=0?'+':'-')+'$'+(absV>=1000?(absV/1000).toFixed(1)+'k':absV.toFixed(0));
+          inner='<span class="tcal-dn">'+day+'</span><span class="tcal-pnl">'+pnlStr+'</span>';
+        } else {
+          inner='<span class="tcal-dn-def">'+day+'</span>';
         }
-      });
+        html+='<div class="'+cls+'">'+inner+'</div>';
+      }
+      grid.innerHTML=html;
+
+      var pnlEl=document.getElementById('pcal-monthly-pnl');
+      var tdEl=document.getElementById('pcal-trading-days');
+      var wrEl=document.getElementById('pcal-winrate');
+      var bdEl=document.getElementById('pcal-best-day');
+      if (pnlEl) { pnlEl.textContent=(monthPnl>=0?'+':'')+'$'+Math.abs(monthPnl).toFixed(2); pnlEl.className='tcal-sum-val '+(monthPnl>=0?'pos':'neg'); }
+      if (tdEl)  tdEl.textContent=tradingDays+' hari';
+      if (wrEl)  wrEl.textContent=totalDays>0?Math.round(winDays/totalDays*100)+'%':'—';
+      if (bdEl)  { bdEl.textContent=bestDay===-Infinity?'—':(bestDayPnl>=0?'+':'')+'$'+Math.abs(bestDayPnl).toFixed(2); }
     }
 
-    // Sync calendar grid
-    var calGrid = document.getElementById('tcal-grid');
-    var proCalGrid = document.getElementById('pro-tcal-grid');
-    if (calGrid && proCalGrid) {
-      proCalGrid.innerHTML = calGrid.innerHTML;
-    }
-    var calMonth = document.getElementById('tcal-month-label');
-    var proCalMonth = document.getElementById('pro-tcal-month-label');
-    if (calMonth && proCalMonth) {
-      proCalMonth.textContent = calMonth.textContent;
-    }
+    var pp=document.getElementById('pcal-prev');
+    var pn=document.getElementById('pcal-next');
+    if (pp) pp.addEventListener('click',function(){ proMonth--; if(proMonth<0){proMonth=11;proYear--;} renderProCal(); });
+    if (pn) pn.addEventListener('click',function(){ proMonth++; if(proMonth>11){proMonth=0;proYear++;} renderProCal(); });
 
-    // Sync tcal summary
-    var calSumIds = ['tcal-monthly-pnl','tcal-trading-days','tcal-winrate','tcal-best-day'];
-    calSumIds.forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        clone.className = orig.className;
-      }
-    });
-
-    // Sync donut charts text
-    var donutIds = ['dn-wins','dn-wins-pct','dn-losses','dn-losses-pct','dn-be','dn-be-pct'];
-    donutIds.forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        clone.className = orig.className;
-      }
-    });
-
-    // Sync BW best/worst
-    var bwIds = ['bw-best-pair','bw-best-pnl','bw-best-meta','bw-worst-pair','bw-worst-pnl','bw-worst-meta','bw-month-label'];
-    bwIds.forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        clone.style.color = orig.style.color;
-      }
-    });
-
-    // Sync goal rings
-    var goalIds = ['goal-pnl-ring','goal-pnl-cur','goal-pnl-target','goal-pnl-pct',
-                   'goal-wr-ring','goal-wr-cur','goal-wr-target','goal-wr-pct',
-                   'goal-tr-ring','goal-tr-cur','goal-tr-target','goal-tr-pct',
-                   'goal-streak-cur','goal-streak-best','goals-month-label','goals-month-pct'];
-    goalIds.forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        if (orig.getAttribute('stroke-dashoffset')) {
-          clone.setAttribute('stroke-dashoffset', orig.getAttribute('stroke-dashoffset'));
-        }
-        clone.style.cssText = orig.style.cssText;
-      }
-    });
-    var monthBar = document.getElementById('goals-month-bar');
-    var proMonthBar = document.getElementById('pro-goals-month-bar');
-    if (monthBar && proMonthBar) proMonthBar.style.width = monthBar.style.width;
-
-    // Sync trader DNA archetype and title
-    ['dna-archetype','dna-min-notice'].forEach(function(id) {
-      var orig = document.getElementById(id);
-      var clone = document.getElementById('pro-' + id);
-      if (orig && clone) {
-        clone.innerHTML = orig.innerHTML;
-        clone.style.display = orig.style.display;
-      }
-    });
-
-    // Sync pattern insights
-    var piOrig = document.getElementById('pattern-insights-list');
-    var piClone = document.getElementById('pro-pattern-insights-list');
-    if (piOrig && piClone) piClone.innerHTML = piOrig.innerHTML;
-
-    var ttOrig = document.getElementById('trader-type-card');
-    var ttClone = document.getElementById('pro-trader-type-card');
-    if (ttOrig && ttClone) {
-      ['tt-type','tt-badge','tt-desc','tt-meta'].forEach(function(id) {
-        var o = document.getElementById(id);
-        var c = document.getElementById('pro-' + id);
-        if (o && c) { c.innerHTML = o.innerHTML; c.style.cssText = o.style.cssText; c.className = o.className; }
-      });
-    }
+    renderProCal();
+    document.addEventListener('tradesUpdated', renderProCal);
+    setInterval(renderProCal, 4000);
   }
-
-  // Expose refresh so main JS can call it when trades update
-  window._refreshProLayout = _refreshProLayout;
-  // Auto-refresh pro layout when tradesUpdated fires
-  document.addEventListener('tradesUpdated', function() {
-    if (currentLayout === 'pro') {
-      setTimeout(_refreshProLayout, 200);
-    }
-  });
-  setInterval(function() {
-    if (currentLayout === 'pro') _refreshProLayout();
-  }, 3000);
 
   function _reorderDashLayout(name) {
     var dashLayout = document.querySelector('#page-dashboard .dash-layout');
@@ -14580,6 +14410,7 @@ const _monkeyPatchTrades = setInterval(() => {
     if (!mainCol || !calCol) return;
 
     if (name === 'compact' || name === 'default' || name === 'pro') {
+      // Ensure main col comes first in DOM
       if (dashLayout.children[0] !== mainCol) {
         dashLayout.insertBefore(mainCol, dashLayout.firstChild);
       }
