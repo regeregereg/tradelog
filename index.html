@@ -86,7 +86,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<!-- iOS PWA: full screen mode -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RPT">
+<!-- Android PWA -->
+<meta name="mobile-web-app-capable" content="yes">
 <title>RiskPerTrade — Tools Journaling Trading</title>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -1646,69 +1652,7 @@ body.sb-off #sticky-profile-bar { left: 0; }
   }
 }
 
-/* ── LAYOUT: pro (mobile-optimized, flexbox reorder) ── */
-/* Only meaningful on mobile — hidden on desktop */
-@media(max-width:768px){
-  #page-dashboard.layout-pro .dash-layout {
-    display:block !important;
-  }
-  #page-dashboard.layout-pro .dash-cal-col {
-    display:none !important;
-  }
-  #page-dashboard.layout-pro .dash-main-col {
-    display:flex !important;
-    flex-direction:column !important;
-    width:100%;
-  }
-  /* Assign order to each widget */
-  /* 1. Equity Curve */
-  #page-dashboard.layout-pro #dash-eq-card          { order:1; }
-  /* 2. Stat cards (PnL, WR, PF, AvgRR, Trades) */
-  #page-dashboard.layout-pro .stats                  { order:2; }
-  /* Period tabs: keep right above stats */
-  #page-dashboard.layout-pro #dash-period-wrap       { order:2; }
-  /* 3. Trading Calendar — inject inline via JS */
-  #page-dashboard.layout-pro #pro-inline-cal         { order:3; display:block !important; }
-  /* 4. P&L per Trade + Win vs Loss */
-  #page-dashboard.layout-pro .g2                     { order:4; }
-  /* 5. Trader DNA */
-  #page-dashboard.layout-pro #trader-dna-card        { order:5; }
-  /* 6. Highlight Bulan Ini */
-  #page-dashboard.layout-pro #bw-trade-widget        { order:6; }
-  /* 7. Monthly Goals */
-  #page-dashboard.layout-pro #goals-widget           { order:7; }
-  /* 8. Profil & Insight */
-  #page-dashboard.layout-pro #pattern-widget         { order:8; }
-  /* Trader card + guest banner stay at top */
-  #page-dashboard.layout-pro #trader-card            { order:0; }
-  #page-dashboard.layout-pro #guest-banner           { order:0; }
-  /* focus-cal-inline stays hidden in pro */
-  #page-dashboard.layout-pro #focus-cal-inline       { display:none !important; }
-}
-
-/* Pro inline calendar widget */
-#pro-inline-cal {
-  display:none;
-  margin-bottom:16px;
-}
-#pro-inline-cal .tcal-widget {
-  background:linear-gradient(160deg,var(--bg2),var(--bg3));
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:14px 16px;
-}
-
-/* Pro button: hide on desktop */
-@media(min-width:769px){
-  #dll-pro { display:none !important; }
-}
-/* Pro badge chip */
-.dll-pro-badge {
-  display:inline-flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#8b5cf6,#6366f1);
-  color:#fff;font-size:8px;font-weight:800;letter-spacing:.4px;
-  border-radius:4px;padding:1px 5px;margin-left:3px;
-}
+/* ── Inline focus-mode calendar strip ── */
 .focus-cal-strip {
   background:linear-gradient(160deg,var(--bg2),var(--bg3));
   border:1px solid var(--border);border-radius:var(--radius);
@@ -1829,7 +1773,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     background:rgba(9,9,11,.97) !important;
     backdrop-filter:blur(20px) !important;
     border-bottom:1px solid rgba(255,255,255,0.05) !important;
-    height:54px !important;
+    height:calc(54px + env(safe-area-inset-top, 0px)) !important;
+    padding-top:env(safe-area-inset-top, 0px) !important;
+  }
+  /* Push main content down to account for taller topbar in PWA mode */
+  .main {
+    padding-top:calc(54px + env(safe-area-inset-top, 0px)) !important;
   }
 }
 
@@ -3293,10 +3242,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="3.5" rx="1" fill="currentColor" opacity=".7"/><rect x="1" y="6" width="5.5" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="7.5" y="6" width="5.5" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="10.5" width="12" height="2.5" rx="1" fill="currentColor" opacity=".3"/></svg>
         Compact
       </button>
-      <button class="dll-btn" id="dll-pro" onclick="setDashLayout('pro')" title="Pro: urutan widget optimal untuk HP">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="2.2" rx="1" fill="currentColor" opacity=".85"/><rect x="1" y="4.8" width="12" height="2.2" rx="1" fill="currentColor" opacity=".65"/><rect x="1" y="8.6" width="7.5" height="2.2" rx="1" fill="currentColor" opacity=".5"/><circle cx="12" cy="9.7" r="1.8" fill="currentColor" opacity=".4"/></svg>
-        Pro <span class="dll-pro-badge">HP</span>
-      </button>
     </div>
     <div class="dash-layout">
     <div class="dash-main-col">
@@ -3383,7 +3328,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Period Filter Tabs -->
-    <div id="dash-period-wrap" style="margin-bottom:16px">
+    <div style="margin-bottom:16px">
       <div class="period-tabs" id="period-tabs">
         <button class="ptab active" data-period="all">Overview</button>
         <button class="ptab" data-period="7">7 Hari</button>
@@ -3594,7 +3539,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Equity Curve (Bybit-style) -->
-    <div class="cc" id="dash-eq-card" style="padding:16px 18px;">
+    <div class="cc" style="padding:16px 18px;">
       <div class="ch" style="margin-bottom:10px;align-items:flex-start;">
         <div>
           <div class="ct" style="margin-bottom:5px;">Equity Curve</div>
@@ -14141,15 +14086,14 @@ const _monkeyPatchTrades = setInterval(() => {
 <script>
 (function() {
   var LAYOUT_KEY = 'rpt_dash_layout';
-  var LAYOUTS = ['default', 'focus', 'compact', 'pro'];
+  var LAYOUTS = ['default', 'focus', 'compact'];
   var currentLayout = 'default';
 
   // Layout descriptions shown as tooltip/subtitle
   var LAYOUT_INFO = {
     default: 'Sidebar kalender kanan + main content',
     focus:   'Full-width, kalender terintegrasi',
-    compact: 'Stats besar, kalender di bawah',
-    pro:     'Urutan widget optimal untuk HP'
+    compact: 'Stats besar, kalender di bawah'
   };
 
   function applyLayout(name) {
@@ -14169,11 +14113,6 @@ const _monkeyPatchTrades = setInterval(() => {
     // In focus mode: inject inline mini calendar strip if not already there
     if (name === 'focus') {
       _ensureFocusCalStrip();
-    }
-
-    // In pro mode: inject inline calendar into main col
-    if (name === 'pro') {
-      _ensureProInlineCal();
     }
 
     // In compact mode: move cal-col below main-col in DOM order
@@ -14289,119 +14228,6 @@ const _monkeyPatchTrades = setInterval(() => {
     setInterval(renderFocusCal, 5000);
   }
 
-  function _ensureProInlineCal() {
-    if (document.getElementById('pro-inline-cal')) return;
-
-    var mainCol = document.querySelector('#page-dashboard .dash-main-col');
-    if (!mainCol) return;
-
-    var MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    var proYear = new Date().getFullYear();
-    var proMonth = new Date().getMonth();
-
-    var wrap = document.createElement('div');
-    wrap.id = 'pro-inline-cal';
-    wrap.innerHTML = [
-      '<div class="tcal-widget">',
-        '<div class="tcal-header">',
-          '<div class="tcal-title"><i class="bi bi-calendar3" style="margin-right:5px"></i> Trading Calendar</div>',
-          '<div class="tcal-nav">',
-            '<button class="tcal-nav-btn" id="pcal-prev">‹</button>',
-            '<div class="tcal-month-label" id="pcal-month-label">—</div>',
-            '<button class="tcal-nav-btn" id="pcal-next">›</button>',
-          '</div>',
-        '</div>',
-        '<div class="tcal-day-labels">',
-          '<div class="tcal-dl">Min</div><div class="tcal-dl">Sen</div>',
-          '<div class="tcal-dl">Sel</div><div class="tcal-dl">Rab</div>',
-          '<div class="tcal-dl">Kam</div><div class="tcal-dl">Jum</div>',
-          '<div class="tcal-dl">Sab</div>',
-        '</div>',
-        '<div class="tcal-grid" id="pcal-grid"></div>',
-        '<div class="tcal-legend" style="margin-top:10px">',
-          '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(0,217,126,.4);border:1px solid rgba(0,217,126,.5)"></div>Win</div>',
-          '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(255,77,77,.35);border:1px solid rgba(255,77,77,.45)"></div>Loss</div>',
-          '<div class="tcal-leg-item"><div class="tcal-leg-dot" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)"></div>BE</div>',
-        '</div>',
-        '<div class="tcal-summary">',
-          '<div class="tcal-sum-item"><div class="tcal-sum-label">P&L Bulan</div><div class="tcal-sum-val" id="pcal-monthly-pnl">—</div></div>',
-          '<div class="tcal-sum-item"><div class="tcal-sum-label">Trading Days</div><div class="tcal-sum-val" id="pcal-trading-days">—</div></div>',
-          '<div class="tcal-sum-item"><div class="tcal-sum-label">Win Rate</div><div class="tcal-sum-val" id="pcal-winrate">—</div></div>',
-          '<div class="tcal-sum-item"><div class="tcal-sum-label">Best Day</div><div class="tcal-sum-val pos" id="pcal-best-day">—</div></div>',
-        '</div>',
-      '</div>'
-    ].join('');
-
-    mainCol.appendChild(wrap);
-
-    function renderProCal() {
-      var grid = document.getElementById('pcal-grid');
-      var lbl  = document.getElementById('pcal-month-label');
-      if (!grid || !lbl) return;
-      lbl.textContent = MONTHS_ID[proMonth].slice(0,3) + ' ' + proYear;
-
-      var trades = window._appTrades || window._trades || [];
-      var map = {};
-      trades.forEach(function(t) {
-        if (!t.date) return;
-        var d = t.date.substring(0,10);
-        if (!map[d]) map[d] = { wins:0, losses:0, be:0, pnl:0 };
-        var pnl = parseFloat(t.pnl) || 0;
-        var r = (t.result||'').toLowerCase();
-        if (r==='win') map[d].wins++;
-        else if (r==='loss') map[d].losses++;
-        else map[d].be++;
-        map[d].pnl += pnl;
-      });
-
-      var todayStr = new Date().toISOString().slice(0,10);
-      var first = new Date(proYear, proMonth, 1).getDay();
-      var dim   = new Date(proYear, proMonth+1, 0).getDate();
-      var html  = '';
-      var monthPnl=0, tradingDays=0, bestDay=-Infinity, bestDayPnl=0, winDays=0, totalDays=0;
-      for (var e=0; e<first; e++) html += '<div class="tcal-cell tcal-empty"></div>';
-      for (var day=1; day<=dim; day++) {
-        var ds = proYear+'-'+String(proMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-        var data = map[ds];
-        var cls='tcal-cell', inner='';
-        if (ds===todayStr) cls+=' tcal-today';
-        if (data) {
-          tradingDays++; totalDays++;
-          monthPnl += data.pnl;
-          if (data.pnl > bestDay) { bestDay=data.pnl; bestDayPnl=data.pnl; }
-          if (data.wins>data.losses) { cls+=' tcal-win'; winDays++; }
-          else if (data.losses>data.wins) cls+=' tcal-loss';
-          else cls+=' tcal-be';
-          var absV=Math.abs(data.pnl);
-          var pnlStr=(data.pnl>=0?'+':'-')+'$'+(absV>=1000?(absV/1000).toFixed(1)+'k':absV.toFixed(0));
-          inner='<span class="tcal-dn">'+day+'</span><span class="tcal-pnl">'+pnlStr+'</span>';
-        } else {
-          inner='<span class="tcal-dn-def">'+day+'</span>';
-        }
-        html+='<div class="'+cls+'">'+inner+'</div>';
-      }
-      grid.innerHTML=html;
-
-      var pnlEl=document.getElementById('pcal-monthly-pnl');
-      var tdEl=document.getElementById('pcal-trading-days');
-      var wrEl=document.getElementById('pcal-winrate');
-      var bdEl=document.getElementById('pcal-best-day');
-      if (pnlEl) { pnlEl.textContent=(monthPnl>=0?'+':'')+'$'+Math.abs(monthPnl).toFixed(2); pnlEl.className='tcal-sum-val '+(monthPnl>=0?'pos':'neg'); }
-      if (tdEl)  tdEl.textContent=tradingDays+' hari';
-      if (wrEl)  wrEl.textContent=totalDays>0?Math.round(winDays/totalDays*100)+'%':'—';
-      if (bdEl)  { bdEl.textContent=bestDay===-Infinity?'—':(bestDayPnl>=0?'+':'')+'$'+Math.abs(bestDayPnl).toFixed(2); }
-    }
-
-    var pp=document.getElementById('pcal-prev');
-    var pn=document.getElementById('pcal-next');
-    if (pp) pp.addEventListener('click',function(){ proMonth--; if(proMonth<0){proMonth=11;proYear--;} renderProCal(); });
-    if (pn) pn.addEventListener('click',function(){ proMonth++; if(proMonth>11){proMonth=0;proYear++;} renderProCal(); });
-
-    renderProCal();
-    document.addEventListener('tradesUpdated', renderProCal);
-    setInterval(renderProCal, 4000);
-  }
-
   function _reorderDashLayout(name) {
     var dashLayout = document.querySelector('#page-dashboard .dash-layout');
     if (!dashLayout) return;
@@ -14409,8 +14235,13 @@ const _monkeyPatchTrades = setInterval(() => {
     var calCol  = dashLayout.querySelector('.dash-cal-col');
     if (!mainCol || !calCol) return;
 
-    if (name === 'compact' || name === 'default' || name === 'pro') {
-      // Ensure main col comes first in DOM
+    if (name === 'compact') {
+      // Make sure main comes first, cal comes second in DOM
+      if (dashLayout.children[0] !== mainCol) {
+        dashLayout.insertBefore(mainCol, dashLayout.firstChild);
+      }
+    } else if (name === 'default') {
+      // Restore: main first, cal second
       if (dashLayout.children[0] !== mainCol) {
         dashLayout.insertBefore(mainCol, dashLayout.firstChild);
       }
