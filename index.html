@@ -86,11 +86,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RPT">
-<meta name="mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>RiskPerTrade — Tools Journaling Trading</title>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -1651,6 +1647,7 @@ body.sb-off #sticky-profile-bar { left: 0; }
 }
 
 /* ── LAYOUT: pro (mobile-optimized, flexbox reorder) ── */
+/* Only meaningful on mobile — hidden on desktop */
 @media(max-width:768px){
   #page-dashboard.layout-pro .dash-layout {
     display:block !important;
@@ -1663,19 +1660,33 @@ body.sb-off #sticky-profile-bar { left: 0; }
     flex-direction:column !important;
     width:100%;
   }
+  /* Assign order to each widget */
+  /* 1. Equity Curve */
   #page-dashboard.layout-pro #dash-eq-card          { order:1; }
+  /* 2. Stat cards (PnL, WR, PF, AvgRR, Trades) */
   #page-dashboard.layout-pro .stats                  { order:2; }
+  /* Period tabs: keep right above stats */
   #page-dashboard.layout-pro #dash-period-wrap       { order:2; }
+  /* 3. Trading Calendar — inject inline via JS */
   #page-dashboard.layout-pro #pro-inline-cal         { order:3; display:block !important; }
+  /* 4. P&L per Trade + Win vs Loss */
   #page-dashboard.layout-pro .g2                     { order:4; }
+  /* 5. Trader DNA */
   #page-dashboard.layout-pro #trader-dna-card        { order:5; }
+  /* 6. Highlight Bulan Ini */
   #page-dashboard.layout-pro #bw-trade-widget        { order:6; }
+  /* 7. Monthly Goals */
   #page-dashboard.layout-pro #goals-widget           { order:7; }
+  /* 8. Profil & Insight */
   #page-dashboard.layout-pro #pattern-widget         { order:8; }
+  /* Trader card + guest banner stay at top */
   #page-dashboard.layout-pro #trader-card            { order:0; }
   #page-dashboard.layout-pro #guest-banner           { order:0; }
+  /* focus-cal-inline stays hidden in pro */
   #page-dashboard.layout-pro #focus-cal-inline       { display:none !important; }
 }
+
+/* Pro inline calendar widget */
 #pro-inline-cal {
   display:none;
   margin-bottom:16px;
@@ -1686,17 +1697,18 @@ body.sb-off #sticky-profile-bar { left: 0; }
   border-radius:var(--radius);
   padding:14px 16px;
 }
+
+/* Pro button: hide on desktop */
 @media(min-width:769px){
   #dll-pro { display:none !important; }
 }
+/* Pro badge chip */
 .dll-pro-badge {
   display:inline-flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,#8b5cf6,#6366f1);
   color:#fff;font-size:8px;font-weight:800;letter-spacing:.4px;
   border-radius:4px;padding:1px 5px;margin-left:3px;
 }
-
-/* ── Inline focus-mode calendar strip ── */
 .focus-cal-strip {
   background:linear-gradient(160deg,var(--bg2),var(--bg3));
   border:1px solid var(--border);border-radius:var(--radius);
@@ -1817,11 +1829,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     background:rgba(9,9,11,.97) !important;
     backdrop-filter:blur(20px) !important;
     border-bottom:1px solid rgba(255,255,255,0.05) !important;
-    height:calc(54px + env(safe-area-inset-top, 0px)) !important;
-    padding-top:env(safe-area-inset-top, 0px) !important;
-  }
-  .main {
-    padding-top:calc(54px + env(safe-area-inset-top, 0px)) !important;
+    height:54px !important;
   }
 }
 
@@ -14147,27 +14155,34 @@ const _monkeyPatchTrades = setInterval(() => {
   function applyLayout(name) {
     var page = document.getElementById('page-dashboard');
     if (!page) return;
+    // Remove all layout classes
     LAYOUTS.forEach(function(l) { page.classList.remove('layout-' + l); });
     page.classList.add('layout-' + name);
     currentLayout = name;
 
+    // Update button states
     LAYOUTS.forEach(function(l) {
       var btn = document.getElementById('dll-' + l);
       if (btn) btn.classList.toggle('active', l === name);
     });
 
+    // In focus mode: inject inline mini calendar strip if not already there
     if (name === 'focus') {
       _ensureFocusCalStrip();
     }
 
+    // In pro mode: inject inline calendar into main col
     if (name === 'pro') {
       _ensureProInlineCal();
     }
 
+    // In compact mode: move cal-col below main-col in DOM order
     _reorderDashLayout(name);
 
+    // Save preference
     try { localStorage.setItem(LAYOUT_KEY, name); } catch(e) {}
 
+    // Trigger calendar refresh since layout changed (column widths changed)
     setTimeout(function() {
       if (window.tcalRefresh) window.tcalRefresh();
     }, 50);
@@ -14276,6 +14291,7 @@ const _monkeyPatchTrades = setInterval(() => {
 
   function _ensureProInlineCal() {
     if (document.getElementById('pro-inline-cal')) return;
+
     var mainCol = document.querySelector('#page-dashboard .dash-main-col');
     if (!mainCol) return;
 
@@ -14290,9 +14306,9 @@ const _monkeyPatchTrades = setInterval(() => {
         '<div class="tcal-header">',
           '<div class="tcal-title"><i class="bi bi-calendar3" style="margin-right:5px"></i> Trading Calendar</div>',
           '<div class="tcal-nav">',
-            '<button class="tcal-nav-btn" id="pcal-prev">&#x2039;</button>',
+            '<button class="tcal-nav-btn" id="pcal-prev">‹</button>',
             '<div class="tcal-month-label" id="pcal-month-label">—</div>',
-            '<button class="tcal-nav-btn" id="pcal-next">&#x203a;</button>',
+            '<button class="tcal-nav-btn" id="pcal-next">›</button>',
           '</div>',
         '</div>',
         '<div class="tcal-day-labels">',
@@ -14329,8 +14345,8 @@ const _monkeyPatchTrades = setInterval(() => {
       trades.forEach(function(t) {
         if (!t.date) return;
         var d = t.date.substring(0,10);
-        if (!map[d]) map[d] = {wins:0,losses:0,be:0,pnl:0};
-        var pnl = parseFloat(t.pnl)||0;
+        if (!map[d]) map[d] = { wins:0, losses:0, be:0, pnl:0 };
+        var pnl = parseFloat(t.pnl) || 0;
         var r = (t.result||'').toLowerCase();
         if (r==='win') map[d].wins++;
         else if (r==='loss') map[d].losses++;
@@ -14342,7 +14358,7 @@ const _monkeyPatchTrades = setInterval(() => {
       var first = new Date(proYear, proMonth, 1).getDay();
       var dim   = new Date(proYear, proMonth+1, 0).getDate();
       var html  = '';
-      var monthPnl=0, tradingDays=0, bestDayPnl=-Infinity, winDays=0;
+      var monthPnl=0, tradingDays=0, bestDay=-Infinity, bestDayPnl=0, winDays=0, totalDays=0;
       for (var e=0; e<first; e++) html += '<div class="tcal-cell tcal-empty"></div>';
       for (var day=1; day<=dim; day++) {
         var ds = proYear+'-'+String(proMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
@@ -14350,9 +14366,9 @@ const _monkeyPatchTrades = setInterval(() => {
         var cls='tcal-cell', inner='';
         if (ds===todayStr) cls+=' tcal-today';
         if (data) {
-          tradingDays++;
+          tradingDays++; totalDays++;
           monthPnl += data.pnl;
-          if (data.pnl > bestDayPnl) bestDayPnl = data.pnl;
+          if (data.pnl > bestDay) { bestDay=data.pnl; bestDayPnl=data.pnl; }
           if (data.wins>data.losses) { cls+=' tcal-win'; winDays++; }
           else if (data.losses>data.wins) cls+=' tcal-loss';
           else cls+=' tcal-be';
@@ -14364,22 +14380,22 @@ const _monkeyPatchTrades = setInterval(() => {
         }
         html+='<div class="'+cls+'">'+inner+'</div>';
       }
-      grid.innerHTML = html;
+      grid.innerHTML=html;
 
       var pnlEl=document.getElementById('pcal-monthly-pnl');
-      var tdEl =document.getElementById('pcal-trading-days');
-      var wrEl =document.getElementById('pcal-winrate');
-      var bdEl =document.getElementById('pcal-best-day');
+      var tdEl=document.getElementById('pcal-trading-days');
+      var wrEl=document.getElementById('pcal-winrate');
+      var bdEl=document.getElementById('pcal-best-day');
       if (pnlEl) { pnlEl.textContent=(monthPnl>=0?'+':'')+'$'+Math.abs(monthPnl).toFixed(2); pnlEl.className='tcal-sum-val '+(monthPnl>=0?'pos':'neg'); }
-      if (tdEl)  tdEl.textContent = tradingDays+' hari';
-      if (wrEl)  wrEl.textContent = tradingDays>0 ? Math.round(winDays/tradingDays*100)+'%' : '—';
-      if (bdEl)  bdEl.textContent = bestDayPnl===-Infinity ? '—' : (bestDayPnl>=0?'+':'')+'$'+Math.abs(bestDayPnl).toFixed(2);
+      if (tdEl)  tdEl.textContent=tradingDays+' hari';
+      if (wrEl)  wrEl.textContent=totalDays>0?Math.round(winDays/totalDays*100)+'%':'—';
+      if (bdEl)  { bdEl.textContent=bestDay===-Infinity?'—':(bestDayPnl>=0?'+':'')+'$'+Math.abs(bestDayPnl).toFixed(2); }
     }
 
-    var ppBtn = document.getElementById('pcal-prev');
-    var pnBtn = document.getElementById('pcal-next');
-    if (ppBtn) ppBtn.addEventListener('click', function(){ proMonth--; if(proMonth<0){proMonth=11;proYear--;} renderProCal(); });
-    if (pnBtn) pnBtn.addEventListener('click', function(){ proMonth++; if(proMonth>11){proMonth=0;proYear++;} renderProCal(); });
+    var pp=document.getElementById('pcal-prev');
+    var pn=document.getElementById('pcal-next');
+    if (pp) pp.addEventListener('click',function(){ proMonth--; if(proMonth<0){proMonth=11;proYear--;} renderProCal(); });
+    if (pn) pn.addEventListener('click',function(){ proMonth++; if(proMonth>11){proMonth=0;proYear++;} renderProCal(); });
 
     renderProCal();
     document.addEventListener('tradesUpdated', renderProCal);
@@ -14392,7 +14408,9 @@ const _monkeyPatchTrades = setInterval(() => {
     var mainCol = dashLayout.querySelector('.dash-main-col');
     var calCol  = dashLayout.querySelector('.dash-cal-col');
     if (!mainCol || !calCol) return;
+
     if (name === 'compact' || name === 'default' || name === 'pro') {
+      // Ensure main col comes first in DOM
       if (dashLayout.children[0] !== mainCol) {
         dashLayout.insertBefore(mainCol, dashLayout.firstChild);
       }
