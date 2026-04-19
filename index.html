@@ -2498,8 +2498,20 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   }
 
 /* ════════════════════════════════════════════════════════════
-   §CSS-FLOAT-CTA — Floating CTA Widget (guest users)
+   §CSS-PRO — Pro Mobile Layout
    ════════════════════════════════════════════════════════════ */
+/* DNA rows khusus Pro page */
+.pro-dna-row{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:6px;border:1px solid transparent;transition:background .15s;cursor:default;}
+.pro-dna-row:hover{background:rgba(139,92,246,.05);border-color:rgba(139,92,246,.1);}
+.pro-dna-ico{font-size:9px;color:rgba(255,255,255,.2);flex-shrink:0;width:10px;text-align:center;transition:color .15s;}
+.pro-dna-row:hover .pro-dna-ico{color:rgba(167,139,250,.6);}
+.pro-dna-lbl{flex:0 0 60px;font-size:8px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:rgba(255,255,255,.2);font-family:var(--font);}
+.pro-dna-bw{flex:1;height:1.5px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.pro-dna-bar{height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,#5b21b6,#a78bfa);transition:width 1.4s cubic-bezier(.25,.46,.45,.94);}
+.pro-dna-val{font-size:9px;font-weight:600;font-family:var(--mono);min-width:20px;text-align:right;color:rgba(255,255,255,.28);transition:color .15s;}
+.pro-dna-row:hover .pro-dna-val{color:#c4b5fd;}
+
+
 @keyframes floatIn {
   from { opacity:0; transform:translateY(20px) scale(.92); }
   to   { opacity:1; transform:translateY(0) scale(1); }
@@ -3143,6 +3155,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <i class="bn-icon bi bi-bar-chart-line"></i>
       <span class="bn-label">Analytics</span>
     </button>
+    <button class="bn-item" id="bn-pro" onclick="bnGo('dashboard');setTimeout(function(){setDashLayout('pro')},80)">
+      <i class="bn-icon bi bi-stars"></i>
+      <span class="bn-label">Pro</span>
+    </button>
     <button class="bn-item" id="bn-more" onclick="bnMoreToggle()">
       <i class="bn-icon bi bi-grid-3x3-gap"></i>
       <span class="bn-label">More</span>
@@ -3230,6 +3246,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <button class="dll-btn" id="dll-compact" onclick="setDashLayout('compact')" title="Compact: stats besar + calendar di bawah">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="3.5" rx="1" fill="currentColor" opacity=".7"/><rect x="1" y="6" width="5.5" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="7.5" y="6" width="5.5" height="3" rx="1" fill="currentColor" opacity=".5"/><rect x="1" y="10.5" width="12" height="2.5" rx="1" fill="currentColor" opacity=".3"/></svg>
         Compact
+      </button>
+      <button class="dll-btn" id="dll-pro" onclick="setDashLayout('pro')" title="Pro: semua statistik dalam satu layar">
+        <i class="bi bi-stars" style="font-size:12px"></i>
+        Pro
       </button>
     </div>
     <div class="dash-layout">
@@ -3790,7 +3810,219 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div><!-- end .dash-cal-col -->
 
     </div><!-- end .dash-layout -->
+
+  <!-- ── Pro Layout Panel (layout switcher option) ───────── -->
+  <div id="pro-layout-panel" style="display:none">
+
+    <!-- Page Header -->
+    <div class="ph" style="margin-bottom:14px">
+      <div>
+        <div class="pt" style="display:flex;align-items:center;gap:8px">
+          <i class="bi bi-stars" style="font-size:18px;color:var(--accent2)"></i> Pro View
+        </div>
+        <div class="ps" style="display:flex;align-items:center;gap:7px;margin-top:4px">
+          <span class="ana-live-dot"></span>
+          <span>Mobile · Semua data dalam satu layar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ① EQUITY CURVE -->
+    <div class="cc" style="padding:16px 18px;margin-bottom:12px">
+      <div class="ch" style="margin-bottom:8px;align-items:flex-start">
+        <div>
+          <div class="ct" style="margin-bottom:4px">Equity Curve</div>
+          <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+            <span id="pro-eq-bal" style="font-size:20px;font-weight:700;font-family:var(--mono);letter-spacing:-.5px">—</span>
+            <span id="pro-eq-pct" style="font-size:10px;font-weight:700;font-family:var(--mono);padding:2px 7px;border-radius:5px">—</span>
+          </div>
+        </div>
+        <div id="pro-eq-live" style="display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#00d97e;font-family:var(--font)">
+          <span style="width:5px;height:5px;border-radius:50%;background:#00d97e;display:inline-block;animation:eqPulse 1.4s ease-in-out infinite"></span>LIVE
+        </div>
+      </div>
+      <!-- Mini stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px">
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:6px 8px">
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:2px">High</div>
+          <div id="pro-eq-high" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#00d97e">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:6px 8px">
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:2px">Low</div>
+          <div id="pro-eq-low" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#ef4444">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:6px 8px">
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:2px">Max DD</div>
+          <div id="pro-eq-dd" style="font-size:11px;font-weight:700;font-family:var(--mono);color:#f4f4f5">—</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:6px 8px">
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:2px">Trades</div>
+          <div id="pro-eq-n" style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--accent2)">—</div>
+        </div>
+      </div>
+      <div style="position:relative;height:160px;touch-action:none"><canvas id="proEqC"></canvas></div>
+    </div>
+
+    <!-- ② STAT PILLS: P&L · Win Rate · Profit Factor · Avg R:R · Trades -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+      <div class="sc"><div class="sl">P&amp;L</div><div class="sv" id="pro-st-bal">—</div><div class="sch" id="pro-st-pnl">—</div></div>
+      <div class="sc"><div class="sl">Win Rate</div><div class="sv" id="pro-st-wr">—</div><div class="sch" id="pro-st-wrs">no trades yet</div></div>
+      <div class="sc"><div class="sl">Profit Factor</div><div class="sv" id="pro-st-pf">—</div><div class="sch neu">gross W ÷ gross L</div></div>
+      <div class="sc"><div class="sl">Avg R:R</div><div class="sv" id="pro-st-rr">—</div><div class="sch neu">realized ratio</div></div>
+      <div class="sc" style="grid-column:1/-1"><div class="sl">Trades</div><div class="sv" id="pro-st-n">0</div><div class="sch" id="pro-st-sk">—</div></div>
+    </div>
+
+    <!-- ③ TRADING CALENDAR -->
+    <div class="cc" style="margin-bottom:12px">
+      <div class="ch" style="margin-bottom:12px">
+        <div class="ct"><i class="bi bi-calendar3" style="margin-right:5px"></i>Trading Calendar</div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <button class="tcal-nav-btn" id="pro-tcal-prev">‹</button>
+          <div class="tcal-month-label" id="pro-tcal-month">—</div>
+          <button class="tcal-nav-btn" id="pro-tcal-next">›</button>
+        </div>
+      </div>
+      <div class="tcal-day-labels">
+        <div class="tcal-dl">Min</div><div class="tcal-dl">Sen</div><div class="tcal-dl">Sel</div>
+        <div class="tcal-dl">Rab</div><div class="tcal-dl">Kam</div><div class="tcal-dl">Jum</div><div class="tcal-dl">Sab</div>
+      </div>
+      <div class="tcal-grid" id="pro-tcal-grid"></div>
+      <div class="tcal-legend" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:2px;background:rgba(0,217,126,.3);display:inline-block"></span>Profit</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:2px;background:rgba(255,77,77,.25);display:inline-block"></span>Loss</span>
+      </div>
+    </div>
+
+    <!-- ④ P&L PER TRADE -->
+    <div class="cc" style="margin-bottom:12px">
+      <div class="ch"><div class="ct">P&amp;L per Trade</div></div>
+      <div style="position:relative;height:130px"><canvas id="proPnlC"></canvas></div>
+    </div>
+
+    <!-- ⑤ WIN VS LOSS -->
+    <div class="cc" style="margin-bottom:12px">
+      <div class="ch"><div class="ct">Win vs Loss</div></div>
+      <div style="position:relative;height:130px"><canvas id="proDnC"></canvas></div>
+      <div style="display:flex;justify-content:center;gap:14px;margin-top:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#00d97e;display:inline-block;flex-shrink:0"></span>
+          <span style="font-size:11px;color:var(--text2)">Win</span>
+          <span id="pro-dn-wins" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#00d97e">0</span>
+          <span id="pro-dn-wins-pct" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#ff4d4d;display:inline-block;flex-shrink:0"></span>
+          <span style="font-size:11px;color:var(--text2)">Loss</span>
+          <span id="pro-dn-losses" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#ff4d4d">0</span>
+          <span id="pro-dn-losses-pct" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#555;display:inline-block;flex-shrink:0"></span>
+          <span style="font-size:11px;color:var(--text2)">BE</span>
+          <span id="pro-dn-be" style="font-size:12px;font-weight:600;font-family:var(--mono);color:var(--text2)">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ TRADER DNA -->
+    <div class="cc" id="pro-dna-card" style="margin-bottom:12px;padding:0;overflow:hidden;position:relative;background:linear-gradient(160deg,#0c0c11,#100f18);border:1px solid rgba(255,255,255,.055);border-radius:20px">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.5) 45%,transparent);pointer-events:none"></div>
+      <div style="display:grid;grid-template-columns:160px 1fr;gap:0;min-height:210px">
+        <!-- Left: radar -->
+        <div style="display:flex;align-items:center;justify-content:center;padding:20px 8px 20px 16px;border-right:1px solid rgba(255,255,255,.04)">
+          <div style="width:140px;height:140px;position:relative">
+            <canvas id="proDnaRadar" style="position:absolute;inset:0;width:100%!important;height:100%!important;filter:drop-shadow(0 0 6px rgba(139,92,246,.3))"></canvas>
+          </div>
+        </div>
+        <!-- Right: stats -->
+        <div style="padding:18px 16px 16px 14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.18);margin-bottom:4px">
+              <span style="width:5px;height:5px;border-radius:50%;background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.7);display:inline-block"></span>Trader Profile
+            </div>
+            <div style="font-size:15px;font-weight:800;letter-spacing:-.4px;color:#f4f4f5;font-family:var(--font)">DNA Analysis</div>
+            <div id="pro-dna-archetype" style="font-size:9px;font-family:var(--mono);font-weight:600;letter-spacing:.3px;color:var(--accent2);margin-top:5px;padding:2px 8px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.18);border-radius:20px;display:inline-block">—</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <div class="pro-dna-row"><i class="bi bi-arrow-repeat pro-dna-ico"></i><span class="pro-dna-lbl">Consistency</span><div class="pro-dna-bw"><div id="pro-dna-b0" class="pro-dna-bar"></div></div><span id="pro-dna-v0" class="pro-dna-val">—</span></div>
+            <div class="pro-dna-row"><i class="bi bi-shield-check pro-dna-ico"></i><span class="pro-dna-lbl">Discipline</span><div class="pro-dna-bw"><div id="pro-dna-b1" class="pro-dna-bar"></div></div><span id="pro-dna-v1" class="pro-dna-val">—</span></div>
+            <div class="pro-dna-row"><i class="bi bi-lightning-charge pro-dna-ico"></i><span class="pro-dna-lbl">Aggression</span><div class="pro-dna-bw"><div id="pro-dna-b2" class="pro-dna-bar"></div></div><span id="pro-dna-v2" class="pro-dna-val">—</span></div>
+            <div class="pro-dna-row"><i class="bi bi-crosshair pro-dna-ico"></i><span class="pro-dna-lbl">Execution</span><div class="pro-dna-bw"><div id="pro-dna-b3" class="pro-dna-bar"></div></div><span id="pro-dna-v3" class="pro-dna-val">—</span></div>
+            <div class="pro-dna-row"><i class="bi bi-activity pro-dna-ico"></i><span class="pro-dna-lbl">Endurance</span><div class="pro-dna-bw"><div id="pro-dna-b4" class="pro-dna-bar"></div></div><span id="pro-dna-v4" class="pro-dna-val">—</span></div>
+            <div class="pro-dna-row"><i class="bi bi-eye pro-dna-ico"></i><span class="pro-dna-lbl">Vision</span><div class="pro-dna-bw"><div id="pro-dna-b5" class="pro-dna-bar"></div></div><span id="pro-dna-v5" class="pro-dna-val">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑦ HIGHLIGHT BULAN INI -->
+    <div id="pro-bw-widget" style="display:none;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Highlight Bulan Ini</div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono)" id="pro-bw-month"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:rgba(0,217,126,.06);border:1px solid rgba(0,217,126,.18);border-radius:14px;padding:14px;position:relative;overflow:hidden">
+          <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:rgba(0,217,126,.7);margin-bottom:7px">Best Trade</div>
+          <div id="pro-bw-best-pair" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);font-family:var(--mono);margin-bottom:3px">—</div>
+          <div id="pro-bw-best-pnl" style="font-size:22px;font-weight:800;color:#00d97e;font-family:var(--mono);line-height:1;letter-spacing:-.8px">+$0</div>
+        </div>
+        <div style="background:rgba(255,77,77,.05);border:1px solid rgba(255,77,77,.16);border-radius:14px;padding:14px;position:relative;overflow:hidden">
+          <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,77,77,.7);margin-bottom:7px">Worst Trade</div>
+          <div id="pro-bw-worst-pair" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);font-family:var(--mono);margin-bottom:3px">—</div>
+          <div id="pro-bw-worst-pnl" style="font-size:22px;font-weight:800;color:#ff4d4d;font-family:var(--mono);line-height:1;letter-spacing:-.8px">-$0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑧ MONTHLY GOALS -->
+    <div id="pro-goals-widget" style="display:none;background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.07),transparent 65%);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Monthly Goals</div>
+        <div id="pro-streak-badge" style="display:none;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);font-size:9px;font-weight:700;color:#f59e0b;font-family:var(--mono)">
+          <i class="bi bi-fire" style="font-size:9px"></i> <span id="pro-streak-num">0</span> hari
+        </div>
+      </div>
+      <!-- Mirror goals-grid content via JS -->
+      <div id="pro-goals-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:10px"></div>
+      <!-- Month progress bar -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
+          <div id="pro-month-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(139,92,246,.5),rgba(167,139,250,.8));transition:width .8s ease;width:0%"></div>
+        </div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap" id="pro-month-pct">0% bulan berlalu</div>
+      </div>
+    </div>
+
+    <!-- ⑨ PROFILE INSIGHT -->
+    <div id="pro-pattern-widget" style="display:none;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Profil &amp; Insight</div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono)" id="pro-pattern-count"></div>
+      </div>
+      <!-- Trader type card (mirror) -->
+      <div style="background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:8px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.1),transparent 65%);pointer-events:none"></div>
+        <div style="display:flex;align-items:center;gap:12px;position:relative">
+          <div id="pro-tt-icon-box" style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2)">
+            <i class="bi bi-lightning-charge" id="pro-tt-icon"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+              <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.3px" id="pro-tt-type">—</div>
+              <div id="pro-tt-badge" style="font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.6px;border:1px solid">—</div>
+            </div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.4" id="pro-tt-desc">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- Pattern insights list (mirror) -->
+      <div id="pro-insights-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
   </div>
+  <!-- ── END §PAGE-PRO ──────────────────────────────────── -->
 
   <!-- ── §PAGE-JOURNAL ───────────────────────────────────── -->
   <div class="page" id="page-journal">
@@ -3867,7 +4099,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <button onclick="openTrade()" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 16px rgba(139,92,246,.35);letter-spacing:.2px;transition:all .2s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">+ Log Trade Pertama Kamu</button>
     </div>
     </div>
-  </div>
+  </div><!-- end #pro-layout-panel -->
+  </div><!-- end #page-dashboard -->
 
   <!-- ── §PAGE-ANALYTICS ─────────────────────────────────── -->
   <div class="page" id="page-analytics">
@@ -6776,6 +7009,7 @@ let trades = [], bal = 0, calOff = 0, sbOpen = false;
 let ftmo = {size:10000,pp:10,dp:5,ddp:10};
 let currentUser = null, unsubTrades = null;
 let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
+let proEqCh=null, proPnlCh=null, proDnCh=null, proDnaCh=null;
 let pendingAction = null; // track what user wanted to do before login
 const ANON_LIMIT = 10;  // max trades for anonymous users
 let currentPeriod = 'all'; // 'all' | '7' | '30' | '180'
@@ -9013,6 +9247,12 @@ function updateStats() {
   }
 
   $('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // Sync Pro layout stats if visible
+  var _proPanel = document.getElementById('pro-layout-panel');
+  if(_proPanel && _proPanel.style.display !== 'none'){
+    renderPro();
+  }
 }
 
 // ── CHARTS ────────────────────────────────────────────
@@ -9693,6 +9933,269 @@ function renderDNA(){
       elements:{line:{borderJoinStyle:'round'}}
     }
   });
+}
+
+// ══════════════════════════════════════════════════════
+// renderPro — Pro mobile page renderer
+// ══════════════════════════════════════════════════════
+function renderPro() {
+  const ft = getFilteredTrades();
+  const allTrades = trades;
+  const allTot = allTrades.reduce((s,t)=>s+t.pnl,0);
+  const b = bal + allTot;
+
+  // ── ① Stat pills ──
+  const n  = ft.length;
+  const W  = ft.filter(t=>t.result==='Win');
+  const L  = ft.filter(t=>t.result==='Loss');
+  const tot= ft.reduce((s,t)=>s+t.pnl,0);
+  const wr = n>0?(W.length/n*100).toFixed(1):null;
+  const gw = W.reduce((s,t)=>s+t.pnl,0);
+  const gl = Math.abs(L.reduce((s,t)=>s+t.pnl,0));
+  const pf = gl>0?(gw/gl).toFixed(2):gw>0?'∞':'—';
+  const rr = n>0?(ft.reduce((s,t)=>s+t.r,0)/n).toFixed(2):'—';
+
+  const $s = id => document.getElementById(id);
+  const set = (id, val, cls) => { const el=$s(id); if(!el)return; el.textContent=val; if(cls!==undefined)el.className=cls; };
+
+  set('pro-st-bal','$'+f2(b),'sv '+(allTot>=0?'pos':'neg'));
+  set('pro-st-pnl',n>0?((tot>=0?'+$':'-$')+f2(Math.abs(tot))):'—','sch '+(tot>0?'pos':tot<0?'neg':'neu'));
+  set('pro-st-wr', wr?wr+'%':'—', 'sv '+(wr>=50?'pos':wr?'neg':''));
+  set('pro-st-wrs', n>0?W.length+' wins / '+n+' trades':'no trades yet');
+  set('pro-st-pf', pf, 'sv '+(parseFloat(pf)>=1?'pos':pf==='—'?'':'neg'));
+  set('pro-st-rr', rr, 'sv '+(parseFloat(rr)>0?'pos':rr==='—'?'':''));
+  set('pro-st-n', n, 'sv');
+  if(allTrades.length>0){
+    let s=0,type=allTrades[allTrades.length-1].result;
+    for(let i=allTrades.length-1;i>=0&&allTrades[i].result===type;i--)s++;
+    set('pro-st-sk',s+' '+type.toLowerCase()+(s>1?'s':'')+' streak','sch '+(type==='Win'?'pos':type==='Loss'?'neg':'neu'));
+  }
+
+  // ── ② Equity curve ──
+  (function(){
+    const allFt = allTrades.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    const labels=[], data=[];
+    let running=bal;
+    allFt.forEach((t,i)=>{ running+=t.pnl; labels.push('#'+(i+1)); data.push(parseFloat(running.toFixed(2))); });
+    const high=data.length?Math.max(...data):bal;
+    const low =data.length?Math.min(...data):bal;
+    let maxDD=0,peak=bal,runDD=bal;
+    allFt.forEach(t=>{runDD+=t.pnl;if(runDD>peak)peak=runDD;const dd=peak-runDD;if(dd>maxDD)maxDD=dd;});
+
+    const balEl=$s('pro-eq-bal');
+    if(balEl){balEl.textContent='$'+f2(b);balEl.style.color=allTot>=0?'var(--green)':'var(--red)';}
+    const pctEl=$s('pro-eq-pct');
+    if(pctEl&&bal>0){
+      const pct=(allTot/bal*100).toFixed(2);
+      pctEl.textContent=(allTot>=0?'+':'')+pct+'%';
+      pctEl.style.background=allTot>=0?'rgba(0,217,126,.12)':'rgba(239,68,68,.1)';
+      pctEl.style.color=allTot>=0?'#00d97e':'#ef4444';
+    }
+    set('pro-eq-high','$'+f2(high));
+    set('pro-eq-low','$'+f2(low));
+    set('pro-eq-dd',maxDD>0?'-$'+f2(maxDD):'—');
+    set('pro-eq-n',allFt.length);
+
+    const canvas=$s('proEqC'); if(!canvas)return;
+    if(proEqCh){proEqCh.destroy();proEqCh=null;}
+    if(!data.length)return;
+    const color=allTot>=0?'rgba(0,217,126,':'rgba(239,68,68,';
+    const ctx=canvas.getContext('2d');
+    const grad=ctx.createLinearGradient(0,0,0,160);
+    grad.addColorStop(0,color+'0.18)'); grad.addColorStop(1,color+'0.01)');
+    proEqCh=new Chart(ctx,{
+      type:'line',
+      data:{labels,datasets:[{data,borderColor:color+'0.85)',borderWidth:1.5,backgroundColor:grad,fill:true,tension:0.3,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:color+'1)',pointHoverBorderColor:'#fff',pointHoverBorderWidth:1.5}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(9,9,11,.97)',borderColor:color+'0.4)',borderWidth:1,bodyColor:'#f4f4f5',bodyFont:{family:"'JetBrains Mono',monospace",size:11},padding:8,cornerRadius:8,displayColors:false,callbacks:{label:i=>'$'+f2(i.raw)}}},scales:{x:{display:false},y:{display:false,min:Math.min(...data)*0.998,max:Math.max(...data)*1.002}},interaction:{mode:'index',intersect:false}}
+    });
+  })();
+
+  // ── ③ Trading Calendar ──
+  (function(){
+    const monthLabel=$s('pro-tcal-month');
+    const grid=$s('pro-tcal-grid');
+    if(!grid)return;
+
+    let proCalYear = new Date().getFullYear();
+    let proCalMonth = new Date().getMonth();
+
+    function renderProCal(){
+      if(monthLabel) monthLabel.textContent = new Date(proCalYear,proCalMonth,1).toLocaleString('id-ID',{month:'long',year:'numeric'});
+      grid.innerHTML='';
+      const firstDay=new Date(proCalYear,proCalMonth,1).getDay();
+      const daysInMonth=new Date(proCalYear,proCalMonth+1,0).getDate();
+      const today=new Date();
+      for(let i=0;i<firstDay;i++){const e=document.createElement('div');e.className='tcal-cell tcal-empty';grid.appendChild(e);}
+      for(let d=1;d<=daysInMonth;d++){
+        const dateStr=proCalYear+'-'+String(proCalMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        const dayTrades=trades.filter(t=>(t.date||'').startsWith(dateStr));
+        const dayPnl=dayTrades.reduce((s,t)=>s+t.pnl,0);
+        const e=document.createElement('div');
+        let cls='tcal-cell';
+        if(dayTrades.length>0) cls+=dayPnl>0?' tcal-win':dayPnl<0?' tcal-loss':' tcal-be';
+        if(d===today.getDate()&&proCalMonth===today.getMonth()&&proCalYear===today.getFullYear()) cls+=' tcal-today';
+        e.className=cls;
+        e.innerHTML=`<div class="tcal-dn">${d}</div>${dayTrades.length>0?`<div class="tcal-pnl ${dayPnl>=0?'pos':'neg'}">${dayPnl>=0?'+':'-'}$${f2(Math.abs(dayPnl))}</div>`:''}`;
+        grid.appendChild(e);
+      }
+    }
+    renderProCal();
+
+    const prevBtn=$s('pro-tcal-prev'), nextBtn=$s('pro-tcal-next');
+    if(prevBtn&&!prevBtn._probound){
+      prevBtn._probound=true;
+      prevBtn.addEventListener('click',()=>{ proCalMonth--; if(proCalMonth<0){proCalMonth=11;proCalYear--;} renderProCal(); });
+    }
+    if(nextBtn&&!nextBtn._probound){
+      nextBtn._probound=true;
+      nextBtn.addEventListener('click',()=>{ proCalMonth++; if(proCalMonth>11){proCalMonth=0;proCalYear++;} renderProCal(); });
+    }
+  })();
+
+  // ── ④ P&L per Trade ──
+  (function(){
+    const canvas=$s('proPnlC'); if(!canvas)return;
+    if(proPnlCh){proPnlCh.destroy();proPnlCh=null;}
+    const sorted=ft.slice();
+    const labels=sorted.map((_,i)=>'#'+(i+1));
+    const data=sorted.map(t=>t.pnl);
+    if(!data.length)return;
+    proPnlCh=new Chart(canvas.getContext('2d'),{
+      type:'bar',
+      data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=0?'rgba(0,217,126,0.7)':'rgba(239,68,68,0.65)'),borderRadius:3,borderSkipped:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(9,9,11,.97)',bodyColor:'#f4f4f5',bodyFont:{family:"'JetBrains Mono',monospace",size:11},padding:7,cornerRadius:7,displayColors:false,callbacks:{label:i=>(i.raw>=0?'+$':'-$')+f2(Math.abs(i.raw))}}},scales:{x:{display:false},y:{display:false,grid:{display:false}}}}
+    });
+  })();
+
+  // ── ⑤ Win vs Loss donut ──
+  (function(){
+    const canvas=$s('proDnC'); if(!canvas)return;
+    if(proDnCh){proDnCh.destroy();proDnCh=null;}
+    const wins=ft.filter(t=>t.result==='Win').length;
+    const losses=ft.filter(t=>t.result==='Loss').length;
+    const be=ft.filter(t=>t.result==='Breakeven').length;
+    const total=ft.length||1;
+    set('pro-dn-wins',wins); set('pro-dn-wins-pct',wins?'('+Math.round(wins/total*100)+'%)':'');
+    set('pro-dn-losses',losses); set('pro-dn-losses-pct',losses?'('+Math.round(losses/total*100)+'%)':'');
+    set('pro-dn-be',be);
+    proDnCh=new Chart(canvas.getContext('2d'),{
+      type:'doughnut',
+      data:{labels:['Win','Loss','BE'],datasets:[{data:[wins,losses,be],backgroundColor:['rgba(0,217,126,0.8)','rgba(239,68,68,0.75)','rgba(100,100,110,0.6)'],borderWidth:0,hoverOffset:4}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(9,9,11,.97)',bodyColor:'#f4f4f5',bodyFont:{family:"'JetBrains Mono',monospace",size:11},padding:7,cornerRadius:7}}}
+    });
+  })();
+
+  // ── ⑥ Trader DNA ──
+  (function(){
+    const scores=calcDNA(trades);
+    scores.forEach((s,i)=>{
+      const b=$s('pro-dna-b'+i), v=$s('pro-dna-v'+i);
+      if(b) setTimeout(()=>{b.style.width=s+'%';},i*60);
+      if(v) v.textContent=s;
+    });
+    const arch=$s('pro-dna-archetype'); if(arch) arch.textContent=getArchetype(scores);
+    const canvas=$s('proDnaRadar'); if(!canvas)return;
+    if(proDnaCh){proDnaCh.destroy();proDnaCh=null;}
+    const hexPl={id:'proHex',beforeDraw(chart){
+      const{ctx,chartArea:ca}=chart; if(!ca)return;
+      const cx=(ca.left+ca.right)/2,cy=(ca.top+ca.bottom)/2;
+      const maxR=Math.min(ca.width,ca.height)/2*0.82;
+      ctx.save();
+      for(let lv=5;lv>=1;lv--){
+        const r=maxR*(lv/5); ctx.beginPath();
+        for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+        ctx.closePath();
+        ctx.strokeStyle=lv===5?'rgba(139,92,246,0.18)':'rgba(139,92,246,0.07)';
+        ctx.lineWidth=lv===5?0.8:0.4; ctx.stroke();
+        if(lv===1){ctx.fillStyle='rgba(139,92,246,0.03)';ctx.fill();}
+      }
+      for(let i=0;i<6;i++){const a=(Math.PI*2*i/6)-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+maxR*Math.cos(a),cy+maxR*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=0.4;ctx.stroke();}
+      ctx.restore();
+    }};
+    proDnaCh=new Chart(canvas.getContext('2d'),{
+      type:'radar',
+      data:{labels:['C','D','A','E','En','V'],datasets:[
+        {data:scores,backgroundColor:'rgba(139,92,246,0.12)',borderColor:'rgba(167,139,250,0.7)',borderWidth:1.2,pointRadius:2,pointBackgroundColor:'#a78bfa',pointBorderColor:'rgba(0,0,0,0.5)',pointBorderWidth:1,fill:true,tension:0.05},
+        {data:scores.map(s=>s*0.65),backgroundColor:'rgba(255,255,255,0.02)',borderColor:'rgba(255,255,255,0.07)',borderWidth:0.5,pointRadius:0,fill:true}
+      ]},
+      plugins:[hexPl],
+      options:{responsive:true,maintainAspectRatio:true,animation:{duration:900},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{r:{display:false,min:0,max:100}},elements:{line:{borderJoinStyle:'round'}}}
+    });
+  })();
+
+  // ── ⑦ Highlight Bulan Ini ──
+  (function(){
+    const widget=$s('pro-bw-widget'); if(!widget)return;
+    const now=new Date(), ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    const thisMonth=trades.filter(t=>(t.date||'').startsWith(ym));
+    if(thisMonth.length<1){widget.style.display='none';return;}
+    widget.style.display='block';
+    const best=thisMonth.reduce((a,b)=>b.pnl>a.pnl?b:a);
+    const worst=thisMonth.reduce((a,b)=>b.pnl<a.pnl?b:a);
+    const ml=$s('pro-bw-month'); if(ml) ml.textContent=now.toLocaleString('id-ID',{month:'long',year:'numeric'});
+    set('pro-bw-best-pair',best.pair||'—');
+    const bpnl=$s('pro-bw-best-pnl'); if(bpnl){bpnl.textContent=(best.pnl>=0?'+$':'-$')+f2(Math.abs(best.pnl));bpnl.style.color='#00d97e';}
+    set('pro-bw-worst-pair',worst.pair||'—');
+    const wpnl=$s('pro-bw-worst-pnl'); if(wpnl){wpnl.textContent=(worst.pnl>=0?'+$':'-$')+f2(Math.abs(worst.pnl));wpnl.style.color='#ff4d4d';}
+  })();
+
+  // ── ⑧ Monthly Goals (mirror dari goals-widget) ──
+  (function(){
+    const src=document.getElementById('goals-widget');
+    const dst=document.getElementById('pro-goals-widget');
+    if(!dst)return;
+    if(!src||src.style.display==='none'){dst.style.display='none';return;}
+    dst.style.display='block';
+    // Mirror goals-grid innerHTML
+    const srcGrid=document.getElementById('goals-grid');
+    const dstGrid=document.getElementById('pro-goals-grid');
+    if(srcGrid&&dstGrid) dstGrid.innerHTML=srcGrid.innerHTML;
+    // Mirror progress bar
+    const srcBar=document.getElementById('goals-month-bar');
+    const dstBar=document.getElementById('pro-month-bar');
+    if(srcBar&&dstBar) dstBar.style.width=srcBar.style.width;
+    const srcPct=document.getElementById('goals-month-pct');
+    const dstPct=document.getElementById('pro-month-pct');
+    if(srcPct&&dstPct) dstPct.textContent=srcPct.textContent;
+    // Mirror streak badge
+    const srcBadge=document.getElementById('streak-badge');
+    const dstBadge=document.getElementById('pro-streak-badge');
+    if(srcBadge&&dstBadge){
+      dstBadge.style.display=srcBadge.style.display;
+      const srcNum=document.getElementById('streak-badge-num');
+      const dstNum=document.getElementById('pro-streak-num');
+      if(srcNum&&dstNum) dstNum.textContent=srcNum.textContent;
+    }
+  })();
+
+  // ── ⑨ Profile Insight (mirror dari pattern-widget) ──
+  (function(){
+    const src=document.getElementById('pattern-widget');
+    const dst=document.getElementById('pro-pattern-widget');
+    if(!dst)return;
+    if(!src||src.style.display==='none'){dst.style.display='none';return;}
+    dst.style.display='block';
+    // Trader type
+    const copyText=(srcId,dstId)=>{ const s=document.getElementById(srcId),d=document.getElementById(dstId); if(s&&d)d.textContent=s.textContent; };
+    const copyAttr=(srcId,dstId,attr)=>{ const s=document.getElementById(srcId),d=document.getElementById(dstId); if(s&&d)d[attr]=s[attr]; };
+    copyText('tt-type','pro-tt-type');
+    copyText('tt-desc','pro-tt-desc');
+    const srcBadge=document.getElementById('tt-badge');
+    const dstBadge=document.getElementById('pro-tt-badge');
+    if(srcBadge&&dstBadge){dstBadge.textContent=srcBadge.textContent;dstBadge.style.cssText=srcBadge.style.cssText;}
+    const srcIcon=document.getElementById('tt-icon');
+    const dstIcon=document.getElementById('pro-tt-icon');
+    if(srcIcon&&dstIcon){dstIcon.className=srcIcon.className;}
+    const srcBox=document.getElementById('tt-icon-box');
+    const dstBox=document.getElementById('pro-tt-icon-box');
+    if(srcBox&&dstBox){dstBox.style.background=srcBox.style.background;dstBox.style.borderColor=srcBox.style.borderColor;}
+    // Pattern insights
+    const srcList=document.getElementById('pattern-insights-list');
+    const dstList=document.getElementById('pro-insights-list');
+    if(srcList&&dstList) dstList.innerHTML=srcList.innerHTML;
+    // Trade count
+    copyText('pattern-trade-count','pro-pattern-count');
+  })();
 }
 
 function renderPnl(){
@@ -14075,7 +14578,7 @@ const _monkeyPatchTrades = setInterval(() => {
 <script>
 (function() {
   var LAYOUT_KEY = 'rpt_dash_layout';
-  var LAYOUTS = ['default', 'focus', 'compact'];
+  var LAYOUTS = ['default', 'focus', 'compact', 'pro'];
   var currentLayout = 'default';
 
   // Layout descriptions shown as tooltip/subtitle
@@ -14102,6 +14605,18 @@ const _monkeyPatchTrades = setInterval(() => {
     // In focus mode: inject inline mini calendar strip if not already there
     if (name === 'focus') {
       _ensureFocusCalStrip();
+    }
+
+    // In pro mode: show pro panel, hide dash-layout; otherwise reverse
+    var proPanel = document.getElementById('pro-layout-panel');
+    var dashLayout = document.querySelector('#page-dashboard .dash-layout');
+    if (name === 'pro') {
+      if (proPanel) proPanel.style.display = '';
+      if (dashLayout) dashLayout.style.display = 'none';
+      if (typeof renderPro === 'function') setTimeout(renderPro, 50);
+    } else {
+      if (proPanel) proPanel.style.display = 'none';
+      if (dashLayout) dashLayout.style.display = '';
     }
 
     // In compact mode: move cal-col below main-col in DOM order
