@@ -13343,6 +13343,18 @@ function resetImportModal() {
         <label class="fl"><i class="bi bi-journals" style="margin-right:4px;color:#f59e0b"></i>Catatan Tambahan</label>
         <textarea class="ta" id="pb-notes" style="min-height:60px;font-size:12px" placeholder="Nuansa, konteks pasar, timeframe terbaik, dll..."></textarea>
       </div>
+      <!-- ── IMAGE UPLOAD SECTION ── -->
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-images" style="margin-right:4px;color:#38bdf8"></i>Gambar Referensi <span style="font-weight:400;color:var(--text3);font-size:10px;margin-left:4px">(chart setup, contoh entry, dll)</span></label>
+        <div id="pb-img-dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)">
+          <input type="file" id="pb-img-input" accept="image/*" multiple style="display:none">
+          <i class="bi bi-cloud-arrow-up" style="font-size:24px;color:var(--text3);display:block;margin-bottom:6px"></i>
+          <div style="font-size:12px;color:var(--text2);font-weight:600">Klik atau drag &amp; drop gambar</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">PNG, JPG, WebP · Maks 5MB per file · Maks 6 gambar</div>
+        </div>
+        <div id="pb-img-upload-list" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
+        <div id="pb-img-preview-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:8px"></div>
+      </div>
     </div>
     <div style="padding:14px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:10px;background:var(--bg2)">
       <button class="btng" id="playbook-modal-cancel" style="flex:1">Batal</button>
@@ -13403,6 +13415,11 @@ function resetImportModal() {
           <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px"><i class="bi bi-journals" style="color:#f59e0b"></i> Catatan</div>
           <div id="pb-d-notes" style="font-size:12px;color:var(--text2);line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;white-space:pre-wrap"></div>
         </div>
+        <!-- Images gallery -->
+        <div id="pb-d-images-wrap" style="display:none">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="bi bi-images" style="color:#38bdf8"></i> Gambar Referensi</div>
+          <div id="pb-d-images-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div>
+        </div>
         <!-- Trade history for this playbook -->
         <div>
           <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="bi bi-journal-text" style="color:var(--accent)"></i> Trade Journal</div>
@@ -13422,6 +13439,17 @@ function resetImportModal() {
 </div>
 
 <!-- ════════════════════════════════════════════════════════════
+     §MODAL-PLAYBOOK-LIGHTBOX — Fullscreen image viewer
+     ════════════════════════════════════════════════════════════ -->
+<div id="pb-lightbox" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);align-items:center;justify-content:center;flex-direction:column" onclick="if(event.target===this)_closePbLightbox()">
+  <button onclick="_closePbLightbox()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;z-index:2" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.08)'"><i class="bi bi-x-lg" style="font-size:13px"></i></button>
+  <button id="pb-lb-prev" onclick="_shiftPbLb(-1)" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;z-index:2" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.08)'"><i class="bi bi-chevron-left" style="font-size:16px"></i></button>
+  <button id="pb-lb-next" onclick="_shiftPbLb(1)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:10px;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;z-index:2" onmouseover="this.style.background='rgba(255,255,255,.18)'" onmouseout="this.style.background='rgba(255,255,255,.08)'"><i class="bi bi-chevron-right" style="font-size:16px"></i></button>
+  <img id="pb-lb-img" src="" alt="" style="max-width:calc(100vw - 130px);max-height:calc(100vh - 110px);object-fit:contain;border-radius:10px;box-shadow:0 24px 64px rgba(0,0,0,.7);transition:opacity .12s">
+  <div id="pb-lb-counter" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,.45);font-family:var(--mono)">1 / 1</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
      §SCRIPT-PLAYBOOK — Playbook + Advanced Analytics Module
      ════════════════════════════════════════════════════════════ -->
 <script type="module">
@@ -13437,6 +13465,209 @@ function waitFor(fn, cb, tries=0) {
 let playbooks = []; // cached playbooks for current user
 let _pbSelectedColor = '#8b5cf6';
 let _pbDetailId = null;
+
+// ══════════════════════════════════════════════════════
+// ── CLOUDINARY CONFIG ─────────────────────────────────
+// ══════════════════════════════════════════════════════
+const _CDN_CLOUD  = 'dwkuq5mlt';
+const _CDN_PRESET = 'RiskpertradePLAYBOOK';
+const _CDN_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${_CDN_CLOUD}/image/upload`;
+
+// ── IMAGE STATE ───────────────────────────────────────
+// Each entry: { url: string, publicId: string }
+let _pbFormImages   = [];  // images in the open form
+let _pbImgUploading = 0;   // active uploads count
+let _pbPendingDeletes = []; // publicIds to delete on save (removed existing images)
+
+// ── LIGHTBOX ──────────────────────────────────────────
+let _lbImgs = [], _lbIdx = 0;
+function _lbKey(e) {
+  if(e.key==='ArrowRight') _shiftPbLb(1);
+  else if(e.key==='ArrowLeft') _shiftPbLb(-1);
+  else if(e.key==='Escape') _closePbLightbox();
+}
+window._closePbLightbox = function() {
+  document.getElementById('pb-lightbox').style.display = 'none';
+  document.removeEventListener('keydown', _lbKey);
+};
+window._shiftPbLb = function(dir) {
+  _lbIdx = (_lbIdx + dir + _lbImgs.length) % _lbImgs.length;
+  _renderLbSlide();
+};
+function _openPbLightbox(urls, startIdx) {
+  _lbImgs = urls; _lbIdx = startIdx || 0;
+  _renderLbSlide();
+  document.getElementById('pb-lightbox').style.display = 'flex';
+  document.addEventListener('keydown', _lbKey);
+}
+function _renderLbSlide() {
+  const img = document.getElementById('pb-lb-img');
+  const ctr = document.getElementById('pb-lb-counter');
+  const prv = document.getElementById('pb-lb-prev');
+  const nxt = document.getElementById('pb-lb-next');
+  img.style.opacity = '0';
+  setTimeout(() => { img.src = _lbImgs[_lbIdx]; img.style.opacity = '1'; }, 80);
+  ctr.textContent = `${_lbIdx+1} / ${_lbImgs.length}`;
+  prv.style.display = nxt.style.display = _lbImgs.length > 1 ? 'flex' : 'none';
+}
+
+// ── CLOUDINARY UPLOAD ─────────────────────────────────
+// Upload single file via unsigned preset → returns { url, publicId }
+async function _uploadToCloudinary(file, onProgress) {
+  if(file.size > 5 * 1024 * 1024) throw new Error('Ukuran file maks 5MB');
+  if(!file.type.startsWith('image/')) throw new Error('Hanya file gambar yang didukung');
+
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', _CDN_PRESET);
+    // Tag with uid so we can find/manage later
+    if(window._currentUser) fd.append('tags', `uid_${window._currentUser.uid}`);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', _CDN_UPLOAD_URL);
+    xhr.upload.onprogress = e => { if(e.lengthComputable && onProgress) onProgress(Math.round(e.loaded/e.total*100)); };
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if(res.error) { reject(new Error(res.error.message)); return; }
+        resolve({ url: res.secure_url, publicId: res.public_id });
+      } catch(e) { reject(e); }
+    };
+    xhr.onerror = () => reject(new Error('Upload gagal, cek koneksi internet'));
+    xhr.send(fd);
+  });
+}
+
+// Delete from Cloudinary via unsigned delete (only works if preset allows it, else skip silently)
+async function _deleteFromCloudinary(publicId) {
+  // Unsigned delete requires delete_token from upload response.
+  // Since we don't store that, we just remove from Firestore.
+  // For full deletion you'd need a backend/cloud function.
+  // For now, just clean up from UI / Firestore record silently.
+  console.log('[Cloudinary] Image removed from record:', publicId);
+}
+
+// ── FORM PREVIEW GRID ─────────────────────────────────
+function _renderFormPreviewGrid() {
+  const grid = document.getElementById('pb-img-preview-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  if(!_pbFormImages.length) return;
+  _pbFormImages.forEach((img, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid var(--border);background:var(--bg3);transition:transform .15s';
+    wrap.onmouseenter = () => wrap.style.transform = 'scale(1.03)';
+    wrap.onmouseleave = () => wrap.style.transform = '';
+    wrap.innerHTML = `
+      <img src="${img.url}" alt="ref ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.style.opacity='.3'">
+      <button onclick="event.stopPropagation();_pbRemoveFormImg(${i})" title="Hapus gambar"
+        style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:6px;background:rgba(0,0,0,.7);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;z-index:2;transition:background .15s"
+        onmouseover="this.style.background='rgba(239,68,68,.85)'" onmouseout="this.style.background='rgba(0,0,0,.7)'">
+        <i class="bi bi-x-lg"></i>
+      </button>`;
+    wrap.addEventListener('click', () => _openPbLightbox(_pbFormImages.map(x=>x.url), i));
+    grid.appendChild(wrap);
+  });
+}
+
+window._pbRemoveFormImg = function(idx) {
+  const img = _pbFormImages[idx];
+  if(!img) return;
+  if(img.publicId && !img._new) {
+    // existing saved image — queue for removal from Firestore record
+    _pbPendingDeletes.push(img.publicId);
+  }
+  _pbFormImages.splice(idx, 1);
+  _renderFormPreviewGrid();
+};
+
+// ── UPLOAD PROGRESS ITEM ──────────────────────────────
+function _makeProgItem(fileName) {
+  const d = document.createElement('div');
+  d.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);font-size:12px';
+  d.innerHTML = `
+    <i class="bi bi-file-image" style="color:#38bdf8;flex-shrink:0"></i>
+    <div style="flex:1;min-width:0">
+      <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-size:11px">${fileName}</div>
+      <div style="height:3px;background:var(--border);border-radius:4px;margin-top:5px;overflow:hidden">
+        <div class="pb-prog-bar" style="height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width .15s"></div>
+      </div>
+    </div>
+    <span class="pb-prog-pct" style="font-family:var(--mono);font-size:10px;color:var(--text3);flex-shrink:0;min-width:30px;text-align:right">0%</span>`;
+  return d;
+}
+
+// ── HANDLE FILE INPUT ─────────────────────────────────
+async function _handlePbFiles(files) {
+  if(!window._currentUser) { alert('Login dulu untuk upload gambar'); return; }
+  const remaining = 6 - _pbFormImages.length;
+  if(remaining <= 0) { alert('Maksimal 6 gambar per strategi'); return; }
+  files = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, remaining);
+  if(!files.length) return;
+
+  const uploadList = document.getElementById('pb-img-upload-list');
+  const saveBtn    = document.getElementById('playbook-save-btn');
+
+  for(const file of files) {
+    const item = _makeProgItem(file.name);
+    uploadList.appendChild(item);
+    const bar = item.querySelector('.pb-prog-bar');
+    const pct = item.querySelector('.pb-prog-pct');
+
+    _pbImgUploading++;
+    if(saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = `<i class="bi bi-cloud-arrow-up" style="font-size:13px"></i> Upload gambar...`; }
+
+    try {
+      const result = await _uploadToCloudinary(file, p => {
+        bar.style.width = p + '%';
+        pct.textContent = p + '%';
+      });
+      _pbFormImages.push({ ...result, _new: true });
+      item.remove();
+      _renderFormPreviewGrid();
+    } catch(e) {
+      pct.textContent = '✕';
+      pct.style.color = '#ef4444';
+      bar.style.background = '#ef4444';
+      bar.style.width = '100%';
+      item.querySelector('.pb-prog-bar').parentElement.previousElementSibling.textContent = e.message || 'Gagal';
+      setTimeout(() => item.remove(), 3000);
+    }
+
+    _pbImgUploading = Math.max(0, _pbImgUploading - 1);
+    if(_pbImgUploading === 0 && saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Playbook';
+    }
+  }
+  // reset input
+  const inp = document.getElementById('pb-img-input');
+  if(inp) inp.value = '';
+}
+
+// ── WIRE UP DROPZONE (called each time modal opens) ───
+function _initPbDropzone() {
+  const zone  = document.getElementById('pb-img-dropzone');
+  const input = document.getElementById('pb-img-input');
+  if(!zone || !input) return;
+
+  // Clone to remove stale listeners
+  const newInput = input.cloneNode(true);
+  input.parentNode.replaceChild(newInput, input);
+  newInput.addEventListener('change', () => _handlePbFiles(newInput.files));
+
+  // Click on zone triggers input (zone itself has onclick inline already removed above, re-add)
+  zone.onclick = () => newInput.click();
+  zone.ondragover = e => { e.preventDefault(); zone.style.borderColor='var(--accent)'; zone.style.background='rgba(139,92,246,.06)'; };
+  zone.ondragleave = () => { zone.style.borderColor='var(--border)'; zone.style.background='var(--bg3)'; };
+  zone.ondrop = e => {
+    e.preventDefault();
+    zone.style.borderColor='var(--border)';
+    zone.style.background='var(--bg3)';
+    _handlePbFiles(e.dataTransfer.files);
+  };
+}
 
 // ── Firestore helpers — reuse functions from main module (same SDK version!)
 // DO NOT re-import firebase-firestore here; it would create a version mismatch
@@ -13614,7 +13845,10 @@ window.renderPlaybook = function() {
           <div style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pb.name}</div>
           <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pb.desc || 'Belum ada deskripsi'}</div>
         </div>
-        <div style="background:${col}22;color:${col};border:1px solid ${col}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;flex-shrink:0;margin-left:10px;font-family:var(--mono)">${wr !== null ? wr+'% WR' : 'No data'}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px">
+          ${pb.images && pb.images.length ? `<div style="background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px"><i class="bi bi-images" style="font-size:9px"></i>${pb.images.length}</div>` : ''}
+          <div style="background:${col}22;color:${col};border:1px solid ${col}44;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;font-family:var(--mono)">${wr !== null ? wr+'% WR' : 'No data'}</div>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-left:8px">
         <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px">
@@ -13634,6 +13868,14 @@ window.renderPlaybook = function() {
       <div style="padding-left:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
         ${_buildSparkline(pb.id, col)}
       </div>
+      ${pb.images && pb.images.length ? `
+      <div style="padding-left:8px;margin-top:10px;display:flex;gap:5px;overflow:hidden">
+        ${pb.images.slice(0,5).map((img,i) => `
+          <div style="width:42px;height:42px;border-radius:7px;overflow:hidden;flex-shrink:0;border:1px solid rgba(255,255,255,.1);position:relative;background:var(--bg3)">
+            <img src="${img.url}" alt="" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy">
+            ${i===4 && pb.images.length > 5 ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">+${pb.images.length-4}</div>` : ''}
+          </div>`).join('')}
+      </div>` : ''}
     `;
     list.appendChild(card);
   });
@@ -13663,7 +13905,39 @@ function openPlaybookDetail(id) {
   setSection('pb-d-rules-wrap','pb-d-rules', pb.rules);
   setSection('pb-d-notes-wrap','pb-d-notes', pb.notes);
 
-  // Stats
+  // ── Images gallery
+  const imgWrap = document.getElementById('pb-d-images-wrap');
+  const imgGrid = document.getElementById('pb-d-images-grid');
+  if(pb.images && pb.images.length > 0) {
+    imgWrap.style.display = 'block';
+    imgGrid.innerHTML = '';
+    const urls = pb.images.map(img => img.url);
+    pb.images.forEach((img, i) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:zoom-in;border:1px solid var(--border);background:var(--bg3);transition:transform .15s,box-shadow .15s';
+      wrap.onmouseenter = () => { wrap.style.transform='scale(1.04)'; wrap.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'; };
+      wrap.onmouseleave = () => { wrap.style.transform=''; wrap.style.boxShadow=''; };
+      wrap.innerHTML = `<img src="${img.url}" alt="ref ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.style.opacity='.3'">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .15s;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s" class="pb-img-overlay">
+          <i class="bi bi-zoom-in" style="color:#fff;font-size:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))"></i>
+        </div>`;
+      wrap.onmouseenter = () => {
+        wrap.style.transform='scale(1.04)'; wrap.style.boxShadow='0 8px 24px rgba(0,0,0,.4)';
+        wrap.querySelector('.pb-img-overlay').style.opacity='1';
+        wrap.querySelector('.pb-img-overlay').style.background='rgba(0,0,0,.25)';
+      };
+      wrap.onmouseleave = () => {
+        wrap.style.transform=''; wrap.style.boxShadow='';
+        wrap.querySelector('.pb-img-overlay').style.opacity='0';
+        wrap.querySelector('.pb-img-overlay').style.background='rgba(0,0,0,0)';
+      };
+      wrap.addEventListener('click', () => _openPbLightbox(urls, i));
+      imgGrid.appendChild(wrap);
+    });
+  } else {
+    imgWrap.style.display = 'none';
+    imgGrid.innerHTML = '';
+  }
   const trades = (window._trades || []).filter(t => t.playbookId === id);
   const wins = trades.filter(t => t.result==='Win');
   const losses = trades.filter(t => t.result==='Loss');
@@ -13731,6 +14005,16 @@ function openPlaybookModal(id) {
     b.style.border = isActive ? `2px solid white` : '2px solid transparent';
     b.style.transform = isActive ? 'scale(1.2)' : 'scale(1)';
   });
+
+  // ── Reset image state for this modal session
+  _pbFormImages     = editing && editing.images ? editing.images.map(img => ({ ...img })) : [];
+  _pbPendingDeletes = [];
+  _pbImgUploading   = 0;
+  const uploadList  = document.getElementById('pb-img-upload-list');
+  if(uploadList) uploadList.innerHTML = '';
+  _renderFormPreviewGrid();
+  _initPbDropzone();
+
   document.getElementById('md-playbook').classList.add('open');
   setTimeout(() => document.getElementById('pb-name').focus(), 80);
 }
@@ -13798,11 +14082,15 @@ document.getElementById('playbook-save-btn').addEventListener('click', async () 
     rules: document.getElementById('pb-rules').value.trim(),
     notes: document.getElementById('pb-notes').value.trim(),
     color: _pbSelectedColor,
+    images: _pbFormImages.map(({ url, publicId }) => ({ url, publicId })),
   };
   const editId = document.getElementById('pb-edit-id').value;
   if(editId) data.id = editId;
   try {
     await savePlaybook(data);
+    // Clean up removed images from Cloudinary record (silent)
+    for(const pid of _pbPendingDeletes) await _deleteFromCloudinary(pid);
+    _pbPendingDeletes = [];
     document.getElementById('md-playbook').classList.remove('open');
   } catch(e) {
     console.error('savePlaybook error:', e);
