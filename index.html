@@ -2963,11 +2963,11 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div class="login-err" id="login-err">Gagal mengirim. Coba lagi.</div>
       <div class="login-loading" id="login-loading">⏳ Mengirim link…</div>
 
-      <!-- Early access note -->
+      <!-- Free tier note -->
       <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.1);border-radius:8px;padding:7px 11px;margin-top:12px;text-align:left">
-        <div style="font-size:10px;color:rgba(255,255,255,.25);line-height:1.5">Akun cloud memerlukan akses terdaftar. Belum punya?
+        <div style="font-size:10px;color:rgba(255,255,255,.25);line-height:1.5">Akun gratis: <strong style="color:rgba(255,255,255,.4)">10 trade/bulan</strong>. Upgrade ke premium untuk unlimited.
           <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
-            style="color:#a78bfa;text-decoration:none;font-weight:600">@journalingtoolsid →</a>
+            style="color:#a78bfa;text-decoration:none;font-weight:600">Info upgrade →</a>
         </div>
       </div>
     </div>
@@ -6786,37 +6786,69 @@ const $ = id => document.getElementById(id);
 const f2 = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const isMob = () => window.innerWidth <= 768;
 
-// ── INVITE CHECK ───────────────────────────────────────
-async function isEmailInvited(email, uid) {
-  if (!email) return false;
+// ════════════════════════════════════════════════════
+// ── FREEMIUM ACCESS SYSTEM ───────────────────────────
+// Free: semua user bisa login + catat, max FREE_MONTHLY_LIMIT trade/bulan
+// Premium: email ada di /invites/{email} dengan active:true → unlimited
+// ════════════════════════════════════════════════════
+const FREE_MONTHLY_LIMIT = 10; // trade gratis per bulan
+let _isPremiumCache = null;    // cached per session setelah login
 
-  // ── Check 1: whitelist (/invites/{email}) ──────────────
-  const inviteRef = doc(db, 'invites', email.toLowerCase().trim());
-  const inviteSnap = await getDoc(inviteRef);
-  if (inviteSnap.exists() && inviteSnap.data().active !== false) {
-    return true;
-  }
+// Cek apakah user premium (ada di whitelist invites)
+async function isPremium(user) {
+  if (!user || user.isAnonymous) return false;
+  if (_isPremiumCache !== null) return _isPremiumCache;
 
-  // ── Check 2: existing user (grandfathered) ─────────────
-  // Users who had an account before the invite system was added
-  // are allowed in if they already have a /users/{uid} document.
-  if (uid) {
-    const userRef = doc(db, 'users', uid);
+  try {
+    // Cek 1: email di /invites/{email}
+    if (user.email) {
+      const inviteRef = doc(db, 'invites', user.email.toLowerCase().trim());
+      const inviteSnap = await getDoc(inviteRef);
+      if (inviteSnap.exists() && inviteSnap.data().active !== false) {
+        _isPremiumCache = true;
+        return true;
+      }
+    }
+    // Cek 2: field premium di /users/{uid}
+    const userRef = doc(db, 'users', user.uid);
     const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      // Auto-add them to invites so future checks are faster
-      try {
-        await setDoc(inviteRef, {
-          active: true,
-          grandfathered: true,
-          addedAt: new Date().toISOString().slice(0,10),
-          name: email,
-        }, { merge: true });
-      } catch(e) {} // non-critical, ignore errors
+    if (userSnap.exists() && userSnap.data().premium === true) {
+      _isPremiumCache = true;
       return true;
     }
-  }
+  } catch(e) { console.warn('isPremium check error:', e); }
 
+  _isPremiumCache = false;
+  return false;
+}
+
+// Hitung trade bulan berjalan (YYYY-MM)
+function getThisMonthCount() {
+  const prefix = new Date().toISOString().slice(0, 7); // "2026-04"
+  return trades.filter(t => (t.date || '').startsWith(prefix)).length;
+}
+
+// Cek apakah user boleh tambah trade baru
+// Returns: { allowed: true } atau { allowed: false, reason: 'free_limit' | 'guest' }
+async function canAddTrade() {
+  if (!currentUser) return { allowed: false, reason: 'guest' };
+  if (currentUser.isAnonymous) return { allowed: false, reason: 'anon' };
+  if (await isPremium(currentUser)) return { allowed: true };
+  const count = getThisMonthCount();
+  if (count < FREE_MONTHLY_LIMIT) return { allowed: true };
+  return { allowed: false, reason: 'free_limit', count };
+}
+
+// Expose global untuk dipakai di updateAnonCounter variant baru
+window._getThisMonthCount = getThisMonthCount;
+window._FREE_MONTHLY_LIMIT = FREE_MONTHLY_LIMIT;
+
+// ── (kept for compatibility) isEmailInvited masih dipakai di upgrade modal ──
+async function isEmailInvited(email, uid) {
+  if (!email) return false;
+  const inviteRef = doc(db, 'invites', email.toLowerCase().trim());
+  const inviteSnap = await getDoc(inviteRef);
+  if (inviteSnap.exists() && inviteSnap.data().active !== false) return true;
   return false;
 }
 
@@ -7014,15 +7046,6 @@ async function handleSendMagic() {
   $('login-loading').style.display= 'block';
   $('send-magic-btn').disabled    = true;
 
-  // Check invite first before sending
-  const invited = await isEmailInvited(email, null);
-  if (!invited) {
-    $('login-loading').style.display = 'none';
-    $('send-magic-btn').disabled     = false;
-    showNotInvited(email);
-    return;
-  }
-
   try {
     await sendMagicLink(email);
     $('login-loading').style.display = 'none';
@@ -7111,6 +7134,121 @@ $('anon-btn').addEventListener('click', async () => {
 function openAnonLimitModal() {
   $('md-anon-limit').classList.add('open');
 }
+
+// ── FREE LIMIT MODAL — untuk free user yang sudah 10 trade/bulan ──
+function openFreeLimitModal() {
+  const el = document.getElementById('md-free-limit');
+  if (el) { el.classList.add('open'); return; }
+
+  const count = getThisMonthCount();
+  const mo = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+  const modal = document.createElement('div');
+  modal.id = 'md-free-limit';
+  modal.className = 'mo open';
+  modal.innerHTML = `
+  <div class="md" style="max-width:440px;text-align:center;padding:36px 32px">
+    <!-- Icon -->
+    <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;box-shadow:0 0 32px rgba(139,92,246,.15)">🔒</div>
+
+    <!-- Heading -->
+    <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-bottom:8px;font-family:var(--font)">Batas Free Tercapai</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px">
+      Kamu sudah mencatat <strong style="color:var(--accent2)">${count} trade</strong> bulan ${mo}.<br>
+      Limit akun free adalah <strong style="color:#fff">${FREE_MONTHLY_LIMIT} trade/bulan</strong>.
+    </div>
+
+    <!-- Stats bar -->
+    <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:14px 18px;margin-bottom:22px;text-align:left">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Trade Bulan Ini</span>
+        <span style="font-size:12px;font-family:var(--mono);color:var(--accent2);font-weight:700">${count} / ${FREE_MONTHLY_LIMIT}</span>
+      </div>
+      <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="width:100%;height:100%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);border-radius:3px"></div>
+      </div>
+    </div>
+
+    <!-- Upgrade benefit list -->
+    <div style="background:rgba(0,217,126,.04);border:1px solid rgba(0,217,126,.15);border-radius:12px;padding:14px 16px;margin-bottom:22px;text-align:left">
+      <div style="font-size:11px;font-weight:700;color:#00d97e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">⚡ Upgrade ke Premium</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Catat <strong style="color:#fff">unlimited trade</strong> setiap bulan</div>
+        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Semua analytics & pattern detector</div>
+        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Daily journal, goals & streak tracking</div>
+        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Export report card & share stats</div>
+      </div>
+    </div>
+
+    <!-- Harga -->
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Sekali bayar · <span style="color:var(--accent2)">Support pengembangan app ini</span></div>
+
+    <!-- CTA button -->
+    <a href="https://lynk.id/regy_trader" target="_blank" rel="noopener"
+       style="display:block;width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border-radius:12px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 18px rgba(139,92,246,.4);margin-bottom:12px;font-family:var(--font);letter-spacing:-.2px;transition:all .2s"
+       onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(139,92,246,.5)'"
+       onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(139,92,246,.4)'">
+      ⚡ Upgrade Sekarang →
+    </a>
+
+    <div style="font-size:11px;color:var(--text3);margin-bottom:18px">
+      Sudah upgrade? Kirim konfirmasi ke
+      <a href="https://instagram.com/journalingtoolsid" target="_blank" style="color:var(--accent2);text-decoration:none">@journalingtoolsid</a>
+    </div>
+
+    <button id="fl-close-btn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text3);padding:9px 24px;border-radius:10px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
+      Tutup — lanjut lihat data lama
+    </button>
+  </div>`;
+
+  document.body.appendChild(modal);
+  modal.querySelector('#fl-close-btn').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+}
+
+// ── FREEMIUM UI — update badge di sidebar / topbar ──────────────
+function updateFreemiumUI(isPrem) {
+  // Update atau inject badge count di sidebar
+  const badge = document.getElementById('free-trade-badge');
+  if (isPrem) {
+    if (badge) badge.style.display = 'none';
+    return;
+  }
+  const count = getThisMonthCount();
+  const rem   = Math.max(0, FREE_MONTHLY_LIMIT - count);
+  const pct   = Math.min(count / FREE_MONTHLY_LIMIT * 100, 100);
+
+  if (!badge) {
+    // Inject badge setelah elemen user info di sidebar
+    const target = document.getElementById('signout-btn');
+    if (target && target.parentNode) {
+      const div = document.createElement('div');
+      div.id = 'free-trade-badge';
+      div.style.cssText = 'margin:8px 12px 4px;padding:10px 12px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:10px;font-size:11px;transition:all .3s';
+      target.parentNode.insertBefore(div, target.nextSibling);
+    }
+  }
+
+  const el = document.getElementById('free-trade-badge');
+  if (!el) return;
+
+  const color = rem === 0 ? '#ff4d4d' : rem <= 3 ? '#f59e0b' : '#a78bfa';
+  el.style.borderColor = rem === 0 ? 'rgba(255,77,77,.3)' : rem <= 3 ? 'rgba(245,158,11,.3)' : 'rgba(139,92,246,.18)';
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Trade Bulan Ini</span>
+      <span style="font-family:var(--mono);color:${color};font-weight:700">${count}/${FREE_MONTHLY_LIMIT}</span>
+    </div>
+    <div style="height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:6px">
+      <div style="width:${pct}%;height:100%;background:${color};border-radius:2px;transition:width .4s"></div>
+    </div>
+    <div style="color:${color};font-size:10px">
+      ${rem === 0 ? '🔒 Limit tercapai · <span style="cursor:pointer;text-decoration:underline" onclick="openFreeLimitModal()">Upgrade →</span>' : rem <= 3 ? `⚠ Sisa ${rem} trade gratis bulan ini` : `${rem} trade tersisa bulan ini`}
+    </div>`;
+  el.style.display = 'block';
+}
+window.openFreeLimitModal = openFreeLimitModal;
+window.updateFreemiumUI = updateFreemiumUI;
 $('limit-close-btn').addEventListener('click', () => {
   $('md-anon-limit').classList.remove('open');
 });
@@ -7155,16 +7293,6 @@ async function handleUpgradeSend() {
   $('upgrade-err').style.display    = 'none';
   $('upgrade-loading').style.display = 'block';
   $('upgrade-send-btn').disabled     = true;
-
-  // Check invite — anonymous upgrading still needs to be invited
-  const invited = await isEmailInvited(email, null);
-  if (!invited) {
-    $('upgrade-loading').style.display = 'none';
-    $('upgrade-send-btn').disabled     = false;
-    $('upgrade-err').style.display     = 'block';
-    $('upgrade-err').textContent       = 'Email ini belum terdaftar. Hubungi admin untuk akses.';
-    return;
-  }
 
   try {
     // Store email + anon UID so we can link after redirect
@@ -7220,10 +7348,8 @@ function setAnonUI(isAnon) {
     $('user-email').textContent = 'Belum tersimpan — klik Simpan Akun';
     $('signout-btn').title      = 'Keluar (data akan hilang)';
     updateAnonCounter();
-    // Anonymous: hide the upgrade CTA (show anon-banner instead)
     setFloatCTA(false);
   } else {
-    // Logged-in (non-anonymous): hide upgrade CTA — user sudah punya akun
     setFloatCTA(false);
   }
 }
@@ -7380,6 +7506,7 @@ $('md-logout').addEventListener('click', e => { if(e.target===$('md-logout')) $(
 $('logout-confirm').addEventListener('click', async () => {
   $('md-logout').classList.remove('open');
   if (unsubTrades) { unsubTrades(); unsubTrades = null; }
+  _isPremiumCache = null;
   await signOut(auth);
   // onAuthStateChanged handles reset — app stays visible in guest mode
 });
@@ -7392,7 +7519,7 @@ $('user-avatar').addEventListener('click', () => {
 // ── AUTH STATE CHANGE ─────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (user) {
-    // ── Anonymous user — skip invite check ─────────────
+    // ── Anonymous user ──────────────────────────────────
     if (user.isAnonymous) {
       currentUser = user;
       closeLoginScreen();
@@ -7409,29 +7536,25 @@ onAuthStateChanged(auth, async user => {
       }
       return;
     }
-    // ── Invite check (email users only) ────────────────
-    $('login-loading').style.display = 'block';
-    const invited = await isEmailInvited(user.email, user.uid);
-    if (!invited) {
-      const rejectedEmail = user.email;
-      await signOut(auth);
-      $('login-loading').style.display = 'none';
-      showNotInvited(rejectedEmail);
-      return;
-    }
-    // ── Invited email user — proceed ───────────────────
+    // ── Email / Google user — langsung masuk, tidak perlu invite ──
+    _isPremiumCache = null; // reset cache tiap login
     currentUser = user;
     window._currentUser = user;
     window._db = db;
+    $('login-loading').style.display = 'none';
     closeLoginScreen();
     showLoginPanel();
     setAuthUI(true);
-    setAnonUI(false); // hide anon banner
+    setAnonUI(false);
     await loadUserProfile(user);
     listenTrades(user.uid);
     updateFinanceNav();
     if (isOwner()) listenFinance();
     listenDaily();
+    // Cek premium status untuk update UI badge
+    isPremium(user).then(premium => {
+      updateFreemiumUI(premium);
+    });
     if (pendingAction === 'openTrade') {
       pendingAction = null;
       setTimeout(() => openTrade(), 600);
@@ -8097,18 +8220,25 @@ function openTrade() {
     openLoginScreen('log');
     return;
   }
-  if (currentUser.isAnonymous && trades.length >= ANON_LIMIT) {
+  if (currentUser.isAnonymous) {
+    // Anon: arahkan ke login/upgrade
     openAnonLimitModal();
     return;
   }
-  clearScreenshot();
-  $('f-dt').value = new Date().toISOString().slice(0,10);
-  _resetTradeModal();
-  $('md-trade').classList.add('open');
-  // scroll modal body to top
-  const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
-  if (body) body.scrollTop = 0;
-  setTimeout(() => $('f-pair').focus(), 80);
+  // Freemium check — async
+  canAddTrade().then(result => {
+    if (!result.allowed && result.reason === 'free_limit') {
+      openFreeLimitModal();
+      return;
+    }
+    clearScreenshot();
+    $('f-dt').value = new Date().toISOString().slice(0,10);
+    _resetTradeModal();
+    $('md-trade').classList.add('open');
+    const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
+    if (body) body.scrollTop = 0;
+    setTimeout(() => $('f-pair').focus(), 80);
+  });
 }
 
 function closeTradeModal() {
@@ -8569,6 +8699,12 @@ function updateAll() {
   if (currentUser) updateTraderCard(currentUser);
   // Update anon counter if applicable
   if (currentUser && currentUser.isAnonymous) updateAnonCounter();
+  // Update freemium badge untuk free users
+  if (currentUser && !currentUser.isAnonymous) {
+    if (_isPremiumCache === false) updateFreemiumUI(false);
+    else if (_isPremiumCache === true) updateFreemiumUI(true);
+    // jika null (belum dicek), biarkan — isPremium akan update setelah login
+  }
   // Notify advanced analytics and playbook modules
   if (window._advAnalyticsReady) window.renderAdvancedAnalytics && window.renderAdvancedAnalytics();
   // Best & Worst trade widget
