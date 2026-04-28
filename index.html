@@ -2964,10 +2964,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div class="login-loading" id="login-loading">⏳ Mengirim link…</div>
 
       <!-- Free tier note -->
-      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.1);border-radius:8px;padding:7px 11px;margin-top:12px;text-align:left">
-        <div style="font-size:10px;color:rgba(255,255,255,.25);line-height:1.5">Akun gratis: <strong style="color:rgba(255,255,255,.4)">10 trade/bulan</strong>. Upgrade ke premium untuk unlimited.
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.1);border-radius:8px;padding:9px 12px;margin-top:12px;text-align:left">
+        <div style="font-size:10px;color:rgba(255,255,255,.3);line-height:1.6;margin-bottom:5px">
+          <strong style="color:rgba(255,255,255,.5)">✦ Akun Gratis:</strong> 10 trade · 3 playbook · 5 daily journal per bulan
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3);line-height:1.6">
+          <strong style="color:#a78bfa">⚡ Premium:</strong> Unlimited trade, DNA Radar, PropFirm tracker & lebih ·
           <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
-            style="color:#a78bfa;text-decoration:none;font-weight:600">Info upgrade →</a>
+            style="color:#a78bfa;text-decoration:none;font-weight:600">Lihat benefit →</a>
         </div>
       </div>
     </div>
@@ -5240,6 +5244,20 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 #trader-type-card:hover #tt-icon-box {
   transform: scale(1.08);
 }
+/* ── FREEMIUM / PRO UI ─────────────────────────────── */
+#md-feature-gate .md { animation: fgSlideIn .28s cubic-bezier(.34,1.3,.64,1); }
+@keyframes fgSlideIn {
+  from { opacity:0; transform:scale(.93) translateY(12px); }
+  to   { opacity:1; transform:scale(1)   translateY(0); }
+}
+.prem-lock { display:flex; align-items:center; margin-left:auto; }
+.dna-lock-overlay { animation: dnaFadeIn .3s ease; }
+@keyframes dnaFadeIn { from{opacity:0} to{opacity:1} }
+#pro-avatar-badge { animation: proBadgeIn .4s cubic-bezier(.34,1.56,.64,1); }
+@keyframes proBadgeIn { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
+#free-trade-badge { animation: ftbSlideDown .3s ease; }
+@keyframes ftbSlideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.ni[data-premium-locked] { position:relative; }
 </style>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -6787,12 +6805,30 @@ const f2 = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractio
 const isMob = () => window.innerWidth <= 768;
 
 // ════════════════════════════════════════════════════
-// ── FREEMIUM ACCESS SYSTEM ───────────────────────────
-// Free: semua user bisa login + catat, max FREE_MONTHLY_LIMIT trade/bulan
-// Premium: email ada di /invites/{email} dengan active:true → unlimited
+// ── FREEMIUM ACCESS SYSTEM v2 ─────────────────────
+// FREE TIER:
+//   - 10 trade journal/bulan
+//   - 3 playbook strategies
+//   - 5 daily journal entries/bulan
+//   - Risk Calculator ✅ (selalu)
+//   - Analytics dasar (tanpa DNA Radar)
+//   - PropFirm tracker ❌ (premium only)
+//   - Daily Reminder ❌ (premium only)
+//
+// PREMIUM TIER (email di /invites/{email}):
+//   - Unlimited trade journal
+//   - 15 playbook strategies
+//   - Unlimited daily journal
+//   - DNA Radar Analysis
+//   - PropFirm tracker
+//   - Daily Reminder
+//   - Badge PRO di profile
 // ════════════════════════════════════════════════════
-const FREE_MONTHLY_LIMIT = 10; // trade gratis per bulan
-let _isPremiumCache = null;    // cached per session setelah login
+const FREE_MONTHLY_LIMIT   = 10;  // trade journal/bulan
+const FREE_PLAYBOOK_LIMIT  = 3;   // max playbook strategies
+const FREE_DAILY_LIMIT     = 5;   // daily journal entries/bulan
+const PREM_PLAYBOOK_LIMIT  = 15;  // premium playbook max
+let _isPremiumCache = null;       // cached per session setelah login
 
 // Cek apakah user premium (ada di whitelist invites)
 async function isPremium(user) {
@@ -6824,26 +6860,55 @@ async function isPremium(user) {
 
 // Hitung trade bulan berjalan (YYYY-MM)
 function getThisMonthCount() {
-  const prefix = new Date().toISOString().slice(0, 7); // "2026-04"
+  const prefix = new Date().toISOString().slice(0, 7);
   return trades.filter(t => (t.date || '').startsWith(prefix)).length;
 }
 
-// Cek apakah user boleh tambah trade baru
-// Returns: { allowed: true } atau { allowed: false, reason: 'free_limit' | 'guest' }
+// Hitung daily journal entries bulan berjalan
+function getThisMonthDailyCount() {
+  const prefix = new Date().toISOString().slice(0, 7);
+  return Object.keys(dailyData || {}).filter(k => k.startsWith(prefix)).length;
+}
+
+// Cek apakah boleh tambah trade
 async function canAddTrade() {
   if (!currentUser) return { allowed: false, reason: 'guest' };
   if (currentUser.isAnonymous) return { allowed: false, reason: 'anon' };
   if (await isPremium(currentUser)) return { allowed: true };
   const count = getThisMonthCount();
   if (count < FREE_MONTHLY_LIMIT) return { allowed: true };
-  return { allowed: false, reason: 'free_limit', count };
+  return { allowed: false, reason: 'free_limit', count, feature: 'trade' };
 }
 
-// Expose global untuk dipakai di updateAnonCounter variant baru
-window._getThisMonthCount = getThisMonthCount;
-window._FREE_MONTHLY_LIMIT = FREE_MONTHLY_LIMIT;
+// Cek apakah boleh tambah playbook
+async function canAddPlaybook(currentCount) {
+  if (!currentUser || currentUser.isAnonymous) return { allowed: false, reason: 'anon' };
+  if (await isPremium(currentUser)) return { allowed: currentCount < PREM_PLAYBOOK_LIMIT };
+  return { allowed: currentCount < FREE_PLAYBOOK_LIMIT, reason: 'free_limit', feature: 'playbook' };
+}
 
-// ── (kept for compatibility) isEmailInvited masih dipakai di upgrade modal ──
+// Cek apakah boleh simpan daily journal hari ini
+async function canSaveDailyJournal(dateStr) {
+  if (!currentUser || currentUser.isAnonymous) return { allowed: false, reason: 'anon' };
+  if (await isPremium(currentUser)) return { allowed: true };
+  // Jika entry untuk hari ini sudah ada, boleh edit
+  if (dailyData && dailyData[dateStr]) return { allowed: true };
+  const count = getThisMonthDailyCount();
+  if (count < FREE_DAILY_LIMIT) return { allowed: true };
+  return { allowed: false, reason: 'free_limit', count, feature: 'daily' };
+}
+
+// Expose globals
+window._getThisMonthCount      = getThisMonthCount;
+window._getThisMonthDailyCount = getThisMonthDailyCount;
+window._FREE_MONTHLY_LIMIT     = FREE_MONTHLY_LIMIT;
+window._FREE_PLAYBOOK_LIMIT    = FREE_PLAYBOOK_LIMIT;
+window._PREM_PLAYBOOK_LIMIT    = PREM_PLAYBOOK_LIMIT;
+window._FREE_DAILY_LIMIT       = FREE_DAILY_LIMIT;
+window._isPremium              = () => _isPremiumCache;
+window.canAddPlaybook          = canAddPlaybook;
+
+// ── (kept for compatibility) ──
 async function isEmailInvited(email, uid) {
   if (!email) return false;
   const inviteRef = doc(db, 'invites', email.toLowerCase().trim());
@@ -7135,119 +7200,252 @@ function openAnonLimitModal() {
   $('md-anon-limit').classList.add('open');
 }
 
-// ── FREE LIMIT MODAL — untuk free user yang sudah 10 trade/bulan ──
-function openFreeLimitModal() {
-  const el = document.getElementById('md-free-limit');
-  if (el) { el.classList.add('open'); return; }
+// ── UNIFIED FEATURE GATE MODAL ─────────────────────────────────────────
+// feature: 'trade' | 'playbook' | 'daily' | 'dna' | 'ftmo' | 'reminder'
+function openFeatureGateModal(feature) {
+  const el = document.getElementById('md-feature-gate');
+  if (el) el.remove(); // always rebuild fresh for correct counts
 
-  const count = getThisMonthCount();
   const mo = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  const tradeCount = getThisMonthCount();
+  const dailyCount = getThisMonthDailyCount();
+
+  const CONFIGS = {
+    trade: {
+      icon: '📊',
+      title: 'Batas Trade Journal Tercapai',
+      desc: `Kamu sudah mencatat <strong style="color:var(--accent2)">${tradeCount} trade</strong> bulan ${mo}. Akun free terbatas <strong style="color:#fff">${FREE_MONTHLY_LIMIT} trade/bulan</strong>.`,
+      blocker: `${tradeCount}/${FREE_MONTHLY_LIMIT} trade digunakan bulan ini`,
+      pct: Math.min(tradeCount / FREE_MONTHLY_LIMIT * 100, 100),
+    },
+    playbook: {
+      icon: '📖',
+      title: 'Batas Playbook Tercapai',
+      desc: `Akun free hanya bisa menyimpan <strong style="color:#fff">${FREE_PLAYBOOK_LIMIT} strategi</strong> di Playbook. Upgrade untuk hingga <strong style="color:var(--accent2)">${PREM_PLAYBOOK_LIMIT} strategi</strong>.`,
+      blocker: `${FREE_PLAYBOOK_LIMIT}/${FREE_PLAYBOOK_LIMIT} playbook slots terpakai`,
+      pct: 100,
+    },
+    daily: {
+      icon: '📝',
+      title: 'Batas Daily Journal Tercapai',
+      desc: `Akun free terbatas <strong style="color:#fff">${FREE_DAILY_LIMIT} entri/bulan</strong>. Kamu sudah menyimpan <strong style="color:var(--accent2)">${dailyCount} entri</strong> bulan ${mo}.`,
+      blocker: `${dailyCount}/${FREE_DAILY_LIMIT} daily journal digunakan`,
+      pct: Math.min(dailyCount / FREE_DAILY_LIMIT * 100, 100),
+    },
+    dna: {
+      icon: '🧬',
+      title: 'Trader DNA — Fitur Premium',
+      desc: `<strong style="color:var(--accent2)">Trader DNA Radar</strong> menganalisis 6 dimensi trading kamu: Consistency, Discipline, Aggression, Execution, Endurance, Vision. Hanya tersedia untuk pengguna premium.`,
+      blocker: 'DNA Analysis terkunci',
+      pct: 0,
+    },
+    ftmo: {
+      icon: '🏆',
+      title: 'PropFirm Tracker — Fitur Premium',
+      desc: `Pantau progress <strong style="color:var(--accent2)">FTMO / challenge prop firm</strong> kamu dengan equity curve, drawdown tracker, dan status challenge secara real-time. Upgrade untuk akses penuh.`,
+      blocker: 'PropFirm Tracker terkunci',
+      pct: 0,
+    },
+    reminder: {
+      icon: '🔔',
+      title: 'Daily Reminder — Fitur Premium',
+      desc: `Atur <strong style="color:var(--accent2)">notifikasi harian</strong> yang menampilkan P&L hari ini, win rate mingguan, dan streak journal kamu. Tetap on track dengan pengingat otomatis.`,
+      blocker: 'Daily Reminder terkunci',
+      pct: 0,
+    },
+  };
+
+  const cfg = CONFIGS[feature] || CONFIGS.trade;
+  const barColor = cfg.pct >= 100 ? '#ff4d4d' : cfg.pct >= 70 ? '#f59e0b' : '#8b5cf6';
 
   const modal = document.createElement('div');
-  modal.id = 'md-free-limit';
+  modal.id = 'md-feature-gate';
   modal.className = 'mo open';
+  modal.style.cssText = 'z-index:9999';
   modal.innerHTML = `
-  <div class="md" style="max-width:440px;text-align:center;padding:36px 32px">
-    <!-- Icon -->
-    <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;box-shadow:0 0 32px rgba(139,92,246,.15)">🔒</div>
+  <div class="md" style="max-width:460px;text-align:center;padding:0;overflow:hidden;border-radius:20px;border:1px solid rgba(139,92,246,.25);background:linear-gradient(145deg,rgba(15,12,28,.98),rgba(10,9,20,.98))">
 
-    <!-- Heading -->
-    <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-bottom:8px;font-family:var(--font)">Batas Free Tercapai</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px">
-      Kamu sudah mencatat <strong style="color:var(--accent2)">${count} trade</strong> bulan ${mo}.<br>
-      Limit akun free adalah <strong style="color:#fff">${FREE_MONTHLY_LIMIT} trade/bulan</strong>.
+    <!-- Header gradient band -->
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(124,106,247,.06));padding:32px 32px 24px;border-bottom:1px solid rgba(139,92,246,.12);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.2),transparent 70%);pointer-events:none"></div>
+      <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;box-shadow:0 0 28px rgba(139,92,246,.18)">${cfg.icon}</div>
+      <div style="font-size:18px;font-weight:800;color:#f4f4f5;letter-spacing:-.4px;margin-bottom:6px;font-family:var(--font)">${cfg.title}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.65">${cfg.desc}</div>
     </div>
 
-    <!-- Stats bar -->
-    <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:14px 18px;margin-bottom:22px;text-align:left">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Trade Bulan Ini</span>
-        <span style="font-size:12px;font-family:var(--mono);color:var(--accent2);font-weight:700">${count} / ${FREE_MONTHLY_LIMIT}</span>
+    <div style="padding:22px 28px 28px">
+      <!-- Usage bar (shown only for limit-based features) -->
+      ${cfg.pct > 0 ? `
+      <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:12px 16px;margin-bottom:18px;text-align:left">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+          <span style="font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Penggunaan Bulan Ini</span>
+          <span style="font-size:11px;font-family:var(--mono);color:${barColor};font-weight:700">${cfg.blocker}</span>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden">
+          <div style="width:${cfg.pct}%;height:100%;background:${barColor};border-radius:3px;transition:width .5s ease"></div>
+        </div>
+      </div>` : `
+      <div style="background:rgba(255,77,77,.04);border:1px solid rgba(255,77,77,.12);border-radius:12px;padding:10px 16px;margin-bottom:18px;text-align:left">
+        <div style="font-size:11px;color:rgba(255,120,120,.7);display:flex;align-items:center;gap:6px"><i class="bi bi-lock-fill"></i> ${cfg.blocker}</div>
+      </div>`}
+
+      <!-- Premium benefits -->
+      <div style="background:rgba(0,217,126,.04);border:1px solid rgba(0,217,126,.13);border-radius:12px;padding:14px 16px;margin-bottom:20px;text-align:left">
+        <div style="font-size:10px;font-weight:700;color:#00d97e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="bi bi-stars"></i> Dengan Premium kamu dapat:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+          ${[
+            ['📊','Unlimited trade/bulan'],
+            ['📖',`Hingga ${PREM_PLAYBOOK_LIMIT} playbook`],
+            ['📝','Unlimited daily journal'],
+            ['🧬','Trader DNA Radar'],
+            ['🏆','PropFirm Tracker'],
+            ['🔔','Daily Reminder'],
+            ['⭐','Badge PRO di profil'],
+            ['🔓','Semua fitur terbuka'],
+          ].map(([ic,txt]) => `
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.65)">
+            <span style="font-size:13px">${ic}</span>${txt}
+          </div>`).join('')}
+        </div>
       </div>
-      <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
-        <div style="width:100%;height:100%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);border-radius:3px"></div>
+
+      <!-- CTA -->
+      <a href="https://lynk.id/regy_trader" target="_blank" rel="noopener"
+         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border-radius:12px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.4);margin-bottom:11px;font-family:var(--font);letter-spacing:-.2px;transition:all .2s"
+         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 26px rgba(139,92,246,.55)'"
+         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(139,92,246,.4)'">
+        <i class="bi bi-lightning-charge-fill"></i> Upgrade ke Premium →
+      </a>
+      <div style="font-size:10px;color:rgba(255,255,255,.25);margin-bottom:14px">
+        Sudah bayar? Kirim konfirmasi ke <a href="https://instagram.com/journalingtoolsid" target="_blank" style="color:#a78bfa;text-decoration:none">@journalingtoolsid</a> untuk aktivasi
       </div>
+      <button id="fg-close-btn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);padding:9px 28px;border-radius:10px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s;width:100%" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.3)'">
+        Tutup
+      </button>
     </div>
-
-    <!-- Upgrade benefit list -->
-    <div style="background:rgba(0,217,126,.04);border:1px solid rgba(0,217,126,.15);border-radius:12px;padding:14px 16px;margin-bottom:22px;text-align:left">
-      <div style="font-size:11px;font-weight:700;color:#00d97e;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">⚡ Upgrade ke Premium</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Catat <strong style="color:#fff">unlimited trade</strong> setiap bulan</div>
-        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Semua analytics & pattern detector</div>
-        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Daily journal, goals & streak tracking</div>
-        <div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px"><span style="color:#00d97e;font-size:14px">✓</span> Export report card & share stats</div>
-      </div>
-    </div>
-
-    <!-- Harga -->
-    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Sekali bayar · <span style="color:var(--accent2)">Support pengembangan app ini</span></div>
-
-    <!-- CTA button -->
-    <a href="https://lynk.id/regy_trader" target="_blank" rel="noopener"
-       style="display:block;width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border-radius:12px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 18px rgba(139,92,246,.4);margin-bottom:12px;font-family:var(--font);letter-spacing:-.2px;transition:all .2s"
-       onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(139,92,246,.5)'"
-       onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(139,92,246,.4)'">
-      ⚡ Upgrade Sekarang →
-    </a>
-
-    <div style="font-size:11px;color:var(--text3);margin-bottom:18px">
-      Sudah upgrade? Kirim konfirmasi ke
-      <a href="https://instagram.com/journalingtoolsid" target="_blank" style="color:var(--accent2);text-decoration:none">@journalingtoolsid</a>
-    </div>
-
-    <button id="fl-close-btn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text3);padding:9px 24px;border-radius:10px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
-      Tutup — lanjut lihat data lama
-    </button>
   </div>`;
 
   document.body.appendChild(modal);
-  modal.querySelector('#fl-close-btn').addEventListener('click', () => modal.classList.remove('open'));
-  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+  modal.querySelector('#fg-close-btn').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.addEventListener('keydown', function _fgKey(e) {
+    if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', _fgKey); }
+  });
 }
+window.openFeatureGateModal = openFeatureGateModal;
 
-// ── FREEMIUM UI — update badge di sidebar / topbar ──────────────
+// ── kept for backward compat ──
+function openFreeLimitModal() { openFeatureGateModal('trade'); }
+window.openFreeLimitModal = openFreeLimitModal;
+
+// ── FREEMIUM SIDEBAR BADGE ──────────────────────────────────────────────
 function updateFreemiumUI(isPrem) {
-  // Update atau inject badge count di sidebar
-  const badge = document.getElementById('free-trade-badge');
+  const existingBadge = document.getElementById('free-trade-badge');
+  const existingProBadge = document.getElementById('pro-avatar-badge');
+
+  // ── PRO badge on avatar ──
+  const avatar = document.getElementById('user-avatar');
   if (isPrem) {
-    if (badge) badge.style.display = 'none';
+    if (!existingProBadge && avatar) {
+      const badge = document.createElement('div');
+      badge.id = 'pro-avatar-badge';
+      badge.title = 'Pengguna Premium';
+      badge.style.cssText = 'position:absolute;bottom:-3px;right:-3px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:7px;font-weight:900;padding:2px 4px;border-radius:4px;letter-spacing:.3px;font-family:var(--font);pointer-events:none;z-index:2;box-shadow:0 2px 6px rgba(245,158,11,.5);line-height:1';
+      badge.textContent = 'PRO';
+      if (avatar.style.position !== 'relative') avatar.style.position = 'relative';
+      avatar.appendChild(badge);
+    }
+    // Hide free badge
+    if (existingBadge) existingBadge.style.display = 'none';
+    // Update user-email to show PRO indicator
+    const emailEl = document.getElementById('user-email');
+    if (emailEl && currentUser?.email) {
+      emailEl.innerHTML = currentUser.email + ' <span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:8px;font-weight:900;padding:1px 5px;border-radius:4px;letter-spacing:.3px;font-family:var(--font);vertical-align:middle">PRO</span>';
+    }
+    // Show PropFirm and Reminder in nav for premium
+    const ftmoNav = document.getElementById('nav-ftmo');
+    const remNav  = document.getElementById('nav-reminder');
+    if (ftmoNav) { ftmoNav.style.opacity = '1'; ftmoNav.style.pointerEvents = ''; ftmoNav.title = ''; }
+    if (remNav)  { remNav.style.opacity  = '1'; remNav.style.pointerEvents  = ''; remNav.title = ''; }
     return;
   }
+
+  // ── Free user — show usage badge ──
+  if (existingProBadge) existingProBadge.remove();
+
   const count = getThisMonthCount();
   const rem   = Math.max(0, FREE_MONTHLY_LIMIT - count);
   const pct   = Math.min(count / FREE_MONTHLY_LIMIT * 100, 100);
+  const color = rem === 0 ? '#ff4d4d' : rem <= 3 ? '#f59e0b' : '#a78bfa';
+  const borderColor = rem === 0 ? 'rgba(255,77,77,.3)' : rem <= 3 ? 'rgba(245,158,11,.25)' : 'rgba(139,92,246,.18)';
 
-  if (!badge) {
-    // Inject badge setelah elemen user info di sidebar
-    const target = document.getElementById('signout-btn');
-    if (target && target.parentNode) {
-      const div = document.createElement('div');
-      div.id = 'free-trade-badge';
-      div.style.cssText = 'margin:8px 12px 4px;padding:10px 12px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:10px;font-size:11px;transition:all .3s';
-      target.parentNode.insertBefore(div, target.nextSibling);
-    }
+  if (!existingBadge) {
+    const div = document.createElement('div');
+    div.id = 'free-trade-badge';
+    div.style.cssText = 'margin:6px 12px 2px;padding:10px 12px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.18);border-radius:10px;font-size:11px;transition:all .3s;cursor:default';
+    // Insert after sbf div
+    const sbf = document.getElementById('sbf');
+    if (sbf && sbf.parentNode) sbf.parentNode.insertBefore(div, sbf.nextSibling);
   }
 
   const el = document.getElementById('free-trade-badge');
   if (!el) return;
-
-  const color = rem === 0 ? '#ff4d4d' : rem <= 3 ? '#f59e0b' : '#a78bfa';
-  el.style.borderColor = rem === 0 ? 'rgba(255,77,77,.3)' : rem <= 3 ? 'rgba(245,158,11,.3)' : 'rgba(139,92,246,.18)';
+  el.style.borderColor = borderColor;
+  el.style.display = 'block';
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <span style="color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Trade Bulan Ini</span>
-      <span style="font-family:var(--mono);color:${color};font-weight:700">${count}/${FREE_MONTHLY_LIMIT}</span>
+      <span style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.7px;font-weight:600">Trade Bulan Ini</span>
+      <span style="font-family:var(--mono);font-size:11px;color:${color};font-weight:700">${count}/${FREE_MONTHLY_LIMIT}</span>
     </div>
-    <div style="height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:6px">
+    <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:7px">
       <div style="width:${pct}%;height:100%;background:${color};border-radius:2px;transition:width .4s"></div>
     </div>
-    <div style="color:${color};font-size:10px">
-      ${rem === 0 ? '🔒 Limit tercapai · <span style="cursor:pointer;text-decoration:underline" onclick="openFreeLimitModal()">Upgrade →</span>' : rem <= 3 ? `⚠ Sisa ${rem} trade gratis bulan ini` : `${rem} trade tersisa bulan ini`}
-    </div>`;
-  el.style.display = 'block';
+    <div style="font-size:10px;color:${color};line-height:1.4">
+      ${rem === 0
+        ? `🔒 Limit tercapai · <span style="cursor:pointer;text-decoration:underline;color:#a78bfa" onclick="openFeatureGateModal('trade')">Upgrade →</span>`
+        : rem <= 3
+          ? `⚠ Sisa ${rem} trade gratis`
+          : `${rem} trade tersisa bulan ini`}
+    </div>
+    ${rem > 0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)"><a href="#" onclick="event.preventDefault();openFeatureGateModal('trade')" style="font-size:10px;color:rgba(139,92,246,.7);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='rgba(139,92,246,.7)'"><i class="bi bi-lightning-charge-fill" style="margin-right:3px"></i>Lihat benefit premium</a></div>` : ''}`;
+
+  // Lock PropFirm and Reminder nav for free users with visual hint
+  const ftmoNav = document.getElementById('nav-ftmo');
+  const remNav  = document.getElementById('nav-reminder');
+  if (ftmoNav) {
+    ftmoNav.style.opacity = '0.45';
+    ftmoNav.style.pointerEvents = 'none';
+    ftmoNav.title = 'PropFirm Tracker — Premium only';
+    // Add lock icon if not there
+    if (!ftmoNav.querySelector('.prem-lock')) {
+      const lock = document.createElement('span');
+      lock.className = 'prem-lock';
+      lock.innerHTML = '<i class="bi bi-lock-fill" style="font-size:9px;margin-left:auto;opacity:.5"></i>';
+      lock.style.cssText = 'margin-left:auto;display:flex;align-items:center';
+      ftmoNav.appendChild(lock);
+      // Re-enable click to show gate
+      ftmoNav.style.pointerEvents = '';
+      ftmoNav.style.cursor = 'pointer';
+      ftmoNav.addEventListener('click', (e) => {
+        if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal('ftmo'); }
+      }, true);
+    }
+  }
+  if (remNav) {
+    remNav.style.opacity = '0.45';
+    if (!remNav.querySelector('.prem-lock')) {
+      const lock = document.createElement('span');
+      lock.className = 'prem-lock';
+      lock.innerHTML = '<i class="bi bi-lock-fill" style="font-size:9px;margin-left:auto;opacity:.5"></i>';
+      lock.style.cssText = 'margin-left:auto;display:flex;align-items:center';
+      remNav.appendChild(lock);
+      remNav.style.pointerEvents = '';
+      remNav.addEventListener('click', (e) => {
+        if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal('reminder'); }
+      }, true);
+    }
+  }
 }
-window.openFreeLimitModal = openFreeLimitModal;
 window.updateFreemiumUI = updateFreemiumUI;
 $('limit-close-btn').addEventListener('click', () => {
   $('md-anon-limit').classList.remove('open');
@@ -7554,6 +7752,14 @@ onAuthStateChanged(auth, async user => {
     // Cek premium status untuk update UI badge
     isPremium(user).then(premium => {
       updateFreemiumUI(premium);
+      // Gate FTMO nav click for free users
+      if (!premium) {
+        const ftmoNavEl = document.getElementById('nav-ftmo');
+        if (ftmoNavEl) {
+          // Override click
+          ftmoNavEl._origHandler = ftmoNavEl._origHandler || null;
+        }
+      }
     });
     if (pendingAction === 'openTrade') {
       pendingAction = null;
@@ -8015,6 +8221,11 @@ $('ovl').addEventListener('click', closeSB);
 
 // ── NAVIGATION ────────────────────────────────────────
 function goPage(name) {
+  // ── Premium gate: blokir navigasi ke halaman premium untuk free user ──
+  if (_isPremiumCache === false) {
+    if (name === 'ftmo')     { openFeatureGateModal('ftmo');     return; }
+    if (name === 'reminder') { openFeatureGateModal('reminder'); return; }
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
   $('page-' + name).classList.add('active');
@@ -8221,14 +8432,12 @@ function openTrade() {
     return;
   }
   if (currentUser.isAnonymous) {
-    // Anon: arahkan ke login/upgrade
     openAnonLimitModal();
     return;
   }
-  // Freemium check — async
   canAddTrade().then(result => {
     if (!result.allowed && result.reason === 'free_limit') {
-      openFreeLimitModal();
+      openFeatureGateModal('trade');
       return;
     }
     clearScreenshot();
@@ -8699,11 +8908,10 @@ function updateAll() {
   if (currentUser) updateTraderCard(currentUser);
   // Update anon counter if applicable
   if (currentUser && currentUser.isAnonymous) updateAnonCounter();
-  // Update freemium badge untuk free users
+  // Update freemium badge untuk free users (non-anon)
   if (currentUser && !currentUser.isAnonymous) {
     if (_isPremiumCache === false) updateFreemiumUI(false);
     else if (_isPremiumCache === true) updateFreemiumUI(true);
-    // jika null (belum dicek), biarkan — isPremium akan update setelah login
   }
   // Notify advanced analytics and playbook modules
   if (window._advAnalyticsReady) window.renderAdvancedAnalytics && window.renderAdvancedAnalytics();
@@ -9828,6 +10036,29 @@ function getArchetype(s){
   return'📈 Developing Trader';
 }
 function renderDNA(){
+  // ── Premium gate for DNA ──
+  const dnaSection = document.getElementById('dna-section') || document.querySelector('[id="dnaRadar"]')?.closest('.cc');
+  if (_isPremiumCache === false) {
+    // Show locked overlay on DNA section
+    const dnaCard = document.getElementById('dna-card-wrapper') || document.querySelector('#dnaRadar')?.closest('div[style*="padding"]');
+    if (dnaCard && !dnaCard.querySelector('.dna-lock-overlay')) {
+      dnaCard.style.position = 'relative';
+      const ov = document.createElement('div');
+      ov.className = 'dna-lock-overlay';
+      ov.style.cssText = 'position:absolute;inset:0;background:rgba(9,9,11,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:inherit;gap:10px;cursor:pointer';
+      ov.innerHTML = `
+        <div style="font-size:30px">🧬</div>
+        <div style="font-size:14px;font-weight:700;color:#f4f4f5;letter-spacing:-.3px">Trader DNA — Premium</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);text-align:center;max-width:220px;line-height:1.5">Analisis 6 dimensi trading kamu. Upgrade untuk unlock DNA Radar.</div>
+        <button onclick="openFeatureGateModal('dna')" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(139,92,246,.35);margin-top:4px">⚡ Upgrade untuk akses</button>`;
+      ov.addEventListener('click', e => { if (e.target === ov) openFeatureGateModal('dna'); });
+      dnaCard.appendChild(ov);
+    }
+    return; // don't render chart
+  }
+  // Remove lock overlay if premium
+  document.querySelectorAll('.dna-lock-overlay').forEach(el => el.remove());
+
   const scores=calcDNA(trades);
   scores.forEach((s,i)=>{
     const b=$('dna-b'+i),v=$('dna-v'+i);
@@ -10895,6 +11126,12 @@ async function saveDailyEntry() {
   if (!currentUser || currentUser.isAnonymous) {
     alert('Login dengan email untuk menyimpan Daily Journal.'); return;
   }
+  // Freemium gate
+  const dailyCheck = await canSaveDailyJournal(dailyDate);
+  if (!dailyCheck.allowed) {
+    openFeatureGateModal('daily');
+    return;
+  }
   const entry = {
     bias:     document.querySelector('.bias-btn.active')?.dataset.bias || '',
     mood:     document.querySelector('.mood-btn.active')?.dataset.mood || '',
@@ -11003,6 +11240,43 @@ function renderDailyHistory() {
 // ── Render daily page ────────────────────────────────
 function renderDailyPage() {
   loadDailyEntry(dailyDate);
+
+  // ── Daily journal usage banner for free users ──
+  const isPrem = window._isPremium ? window._isPremium() : null;
+  if (isPrem === false) {
+    const dailyCount = getThisMonthDailyCount();
+    const rem   = Math.max(0, FREE_DAILY_LIMIT - dailyCount);
+    const pct   = Math.min(dailyCount / FREE_DAILY_LIMIT * 100, 100);
+    const color = rem === 0 ? '#ff4d4d' : rem <= 2 ? '#f59e0b' : '#a78bfa';
+
+    let banner = document.getElementById('daily-limit-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'daily-limit-banner';
+      banner.style.cssText = 'margin-bottom:14px';
+      const dateRow = document.getElementById('daily-date')?.closest('div[style]') || document.getElementById('daily-page-header');
+      if (dateRow && dateRow.parentNode) dateRow.parentNode.insertBefore(banner, dateRow);
+    }
+    banner.innerHTML = `
+      <div style="background:rgba(139,92,246,.06);border:1px solid ${rem===0?'rgba(255,77,77,.22)':'rgba(139,92,246,.14)'};border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:180px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Daily Journal Bulan Ini</span>
+            <span style="font-family:var(--mono);font-size:11px;color:${color};font-weight:700">${dailyCount}/${FREE_DAILY_LIMIT}</span>
+          </div>
+          <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${color};border-radius:2px;transition:width .4s"></div>
+          </div>
+        </div>
+        ${rem === 0
+          ? `<button onclick="openFeatureGateModal('daily')" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">⚡ Upgrade untuk unlimited →</button>`
+          : `<span style="font-size:10px;color:rgba(255,255,255,.3)">${rem} entri tersisa · <a href="#" onclick="event.preventDefault();openFeatureGateModal('daily')" style="color:#a78bfa;text-decoration:none">Premium: unlimited</a></span>`}
+      </div>`;
+    banner.style.display = 'block';
+  } else {
+    const banner = document.getElementById('daily-limit-banner');
+    if (banner) banner.style.display = 'none';
+  }
 }
 
 // ── Wire Daily Journal buttons ─────────────────────
@@ -13835,6 +14109,14 @@ async function savePlaybook(data) {
   if(!window._db || !window._currentUser) {
     throw new Error('Tidak terkoneksi ke cloud. Pastikan kamu sudah login dan coba lagi.');
   }
+  // ── Freemium check: hanya berlaku untuk playbook baru ──
+  if (!data.id && window.canAddPlaybook) {
+    const check = await window.canAddPlaybook(playbooks.length);
+    if (!check.allowed) {
+      if (window.openFeatureGateModal) window.openFeatureGateModal('playbook');
+      return; // block save
+    }
+  }
   const { collection, doc, addDoc, updateDoc } = getFs();
   const col = collection(window._db, 'users', window._currentUser.uid, 'playbooks');
   if(data.id) {
@@ -13873,6 +14155,46 @@ window.renderPlaybook = function() {
   const list = document.getElementById('playbook-list');
   const empty = document.getElementById('playbook-empty');
   if(!list) return;
+
+  // ── Show playbook slot usage for free users ──
+  const slotBannerEl = document.getElementById('pb-slot-banner');
+  const isPrem = window._isPremium ? window._isPremium() : null;
+  const pbLimit = isPrem ? (window._PREM_PLAYBOOK_LIMIT || 15) : (window._FREE_PLAYBOOK_LIMIT || 3);
+  const pbUsed  = playbooks.length;
+
+  if (!slotBannerEl) {
+    const banner = document.createElement('div');
+    banner.id = 'pb-slot-banner';
+    banner.style.cssText = 'margin-bottom:14px;transition:all .3s';
+    const header = document.getElementById('pb-header') || list.parentNode;
+    if (header) header.insertBefore(banner, header.firstChild);
+  }
+  const bannerEl = document.getElementById('pb-slot-banner');
+  if (bannerEl) {
+    if (isPrem === false) {
+      const rem   = Math.max(0, pbLimit - pbUsed);
+      const pct   = Math.min(pbUsed / pbLimit * 100, 100);
+      const color = rem === 0 ? '#ff4d4d' : rem <= 1 ? '#f59e0b' : '#a78bfa';
+      bannerEl.innerHTML = `
+        <div style="background:rgba(139,92,246,.06);border:1px solid ${rem===0?'rgba(255,77,77,.2)':'rgba(139,92,246,.15)'};border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:180px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <span style="font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Slot Playbook</span>
+              <span style="font-family:var(--mono);font-size:11px;color:${color};font-weight:700">${pbUsed}/${pbLimit}</span>
+            </div>
+            <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
+              <div style="width:${pct}%;height:100%;background:${color};border-radius:2px;transition:width .4s"></div>
+            </div>
+          </div>
+          ${rem === 0
+            ? `<button onclick="openFeatureGateModal('playbook')" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">⚡ Upgrade ke 15 slot →</button>`
+            : `<span style="font-size:10px;color:rgba(255,255,255,.3)">${rem} slot tersisa · <a href="#" onclick="event.preventDefault();openFeatureGateModal('playbook')" style="color:#a78bfa;text-decoration:none">Premium: 15 slot</a></span>`}
+        </div>`;
+      bannerEl.style.display = 'block';
+    } else {
+      bannerEl.style.display = 'none';
+    }
+  }
 
   // Stats aggregation
   const pbStats = {};
