@@ -15412,6 +15412,14 @@ const _monkeyPatchTrades = setInterval(() => {
     document.addEventListener('click', function() { dllClose(); });
     // Prevent dropdown itself from closing when clicking inside
     if (dd) dd.addEventListener('click', function(e) { e.stopPropagation(); });
+
+    // Close on scroll — dropdown jadi orphan kalau trigger tenggelam
+    window.addEventListener('scroll', function() { dllClose(); }, { passive: true });
+    // Also catch scroll inside the main content area (SPA scroll container)
+    var mainEl = document.getElementById('main');
+    if (mainEl) {
+      mainEl.addEventListener('scroll', function() { dllClose(); }, { passive: true });
+    }
   });
 
   // Init: restore saved layout
