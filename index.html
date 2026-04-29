@@ -5111,6 +5111,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 <!-- ════════════════════════════════════════════════════════════
      §MODAL-FLOAT-CTA — Floating upgrade widget (guest users only)
      ════════════════════════════════════════════════════════════ -->
+<!-- Float CTA backdrop (mobile only) -->
+<div id="float-cta-backdrop" style="display:none;position:fixed;inset:0;z-index:349;background:rgba(7,5,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .3s ease;opacity:0;"></div>
+
 <div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:350;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:bottom .25s,right .25s,left .25s">
 
   <!-- Dismiss button -->
@@ -7690,6 +7693,7 @@ let floatCTAVisible = false;
 
 function setFloatCTA(show) {
   const el = $('float-cta');
+  const bd = $('float-cta-backdrop');
   if (!el) return;
   // If user dismissed it this session, don't re-show
   try { if (sessionStorage.getItem(FLOAT_CTA_DISMISS_KEY)) show = false; } catch(e) {}
@@ -7698,12 +7702,33 @@ function setFloatCTA(show) {
     setTimeout(() => {
       el.style.display = 'block';
       floatCTAVisible = true;
+      // Show backdrop on mobile only
+      if (bd && window.innerWidth <= 768) {
+        bd.style.display = 'block';
+        requestAnimationFrame(() => { bd.style.opacity = '1'; });
+      }
     }, 2500);
   } else if (!show) {
     el.style.display = 'none';
     floatCTAVisible = false;
+    _hideCTABackdrop();
   }
 }
+
+function _hideCTABackdrop() {
+  const bd = $('float-cta-backdrop');
+  if (!bd) return;
+  bd.style.opacity = '0';
+  setTimeout(() => { bd.style.display = 'none'; }, 300);
+}
+
+// Hide backdrop if window resized to desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    const bd = $('float-cta-backdrop');
+    if (bd) { bd.style.opacity = '0'; bd.style.display = 'none'; }
+  }
+});
 
 // Wire floating CTA buttons
 document.addEventListener('DOMContentLoaded', () => {
@@ -7712,12 +7737,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn   = $('purchase-close');
   const mdPurchase = $('md-purchase');
 
+  function dismissCTA() {
+    $('float-cta').style.display = 'none';
+    floatCTAVisible = false;
+    _hideCTABackdrop();
+    try { sessionStorage.setItem(FLOAT_CTA_DISMISS_KEY, '1'); } catch(e) {}
+  }
+
   if (dismissBtn) {
-    dismissBtn.addEventListener('click', () => {
-      $('float-cta').style.display = 'none';
-      floatCTAVisible = false;
-      try { sessionStorage.setItem(FLOAT_CTA_DISMISS_KEY, '1'); } catch(e) {}
-    });
+    dismissBtn.addEventListener('click', dismissCTA);
+  }
+
+  // Tap backdrop to dismiss
+  const ctaBd = $('float-cta-backdrop');
+  if (ctaBd) ctaBd.addEventListener('click', dismissCTA);
+
+  // Swipe down to dismiss on mobile
+  const ctaEl = $('float-cta');
+  if (ctaEl) {
+    let _touchStartY = 0;
+    ctaEl.addEventListener('touchstart', e => {
+      _touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    ctaEl.addEventListener('touchmove', e => {
+      const dy = e.touches[0].clientY - _touchStartY;
+      if (dy > 0) ctaEl.style.transform = 'translateY(' + dy + 'px)';
+    }, { passive: true });
+    ctaEl.addEventListener('touchend', e => {
+      const dy = e.changedTouches[0].clientY - _touchStartY;
+      if (dy > 80) {
+        ctaEl.style.transition = 'transform .25s ease';
+        ctaEl.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+          ctaEl.style.transform = '';
+          ctaEl.style.transition = '';
+          dismissCTA();
+        }, 250);
+      } else {
+        ctaEl.style.transition = 'transform .2s ease';
+        ctaEl.style.transform = '';
+        setTimeout(() => { ctaEl.style.transition = ''; }, 200);
+      }
+    }, { passive: true });
   }
 
   if (ctaBtn) {
