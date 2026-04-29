@@ -1601,10 +1601,7 @@ body.sb-off #sticky-profile-bar { left: 0; }
   opacity:1;transform:translateY(0) scale(1);
   pointer-events:auto;
 }
-/* On mobile: dropdown opens upward from header button */
-@media(max-width:768px){
-  .dll-dropdown { top:auto; bottom:calc(100% + 7px); right:0; }
-}
+/* Dropdown position is handled dynamically by JS positionDropdown() */
 
 /* Each option row */
 .dll-opt {
@@ -15351,36 +15348,60 @@ const _monkeyPatchTrades = setInterval(() => {
   window.dllClose = dllClose;
 
   document.addEventListener('DOMContentLoaded', function() {
+    var dd = document.getElementById('dll-dropdown');
+
+    // ── Move dropdown to <body> so parent display:none can't hide it ──
+    if (dd) {
+      document.body.appendChild(dd);
+      dd.style.position = 'fixed';
+      dd.style.zIndex   = '1200';
+      dd.style.display  = 'block'; // visibility controlled by .open class only
+    }
+
+    function positionDropdown(anchorEl) {
+      if (!dd || !anchorEl) return;
+      var rect = anchorEl.getBoundingClientRect();
+      // Default: open downward aligned to right edge of anchor
+      var spaceBelow = window.innerHeight - rect.bottom;
+      var spaceAbove = rect.top;
+      if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+        // Open downward
+        dd.style.top    = (rect.bottom + 6) + 'px';
+        dd.style.bottom = 'auto';
+      } else {
+        // Open upward
+        dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+        dd.style.top    = 'auto';
+      }
+      // Align right edge to anchor right edge, clamp to viewport
+      var rightOffset = window.innerWidth - rect.right;
+      dd.style.right = Math.max(8, rightOffset) + 'px';
+      dd.style.left  = 'auto';
+    }
+
     // Wire desktop trigger
     var trig = document.getElementById('dll-trigger');
-    if (trig) trig.addEventListener('click', function(e) { e.stopPropagation(); dllToggle(); });
+    if (trig) {
+      trig.addEventListener('click', function(e) {
+        e.stopPropagation();
+        positionDropdown(trig);
+        dllToggle();
+      });
+    }
 
     // Wire mobile trigger (in page header)
     var trigMob = document.getElementById('dll-trigger-mobile');
     if (trigMob) {
       trigMob.addEventListener('click', function(e) {
         e.stopPropagation();
-        // On mobile, dropdown is attached to desktop trigger wrapper — reuse same panel
+        positionDropdown(trigMob);
         dllToggle();
-        // Make sure dropdown panel is visible near mobile trigger
-        var dd = document.getElementById('dll-dropdown');
-        var wrap = document.getElementById('dll-wrap');
-        if (dd && wrap) {
-          // Temporarily reattach position relative to mobile trigger
-          var rect = trigMob.getBoundingClientRect();
-          dd.style.right = (window.innerWidth - rect.right) + 'px';
-          dd.style.top = 'auto';
-          dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
-          dd.style.position = 'fixed';
-          dd.style.zIndex = '1000';
-        }
       });
     }
 
-    // Close dropdown on outside click
+    // Close on outside click
     document.addEventListener('click', function() { dllClose(); });
     // Prevent dropdown itself from closing when clicking inside
-    var dd = document.getElementById('dll-dropdown');
     if (dd) dd.addEventListener('click', function(e) { e.stopPropagation(); });
   });
 
