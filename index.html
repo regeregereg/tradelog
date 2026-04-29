@@ -1455,6 +1455,10 @@ body.sb-off #sticky-profile-bar { left: 0; }
   font-size: 13px; font-weight: 600; color: #e4e4e7;
   font-family: var(--font); flex: 1;
 }
+.bmp-logout-btn:hover {
+  background: rgba(255,77,77,0.08) !important;
+}
+.bmp-logout-btn:hover .bmp-label { color: #ff4d4d !important; }
 .bmp-arrow {
   font-size: 10px; color: rgba(255,255,255,0.16);
   flex-shrink: 0;
@@ -13001,7 +13005,7 @@ riskpertrade.me`;
     <div class="bmp-divider"></div>
 
     <!-- Cara Penggunaan -->
-    <div style="padding:6px 8px 10px;">
+    <div style="padding:6px 8px 4px;">
       <button class="bmp-item" onclick="bnMoreOpenTour()" style="background:rgba(124,106,247,0.07);border-radius:12px;">
         <span class="bmp-icon" style="background:rgba(124,106,247,0.18);color:#a89cf7;"><i class="bi bi-question-circle"></i></span>
         <div style="flex:1;">
@@ -13009,6 +13013,17 @@ riskpertrade.me`;
           <div style="font-size:10px;color:rgba(255,255,255,0.3);font-family:var(--font);margin-top:1px;">Panduan fitur lengkap</div>
         </div>
         <i class="bi bi-chevron-right bmp-arrow"></i>
+      </button>
+    </div>
+
+    <!-- Divider -->
+    <div class="bmp-divider"></div>
+
+    <!-- Logout -->
+    <div style="padding:4px 8px calc(8px + env(safe-area-inset-bottom,0px));">
+      <button class="bmp-item bmp-logout-btn" id="bmp-logout-btn" onclick="bnMoreClose();document.getElementById('signout-btn').click();">
+        <span class="bmp-icon" style="background:rgba(255,77,77,0.1);color:#ff6b6b;"><i class="bi bi-box-arrow-right"></i></span>
+        <span class="bmp-label" style="color:#ff6b6b;">Logout</span>
       </button>
     </div>
 
