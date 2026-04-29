@@ -1321,13 +1321,7 @@ body.sb-off #sticky-profile-bar { left: 0; }
   /* Layout bar hidden on mobile (trigger is in header instead) */
   .dash-layout-bar { display:none !important; }
 
-  /* float-cta: full-width bottom sheet on mobile */
-  #float-cta{
-    bottom: 0 !important;
-    right: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-  }
+  /* float-cta: handled by #fcta-desktop / #fcta-sheet split */
   /* Purchase CTA modal: sheet dari bawah, bisa scroll */
   #md-purchase{
     align-items: flex-end !important;
@@ -2643,37 +2637,16 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   0%,100% { background-position:0% 50%; }
   50%     { background-position:100% 50%; }
 }
-#float-cta { animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards; }
+/* ── Float CTA: desktop bubble ── */
+#fcta-desktop { display:block; }
+#fcta-sheet   { display:none; }
 
-/* ── Float CTA: full-width bottom sheet on mobile ── */
+/* ── Float CTA: mobile — hide bubble, show sheet ── */
 @media(max-width:768px){
-  /* The outer container becomes full-width, anchored to bottom */
-  #float-cta { animation:mobileSlideUp .35s cubic-bezier(.34,1.2,.64,1) forwards !important; }
-  /* The inner card fills width and gets rounded top corners */
-  #float-cta > div:last-child {
-    width: 100% !important;
-    border-radius: 20px 20px 0 0 !important;
-    padding: 22px 20px calc(14px + env(safe-area-inset-bottom,0px)) !important;
-    box-shadow: 0 -8px 40px rgba(0,0,0,.7), 0 0 0 1px rgba(139,92,246,.2) !important;
-  }
-  /* Drag handle */
-  #float-cta > div:last-child::before {
-    content: '';
-    display: block;
-    width: 36px;
-    height: 4px;
-    border-radius: 2px;
-    background: rgba(255,255,255,.15);
-    margin: 0 auto 16px;
-  }
-  /* Reposition dismiss button */
-  #float-cta-dismiss {
-    top: 12px !important;
-    right: 16px !important;
-  }
-  /* Bigger touch target for CTA */
-  #float-cta-btn { padding: 14px !important; font-size: 14px !important; }
+  #fcta-desktop { display:none !important; }
+  #fcta-sheet   { display:block !important; }
 }
+
 @keyframes mobileSlideUp {
   from { opacity:0; transform:translateY(100%); }
   to   { opacity:1; transform:translateY(0); }
@@ -5114,73 +5087,124 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 <!-- Float CTA backdrop (mobile only) -->
 <div id="float-cta-backdrop" style="display:none;position:fixed;inset:0;z-index:349;background:rgba(7,5,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .3s ease;opacity:0;"></div>
 
-<div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:350;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:bottom .25s,right .25s,left .25s">
+<!-- ═══════════════════════════════════════════════
+     FLOAT CTA — Desktop: bubble · Mobile: bottom sheet
+     ═══════════════════════════════════════════════ -->
+<div id="float-cta" style="display:none;">
 
-  <!-- Dismiss button -->
-  <button id="float-cta-dismiss"
-    style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:#1e1e24;border:1px solid rgba(255,255,255,.12);color:#666;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:1;transition:all .15s"
-    onmouseover="this.style.background='rgba(239,68,68,.2)';this.style.color='#ef4444';this.style.borderColor='rgba(239,68,68,.3)'"
-    onmouseout="this.style.background='#1e1e24';this.style.color='#666';this.style.borderColor='rgba(255,255,255,.12)'"
-    title="Tutup">✕</button>
-
-  <!-- Main bubble card -->
-  <div style="background:linear-gradient(160deg,#13102a 0%,#0d0d18 100%);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;max-width:100%;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
-
-    <!-- Ambient glow top-right -->
-    <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 70%);pointer-events:none"></div>
-    <!-- Ambient glow bottom-left -->
-    <div style="position:absolute;bottom:-30px;left:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.1),transparent 70%);pointer-events:none"></div>
-
-    <!-- Header: logo + label -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;position:relative">
-      <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;box-shadow:0 0 0 1px rgba(139,92,246,.4),0 4px 12px rgba(139,92,246,.3)"><i class="bi bi-journal-text" style="color:#fff"></i></div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#f4f4f5;letter-spacing:-.2px;line-height:1.2">RiskPerTrade</div>
-        <div style="font-size:10px;color:rgba(167,139,250,.7);font-family:var(--mono);margin-top:1px">Trading Journal</div>
+  <!-- ── DESKTOP BUBBLE ── -->
+  <div id="fcta-desktop" style="position:fixed;bottom:24px;right:24px;z-index:350;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;">
+    <button id="float-cta-dismiss"
+      style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:#1e1e24;border:1px solid rgba(255,255,255,.12);color:#666;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all .15s"
+      onmouseover="this.style.background='rgba(239,68,68,.2)';this.style.color='#ef4444';this.style.borderColor='rgba(239,68,68,.3)'"
+      onmouseout="this.style.background='#1e1e24';this.style.color='#666';this.style.borderColor='rgba(255,255,255,.12)'"
+      title="Tutup">✕</button>
+    <div style="background:linear-gradient(160deg,#13102a,#0d0d18);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 70%);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;box-shadow:0 0 0 1px rgba(139,92,246,.4),0 4px 12px rgba(139,92,246,.3)"><i class="bi bi-journal-text" style="color:#fff"></i></div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#f4f4f5;letter-spacing:-.2px">RiskPerTrade</div>
+          <div style="font-size:10px;color:rgba(167,139,250,.7);font-family:var(--mono)">Trading Journal</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.6)"></div>
+          <span style="font-size:9px;color:#00d97e;font-family:var(--mono);font-weight:600;letter-spacing:.3px">LIVE</span>
+        </div>
       </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0">
-        <div style="width:6px;height:6px;border-radius:50%;background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.6)"></div>
-        <span style="font-size:9px;color:#00d97e;font-family:var(--mono);font-weight:600;letter-spacing:.3px">LIVE</span>
-      </div>
+      <div style="font-size:13px;font-weight:700;color:#f4f4f5;line-height:1.4;letter-spacing:-.2px;margin-bottom:6px">Tau kenapa trading kamu<br>belum konsisten?</div>
+      <div style="font-size:11px;color:rgba(212,212,216,.65);line-height:1.6;margin-bottom:14px">Bukan soal strategi — tapi karena tidak pernah <strong style="color:#a78bfa">review trade sendiri</strong>.</div>
+      <button id="float-cta-btn"
+        style="width:100%;padding:11px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 4px 18px rgba(139,92,246,.45);letter-spacing:.1px"
+        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(139,92,246,.55)'"
+        onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 18px rgba(139,92,246,.45)'">
+        Lihat Apa yang Kamu Dapat →
+      </button>
+      <div style="text-align:center;margin-top:7px;font-size:10px;color:rgba(255,255,255,.22);font-family:var(--mono)">Bayar sekali · Akses selamanya</div>
     </div>
-
-    <!-- Value proposition — clear & punchy -->
-    <div style="margin-bottom:14px;position:relative">
-      <div style="font-size:14px;font-weight:700;color:#f4f4f5;line-height:1.4;letter-spacing:-.2px;margin-bottom:6px">
-        Tau kenapa trading kamu<br>belum konsisten?
-      </div>
-      <div style="font-size:12px;color:rgba(212,212,216,.7);line-height:1.6">
-        Kebanyakan trader kalah bukan karena strategi — tapi karena tidak pernah <strong style="color:#a78bfa">review trade mereka sendiri</strong>.
-      </div>
-    </div>
-
-    <!-- 3 micro-benefits -->
-    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px;position:relative">
-      <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(212,212,216,.8)">
-        <div style="width:20px;height:20px;border-radius:6px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px"><i class="bi bi-journal-text"></i></div>
-        Journal trade lengkap — catat, review, berkembang
-      </div>
-      <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(212,212,216,.8)">
-        <div style="width:20px;height:20px;border-radius:6px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px"><i class="bi bi-bar-chart-line"></i></div>
-        Lihat win rate, P&amp;L &amp; equity curve kamu nyata
-      </div>
-      <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:rgba(212,212,216,.8)">
-        <div style="width:20px;height:20px;border-radius:6px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px"><i class="bi bi-cpu"></i></div>
-        Daily journal — bias &amp; psikologi trading kamu
-      </div>
-    </div>
-
-    <!-- CTA Button -->
-    <button id="float-cta-btn"
-      style="width:100%;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 4px 18px rgba(139,92,246,.45);letter-spacing:.1px;position:relative"
-      onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(139,92,246,.55)'"
-      onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 18px rgba(139,92,246,.45)'">
-      Lihat Apa yang Kamu Dapat →
-    </button>
-
-    <!-- Sub note -->
-    <div style="text-align:center;margin-top:8px;font-size:10px;color:rgba(255,255,255,.25);font-family:var(--mono);letter-spacing:.2px">Bayar sekali · Akses selamanya</div>
   </div>
+
+  <!-- ── MOBILE BOTTOM SHEET ── -->
+  <div id="fcta-sheet" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:351;animation:mobileSlideUp .35s cubic-bezier(.34,1.2,.64,1) forwards;">
+    <div style="background:linear-gradient(170deg,#16112e,#0e0c1c);border-top:1px solid rgba(139,92,246,.3);border-radius:24px 24px 0 0;max-height:85dvh;overflow-y:auto;box-shadow:0 -12px 48px rgba(0,0,0,.7),0 0 0 1px rgba(139,92,246,.1);position:relative;">
+      <!-- Ambient glow -->
+      <div style="position:absolute;top:-60px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);pointer-events:none"></div>
+
+      <!-- Sticky header: drag handle + close -->
+      <div style="position:sticky;top:0;z-index:5;background:linear-gradient(170deg,#16112e,#16112e);padding:14px 20px 10px;display:flex;align-items:center;justify-content:center;border-radius:24px 24px 0 0;">
+        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15)"></div>
+        <button id="float-cta-dismiss-mob"
+          style="position:absolute;right:16px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s"
+          onmouseover="this.style.background='rgba(239,68,68,.15)';this.style.color='#ef4444'"
+          onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'"
+          title="Tutup">✕</button>
+      </div>
+
+      <!-- Scrollable content -->
+      <div style="padding:4px 20px 0;">
+        <!-- Brand row -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;box-shadow:0 0 0 1px rgba(139,92,246,.4),0 4px 14px rgba(139,92,246,.35)"><i class="bi bi-journal-text" style="color:#fff"></i></div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#f4f4f5;letter-spacing:-.3px">RiskPerTrade</div>
+            <div style="font-size:10px;color:rgba(167,139,250,.65);font-family:var(--mono);margin-top:1px">Trading Journal</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px;background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.2);border-radius:20px;padding:3px 8px">
+            <div style="width:5px;height:5px;border-radius:50%;background:#00d97e;box-shadow:0 0 5px rgba(0,217,126,.7)"></div>
+            <span style="font-size:9px;color:#00d97e;font-family:var(--mono);font-weight:700;letter-spacing:.4px">LIVE</span>
+          </div>
+        </div>
+
+        <!-- Headline -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:21px;font-weight:800;color:#f4f4f5;line-height:1.2;letter-spacing:-.5px;margin-bottom:8px">
+            Tau kenapa trading kamu<br><span style="color:#a78bfa">belum konsisten?</span>
+          </div>
+          <div style="font-size:13px;color:rgba(212,212,216,.6);line-height:1.65">
+            Kebanyakan trader kalah bukan karena strategi — tapi karena tidak pernah <strong style="color:rgba(212,212,216,.9)">review trade mereka sendiri</strong>.
+          </div>
+        </div>
+
+        <!-- 3 benefits -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:10px 12px">
+            <div style="width:32px;height:32px;border-radius:9px;background:rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#a78bfa;font-size:14px"><i class="bi bi-journal-text"></i></div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Journal trade otomatis</div>
+              <div style="font-size:11px;color:rgba(212,212,216,.5)">Catat pair, profit/loss, emosi — 30 detik selesai</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:10px 12px">
+            <div style="width:32px;height:32px;border-radius:9px;background:rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#a78bfa;font-size:14px"><i class="bi bi-bar-chart-line"></i></div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Lihat pola trading kamu</div>
+              <div style="font-size:11px;color:rgba(212,212,216,.5)">Win rate, P&amp;L, equity curve — semua otomatis</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(0,217,126,.05);border:1px solid rgba(0,217,126,.15);border-radius:12px;padding:10px 12px">
+            <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,217,126,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#00d97e;font-size:14px"><i class="bi bi-graph-up-arrow"></i></div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Berkembang lebih cepat</div>
+              <div style="font-size:11px;color:rgba(212,212,216,.5)">Trader yang rutin journal terbukti lebih konsisten</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky CTA footer -->
+      <div style="position:sticky;bottom:0;background:linear-gradient(to top,#0e0c1c 80%,transparent);padding:16px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+        <button id="float-cta-btn-mob"
+          style="width:100%;padding:16px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 6px 24px rgba(139,92,246,.5);letter-spacing:.1px"
+          onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 28px rgba(139,92,246,.65)'"
+          onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 24px rgba(139,92,246,.5)'">
+          Upgrade Sekarang →
+        </button>
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(255,255,255,.22);font-family:var(--mono)">Bayar sekali · Akses selamanya · No subscription</div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -7744,39 +7768,48 @@ document.addEventListener('DOMContentLoaded', () => {
     try { sessionStorage.setItem(FLOAT_CTA_DISMISS_KEY, '1'); } catch(e) {}
   }
 
-  if (dismissBtn) {
-    dismissBtn.addEventListener('click', dismissCTA);
-  }
+  // Desktop dismiss X
+  if (dismissBtn) dismissBtn.addEventListener('click', dismissCTA);
+
+  // Mobile dismiss X
+  const dismissMob = $('float-cta-dismiss-mob');
+  if (dismissMob) dismissMob.addEventListener('click', dismissCTA);
 
   // Tap backdrop to dismiss
   const ctaBd = $('float-cta-backdrop');
   if (ctaBd) ctaBd.addEventListener('click', dismissCTA);
 
-  // Swipe down to dismiss on mobile
-  const ctaEl = $('float-cta');
-  if (ctaEl) {
-    let _touchStartY = 0;
-    ctaEl.addEventListener('touchstart', e => {
-      _touchStartY = e.touches[0].clientY;
+  // Mobile CTA button → open purchase modal
+  const ctaBtnMob = $('float-cta-btn-mob');
+  if (ctaBtnMob && mdPurchase) ctaBtnMob.addEventListener('click', () => {
+    dismissCTA();
+    mdPurchase.classList.add('open');
+  });
+
+  // Swipe down on sheet to dismiss
+  const sheetEl = $('fcta-sheet');
+  if (sheetEl) {
+    let _ty = 0, _startY = 0;
+    sheetEl.addEventListener('touchstart', e => {
+      _startY = e.touches[0].clientY; _ty = 0;
     }, { passive: true });
-    ctaEl.addEventListener('touchmove', e => {
-      const dy = e.touches[0].clientY - _touchStartY;
-      if (dy > 0) ctaEl.style.transform = 'translateY(' + dy + 'px)';
+    sheetEl.addEventListener('touchmove', e => {
+      const dy = e.touches[0].clientY - _startY;
+      if (dy > 0) { _ty = dy; sheetEl.style.transform = 'translateY(' + dy + 'px)'; }
     }, { passive: true });
-    ctaEl.addEventListener('touchend', e => {
-      const dy = e.changedTouches[0].clientY - _touchStartY;
-      if (dy > 80) {
-        ctaEl.style.transition = 'transform .25s ease';
-        ctaEl.style.transform = 'translateY(100%)';
+    sheetEl.addEventListener('touchend', () => {
+      if (_ty > 80) {
+        sheetEl.style.transition = 'transform .22s ease';
+        sheetEl.style.transform = 'translateY(100%)';
         setTimeout(() => {
-          ctaEl.style.transform = '';
-          ctaEl.style.transition = '';
+          sheetEl.style.transform = '';
+          sheetEl.style.transition = '';
           dismissCTA();
-        }, 250);
+        }, 220);
       } else {
-        ctaEl.style.transition = 'transform .2s ease';
-        ctaEl.style.transform = '';
-        setTimeout(() => { ctaEl.style.transition = ''; }, 200);
+        sheetEl.style.transition = 'transform .18s ease';
+        sheetEl.style.transform = '';
+        setTimeout(() => { sheetEl.style.transition = ''; }, 180);
       }
     }, { passive: true });
   }
