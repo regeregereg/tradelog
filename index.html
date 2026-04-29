@@ -162,7 +162,7 @@ window.addEventListener('load', function() {
   "creator": {
     "@type": "Person",
     "name": "Regy Anelka",
-    "sameAs": "https://www.instagram.com/journalingtoolsid/"
+    "sameAs": "https://www.instagram.com/riskpertrade.me/"
   },
   "inLanguage": "id",
   "keywords": "trading journal, jurnal trading, prop firm, FTMO tracker, forex, crypto, aplikasi trading journal, trader pemula"
@@ -1315,21 +1315,25 @@ body.sb-off #sticky-profile-bar { left: 0; }
     bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 10px) !important;
     width: calc(100% - 24px) !important;
   }
+  /* float-cta: full-width bottom sheet on mobile */
   #float-cta{
-    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px) !important;
-    right: 12px !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
   }
-  /* Purchase CTA modal: sheet dari bawah, bisa scroll, tombol tidak tenggelam */
+  /* Purchase CTA modal: sheet dari bawah, bisa scroll */
   #md-purchase{
     align-items: flex-end !important;
     padding: 0 !important;
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   }
   #md-purchase > .md{
     border-radius: 20px 20px 0 0 !important;
-    max-height: calc(92vh - 64px - env(safe-area-inset-bottom, 0px)) !important;
+    max-height: 92dvh !important;
     width: 100% !important;
     max-width: 100% !important;
+    overflow-y: auto !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
@@ -2575,10 +2579,41 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   50%     { background-position:100% 50%; }
 }
 #float-cta { animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* ── Float CTA: full-width bottom sheet on mobile ── */
 @media(max-width:768px){
-  #float-cta { bottom:calc(62px + env(safe-area-inset-bottom,0px) + 12px); right:12px; }
-  #float-cta > div:last-child { width:240px; }
+  /* The outer container becomes full-width, anchored to bottom */
+  #float-cta { animation:mobileSlideUp .35s cubic-bezier(.34,1.2,.64,1) forwards !important; }
+  /* The inner card fills width and gets rounded top corners */
+  #float-cta > div:last-child {
+    width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 22px 20px calc(14px + env(safe-area-inset-bottom,0px)) !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,.7), 0 0 0 1px rgba(139,92,246,.2) !important;
+  }
+  /* Drag handle */
+  #float-cta > div:last-child::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,.15);
+    margin: 0 auto 16px;
+  }
+  /* Reposition dismiss button */
+  #float-cta-dismiss {
+    top: 12px !important;
+    right: 16px !important;
+  }
+  /* Bigger touch target for CTA */
+  #float-cta-btn { padding: 14px !important; font-size: 14px !important; }
 }
+@keyframes mobileSlideUp {
+  from { opacity:0; transform:translateY(100%); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
 
 /* ════════════════════════════════════════════════════════════
    §CSS-IMPORT — Import Modal Styles
@@ -2863,7 +2898,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
                   </div>
                   <div>
                     <div class="ob-feature-name" style="color:#a78bfa;">Butuh akses penuh?</div>
-                    <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/journalingtoolsid/" target="_blank" style="color:#a78bfa;font-weight:600;text-decoration:none;">@journalingtoolsid</a> di Instagram untuk info akses lengkap.</div>
+                    <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/riskpertrade.me/" target="_blank" style="color:#a78bfa;font-weight:600;text-decoration:none;">@riskpertrade.me</a> di Instagram untuk info akses lengkap.</div>
                   </div>
                 </div>
               </div>
@@ -2970,7 +3005,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
         <div style="font-size:10px;color:rgba(255,255,255,.3);line-height:1.6">
           <strong style="color:#a78bfa">⚡ Premium:</strong> Unlimited trade, DNA Radar, PropFirm tracker & lebih ·
-          <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+          <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
             style="color:#a78bfa;text-decoration:none;font-weight:600">Lihat benefit →</a>
         </div>
       </div>
@@ -3125,12 +3160,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         Coba Email Lain
       </button>
 
-      <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+      <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:rgba(255,255,255,.4);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:14px;transition:all .15s;box-sizing:border-box"
         onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.7)';this.style.borderColor='rgba(139,92,246,.3)'"
         onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.4)';this.style.borderColor='rgba(255,255,255,.08)'">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        Hubungi @journalingtoolsid untuk akses
+        Hubungi @riskpertrade.me untuk akses
       </a>
 
       <button id="notinvited-skip" style="background:none;border:none;color:rgba(255,255,255,.18);font-size:11px;cursor:pointer;font-family:var(--font);padding:4px;transition:color .15s" onmouseover="this.style.color='rgba(255,255,255,.45)'" onmouseout="this.style.color='rgba(255,255,255,.18)'">Lihat-lihat dulu →</button>
@@ -3254,12 +3289,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <button id="sb-login-btn" style="display:none;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       Masuk / Login
     </button>
-    <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+    <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
       style="display:flex;align-items:center;justify-content:center;gap:6px;padding:7px;border-radius:7px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-size:11px;text-decoration:none;transition:all .15s"
       onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--border2)'"
       onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-      @journalingtoolsid
+      @riskpertrade.me
     </a>
     <button id="sb-tour-btn"
       style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;border-radius:7px;background:none;border:1px solid var(--border);color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .15s"
@@ -4979,7 +5014,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 <!-- ════════════════════════════════════════════════════════════
      §MODAL-FLOAT-CTA — Floating upgrade widget (guest users only)
      ════════════════════════════════════════════════════════════ -->
-<div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:300;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:bottom .25s">
+<div id="float-cta" style="display:none;position:fixed;bottom:24px;right:24px;z-index:350;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;transition:bottom .25s,right .25s,left .25s">
 
   <!-- Dismiss button -->
   <button id="float-cta-dismiss"
@@ -4989,7 +5024,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     title="Tutup">✕</button>
 
   <!-- Main bubble card -->
-  <div style="background:linear-gradient(160deg,#13102a 0%,#0d0d18 100%);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
+  <div style="background:linear-gradient(160deg,#13102a 0%,#0d0d18 100%);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;max-width:100%;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
 
     <!-- Ambient glow top-right -->
     <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 70%);pointer-events:none"></div>
@@ -5129,18 +5164,18 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
 
       <!-- Buttons -->
-      <a href="http://lynk.id/riskpertrade/ok7m3y56myz2/checkout" target="_blank"
+      <a href="https://lynk.id/riskpertrade/ok7m3y56myz2/checkout" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 20px rgba(139,92,246,.45);transition:all .2s;letter-spacing:.1px;box-sizing:border-box"
         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 28px rgba(139,92,246,.55)'"
         onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(139,92,246,.45)'">
         Dapatkan Akses Sekarang →
       </a>
-      <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+      <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:rgba(212,212,216,.6);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:10px;transition:all .15s;box-sizing:border-box"
         onmouseover="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(212,212,216,.9)'"
         onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(212,212,216,.6)'">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        Ada pertanyaan? — @journalingtoolsid
+        Ada pertanyaan? — @riskpertrade.me
       </a>
       <button class="btng" id="purchase-close" style="width:100%;padding:10px;background:transparent;border-color:rgba(255,255,255,.08);color:rgba(161,161,170,.5);font-size:12px">Nanti saja</button>
     </div>
@@ -5461,12 +5496,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <button class="btn" id="limit-upgrade-btn" style="width:100%;padding:12px;font-size:14px">
         <i class="bi bi-cloud-arrow-up-fill" style="margin-right:5px"></i> Simpan Akun Sekarang
       </button>
-      <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+      <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:13px;font-weight:500;text-decoration:none;transition:all .15s"
         onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
         onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        Request Akses — @journalingtoolsid
+        Request Akses — @riskpertrade.me
       </a>
       <button class="btng" id="limit-close-btn" style="width:100%">Nanti saja</button>
     </div>
@@ -7310,14 +7345,14 @@ function openFeatureGateModal(feature) {
       </div>
 
       <!-- CTA -->
-      <a href="https://lynk.id/regy_trader" target="_blank" rel="noopener"
+      <a href="https://lynk.id/riskpertrade/ok7m3y56myz2/checkout" target="_blank" rel="noopener"
          style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border-radius:12px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.4);margin-bottom:11px;font-family:var(--font);letter-spacing:-.2px;transition:all .2s"
          onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 26px rgba(139,92,246,.55)'"
          onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(139,92,246,.4)'">
         <i class="bi bi-lightning-charge-fill"></i> Upgrade ke Premium →
       </a>
       <div style="font-size:10px;color:rgba(255,255,255,.25);margin-bottom:14px">
-        Sudah bayar? Kirim konfirmasi ke <a href="https://instagram.com/journalingtoolsid" target="_blank" style="color:#a78bfa;text-decoration:none">@journalingtoolsid</a> untuk aktivasi
+        Sudah bayar? Kirim konfirmasi ke <a href="https://www.instagram.com/riskpertrade.me/" target="_blank" style="color:#a78bfa;text-decoration:none">@riskpertrade.me</a> untuk aktivasi
       </div>
       <button id="fg-close-btn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);padding:9px 28px;border-radius:10px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s;width:100%" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.3)'">
         Tutup
