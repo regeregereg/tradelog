@@ -15361,22 +15361,31 @@ const _monkeyPatchTrades = setInterval(() => {
     function positionDropdown(anchorEl) {
       if (!dd || !anchorEl) return;
       var rect = anchorEl.getBoundingClientRect();
-      // Default: open downward aligned to right edge of anchor
+      var isMobile = window.innerWidth <= 768;
+      var ddWidth  = isMobile ? Math.min(window.innerWidth - 32, 260) : 210;
+
+      // Vertical: below or above anchor
       var spaceBelow = window.innerHeight - rect.bottom;
       var spaceAbove = rect.top;
       if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
-        // Open downward
         dd.style.top    = (rect.bottom + 6) + 'px';
         dd.style.bottom = 'auto';
       } else {
-        // Open upward
         dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
         dd.style.top    = 'auto';
       }
-      // Align right edge to anchor right edge, clamp to viewport
-      var rightOffset = window.innerWidth - rect.right;
-      dd.style.right = Math.max(8, rightOffset) + 'px';
-      dd.style.left  = 'auto';
+
+      // Horizontal: mobile = centered on screen, desktop = right-aligned to anchor
+      if (isMobile) {
+        dd.style.left  = ((window.innerWidth - ddWidth) / 2) + 'px';
+        dd.style.right = 'auto';
+        dd.style.width = ddWidth + 'px';
+      } else {
+        var rightOffset = window.innerWidth - rect.right;
+        dd.style.right = Math.max(8, rightOffset) + 'px';
+        dd.style.left  = 'auto';
+        dd.style.width = 'auto';
+      }
     }
 
     // Wire desktop trigger
