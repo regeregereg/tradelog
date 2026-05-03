@@ -234,6 +234,9 @@ function bnMoreClose(){if(window._bnReady)window._bnReady.bnMoreClose();}
 function bnMoreGo(p){if(window._bnReady)window._bnReady.bnMoreGo(p);else window._bnQueue.push(['bnMoreGo',p]);}
 function bnMoreOpenTour(){bnMoreClose();if(window._bnReady&&window._bnReady.openTour)window._bnReady.openTour();else if(window.openTour)window.openTour();}
 
+// ── Active Trade: tab switching stub (resolved by module) ──
+function switchJournalView(v){if(window._switchJournalViewReady)window._switchJournalViewReady(v);}
+
 // ── crosshairOpts: helper untuk line chart hover ──
 function crosshairOpts() {
   return {
@@ -647,6 +650,51 @@ tr:hover td{background:rgba(139,92,246,.04);}
   .journal-tool-btn{padding:7px 10px;}
   .journal-actions{gap:6px;}
 }
+/* ── ACTIVE TRADE TRACKER ── */
+.at-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.at-tab{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;gap:6px;}
+.at-tab.active{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.45);color:var(--accent2);}
+.at-tab .at-count{background:rgba(139,92,246,.25);color:#c4b5fd;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px;font-family:var(--mono);}
+.at-tab.at-live .at-count{background:rgba(245,158,11,.2);color:#f59e0b;}
+.at-card{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;margin-bottom:10px;transition:all .2s;position:relative;overflow:hidden;}
+.at-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.at-card.status-open::before{background:linear-gradient(180deg,#f59e0b,#fb923c);}
+.at-card.status-partial::before{background:linear-gradient(180deg,#38bdf8,#7c3aed);}
+.at-card.status-be::before{background:linear-gradient(180deg,#a78bfa,#7c3aed);}
+.at-card:hover{border-color:rgba(139,92,246,.3);box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.at-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.at-pair{font-size:15px;font-weight:800;color:var(--text);letter-spacing:.3px;font-family:var(--mono);}
+.at-status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;}
+.at-status-open{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
+.at-status-partial{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);}
+.at-status-be{background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.25);}
+.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.at-cell{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:8px 10px;}
+.at-cell-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:3px;}
+.at-cell-val{font-size:13px;font-weight:700;color:var(--text);font-family:var(--mono);}
+.at-plan-box{background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.12);border-radius:9px;padding:8px 12px;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.at-plan-box strong{color:var(--text);font-weight:600;}
+.at-timer{font-size:11px;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;gap:4px;}
+.at-timer i{font-size:10px;color:#f59e0b;}
+.at-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.at-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:5px;}
+.at-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text);background:rgba(139,92,246,.07);}
+.at-btn.at-btn-close{background:rgba(0,217,126,.08);border-color:rgba(0,217,126,.3);color:#00d97e;}
+.at-btn.at-btn-close:hover{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.5);}
+.at-btn.at-btn-del{color:var(--text3);}
+.at-btn.at-btn-del:hover{color:#ff4d4d;border-color:rgba(255,77,77,.3);background:rgba(255,77,77,.06);}
+.at-empty{text-align:center;padding:36px 20px;color:var(--text3);font-size:13px;}
+.at-empty i{font-size:28px;margin-bottom:10px;opacity:.3;display:block;}
+#md-close-active .md{width:460px;}
+.cat-rr-preview{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:10px;padding:12px 14px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;}
+.cat-rr-val{font-size:20px;font-weight:800;font-family:var(--mono);}
+#md-new-active .md{width:500px;}
+@media(max-width:600px){
+  #md-close-active .md,#md-new-active .md{width:100%!important;border-radius:20px 20px 0 0!important;position:fixed!important;bottom:0;left:0;right:0;max-height:92vh!important;}
+  #md-close-active,#md-new-active{align-items:flex-end!important;}
+  .at-grid{grid-template-columns:repeat(2,1fr);}
+}
+
 /* ── DAILY JOURNAL PREMIUM STYLES ── */
 #daily-checklist label:hover{background:rgba(139,92,246,.06)!important;border-color:rgba(139,92,246,.25)!important;}
 #daily-checklist label:has(input:checked){background:rgba(0,217,126,.06)!important;border-color:rgba(0,217,126,.28)!important;color:var(--text)!important;}
@@ -3984,8 +4032,30 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
     </div>
 
+    <!-- ── View mode tabs: History / Active ── -->
+    <div class="at-tabs" id="at-view-tabs">
+      <button class="at-tab active" id="at-tab-history" onclick="switchJournalView('history')">
+        <i class="bi bi-journal-text"></i> History
+      </button>
+      <button class="at-tab at-live" id="at-tab-active" onclick="switchJournalView('active')">
+        <i class="bi bi-activity"></i> Active Trade
+        <span class="at-count" id="at-active-count">0</span>
+      </button>
+    </div>
+
+    <!-- ── ACTIVE TRADES PANEL ── -->
+    <div id="at-panel" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--text3)">Trade yang sedang berjalan — close untuk masuk ke journal</div>
+        <button onclick="openNewActiveTrade()" style="background:linear-gradient(135deg,#f59e0b,#fb923c);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(245,158,11,.3)">
+          <i class="bi bi-plus-lg" style="font-size:10px"></i> Plan Trade Baru
+        </button>
+      </div>
+      <div id="at-list"></div>
+    </div>
+
     <!-- Journal filter bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div id="at-history-panel" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <!-- Period tabs (left) -->
       <div class="period-tabs" id="journal-period-tabs" style="flex-shrink:0">
         <button class="ptab active" data-jperiod="all">Semua</button>
@@ -5728,6 +5798,199 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
       <div class="whint">Contoh: 10000 → $10K &nbsp;·&nbsp; 100000 → PropFirm $100K</div>
       <button class="btn" style="width:100%;padding:12px;font-size:14px" id="welcome-btn">Mulai Trading →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-NEW-ACTIVE — Plan New Active Trade
+     ════════════════════════════════════════════════════════════ -->
+<div class="mo" id="md-new-active">
+  <div class="md" style="width:500px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(251,146,60,.1));border:1px solid rgba(245,158,11,.35);display:flex;align-items:center;justify-content:center">
+          <i class="bi bi-activity" style="color:#f59e0b;font-size:15px"></i>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Plan Trade Baru</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px">Pre-trade plan · Eksekusi dulu, close nanti</div>
+        </div>
+      </div>
+      <button onclick="document.getElementById('md-new-active').classList.remove('open')" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <!-- Pair + Direction -->
+      <div class="fg">
+        <div class="fgg">
+          <label class="fl">Pair</label>
+          <input class="fi" id="nat-pair" type="text" placeholder="XAUUSD, EURUSD..." style="text-transform:uppercase;font-weight:600;letter-spacing:.5px">
+        </div>
+        <div class="fgg">
+          <label class="fl">Arah</label>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="dir-toggle-btn" id="nat-long" onclick="setNatDir('Long')" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">▲ Long</button>
+            <button type="button" class="dir-toggle-btn" id="nat-short" onclick="setNatDir('Short')" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">▼ Short</button>
+          </div>
+          <input type="hidden" id="nat-dir" value="Long">
+        </div>
+      </div>
+
+      <!-- Entry plan / SL / TP -->
+      <div class="fg">
+        <div class="fgg"><label class="fl">Entry Plan</label><input class="fi" id="nat-entry" type="number" placeholder="0.00000" step="any"></div>
+        <div class="fgg"><label class="fl">Stop Loss</label><input class="fi" id="nat-sl" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()"></div>
+      </div>
+      <div class="fg">
+        <div class="fgg"><label class="fl">Take Profit</label><input class="fi" id="nat-tp" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()"></div>
+        <div class="fgg">
+          <label class="fl">Risk ($)</label>
+          <input class="fi" id="nat-risk" type="number" placeholder="100" step="any">
+        </div>
+      </div>
+
+      <!-- Planned R:R preview -->
+      <div id="nat-rr-preview" style="display:none;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--text2)">Planned R:R</span>
+        <span id="nat-rr-val" style="font-size:18px;font-weight:800;font-family:var(--mono);color:#f59e0b">—</span>
+      </div>
+
+      <!-- Session -->
+      <div class="fgg">
+        <label class="fl">Sesi</label>
+        <select class="fi" id="nat-session">
+          <option value="">— Pilih sesi —</option>
+          <option>Sydney</option><option>Tokyo</option><option>London</option><option>New York</option><option>London-NY Overlap</option>
+        </select>
+      </div>
+
+      <!-- Setup / Strategy -->
+      <div class="fgg">
+        <label class="fl">Setup / Strategi</label>
+        <input class="fi" id="nat-setup" type="text" placeholder="Trend Follow, OB, Supply/Demand...">
+      </div>
+
+      <!-- Kenapa ambil trade ini -->
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-chat-quote" style="margin-right:4px"></i>Kenapa kamu ambil trade ini?</label>
+        <textarea class="ta" id="nat-reason" placeholder="Alasan entry, kondisi market, level kunci yang diperhatikan..." style="min-height:70px;font-size:12px"></textarea>
+      </div>
+
+      <!-- Emosi sekarang -->
+      <div class="fgg">
+        <label class="fl">Kondisi Emosi Saat Entry</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="emotion-btn" data-em="Calm" onclick="setNatEmotion('Calm')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Calm</button>
+          <button type="button" class="emotion-btn" data-em="Confident" onclick="setNatEmotion('Confident')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">💪 Confident</button>
+          <button type="button" class="emotion-btn" data-em="FOMO" onclick="setNatEmotion('FOMO')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ FOMO</button>
+          <button type="button" class="emotion-btn" data-em="Revenge" onclick="setNatEmotion('Revenge')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">🔥 Revenge</button>
+          <button type="button" class="emotion-btn" data-em="Anxious" onclick="setNatEmotion('Anxious')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Anxious</button>
+        </div>
+        <input type="hidden" id="nat-emotion" value="">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+      <button type="button" onclick="document.getElementById('md-new-active').classList.remove('open')" style="padding:10px 18px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Batal</button>
+      <button type="button" onclick="saveNewActiveTrade()" style="padding:10px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,#f59e0b,#fb923c);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(245,158,11,.35)"><i class="bi bi-send-fill" style="margin-right:5px;font-size:11px"></i>Mulai Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     §MODAL-CLOSE-ACTIVE — Close Active Trade → into Journal
+     ════════════════════════════════════════════════════════════ -->
+<div class="mo" id="md-close-active">
+  <div class="md" style="width:460px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(0,217,126,.2),rgba(0,217,126,.05));border:1px solid rgba(0,217,126,.3);display:flex;align-items:center;justify-content:center">
+          <i class="bi bi-check-circle" style="color:#00d97e;font-size:15px"></i>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Tutup Trade</div>
+          <div id="cat-pair-label" style="font-size:11px;color:var(--text3);margin-top:1px">Masukkan hasil → otomatis ke journal</div>
+        </div>
+      </div>
+      <button onclick="document.getElementById('md-close-active').classList.remove('open')" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+
+    <!-- Plan recap -->
+    <div id="cat-plan-recap" class="at-plan-box" style="margin-bottom:14px"></div>
+
+    <!-- Actual exit -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="fg">
+        <div class="fgg"><label class="fl">Actual Entry</label><input class="fi" id="cat-entry" type="number" placeholder="0.00000" step="any" oninput="calcCatRR()"></div>
+        <div class="fgg"><label class="fl">Exit Price</label><input class="fi" id="cat-exit" type="number" placeholder="0.00000" step="any" oninput="calcCatRR()"></div>
+      </div>
+
+      <div class="fg">
+        <div class="fgg">
+          <label class="fl">Profit / Loss ($)</label>
+          <div style="position:relative">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3)">$</span>
+            <input class="fi" id="cat-pnl" type="number" placeholder="+250 atau -100" step="any" style="padding-left:22px" oninput="autoCatResult()">
+          </div>
+        </div>
+        <div class="fgg">
+          <label class="fl">Result</label>
+          <div style="display:flex;gap:5px">
+            <button type="button" class="result-btn" id="cat-r-win" onclick="setCatResult('Win')" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">Win</button>
+            <button type="button" class="result-btn" id="cat-r-loss" onclick="setCatResult('Loss')" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">Loss</button>
+            <button type="button" class="result-btn" id="cat-r-be" onclick="setCatResult('Breakeven')" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">BE</button>
+          </div>
+          <input type="hidden" id="cat-result" value="">
+        </div>
+      </div>
+
+      <!-- R:R realisasi preview -->
+      <div class="cat-rr-preview" id="cat-rr-preview">
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700">Planned R:R</div>
+          <div id="cat-planned-rr" style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--text2);margin-top:2px">—</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch"></div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700">Actual R:R</div>
+          <div id="cat-actual-rr" class="cat-rr-val" style="margin-top:2px;color:var(--text)">—</div>
+        </div>
+      </div>
+
+      <!-- Apakah eksekusi sesuai plan? -->
+      <div class="fgg">
+        <label class="fl"><i class="bi bi-patch-question" style="margin-right:4px"></i>Eksekusi sesuai plan?</label>
+        <div style="display:flex;gap:8px">
+          <button type="button" id="cat-conform-yes" onclick="setCatConform(true)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">✅ Ya, sesuai</button>
+          <button type="button" id="cat-conform-no" onclick="setCatConform(false)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">❌ Tidak</button>
+        </div>
+        <input type="hidden" id="cat-conform" value="">
+      </div>
+
+      <!-- Rating kualitas proses -->
+      <div class="fgg">
+        <label class="fl">Rating Kualitas Eksekusi (bukan hasil)</label>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:4px" id="cat-stars">
+          <span data-star="1" onclick="setCatStar(1)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
+          <span data-star="2" onclick="setCatStar(2)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
+          <span data-star="3" onclick="setCatStar(3)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
+          <span data-star="4" onclick="setCatStar(4)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
+          <span data-star="5" onclick="setCatStar(5)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
+        </div>
+        <input type="hidden" id="cat-rating" value="0">
+      </div>
+
+      <!-- Catatan post-trade -->
+      <div class="fgg">
+        <label class="fl">Pelajaran / Catatan</label>
+        <textarea class="ta" id="cat-notes" placeholder="Apa yang berjalan baik? Apa yang bisa diperbaiki?" style="min-height:65px;font-size:12px"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+      <button type="button" onclick="document.getElementById('md-close-active').classList.remove('open')" style="padding:10px 18px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Batal</button>
+      <button type="button" onclick="closeActiveTrade()" style="padding:10px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,#00d97e,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(0,217,126,.3)"><i class="bi bi-check2-circle" style="margin-right:5px;font-size:11px"></i>Tutup & Simpan ke Journal</button>
     </div>
   </div>
 </div>
@@ -9193,6 +9456,457 @@ function updateAll() {
 }
 window.updateAll = updateAll; // expose for external modules
 
+// ══════════════════════════════════════════════════════════════
+//  ACTIVE TRADE TRACKER — Full Engine
+// ══════════════════════════════════════════════════════════════
+// NOTE: switchJournalView is exposed to window below (after definition)
+
+let activeTrades = []; // array of active trade objects
+let _closingActiveId = null; // ID of active trade being closed
+let _journalView = 'history'; // 'history' | 'active'
+const AT_KEY_PREFIX = 'at_'; // localStorage key prefix per user
+
+// ── Storage helpers (localStorage, per user) ──────────────────
+function _atKey() {
+  return 'activeTrades_' + (currentUser ? currentUser.uid : 'guest');
+}
+function _atLoad() {
+  try { activeTrades = JSON.parse(localStorage.getItem(_atKey()) || '[]'); } catch(e) { activeTrades = []; }
+}
+function _atSave() {
+  try { localStorage.setItem(_atKey(), JSON.stringify(activeTrades)); } catch(e) {}
+}
+
+// ── View switching ─────────────────────────────────────────────
+function switchJournalView(view) {
+  _journalView = view;
+  const histPanel = document.getElementById('at-history-panel');
+  const summaryEl = document.getElementById('journal-summary');
+  const tableEl   = document.querySelector('.tc');
+  const esEl      = document.getElementById('es');
+  const atPanel   = document.getElementById('at-panel');
+  const filterBar = document.getElementById('journal-period-tabs')?.parentElement;
+
+  const isHistory = view === 'history';
+  if (histPanel) histPanel.style.display = isHistory ? 'flex' : 'none';
+  if (summaryEl) summaryEl.style.display = isHistory ? '' : 'none';
+  if (tableEl)   tableEl.style.display   = isHistory ? '' : 'none';
+  if (esEl)      esEl.style.display      = (isHistory && trades.length === 0) ? 'block' : 'none';
+  if (atPanel)   atPanel.style.display   = isHistory ? 'none' : 'block';
+
+  document.getElementById('at-tab-history')?.classList.toggle('active', isHistory);
+  document.getElementById('at-tab-active')?.classList.toggle('active', !isHistory);
+
+  if (!isHistory) renderActiveTrades();
+}
+window.switchJournalView = switchJournalView; // expose to global scope for onclick= attrs
+window._switchJournalViewReady = switchJournalView; // bridge for early stub calls
+
+// ── Render active trades list ──────────────────────────────────
+function renderActiveTrades() {
+  _atLoad();
+  const el = document.getElementById('at-list');
+  if (!el) return;
+
+  // Update count badge
+  const badge = document.getElementById('at-active-count');
+  if (badge) badge.textContent = activeTrades.length;
+
+  if (activeTrades.length === 0) {
+    el.innerHTML = `<div class="at-empty">
+      <i class="bi bi-inbox"></i>
+      Belum ada trade aktif.<br>
+      <span style="font-size:12px;margin-top:6px;display:block">Klik <strong style="color:var(--text)">"Plan Trade Baru"</strong> sebelum eksekusi.</span>
+    </div>`;
+    return;
+  }
+
+  const statusClass = { open:'status-open', partial:'status-partial', be:'status-be' };
+  const statusBadge = {
+    open:    '<span class="at-status-badge at-status-open">● Open</span>',
+    partial: '<span class="at-status-badge at-status-partial">◑ Partial TP</span>',
+    be:      '<span class="at-status-badge at-status-be">→ Move to BE</span>'
+  };
+
+  el.innerHTML = activeTrades.map(at => {
+    const dur = _atDuration(at.openedAt);
+    const dirColor = at.dir === 'Long' ? '#00d97e' : '#ff4d4d';
+    const dirLabel = at.dir === 'Long' ? '▲ Long' : '▼ Short';
+    const planRR = at.plannedRR ? `${at.plannedRR}R` : '—';
+
+    return `<div class="at-card ${statusClass[at.status] || 'status-open'}" id="at-card-${at.id}">
+      <div class="at-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="at-pair">${at.pair||'—'}</span>
+          <span style="font-size:11px;font-weight:700;color:${dirColor};background:${dirColor}18;padding:2px 8px;border-radius:6px;border:1px solid ${dirColor}30">${dirLabel}</span>
+          ${statusBadge[at.status] || statusBadge.open}
+        </div>
+        <div class="at-timer"><i class="bi bi-clock"></i>${dur}</div>
+      </div>
+
+      <div class="at-grid">
+        <div class="at-cell"><div class="at-cell-label">Entry Plan</div><div class="at-cell-val">${at.entryPlan||'—'}</div></div>
+        <div class="at-cell"><div class="at-cell-label">Stop Loss</div><div class="at-cell-val" style="color:#ff4d4d">${at.sl||'—'}</div></div>
+        <div class="at-cell"><div class="at-cell-label">Take Profit</div><div class="at-cell-val" style="color:#00d97e">${at.tp||'—'}</div></div>
+        <div class="at-cell"><div class="at-cell-label">Risk</div><div class="at-cell-val">$${at.risk||'—'}</div></div>
+        <div class="at-cell"><div class="at-cell-label">Planned R:R</div><div class="at-cell-val" style="color:#f59e0b">${planRR}</div></div>
+        <div class="at-cell"><div class="at-cell-label">Sesi</div><div class="at-cell-val" style="font-size:11px">${at.session||'—'}</div></div>
+      </div>
+
+      ${at.reason ? `<div class="at-plan-box"><strong>Plan:</strong> ${at.reason}</div>` : ''}
+      ${at.setup ? `<div style="font-size:11px;color:var(--text3);margin-bottom:10px"><i class="bi bi-tags" style="margin-right:4px"></i>${at.setup}</div>` : ''}
+
+      <div class="at-actions">
+        <button class="at-btn at-btn-close" onclick="openCloseActiveModal('${at.id}')">
+          <i class="bi bi-check2-circle"></i> Tutup Trade
+        </button>
+        <button class="at-btn" onclick="setAtStatus('${at.id}','partial')" title="Sebagian profit sudah diambil">
+          <i class="bi bi-pie-chart"></i> Partial TP
+        </button>
+        <button class="at-btn" onclick="setAtStatus('${at.id}','be')" title="SL sudah dipindah ke breakeven">
+          <i class="bi bi-shield-check"></i> Move to BE
+        </button>
+        <button class="at-btn at-btn-del" onclick="deleteActiveTrade('${at.id}')">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _atDuration(openedAt) {
+  if (!openedAt) return '—';
+  const diff = Date.now() - openedAt;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h > 0) return `${h}j ${m}m`;
+  return `${m}m`;
+}
+
+// ── New Active Trade Modal ─────────────────────────────────────
+function openNewActiveTrade() {
+  ['nat-pair','nat-entry','nat-sl','nat-tp','nat-risk','nat-reason','nat-setup'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('nat-direction') && (document.getElementById('nat-direction').value = '');
+  document.querySelectorAll('#md-new-active .emotion-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nat-emotion').value = '';
+  document.getElementById('nat-rr-preview').style.display = 'none';
+  setNatDir('Long');
+  document.getElementById('md-new-active').classList.add('open');
+  setTimeout(() => document.getElementById('nat-pair')?.focus(), 80);
+}
+window.openNewActiveTrade = openNewActiveTrade;
+
+function setNatDir(dir) {
+  document.getElementById('nat-dir').value = dir;
+  document.getElementById('nat-long').className = 'dir-toggle-btn' + (dir==='Long'?' active-long':'');
+  document.getElementById('nat-short').className = 'dir-toggle-btn' + (dir==='Short'?' active-short':'');
+  ['nat-long','nat-short'].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.style.padding='9px'; b.style.borderRadius='9px'; b.style.border='1px solid var(--border)';
+    b.style.background='var(--bg3)'; b.style.color='var(--text2)'; b.style.fontSize='12px';
+    b.style.fontWeight='700'; b.style.cursor='pointer'; b.style.fontFamily='var(--font)'; b.style.transition='all .15s'; b.style.flex='1';
+  });
+}
+window.setNatDir = setNatDir;
+
+function setNatEmotion(em) {
+  document.getElementById('nat-emotion').value = em;
+  document.querySelectorAll('#md-new-active .emotion-btn').forEach(b => b.classList.toggle('active', b.dataset.em === em));
+}
+window.setNatEmotion = setNatEmotion;
+
+function calcNatRR() {
+  const entry = parseFloat(document.getElementById('nat-entry')?.value);
+  const sl    = parseFloat(document.getElementById('nat-sl')?.value);
+  const tp    = parseFloat(document.getElementById('nat-tp')?.value);
+  const dir   = document.getElementById('nat-dir')?.value;
+  const prev  = document.getElementById('nat-rr-preview');
+  const val   = document.getElementById('nat-rr-val');
+  if (!entry || !sl || !tp || !dir || !prev || !val) return;
+  const risk   = Math.abs(entry - sl);
+  const reward = Math.abs(tp - entry);
+  if (risk === 0) return;
+  const rr = (reward / risk).toFixed(2);
+  val.textContent = rr + 'R';
+  val.style.color = parseFloat(rr) >= 2 ? '#00d97e' : parseFloat(rr) >= 1 ? '#f59e0b' : '#ff4d4d';
+  prev.style.display = 'flex';
+}
+window.calcNatRR = calcNatRR;
+
+function saveNewActiveTrade() {
+  const pair = document.getElementById('nat-pair')?.value.trim().toUpperCase();
+  if (!pair) { alert('Isi pair dulu!'); return; }
+  const entry = parseFloat(document.getElementById('nat-entry')?.value) || 0;
+  const sl    = parseFloat(document.getElementById('nat-sl')?.value) || 0;
+  const tp    = parseFloat(document.getElementById('nat-tp')?.value) || 0;
+  const dir   = document.getElementById('nat-dir')?.value || 'Long';
+  const risk  = parseFloat(document.getElementById('nat-risk')?.value) || 0;
+  let plannedRR = 0;
+  if (entry && sl) {
+    const riskPts = Math.abs(entry - sl);
+    const rewPts  = tp ? Math.abs(tp - entry) : 0;
+    if (riskPts > 0 && rewPts > 0) plannedRR = Math.round(rewPts / riskPts * 100) / 100;
+  }
+
+  const at = {
+    id: 'at_' + Date.now(),
+    pair, dir,
+    entryPlan: entry || null,
+    sl: sl || null,
+    tp: tp || null,
+    risk: risk || null,
+    plannedRR,
+    session:  document.getElementById('nat-session')?.value || '',
+    setup:    document.getElementById('nat-setup')?.value.trim() || '',
+    reason:   document.getElementById('nat-reason')?.value.trim() || '',
+    emotion:  document.getElementById('nat-emotion')?.value || '',
+    status:   'open',
+    openedAt: Date.now(),
+    date:     new Date().toISOString().slice(0,10)
+  };
+
+  _atLoad();
+  activeTrades.unshift(at);
+  _atSave();
+  document.getElementById('md-new-active').classList.remove('open');
+  renderActiveTrades();
+  _updateAtBadge();
+}
+window.saveNewActiveTrade = saveNewActiveTrade;
+
+function setAtStatus(id, status) {
+  _atLoad();
+  const at = activeTrades.find(x => x.id === id);
+  if (at) { at.status = status; _atSave(); renderActiveTrades(); }
+}
+window.setAtStatus = setAtStatus;
+
+function deleteActiveTrade(id) {
+  if (!confirm('Hapus trade aktif ini?')) return;
+  _atLoad();
+  activeTrades = activeTrades.filter(x => x.id !== id);
+  _atSave();
+  renderActiveTrades();
+  _updateAtBadge();
+}
+window.deleteActiveTrade = deleteActiveTrade;
+
+// ── Close Active Trade Modal ───────────────────────────────────
+function openCloseActiveModal(id) {
+  _atLoad();
+  const at = activeTrades.find(x => x.id === id);
+  if (!at) return;
+  _closingActiveId = id;
+
+  // Populate recap
+  const recap = document.getElementById('cat-plan-recap');
+  if (recap) {
+    recap.innerHTML = `<strong>${at.pair}</strong> ${at.dir} · Plan entry: <strong>${at.entryPlan||'—'}</strong> · SL: <strong style="color:#ff4d4d">${at.sl||'—'}</strong> · TP: <strong style="color:#00d97e">${at.tp||'—'}</strong> · Planned R:R: <strong style="color:#f59e0b">${at.plannedRR||'—'}R</strong>${at.reason ? `<br><span style="color:var(--text3);margin-top:4px;display:block">${at.reason}</span>` : ''}`;
+  }
+  const label = document.getElementById('cat-pair-label');
+  if (label) label.textContent = at.pair + ' · ' + at.dir + ' · ' + (at.session||'');
+
+  // Pre-fill entry from plan
+  const catEntry = document.getElementById('cat-entry');
+  if (catEntry) catEntry.value = at.entryPlan || '';
+
+  // Reset fields
+  ['cat-exit','cat-pnl','cat-notes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('cat-result').value = '';
+  document.getElementById('cat-conform').value = '';
+  document.getElementById('cat-rating').value = '0';
+
+  // Planned RR display
+  const prrEl = document.getElementById('cat-planned-rr');
+  if (prrEl) prrEl.textContent = at.plannedRR ? at.plannedRR + 'R' : '—';
+  document.getElementById('cat-actual-rr').textContent = '—';
+  document.getElementById('cat-actual-rr').style.color = 'var(--text)';
+
+  // Reset buttons
+  ['cat-r-win','cat-r-loss','cat-r-be'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) { b.className = 'result-btn'; b.style.cssText='flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s'; }
+  });
+  ['cat-conform-yes','cat-conform-no'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) { b.style.background='var(--bg3)'; b.style.borderColor='var(--border)'; b.style.color='var(--text2)'; }
+  });
+  setCatStar(0);
+
+  document.getElementById('md-close-active').classList.add('open');
+}
+window.openCloseActiveModal = openCloseActiveModal;
+
+function calcCatRR() {
+  _atLoad();
+  const at = activeTrades.find(x => x.id === _closingActiveId);
+  if (!at) return;
+  const entry = parseFloat(document.getElementById('cat-entry')?.value);
+  const exit  = parseFloat(document.getElementById('cat-exit')?.value);
+  const sl    = at.sl;
+  const el    = document.getElementById('cat-actual-rr');
+  if (!entry || !exit || !sl || !el) return;
+  const risk   = Math.abs(entry - sl);
+  if (risk === 0) return;
+  const pnlPts = (at.dir === 'Long') ? (exit - entry) : (entry - exit);
+  const rr     = Math.round(pnlPts / risk * 100) / 100;
+  el.textContent = (rr >= 0 ? '+' : '') + rr + 'R';
+  el.style.color  = rr > 0 ? '#00d97e' : rr < 0 ? '#ff4d4d' : '#a78bfa';
+}
+window.calcCatRR = calcCatRR;
+
+function autoCatResult() {
+  const pnl = parseFloat(document.getElementById('cat-pnl')?.value);
+  if (isNaN(pnl)) return;
+  if (pnl > 0) setCatResult('Win');
+  else if (pnl < 0) setCatResult('Loss');
+  else setCatResult('Breakeven');
+}
+window.autoCatResult = autoCatResult;
+
+function setCatResult(r) {
+  document.getElementById('cat-result').value = r;
+  const map = { Win:'cat-r-win', Loss:'cat-r-loss', Breakeven:'cat-r-be' };
+  const cls = { Win:'result-btn active-win', Loss:'result-btn active-loss', Breakeven:'result-btn active-be' };
+  const base = 'flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s';
+  ['cat-r-win','cat-r-loss','cat-r-be'].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.className = 'result-btn';
+    b.style.cssText = base;
+  });
+  const btn = document.getElementById(map[r]);
+  if (btn) btn.className = cls[r] || 'result-btn';
+}
+window.setCatResult = setCatResult;
+
+function setCatConform(yes) {
+  document.getElementById('cat-conform').value = yes ? 'yes' : 'no';
+  const yBtn = document.getElementById('cat-conform-yes');
+  const nBtn = document.getElementById('cat-conform-no');
+  if (yBtn) { yBtn.style.background = yes ? 'rgba(0,217,126,.1)' : 'var(--bg3)'; yBtn.style.borderColor = yes ? 'rgba(0,217,126,.4)' : 'var(--border)'; yBtn.style.color = yes ? '#00d97e' : 'var(--text2)'; }
+  if (nBtn) { nBtn.style.background = !yes ? 'rgba(255,77,77,.08)' : 'var(--bg3)'; nBtn.style.borderColor = !yes ? 'rgba(255,77,77,.35)' : 'var(--border)'; nBtn.style.color = !yes ? '#ff4d4d' : 'var(--text2)'; }
+}
+window.setCatConform = setCatConform;
+
+function setCatStar(n) {
+  document.getElementById('cat-rating').value = n;
+  const starEls = document.querySelectorAll('#cat-stars span');
+  starEls.forEach((s, i) => {
+    const active = i < n;
+    s.style.opacity = active ? '1' : '.3';
+    s.style.color   = active ? (n >= 4 ? '#a78bfa' : n >= 3 ? '#f59e0b' : '#71717a') : 'var(--text3)';
+  });
+}
+window.setCatStar = setCatStar;
+
+async function closeActiveTrade() {
+  _atLoad();
+  const at = activeTrades.find(x => x.id === _closingActiveId);
+  if (!at) return;
+
+  const pnl    = parseFloat(document.getElementById('cat-pnl')?.value) || 0;
+  const result = document.getElementById('cat-result')?.value || 'Breakeven';
+  const exit   = parseFloat(document.getElementById('cat-exit')?.value) || 0;
+  const entry  = parseFloat(document.getElementById('cat-entry')?.value) || at.entryPlan || 0;
+  const rating = parseInt(document.getElementById('cat-rating')?.value) || 0;
+  const notes  = document.getElementById('cat-notes')?.value.trim() || '';
+  const conform = document.getElementById('cat-conform')?.value || '';
+
+  if (!result) { alert('Pilih result dulu (Win / Loss / Breakeven)'); return; }
+
+  // Calculate actual R
+  let actualR = 0;
+  if (at.sl && entry) {
+    const risk = Math.abs(entry - at.sl);
+    if (risk > 0) {
+      const pnlPts = (at.dir === 'Long') ? (exit - entry) : (entry - exit);
+      actualR = Math.round(pnlPts / risk * 100) / 100;
+    }
+  }
+  if (!actualR && at.risk && at.risk > 0) actualR = Math.round(pnl / at.risk * 100) / 100;
+
+  // Build closed trade object (matches existing journal schema)
+  const closedNote = [
+    notes,
+    at.reason ? `Plan: ${at.reason}` : '',
+    conform ? `Eksekusi ${conform === 'yes' ? 'sesuai' : 'tidak sesuai'} plan` : '',
+    at.emotion ? `Emosi saat entry: ${at.emotion}` : ''
+  ].filter(Boolean).join(' · ');
+
+  const trade = {
+    date:         at.date || new Date().toISOString().slice(0,10),
+    pair:         at.pair,
+    dir:          at.dir,
+    session:      at.session || '',
+    entry:        entry,
+    exit:         exit,
+    sl:           at.sl || 0,
+    risk:         at.risk || 0,
+    pnl:          pnl,
+    r:            actualR,
+    result:       result,
+    setup:        at.setup || '',
+    notes:        closedNote,
+    emotion:      at.emotion || '',
+    rating:       rating,
+    plannedRR:    at.plannedRR || 0,
+    followedPlan: conform === 'yes',
+    holdingMinutes: Math.round((Date.now() - at.openedAt) / 60000)
+  };
+
+  // Remove from active list
+  activeTrades = activeTrades.filter(x => x.id !== _closingActiveId);
+  _atSave();
+
+  // Save to journal (existing pipeline)
+  await saveTradeToCloud(trade);
+
+  document.getElementById('md-close-active').classList.remove('open');
+  _closingActiveId = null;
+  renderActiveTrades();
+  _updateAtBadge();
+
+  // Show confirmation toast
+  _atToast(`✅ Trade ${trade.pair} ditutup — masuk journal sebagai <strong style="color:${result==='Win'?'#00d97e':result==='Loss'?'#ff4d4d':'#a78bfa'}">${result}</strong>`);
+}
+window.closeActiveTrade = closeActiveTrade;
+
+function _updateAtBadge() {
+  _atLoad();
+  const badge = document.getElementById('at-active-count');
+  if (badge) badge.textContent = activeTrades.length;
+}
+
+function _atToast(msg) {
+  const t = document.createElement('div');
+  t.innerHTML = msg;
+  Object.assign(t.style, {
+    position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%) translateY(10px)',
+    background:'var(--bg2)', border:'1px solid rgba(0,217,126,.3)', borderRadius:'12px',
+    padding:'10px 18px', fontSize:'13px', fontWeight:'600', color:'var(--text)',
+    zIndex:'9999', boxShadow:'0 8px 32px rgba(0,0,0,.4)', opacity:'0',
+    transition:'all .3s cubic-bezier(.34,1.2,.64,1)', whiteSpace:'nowrap'
+  });
+  document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
+  setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+// ── Init on page load ──────────────────────────────────────────
+(function initActiveTrades() {
+  _atLoad();
+  _updateAtBadge();
+  // Refresh timer every minute
+  setInterval(() => { if (_journalView === 'active') renderActiveTrades(); }, 60000);
+})();
+// ── END ACTIVE TRADE TRACKER ──────────────────────────────────
+
+
 // ── TRADER TYPE PROFILING ─────────────────────────────
 function _detectTraderType(tArr) {
   if (!tArr || tArr.length < 5) return null;
@@ -10558,6 +11272,7 @@ function renderDonut(){
 
 // ── TABLE ─────────────────────────────────────────────
 function renderTable(){
+  _updateAtBadge && _updateAtBadge();
   const fp=$('fp').value, fr=$('fr').value;
 
   // Apply period filter first, then pair/result filters
