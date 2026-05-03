@@ -650,49 +650,187 @@ tr:hover td{background:rgba(139,92,246,.04);}
   .journal-tool-btn{padding:7px 10px;}
   .journal-actions{gap:6px;}
 }
-/* ── ACTIVE TRADE TRACKER ── */
-.at-tabs{display:flex;gap:6px;margin-bottom:14px;}
-.at-tab{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;gap:6px;}
-.at-tab.active{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.45);color:var(--accent2);}
-.at-tab .at-count{background:rgba(139,92,246,.25);color:#c4b5fd;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px;font-family:var(--mono);}
-.at-tab.at-live .at-count{background:rgba(245,158,11,.2);color:#f59e0b;}
-.at-card{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;margin-bottom:10px;transition:all .2s;position:relative;overflow:hidden;}
-.at-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
-.at-card.status-open::before{background:linear-gradient(180deg,#f59e0b,#fb923c);}
-.at-card.status-partial::before{background:linear-gradient(180deg,#38bdf8,#7c3aed);}
-.at-card.status-be::before{background:linear-gradient(180deg,#a78bfa,#7c3aed);}
-.at-card:hover{border-color:rgba(139,92,246,.3);box-shadow:0 4px 20px rgba(0,0,0,.3);}
-.at-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+/* ══════════════════════════════════════════════════════════════
+   ACTIVE TRADE TRACKER — Premium Redesign
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tab Bar ── */
+.at-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--bg3);border-radius:12px;padding:3px;border:1px solid var(--border);}
+.at-tab{flex:1;padding:9px 14px;border-radius:9px;border:none;background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.1px;}
+.at-tab.active{background:var(--bg);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.4);border:1px solid var(--border2);}
+.at-tab.at-live.active{background:rgba(139,92,246,.1);color:var(--accent2);border-color:rgba(139,92,246,.3);}
+.at-tab .at-count{background:rgba(139,92,246,.2);color:var(--accent2);border-radius:20px;font-size:10px;font-weight:800;padding:1px 7px;font-family:var(--mono);min-width:18px;text-align:center;}
+.at-tab:not(.active) .at-count{background:rgba(255,255,255,.06);color:var(--text3);}
+
+/* ── Live pulse dot ── */
+.at-live-dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0;animation:at-pulse 2.4s ease-in-out infinite;}
+@keyframes at-pulse{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.5);}60%{box-shadow:0 0 0 5px rgba(139,92,246,0);}}
+
+/* ── Panel header bar ── */
+.at-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.at-panel-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;}
+.at-add-btn{display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;box-shadow:0 4px 16px rgba(139,92,246,.3);letter-spacing:.1px;}
+.at-add-btn:hover{background:#7c3aed;box-shadow:0 6px 22px rgba(139,92,246,.45);transform:translateY(-1px);}
+.at-add-btn:active{transform:translateY(0);}
+
+/* ── Summary bar ── */
+.at-summary-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.at-sum-cell{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:center;}
+.at-sum-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:5px;}
+.at-sum-val{font-size:17px;font-weight:800;font-family:var(--mono);color:var(--text);}
+.at-sum-val.pos{color:#22c55e;}
+.at-sum-val.neg{color:#ef4444;}
+.at-sum-val.gold{color:var(--accent2);}
+
+/* ── Trade card ── */
+.at-card{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:0;
+  margin-bottom:10px;
+  transition:border-color .2s,box-shadow .2s;
+  position:relative;
+  overflow:hidden;
+}
+.at-card:hover{border-color:rgba(139,92,246,.3);box-shadow:0 4px 24px rgba(0,0,0,.3);}
+/* Status left accent bar */
+.at-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.at-card.status-open::before{background:var(--accent);}
+.at-card.status-partial::before{background:var(--accent2);}
+.at-card.status-be::before{background:rgba(139,92,246,.35);}
+
+/* ── Card inner padding wrapper ── */
+.at-card-inner{padding:14px 16px 14px 20px;}
+
+/* ── Card header row ── */
+.at-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0;}
+.at-header-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.at-header-row1{display:flex;align-items:center;gap:8px;}
 .at-pair{font-size:15px;font-weight:800;color:var(--text);letter-spacing:.3px;font-family:var(--mono);}
-.at-status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;}
-.at-status-open{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
-.at-status-partial{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);}
-.at-status-be{background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.25);}
-.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
-.at-cell{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:8px 10px;}
-.at-cell-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:3px;}
-.at-cell-val{font-size:13px;font-weight:700;color:var(--text);font-family:var(--mono);}
-.at-plan-box{background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.12);border-radius:9px;padding:8px 12px;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
-.at-plan-box strong{color:var(--text);font-weight:600;}
-.at-timer{font-size:11px;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;gap:4px;}
-.at-timer i{font-size:10px;color:#f59e0b;}
-.at-actions{display:flex;gap:6px;flex-wrap:wrap;}
-.at-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:5px;}
-.at-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text);background:rgba(139,92,246,.07);}
-.at-btn.at-btn-close{background:rgba(0,217,126,.08);border-color:rgba(0,217,126,.3);color:#00d97e;}
-.at-btn.at-btn-close:hover{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.5);}
-.at-btn.at-btn-del{color:var(--text3);}
-.at-btn.at-btn-del:hover{color:#ff4d4d;border-color:rgba(255,77,77,.3);background:rgba(255,77,77,.06);}
-.at-empty{text-align:center;padding:36px 20px;color:var(--text3);font-size:13px;}
-.at-empty i{font-size:28px;margin-bottom:10px;opacity:.3;display:block;}
-#md-close-active .md{width:460px;}
-.cat-rr-preview{background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:10px;padding:12px 14px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;}
-.cat-rr-val{font-size:20px;font-weight:800;font-family:var(--mono);}
-#md-new-active .md{width:500px;}
+.at-dir-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;letter-spacing:.2px;}
+.at-dir-long{color:#22c55e;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);}
+.at-dir-short{color:#ef4444;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);}
+
+/* Status badge */
+.at-status-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;}
+.at-status-open{background:rgba(139,92,246,.12);color:var(--accent2);border:1px solid rgba(139,92,246,.25);}
+.at-status-partial{background:rgba(167,139,250,.1);color:var(--accent2);border:1px solid rgba(139,92,246,.2);}
+.at-status-be{background:rgba(139,92,246,.08);color:var(--text3);border:1px solid var(--border2);}
+
+/* Timer */
+.at-timer{font-size:10px;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;gap:4px;margin-left:auto;}
+.at-timer i{font-size:9px;}
+
+/* Collapse toggle */
+.at-collapse-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;flex-shrink:0;margin-left:8px;}
+.at-collapse-btn:hover{border-color:var(--accent);color:var(--accent2);}
+
+/* ── Price grid ── */
+.at-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.at-cell{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:9px;padding:9px 11px;}
+.at-cell-label{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:3px;}
+.at-cell-val{font-size:12px;font-weight:800;color:var(--text);font-family:var(--mono);}
+
+/* ── R:R row ── */
+.at-rr-bar-wrap{margin-bottom:10px;}
+.at-rr-bar-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.at-rr-bar-label{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;}
+.at-rr-bar-val{font-size:11px;font-weight:800;font-family:var(--mono);color:var(--accent2);}
+.at-rr-track{height:3px;border-radius:4px;background:rgba(255,255,255,.05);overflow:hidden;}
+.at-rr-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .5s cubic-bezier(.34,1,.64,1);}
+
+/* ── Plan / Reason box ── */
+.at-plan-box{background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.1);border-radius:9px;padding:9px 12px;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+
+/* Setup + emotion tags */
+.at-setup-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:6px;padding:2px 8px;margin-bottom:10px;font-family:var(--mono);}
+.at-emotion-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;border-radius:6px;padding:2px 8px;margin-bottom:10px;margin-left:5px;}
+.at-emotion-calm{background:rgba(34,197,94,.07);color:#22c55e;border:1px solid rgba(34,197,94,.18);}
+.at-emotion-confident{background:rgba(139,92,246,.08);color:var(--accent2);border:1px solid rgba(139,92,246,.18);}
+.at-emotion-fomo{background:rgba(245,158,11,.07);color:#f59e0b;border:1px solid rgba(245,158,11,.18);}
+.at-emotion-revenge,.at-emotion-anxious{background:rgba(239,68,68,.06);color:#f87171;border:1px solid rgba(239,68,68,.18);}
+
+/* ── Action buttons ── */
+.at-actions{display:flex;gap:6px;padding:10px 16px 12px 20px;border-top:1px solid var(--border);}
+.at-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.at-btn:hover{border-color:var(--border2);color:var(--text2);}
+.at-btn.at-btn-close{background:var(--accent);border-color:var(--accent);color:#fff;flex:1;justify-content:center;font-weight:700;box-shadow:0 3px 12px rgba(139,92,246,.25);}
+.at-btn.at-btn-close:hover{background:#7c3aed;box-shadow:0 4px 18px rgba(139,92,246,.4);}
+.at-btn.at-btn-partial{color:var(--accent2);border-color:rgba(139,92,246,.25);background:rgba(139,92,246,.07);}
+.at-btn.at-btn-partial:hover{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.4);}
+.at-btn.at-btn-be{color:var(--accent2);border-color:rgba(139,92,246,.2);background:rgba(139,92,246,.05);}
+.at-btn.at-btn-be:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.35);}
+.at-btn.at-btn-del{color:var(--text3);padding:7px 10px;margin-left:auto;}
+.at-btn.at-btn-del:hover{color:#ef4444;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05);}
+
+/* ── Empty state ── */
+.at-empty{text-align:center;padding:40px 20px;color:var(--text3);}
+.at-empty-icon{width:48px;height:48px;border-radius:14px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px;}
+.at-empty-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:5px;letter-spacing:-.2px;}
+.at-empty-sub{font-size:12px;color:var(--text3);line-height:1.6;max-width:220px;margin:0 auto 18px;}
+.at-empty-cta{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(139,92,246,.3);}
+.at-empty-cta:hover{background:#7c3aed;}
+
+/* ── Collapse animation ── */
+.at-card-body{overflow:hidden;transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .25s;}
+.at-card-body.collapsed{max-height:0!important;opacity:0;pointer-events:none;}
+
+/* ═══════════════════════════════════════════════
+   MODAL — Plan Trade Baru (redesign)
+   ═══════════════════════════════════════════════ */
+#md-new-active .md{width:520px;}
+.nat-header-band{
+  background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(139,92,246,.04));
+  border:1px solid rgba(139,92,246,.18);
+  border-radius:12px;padding:14px 16px;
+  margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.nat-header-icon{width:40px;height:40px;border-radius:11px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nat-step{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3);margin-top:12px;}
+.nat-step-dot{width:18px;height:18px;border-radius:50%;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:var(--accent2);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nat-step-dot.done{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:#22c55e;}
+.nat-section-label{font-size:9px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px;margin-top:4px;display:flex;align-items:center;gap:6px;}
+.nat-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.nat-price-group{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.nat-rr-pill{display:flex;align-items:center;justify-content:space-between;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.18);border-radius:10px;padding:10px 14px;margin-top:4px;}
+.nat-rr-pill-label{font-size:11px;color:var(--text2);}
+.nat-rr-pill-val{font-size:20px;font-weight:900;font-family:var(--mono);color:var(--accent2);}
+
+/* ═══════════════════════════════════════════════
+   MODAL — Tutup Trade (redesign)
+   ═══════════════════════════════════════════════ */
+#md-close-active .md{width:480px;}
+.cat-recap-card{background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.12);border-radius:12px;padding:12px 14px;margin-bottom:16px;}
+.cat-recap-title{font-size:9px;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px;}
+.cat-recap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.cat-recap-cell{text-align:center;}
+.cat-recap-cell-label{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:2px;}
+.cat-recap-cell-val{font-size:12px;font-weight:800;font-family:var(--mono);color:var(--text);}
+.cat-rr-panel{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.12);border-radius:12px;padding:12px 16px;margin:4px 0;}
+.cat-rr-panel-divider{width:1px;height:32px;background:var(--border2);}
+.cat-rr-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:3px;}
+.cat-rr-val-big{font-size:22px;font-weight:900;font-family:var(--mono);}
+.cat-result-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.cat-result-btn{padding:10px 4px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center;letter-spacing:.1px;}
+.cat-result-btn.active-win{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.4);color:#4ade80;box-shadow:0 2px 10px rgba(34,197,94,.12);}
+.cat-result-btn.active-loss{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.35);color:#f87171;box-shadow:0 2px 10px rgba(239,68,68,.1);}
+.cat-result-btn.active-be{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.35);color:var(--accent2);box-shadow:0 2px 10px rgba(139,92,246,.1);}
+.cat-conform-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cat-conform-btn{padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center;}
+.cat-conform-btn:hover{border-color:rgba(139,92,246,.3);color:var(--text);}
+.cat-stars-row{display:flex;gap:4px;justify-content:center;margin-top:6px;}
+.cat-star{font-size:28px;cursor:pointer;opacity:.2;transition:all .15s;color:var(--accent2);line-height:1;}
+.cat-star.lit{opacity:1;text-shadow:0 0 12px rgba(139,92,246,.5);}
+.cat-star:hover{transform:scale(1.2);}
+
+/* responsive */
 @media(max-width:600px){
   #md-close-active .md,#md-new-active .md{width:100%!important;border-radius:20px 20px 0 0!important;position:fixed!important;bottom:0;left:0;right:0;max-height:92vh!important;}
   #md-close-active,#md-new-active{align-items:flex-end!important;}
-  .at-grid{grid-template-columns:repeat(2,1fr);}
+  .at-grid,.nat-price-group,.cat-recap-grid{grid-template-columns:repeat(2,1fr);}
+  .at-summary-bar{grid-template-columns:repeat(3,1fr);}
 }
 
 /* ── DAILY JOURNAL PREMIUM STYLES ── */
@@ -4035,22 +4173,43 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <!-- ── View mode tabs: History / Active ── -->
     <div class="at-tabs" id="at-view-tabs">
       <button class="at-tab active" id="at-tab-history" onclick="switchJournalView('history')">
-        <i class="bi bi-journal-text"></i> History
+        <i class="bi bi-journal-text" style="font-size:11px"></i> History
       </button>
       <button class="at-tab at-live" id="at-tab-active" onclick="switchJournalView('active')">
-        <i class="bi bi-activity"></i> Active Trade
+        <span class="at-live-dot"></span> Active
         <span class="at-count" id="at-active-count">0</span>
       </button>
     </div>
 
     <!-- ── ACTIVE TRADES PANEL ── -->
     <div id="at-panel" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:12px;color:var(--text3)">Trade yang sedang berjalan — close untuk masuk ke journal</div>
-        <button onclick="openNewActiveTrade()" style="background:linear-gradient(135deg,#f59e0b,#fb923c);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(245,158,11,.3)">
-          <i class="bi bi-plus-lg" style="font-size:10px"></i> Plan Trade Baru
+      <!-- Summary bar -->
+      <div class="at-summary-bar" id="at-summary-bar">
+        <div class="at-sum-cell">
+          <div class="at-sum-label">Open Trades</div>
+          <div class="at-sum-val gold" id="ats-count">0</div>
+        </div>
+        <div class="at-sum-cell">
+          <div class="at-sum-label">Total Risk</div>
+          <div class="at-sum-val neg" id="ats-risk">$0</div>
+        </div>
+        <div class="at-sum-cell">
+          <div class="at-sum-label">Avg Plan R:R</div>
+          <div class="at-sum-val gold" id="ats-rr">—</div>
+        </div>
+      </div>
+
+      <!-- Panel header -->
+      <div class="at-panel-header">
+        <div class="at-panel-meta">
+          <span class="at-live-dot"></span>
+          Live positions
+        </div>
+        <button class="at-add-btn" onclick="openNewActiveTrade()">
+          <i class="bi bi-plus-lg" style="font-size:10px"></i> New Trade
         </button>
       </div>
+
       <div id="at-list"></div>
     </div>
 
@@ -5806,94 +5965,122 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
      §MODAL-NEW-ACTIVE — Plan New Active Trade
      ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-new-active">
-  <div class="md" style="width:500px;max-height:90vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(251,146,60,.1));border:1px solid rgba(245,158,11,.35);display:flex;align-items:center;justify-content:center">
-          <i class="bi bi-activity" style="color:#f59e0b;font-size:15px"></i>
-        </div>
-        <div>
-          <div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Plan Trade Baru</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:1px">Pre-trade plan · Eksekusi dulu, close nanti</div>
-        </div>
+  <div class="md" style="width:520px;max-height:90vh;overflow-y:auto;padding:20px 22px">
+
+    <!-- Header band -->
+    <div class="nat-header-band">
+      <div class="nat-header-icon">
+        <i class="bi bi-activity" style="color:var(--accent2);font-size:17px"></i>
       </div>
-      <button onclick="document.getElementById('md-new-active').classList.remove('open')" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:800;letter-spacing:-.3px;color:var(--text)">New Trade Plan</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Log levels & reasoning before execution</div>
+      </div>
+      <button onclick="document.getElementById('md-new-active').classList.remove('open')" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <!-- Pair + Direction -->
-      <div class="fg">
-        <div class="fgg">
-          <label class="fl">Pair</label>
-          <input class="fi" id="nat-pair" type="text" placeholder="XAUUSD, EURUSD..." style="text-transform:uppercase;font-weight:600;letter-spacing:.5px">
-        </div>
-        <div class="fgg">
-          <label class="fl">Arah</label>
-          <div style="display:flex;gap:6px">
-            <button type="button" class="dir-toggle-btn" id="nat-long" onclick="setNatDir('Long')" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">▲ Long</button>
-            <button type="button" class="dir-toggle-btn" id="nat-short" onclick="setNatDir('Short')" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">▼ Short</button>
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- § INSTRUMENT -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-graph-up" style="color:var(--accent2)"></i> Instrument & Direction</div>
+        <div class="fg" style="gap:10px">
+          <div class="fgg" style="flex:1.4">
+            <label class="fl">Pair / Symbol</label>
+            <input class="fi" id="nat-pair" type="text" placeholder="XAUUSD, EURUSD, BTC..." style="text-transform:uppercase;font-weight:700;font-family:var(--mono);letter-spacing:.8px;font-size:14px">
           </div>
-          <input type="hidden" id="nat-dir" value="Long">
+          <div class="fgg" style="flex:1">
+            <label class="fl">Direction</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <button type="button" id="nat-long" onclick="setNatDir('Long')" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center">▲ Long</button>
+              <button type="button" id="nat-short" onclick="setNatDir('Short')" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center">▼ Short</button>
+            </div>
+            <input type="hidden" id="nat-dir" value="Long">
+          </div>
         </div>
       </div>
 
-      <!-- Entry plan / SL / TP -->
-      <div class="fg">
-        <div class="fgg"><label class="fl">Entry Plan</label><input class="fi" id="nat-entry" type="number" placeholder="0.00000" step="any"></div>
-        <div class="fgg"><label class="fl">Stop Loss</label><input class="fi" id="nat-sl" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()"></div>
+      <!-- § LEVEL -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-bullseye" style="color:var(--accent2)"></i> Key Levels</div>
+        <div class="nat-price-group">
+          <div class="fgg">
+            <label class="fl">Entry</label>
+            <input class="fi" id="nat-entry" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()" style="font-family:var(--mono);font-weight:700">
+          </div>
+          <div class="fgg">
+            <label class="fl" style="color:#f87171">Stop Loss</label>
+            <input class="fi" id="nat-sl" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()" style="font-family:var(--mono);font-weight:700;border-color:rgba(239,68,68,.2)">
+          </div>
+          <div class="fgg">
+            <label class="fl" style="color:#4ade80">Take Profit</label>
+            <input class="fi" id="nat-tp" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()" style="font-family:var(--mono);font-weight:700;border-color:rgba(34,197,94,.2)">
+          </div>
+        </div>
+
+        <div id="nat-rr-preview" style="display:none;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.18);border-radius:10px;padding:10px 14px;margin-top:8px;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:2px">Planned R:R</div>
+            <div style="font-size:10px;color:var(--text3)">Risk : Reward ratio</div>
+          </div>
+          <div id="nat-rr-val" style="font-size:26px;font-weight:900;font-family:var(--mono);color:var(--accent2);letter-spacing:-.5px">—</div>
+        </div>
       </div>
-      <div class="fg">
-        <div class="fgg"><label class="fl">Take Profit</label><input class="fi" id="nat-tp" type="number" placeholder="0.00000" step="any" oninput="calcNatRR()"></div>
+
+      <!-- § RISK -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-shield-exclamation" style="color:var(--accent2)"></i> Risk & Session</div>
+        <div class="fg" style="gap:10px">
+          <div class="fgg">
+            <label class="fl">Risk ($)</label>
+            <div style="position:relative">
+              <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
+              <input class="fi" id="nat-risk" type="number" placeholder="100" step="any" style="padding-left:22px;font-family:var(--mono);font-weight:700">
+            </div>
+          </div>
+          <div class="fgg">
+            <label class="fl">Session</label>
+            <select class="fi" id="nat-session">
+              <option value="">— Select session —</option>
+              <option>Sydney</option><option>Tokyo</option><option>London</option><option>New York</option><option>London-NY Overlap</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- § SETUP -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-tags" style="color:var(--accent2)"></i> Setup & Psychology</div>
+        <div class="fgg" style="margin-bottom:10px">
+          <label class="fl">Setup / Strategy</label>
+          <input class="fi" id="nat-setup" type="text" placeholder="OB, BOS, Supply-Demand, Trend Follow...">
+        </div>
+
+        <div class="fgg" style="margin-bottom:10px">
+          <label class="fl">Reasoning</label>
+          <textarea class="ta" id="nat-reason" placeholder="Market structure, key levels, confluence..." style="min-height:72px;font-size:12px;resize:vertical"></textarea>
+        </div>
+
         <div class="fgg">
-          <label class="fl">Risk ($)</label>
-          <input class="fi" id="nat-risk" type="number" placeholder="100" step="any">
+          <label class="fl">Emotion at Entry</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:2px">
+            <button type="button" class="emotion-btn" data-em="Calm"      onclick="setNatEmotion('Calm')"      style="padding:6px 13px;border-radius:20px;border:1px solid rgba(34,197,94,.22);background:rgba(34,197,94,.07);color:#4ade80;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Calm</button>
+            <button type="button" class="emotion-btn" data-em="Confident" onclick="setNatEmotion('Confident')" style="padding:6px 13px;border-radius:20px;border:1px solid rgba(139,92,246,.22);background:rgba(139,92,246,.07);color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">💪 Confident</button>
+            <button type="button" class="emotion-btn" data-em="FOMO"      onclick="setNatEmotion('FOMO')"      style="padding:6px 13px;border-radius:20px;border:1px solid rgba(245,158,11,.22);background:rgba(245,158,11,.06);color:#fbbf24;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ FOMO</button>
+            <button type="button" class="emotion-btn" data-em="Revenge"   onclick="setNatEmotion('Revenge')"   style="padding:6px 13px;border-radius:20px;border:1px solid rgba(239,68,68,.22);background:rgba(239,68,68,.06);color:#f87171;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">🔥 Revenge</button>
+            <button type="button" class="emotion-btn" data-em="Anxious"   onclick="setNatEmotion('Anxious')"   style="padding:6px 13px;border-radius:20px;border:1px solid rgba(239,68,68,.18);background:rgba(239,68,68,.04);color:#fca5a5;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Anxious</button>
+          </div>
+          <input type="hidden" id="nat-emotion" value="">
         </div>
-      </div>
-
-      <!-- Planned R:R preview -->
-      <div id="nat-rr-preview" style="display:none;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;justify-content:space-between;align-items:center">
-        <span style="font-size:12px;color:var(--text2)">Planned R:R</span>
-        <span id="nat-rr-val" style="font-size:18px;font-weight:800;font-family:var(--mono);color:#f59e0b">—</span>
-      </div>
-
-      <!-- Session -->
-      <div class="fgg">
-        <label class="fl">Sesi</label>
-        <select class="fi" id="nat-session">
-          <option value="">— Pilih sesi —</option>
-          <option>Sydney</option><option>Tokyo</option><option>London</option><option>New York</option><option>London-NY Overlap</option>
-        </select>
-      </div>
-
-      <!-- Setup / Strategy -->
-      <div class="fgg">
-        <label class="fl">Setup / Strategi</label>
-        <input class="fi" id="nat-setup" type="text" placeholder="Trend Follow, OB, Supply/Demand...">
-      </div>
-
-      <!-- Kenapa ambil trade ini -->
-      <div class="fgg">
-        <label class="fl"><i class="bi bi-chat-quote" style="margin-right:4px"></i>Kenapa kamu ambil trade ini?</label>
-        <textarea class="ta" id="nat-reason" placeholder="Alasan entry, kondisi market, level kunci yang diperhatikan..." style="min-height:70px;font-size:12px"></textarea>
-      </div>
-
-      <!-- Emosi sekarang -->
-      <div class="fgg">
-        <label class="fl">Kondisi Emosi Saat Entry</label>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button type="button" class="emotion-btn" data-em="Calm" onclick="setNatEmotion('Calm')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Calm</button>
-          <button type="button" class="emotion-btn" data-em="Confident" onclick="setNatEmotion('Confident')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">💪 Confident</button>
-          <button type="button" class="emotion-btn" data-em="FOMO" onclick="setNatEmotion('FOMO')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ FOMO</button>
-          <button type="button" class="emotion-btn" data-em="Revenge" onclick="setNatEmotion('Revenge')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">🔥 Revenge</button>
-          <button type="button" class="emotion-btn" data-em="Anxious" onclick="setNatEmotion('Anxious')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Anxious</button>
-        </div>
-        <input type="hidden" id="nat-emotion" value="">
       </div>
     </div>
 
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
-      <button type="button" onclick="document.getElementById('md-new-active').classList.remove('open')" style="padding:10px 18px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Batal</button>
-      <button type="button" onclick="saveNewActiveTrade()" style="padding:10px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,#f59e0b,#fb923c);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(245,158,11,.35)"><i class="bi bi-send-fill" style="margin-right:5px;font-size:11px"></i>Mulai Trade</button>
+    <!-- Footer -->
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button type="button" onclick="document.getElementById('md-new-active').classList.remove('open')" style="padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
+      <button type="button" onclick="saveNewActiveTrade()" style="padding:10px 22px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 18px rgba(139,92,246,.35);display:flex;align-items:center;gap:7px">
+        <i class="bi bi-activity" style="font-size:12px"></i> Start Trade
+      </button>
     </div>
   </div>
 </div>
@@ -5902,95 +6089,120 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
      §MODAL-CLOSE-ACTIVE — Close Active Trade → into Journal
      ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-close-active">
-  <div class="md" style="width:460px;max-height:90vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+  <div class="md" style="width:480px;max-height:90vh;overflow-y:auto;padding:20px 22px">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(0,217,126,.2),rgba(0,217,126,.05));border:1px solid rgba(0,217,126,.3);display:flex;align-items:center;justify-content:center">
-          <i class="bi bi-check-circle" style="color:#00d97e;font-size:15px"></i>
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center">
+          <i class="bi bi-check2-circle" style="color:var(--accent2);font-size:16px"></i>
         </div>
         <div>
-          <div style="font-size:15px;font-weight:700;letter-spacing:-.3px">Tutup Trade</div>
-          <div id="cat-pair-label" style="font-size:11px;color:var(--text3);margin-top:1px">Masukkan hasil → otomatis ke journal</div>
+          <div style="font-size:15px;font-weight:800;letter-spacing:-.3px">Close Trade</div>
+          <div id="cat-pair-label" style="font-size:11px;color:var(--text3);margin-top:1px">XAUUSD · Long</div>
         </div>
       </div>
-      <button onclick="document.getElementById('md-close-active').classList.remove('open')" style="background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
+      <button onclick="document.getElementById('md-close-active').classList.remove('open')" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button>
     </div>
 
-    <!-- Plan recap -->
-    <div id="cat-plan-recap" class="at-plan-box" style="margin-bottom:14px"></div>
+    <!-- Plan recap card -->
+    <div class="cat-recap-card">
+      <div class="cat-recap-title">Pre-Trade Plan</div>
+      <div id="cat-plan-recap-grid" class="cat-recap-grid" style="margin-bottom:8px"></div>
+      <div id="cat-plan-reason" style="display:none;font-size:11px;color:var(--text3);line-height:1.6;padding-top:8px;border-top:1px solid var(--border)"></div>
+    </div>
 
-    <!-- Actual exit -->
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div class="fg">
-        <div class="fgg"><label class="fl">Actual Entry</label><input class="fi" id="cat-entry" type="number" placeholder="0.00000" step="any" oninput="calcCatRR()"></div>
-        <div class="fgg"><label class="fl">Exit Price</label><input class="fi" id="cat-exit" type="number" placeholder="0.00000" step="any" oninput="calcCatRR()"></div>
-      </div>
+    <div style="display:flex;flex-direction:column;gap:13px">
 
-      <div class="fg">
-        <div class="fgg">
-          <label class="fl">Profit / Loss ($)</label>
-          <div style="position:relative">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3)">$</span>
-            <input class="fi" id="cat-pnl" type="number" placeholder="+250 atau -100" step="any" style="padding-left:22px" oninput="autoCatResult()">
+      <!-- § ACTUAL PRICES -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-arrow-left-right" style="color:var(--accent2)"></i> Actual Execution</div>
+        <div class="fg" style="gap:10px">
+          <div class="fgg">
+            <label class="fl">Actual Entry</label>
+            <input class="fi" id="cat-entry" type="number" placeholder="0.00000" step="any" oninput="calcCatRR()" style="font-family:var(--mono);font-weight:700">
+          </div>
+          <div class="fgg">
+            <label class="fl">Exit Price</label>
+            <input class="fi" id="cat-exit" type="number" placeholder="0.00000" step="any" oninput="calcCatRR()" style="font-family:var(--mono);font-weight:700">
           </div>
         </div>
-        <div class="fgg">
-          <label class="fl">Result</label>
-          <div style="display:flex;gap:5px">
-            <button type="button" class="result-btn" id="cat-r-win" onclick="setCatResult('Win')" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">Win</button>
-            <button type="button" class="result-btn" id="cat-r-loss" onclick="setCatResult('Loss')" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">Loss</button>
-            <button type="button" class="result-btn" id="cat-r-be" onclick="setCatResult('Breakeven')" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">BE</button>
+      </div>
+
+      <!-- § P&L + RESULT -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-cash-stack" style="color:var(--accent2)"></i> Result</div>
+        <div class="fg" style="gap:10px;margin-bottom:10px">
+          <div class="fgg">
+            <label class="fl">P&amp;L ($)</label>
+            <div style="position:relative">
+              <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
+              <input class="fi" id="cat-pnl" type="number" placeholder="+250 or -100" step="any" style="padding-left:22px;font-family:var(--mono);font-weight:700;font-size:14px" oninput="autoCatResult()">
+            </div>
           </div>
-          <input type="hidden" id="cat-result" value="">
+          <div class="fgg">
+            <label class="fl">Outcome</label>
+            <div class="cat-result-row">
+              <button type="button" class="cat-result-btn" id="cat-r-win"  onclick="setCatResult('Win')">✅ Win</button>
+              <button type="button" class="cat-result-btn" id="cat-r-loss" onclick="setCatResult('Loss')">❌ Loss</button>
+              <button type="button" class="cat-result-btn" id="cat-r-be"   onclick="setCatResult('Breakeven')">— BE</button>
+            </div>
+            <input type="hidden" id="cat-result" value="">
+          </div>
+        </div>
+
+        <!-- R:R comparison panel -->
+        <div class="cat-rr-panel" id="cat-rr-preview">
+          <div>
+            <div class="cat-rr-label">Planned R:R</div>
+            <div id="cat-planned-rr" style="font-size:18px;font-weight:900;font-family:var(--mono);color:var(--text2);margin-top:2px">—</div>
+          </div>
+          <div class="cat-rr-panel-divider"></div>
+          <div style="text-align:right">
+            <div class="cat-rr-label">Actual R:R</div>
+            <div id="cat-actual-rr" style="font-size:22px;font-weight:900;font-family:var(--mono);color:var(--text);margin-top:2px">—</div>
+          </div>
         </div>
       </div>
 
-      <!-- R:R realisasi preview -->
-      <div class="cat-rr-preview" id="cat-rr-preview">
-        <div>
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700">Planned R:R</div>
-          <div id="cat-planned-rr" style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--text2);margin-top:2px">—</div>
-        </div>
-        <div style="width:1px;background:var(--border);align-self:stretch"></div>
-        <div style="text-align:right">
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:700">Actual R:R</div>
-          <div id="cat-actual-rr" class="cat-rr-val" style="margin-top:2px;color:var(--text)">—</div>
-        </div>
-      </div>
+      <!-- § QUALITY REVIEW -->
+      <div>
+        <div class="nat-section-label"><i class="bi bi-clipboard2-check" style="color:var(--accent2)"></i> Execution Review</div>
 
-      <!-- Apakah eksekusi sesuai plan? -->
-      <div class="fgg">
-        <label class="fl"><i class="bi bi-patch-question" style="margin-right:4px"></i>Eksekusi sesuai plan?</label>
-        <div style="display:flex;gap:8px">
-          <button type="button" id="cat-conform-yes" onclick="setCatConform(true)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">✅ Ya, sesuai</button>
-          <button type="button" id="cat-conform-no" onclick="setCatConform(false)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">❌ Tidak</button>
+        <div class="fgg" style="margin-bottom:10px">
+          <label class="fl">Followed the plan?</label>
+          <div class="cat-conform-row">
+            <button type="button" id="cat-conform-yes" onclick="setCatConform(true)" class="cat-conform-btn">✅ Yes, on plan</button>
+            <button type="button" id="cat-conform-no"  onclick="setCatConform(false)" class="cat-conform-btn">❌ No, deviated</button>
+          </div>
+          <input type="hidden" id="cat-conform" value="">
         </div>
-        <input type="hidden" id="cat-conform" value="">
-      </div>
 
-      <!-- Rating kualitas proses -->
-      <div class="fgg">
-        <label class="fl">Rating Kualitas Eksekusi (bukan hasil)</label>
-        <div style="display:flex;gap:6px;justify-content:center;margin-top:4px" id="cat-stars">
-          <span data-star="1" onclick="setCatStar(1)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
-          <span data-star="2" onclick="setCatStar(2)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
-          <span data-star="3" onclick="setCatStar(3)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
-          <span data-star="4" onclick="setCatStar(4)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
-          <span data-star="5" onclick="setCatStar(5)" style="font-size:24px;cursor:pointer;opacity:.35;transition:all .15s">★</span>
+        <div class="fgg" style="margin-bottom:10px">
+          <label class="fl">Process Quality <span style="color:var(--text3);font-weight:400">(not outcome)</span></label>
+          <div class="cat-stars-row" id="cat-stars">
+            <span class="cat-star" onclick="setCatStar(1)">★</span>
+            <span class="cat-star" onclick="setCatStar(2)">★</span>
+            <span class="cat-star" onclick="setCatStar(3)">★</span>
+            <span class="cat-star" onclick="setCatStar(4)">★</span>
+            <span class="cat-star" onclick="setCatStar(5)">★</span>
+          </div>
+          <input type="hidden" id="cat-rating" value="0">
         </div>
-        <input type="hidden" id="cat-rating" value="0">
-      </div>
 
-      <!-- Catatan post-trade -->
-      <div class="fgg">
-        <label class="fl">Pelajaran / Catatan</label>
-        <textarea class="ta" id="cat-notes" placeholder="Apa yang berjalan baik? Apa yang bisa diperbaiki?" style="min-height:65px;font-size:12px"></textarea>
+        <div class="fgg">
+          <label class="fl">Notes & Lessons</label>
+          <textarea class="ta" id="cat-notes" placeholder="What worked? What to improve?" style="min-height:68px;font-size:12px;resize:vertical"></textarea>
+        </div>
       </div>
     </div>
 
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
-      <button type="button" onclick="document.getElementById('md-close-active').classList.remove('open')" style="padding:10px 18px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Batal</button>
-      <button type="button" onclick="closeActiveTrade()" style="padding:10px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,#00d97e,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(0,217,126,.3)"><i class="bi bi-check2-circle" style="margin-right:5px;font-size:11px"></i>Tutup & Simpan ke Journal</button>
+    <!-- Footer -->
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button type="button" onclick="document.getElementById('md-close-active').classList.remove('open')" style="padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Cancel</button>
+      <button type="button" onclick="closeActiveTrade()" style="padding:10px 22px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 18px rgba(139,92,246,.3);display:flex;align-items:center;gap:7px">
+        <i class="bi bi-check2-circle" style="font-size:13px"></i> Save to Journal
+      </button>
     </div>
   </div>
 </div>
@@ -9512,66 +9724,129 @@ function renderActiveTrades() {
   const badge = document.getElementById('at-active-count');
   if (badge) badge.textContent = activeTrades.length;
 
+  // Update summary bar
+  _updateAtSummary();
+
   if (activeTrades.length === 0) {
     el.innerHTML = `<div class="at-empty">
-      <i class="bi bi-inbox"></i>
-      Belum ada trade aktif.<br>
-      <span style="font-size:12px;margin-top:6px;display:block">Klik <strong style="color:var(--text)">"Plan Trade Baru"</strong> sebelum eksekusi.</span>
+      <div class="at-empty-icon">📊</div>
+      <div class="at-empty-title">Belum ada trade aktif</div>
+      <div class="at-empty-sub">Plan trade kamu sebelum eksekusi. Semua level & reasoning tersimpan — tinggal close untuk masuk journal otomatis.</div>
+      <button class="at-empty-cta" onclick="openNewActiveTrade()">
+        <i class="bi bi-plus-lg" style="font-size:10px"></i> Plan Trade Pertama
+      </button>
     </div>`;
     return;
   }
 
   const statusClass = { open:'status-open', partial:'status-partial', be:'status-be' };
   const statusBadge = {
-    open:    '<span class="at-status-badge at-status-open">● Open</span>',
+    open:    '<span class="at-status-badge at-status-open">● Live</span>',
     partial: '<span class="at-status-badge at-status-partial">◑ Partial TP</span>',
-    be:      '<span class="at-status-badge at-status-be">→ Move to BE</span>'
+    be:      '<span class="at-status-badge at-status-be">→ Breakeven</span>'
   };
 
-  el.innerHTML = activeTrades.map(at => {
+  const emotionEmoji = { Calm:'😌', Confident:'💪', FOMO:'⚡', Revenge:'🔥', Anxious:'😰' };
+  const emotionClass = { Calm:'at-emotion-calm', Confident:'at-emotion-confident', FOMO:'at-emotion-fomo', Revenge:'at-emotion-revenge', Anxious:'at-emotion-anxious' };
+
+  el.innerHTML = activeTrades.map((at, idx) => {
     const dur = _atDuration(at.openedAt);
-    const dirColor = at.dir === 'Long' ? '#00d97e' : '#ff4d4d';
-    const dirLabel = at.dir === 'Long' ? '▲ Long' : '▼ Short';
+    const dirIsLong = at.dir === 'Long';
     const planRR = at.plannedRR ? `${at.plannedRR}R` : '—';
+    const rrFill = at.plannedRR ? Math.min(100, (at.plannedRR / 5) * 100) : 0;
+
+    const emotionTag = at.emotion
+      ? `<span class="at-emotion-tag ${emotionClass[at.emotion]||'at-emotion-calm'}">${emotionEmoji[at.emotion]||''} ${at.emotion}</span>`
+      : '';
+    const setupTag = at.setup
+      ? `<span class="at-setup-tag"><i class="bi bi-tags" style="font-size:9px"></i> ${at.setup}</span>`
+      : '';
 
     return `<div class="at-card ${statusClass[at.status] || 'status-open'}" id="at-card-${at.id}">
-      <div class="at-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="at-pair">${at.pair||'—'}</span>
-          <span style="font-size:11px;font-weight:700;color:${dirColor};background:${dirColor}18;padding:2px 8px;border-radius:6px;border:1px solid ${dirColor}30">${dirLabel}</span>
-          ${statusBadge[at.status] || statusBadge.open}
+      <div class="at-card-inner">
+        <div class="at-header" style="margin-bottom:${(at.entryPlan||at.sl||at.tp||at.risk||at.reason||setupTag||emotionTag) ? '12px' : '0'}">
+          <div class="at-header-left">
+            <span class="at-pair">${at.pair||'—'}</span>
+            <span class="at-dir-badge ${dirIsLong ? 'at-dir-long' : 'at-dir-short'}">${dirIsLong ? '▲ Long' : '▼ Short'}</span>
+            ${statusBadge[at.status] || statusBadge.open}
+          </div>
+          <span class="at-timer"><i class="bi bi-clock"></i>${dur}</span>
+          <button class="at-collapse-btn" onclick="atToggleCollapse('${at.id}', this)" title="Expand / Collapse">
+            <i class="bi bi-chevron-up"></i>
+          </button>
         </div>
-        <div class="at-timer"><i class="bi bi-clock"></i>${dur}</div>
-      </div>
 
-      <div class="at-grid">
-        <div class="at-cell"><div class="at-cell-label">Entry Plan</div><div class="at-cell-val">${at.entryPlan||'—'}</div></div>
-        <div class="at-cell"><div class="at-cell-label">Stop Loss</div><div class="at-cell-val" style="color:#ff4d4d">${at.sl||'—'}</div></div>
-        <div class="at-cell"><div class="at-cell-label">Take Profit</div><div class="at-cell-val" style="color:#00d97e">${at.tp||'—'}</div></div>
-        <div class="at-cell"><div class="at-cell-label">Risk</div><div class="at-cell-val">$${at.risk||'—'}</div></div>
-        <div class="at-cell"><div class="at-cell-label">Planned R:R</div><div class="at-cell-val" style="color:#f59e0b">${planRR}</div></div>
-        <div class="at-cell"><div class="at-cell-label">Sesi</div><div class="at-cell-val" style="font-size:11px">${at.session||'—'}</div></div>
+        <div class="at-card-body" id="at-body-${at.id}" style="max-height:600px">
+          ${(setupTag || emotionTag) ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${setupTag}${emotionTag}</div>` : ''}
+          ${(at.entryPlan||at.sl||at.tp) ? `<div class="at-grid">
+            <div class="at-cell">
+              <div class="at-cell-label">Entry</div>
+              <div class="at-cell-val">${at.entryPlan||'—'}</div>
+            </div>
+            <div class="at-cell">
+              <div class="at-cell-label">Stop Loss</div>
+              <div class="at-cell-val" style="color:#f87171">${at.sl||'—'}</div>
+            </div>
+            <div class="at-cell">
+              <div class="at-cell-label">Take Profit</div>
+              <div class="at-cell-val" style="color:#4ade80">${at.tp||'—'}</div>
+            </div>
+          </div>` : ''}
+          ${(at.risk||at.plannedRR) ? `<div class="at-grid" style="grid-template-columns:${at.risk && at.plannedRR ? '1fr 2fr' : '1fr'};margin-bottom:10px">
+            ${at.risk ? `<div class="at-cell"><div class="at-cell-label">Risk</div><div class="at-cell-val">$${at.risk}</div></div>` : ''}
+            ${at.plannedRR ? `<div class="at-cell"><div class="at-cell-label">R:R</div><div class="at-cell-val" style="color:var(--accent2)">${planRR}</div><div class="at-rr-track" style="margin-top:5px"><div class="at-rr-fill" style="width:${rrFill}%"></div></div></div>` : ''}
+          </div>` : ''}
+          ${at.reason ? `<div class="at-plan-box">${at.reason}</div>` : ''}
+        </div>
       </div>
-
-      ${at.reason ? `<div class="at-plan-box"><strong>Plan:</strong> ${at.reason}</div>` : ''}
-      ${at.setup ? `<div style="font-size:11px;color:var(--text3);margin-bottom:10px"><i class="bi bi-tags" style="margin-right:4px"></i>${at.setup}</div>` : ''}
 
       <div class="at-actions">
         <button class="at-btn at-btn-close" onclick="openCloseActiveModal('${at.id}')">
-          <i class="bi bi-check2-circle"></i> Tutup Trade
+          <i class="bi bi-check2-circle"></i> Close Trade
         </button>
-        <button class="at-btn" onclick="setAtStatus('${at.id}','partial')" title="Sebagian profit sudah diambil">
-          <i class="bi bi-pie-chart"></i> Partial TP
+        <button class="at-btn at-btn-partial" onclick="setAtStatus('${at.id}','partial')" title="Partial TP">
+          <i class="bi bi-pie-chart-fill"></i> Partial TP
         </button>
-        <button class="at-btn" onclick="setAtStatus('${at.id}','be')" title="SL sudah dipindah ke breakeven">
-          <i class="bi bi-shield-check"></i> Move to BE
+        <button class="at-btn at-btn-be" onclick="setAtStatus('${at.id}','be')" title="Breakeven">
+          <i class="bi bi-shield-fill-check"></i> BE
         </button>
-        <button class="at-btn at-btn-del" onclick="deleteActiveTrade('${at.id}')">
+        <button class="at-btn at-btn-del" onclick="deleteActiveTrade('${at.id}')" title="Delete">
           <i class="bi bi-trash"></i>
         </button>
       </div>
     </div>`;
   }).join('');
+}
+
+// ── Toggle collapse on card ────────────────────────────────────
+function atToggleCollapse(id, btn) {
+  const body = document.getElementById('at-body-' + id);
+  if (!body) return;
+  const isCollapsed = body.classList.contains('collapsed');
+  body.classList.toggle('collapsed', !isCollapsed);
+  const icon = btn.querySelector('i');
+  if (icon) {
+    icon.className = isCollapsed ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+  }
+}
+window.atToggleCollapse = atToggleCollapse;
+
+// ── Update summary bar ─────────────────────────────────────────
+function _updateAtSummary() {
+  const countEl = document.getElementById('ats-count');
+  const riskEl  = document.getElementById('ats-risk');
+  const rrEl    = document.getElementById('ats-rr');
+  if (!countEl) return;
+
+  const totalRisk = activeTrades.reduce((s, t) => s + (parseFloat(t.risk) || 0), 0);
+  const rrTrades  = activeTrades.filter(t => t.plannedRR > 0);
+  const avgRR     = rrTrades.length
+    ? (rrTrades.reduce((s, t) => s + t.plannedRR, 0) / rrTrades.length).toFixed(2)
+    : null;
+
+  countEl.textContent = activeTrades.length;
+  riskEl.textContent  = '$' + totalRisk.toFixed(0);
+  rrEl.textContent    = avgRR ? avgRR + 'R' : '—';
 }
 
 function _atDuration(openedAt) {
@@ -9601,21 +9876,37 @@ window.openNewActiveTrade = openNewActiveTrade;
 
 function setNatDir(dir) {
   document.getElementById('nat-dir').value = dir;
-  document.getElementById('nat-long').className = 'dir-toggle-btn' + (dir==='Long'?' active-long':'');
-  document.getElementById('nat-short').className = 'dir-toggle-btn' + (dir==='Short'?' active-short':'');
-  ['nat-long','nat-short'].forEach(id => {
-    const b = document.getElementById(id);
-    if (!b) return;
-    b.style.padding='9px'; b.style.borderRadius='9px'; b.style.border='1px solid var(--border)';
-    b.style.background='var(--bg3)'; b.style.color='var(--text2)'; b.style.fontSize='12px';
-    b.style.fontWeight='700'; b.style.cursor='pointer'; b.style.fontFamily='var(--font)'; b.style.transition='all .15s'; b.style.flex='1';
-  });
+  const longBtn  = document.getElementById('nat-long');
+  const shortBtn = document.getElementById('nat-short');
+  if (!longBtn || !shortBtn) return;
+
+  // Long active style
+  if (dir === 'Long') {
+    longBtn.style.cssText  = 'padding:10px 6px;border-radius:10px;border:1px solid rgba(0,217,126,.45);background:rgba(0,217,126,.15);color:#00d97e;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center;box-shadow:0 2px 10px rgba(0,217,126,.12)';
+    shortBtn.style.cssText = 'padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center';
+  } else {
+    shortBtn.style.cssText = 'padding:10px 6px;border-radius:10px;border:1px solid rgba(255,77,77,.45);background:rgba(255,77,77,.12);color:#ff4d4d;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center;box-shadow:0 2px 10px rgba(255,77,77,.1)';
+    longBtn.style.cssText  = 'padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .15s;text-align:center';
+  }
 }
 window.setNatDir = setNatDir;
 
 function setNatEmotion(em) {
   document.getElementById('nat-emotion').value = em;
-  document.querySelectorAll('#md-new-active .emotion-btn').forEach(b => b.classList.toggle('active', b.dataset.em === em));
+  const activeStyles = {
+    Calm:      'border-color:rgba(0,217,126,.55);box-shadow:0 0 10px rgba(0,217,126,.2);filter:brightness(1.2)',
+    Confident: 'border-color:rgba(139,92,246,.55);box-shadow:0 0 10px rgba(139,92,246,.2);filter:brightness(1.2)',
+    FOMO:      'border-color:rgba(245,158,11,.55);box-shadow:0 0 10px rgba(245,158,11,.2);filter:brightness(1.2)',
+    Revenge:   'border-color:rgba(255,77,77,.55);box-shadow:0 0 10px rgba(255,77,77,.2);filter:brightness(1.2)',
+    Anxious:   'border-color:rgba(255,77,77,.45);box-shadow:0 0 10px rgba(255,77,77,.15);filter:brightness(1.15)',
+  };
+  document.querySelectorAll('#md-new-active .emotion-btn').forEach(b => {
+    const isActive = b.dataset.em === em;
+    b.style.outline = isActive ? '2px solid currentColor' : 'none';
+    b.style.outlineOffset = isActive ? '2px' : '0';
+    b.style.transform = isActive ? 'scale(1.06)' : 'none';
+    b.style.filter = isActive ? 'brightness(1.2)' : 'none';
+  });
 }
 window.setNatEmotion = setNatEmotion;
 
@@ -9702,20 +9993,55 @@ function openCloseActiveModal(id) {
   if (!at) return;
   _closingActiveId = id;
 
-  // Populate recap
-  const recap = document.getElementById('cat-plan-recap');
-  if (recap) {
-    recap.innerHTML = `<strong>${at.pair}</strong> ${at.dir} · Plan entry: <strong>${at.entryPlan||'—'}</strong> · SL: <strong style="color:#ff4d4d">${at.sl||'—'}</strong> · TP: <strong style="color:#00d97e">${at.tp||'—'}</strong> · Planned R:R: <strong style="color:#f59e0b">${at.plannedRR||'—'}R</strong>${at.reason ? `<br><span style="color:var(--text3);margin-top:4px;display:block">${at.reason}</span>` : ''}`;
+  // Populate recap grid (new design)
+  const recapGrid = document.getElementById('cat-plan-recap-grid');
+  if (recapGrid) {
+    recapGrid.innerHTML = `
+      <div class="cat-recap-cell">
+        <div class="cat-recap-cell-label">Pair</div>
+        <div class="cat-recap-cell-val" style="color:var(--text);font-size:14px">${at.pair||'—'}</div>
+      </div>
+      <div class="cat-recap-cell">
+        <div class="cat-recap-cell-label">Arah</div>
+        <div class="cat-recap-cell-val" style="color:${at.dir==='Long'?'#4ade80':'#ff6e6e'}">${at.dir==='Long'?'▲ Long':'▼ Short'}</div>
+      </div>
+      <div class="cat-recap-cell">
+        <div class="cat-recap-cell-label">Planned R:R</div>
+        <div class="cat-recap-cell-val" style="color:#f59e0b">${at.plannedRR ? at.plannedRR + 'R' : '—'}</div>
+      </div>
+      <div class="cat-recap-cell">
+        <div class="cat-recap-cell-label">Entry Plan</div>
+        <div class="cat-recap-cell-val">${at.entryPlan||'—'}</div>
+      </div>
+      <div class="cat-recap-cell">
+        <div class="cat-recap-cell-label">Stop Loss</div>
+        <div class="cat-recap-cell-val" style="color:#ff6e6e">${at.sl||'—'}</div>
+      </div>
+      <div class="cat-recap-cell">
+        <div class="cat-recap-cell-label">Take Profit</div>
+        <div class="cat-recap-cell-val" style="color:#4ade80">${at.tp||'—'}</div>
+      </div>`;
   }
+  // Reason line
+  const reasonEl = document.getElementById('cat-plan-reason');
+  if (reasonEl) {
+    if (at.reason) {
+      reasonEl.style.display = 'block';
+      reasonEl.textContent = '💬 ' + at.reason;
+    } else {
+      reasonEl.style.display = 'none';
+    }
+  }
+
   const label = document.getElementById('cat-pair-label');
-  if (label) label.textContent = at.pair + ' · ' + at.dir + ' · ' + (at.session||'');
+  if (label) label.textContent = at.pair + ' · ' + at.dir + (at.session ? ' · ' + at.session : '');
 
   // Pre-fill entry from plan
   const catEntry = document.getElementById('cat-entry');
   if (catEntry) catEntry.value = at.entryPlan || '';
 
   // Reset fields
-  ['cat-exit','cat-pnl','cat-notes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['cat-exit','cat-pnl','cat-notes'].forEach(fid => { const el=document.getElementById(fid); if(el) el.value=''; });
   document.getElementById('cat-result').value = '';
   document.getElementById('cat-conform').value = '';
   document.getElementById('cat-rating').value = '0';
@@ -9723,20 +10049,21 @@ function openCloseActiveModal(id) {
   // Planned RR display
   const prrEl = document.getElementById('cat-planned-rr');
   if (prrEl) prrEl.textContent = at.plannedRR ? at.plannedRR + 'R' : '—';
-  document.getElementById('cat-actual-rr').textContent = '—';
-  document.getElementById('cat-actual-rr').style.color = 'var(--text)';
+  const actRrEl = document.getElementById('cat-actual-rr');
+  if (actRrEl) { actRrEl.textContent = '—'; actRrEl.style.color = 'var(--text)'; }
 
-  // Reset buttons
-  ['cat-r-win','cat-r-loss','cat-r-be'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b) { b.className = 'result-btn'; b.style.cssText='flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s'; }
+  // Reset result buttons
+  ['cat-r-win','cat-r-loss','cat-r-be'].forEach(bid => {
+    const b = document.getElementById(bid);
+    if (b) b.className = 'cat-result-btn';
   });
-  ['cat-conform-yes','cat-conform-no'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b) { b.style.background='var(--bg3)'; b.style.borderColor='var(--border)'; b.style.color='var(--text2)'; }
-  });
+  // Reset conform buttons
+  const yBtn = document.getElementById('cat-conform-yes');
+  const nBtn = document.getElementById('cat-conform-no');
+  if (yBtn) { yBtn.style.background='var(--bg3)'; yBtn.style.borderColor='var(--border)'; yBtn.style.color='var(--text2)'; }
+  if (nBtn) { nBtn.style.background='var(--bg3)'; nBtn.style.borderColor='var(--border)'; nBtn.style.color='var(--text2)'; }
+
   setCatStar(0);
-
   document.getElementById('md-close-active').classList.add('open');
 }
 window.openCloseActiveModal = openCloseActiveModal;
@@ -9771,16 +10098,13 @@ window.autoCatResult = autoCatResult;
 function setCatResult(r) {
   document.getElementById('cat-result').value = r;
   const map = { Win:'cat-r-win', Loss:'cat-r-loss', Breakeven:'cat-r-be' };
-  const cls = { Win:'result-btn active-win', Loss:'result-btn active-loss', Breakeven:'result-btn active-be' };
-  const base = 'flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s';
-  ['cat-r-win','cat-r-loss','cat-r-be'].forEach(id => {
-    const b = document.getElementById(id);
-    if (!b) return;
-    b.className = 'result-btn';
-    b.style.cssText = base;
+  const activeClass = { Win:'active-win', Loss:'active-loss', Breakeven:'active-be' };
+  ['cat-r-win','cat-r-loss','cat-r-be'].forEach(bid => {
+    const b = document.getElementById(bid);
+    if (b) b.className = 'cat-result-btn';
   });
   const btn = document.getElementById(map[r]);
-  if (btn) btn.className = cls[r] || 'result-btn';
+  if (btn) btn.className = 'cat-result-btn ' + (activeClass[r] || '');
 }
 window.setCatResult = setCatResult;
 
@@ -9795,11 +10119,17 @@ window.setCatConform = setCatConform;
 
 function setCatStar(n) {
   document.getElementById('cat-rating').value = n;
-  const starEls = document.querySelectorAll('#cat-stars span');
+  const starEls = document.querySelectorAll('#cat-stars .cat-star');
   starEls.forEach((s, i) => {
     const active = i < n;
-    s.style.opacity = active ? '1' : '.3';
-    s.style.color   = active ? (n >= 4 ? '#a78bfa' : n >= 3 ? '#f59e0b' : '#71717a') : 'var(--text3)';
+    s.classList.toggle('lit', active);
+    if (active) {
+      s.style.color = n >= 4 ? '#a78bfa' : n >= 3 ? '#f59e0b' : '#71717a';
+      s.style.textShadow = n >= 4 ? '0 0 12px rgba(167,139,250,.5)' : n >= 3 ? '0 0 12px rgba(245,158,11,.5)' : 'none';
+    } else {
+      s.style.color = '';
+      s.style.textShadow = '';
+    }
   });
 }
 window.setCatStar = setCatStar;
