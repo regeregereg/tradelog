@@ -3652,28 +3652,37 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <!-- ── END TRADER CARD ── -->
 
     <!-- Guest banner -->
-    <div id="guest-banner" style="background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(124,58,237,.05));border:1px solid rgba(139,92,246,.2);border-radius:16px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden">
-      <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);pointer-events:none"></div>
+    <div id="guest-banner" style="background:var(--bg2);border:1px solid rgba(139,92,246,.18);border-radius:14px;padding:16px 18px;margin-bottom:16px;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 100% 0%,rgba(139,92,246,.07),transparent 60%);pointer-events:none"></div>
       <div style="position:relative">
-        <div style="font-size:13px;font-weight:700;margin-bottom:8px;letter-spacing:-.1px"><i class="bi bi-hand-wave" style="margin-right:4px"></i> Lagi lihat-lihat? Ini cara pakainya:</div>
-        <!-- Step guide -->
-        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
-            <div style="width:20px;height:20px;border-radius:50%;background:rgba(0,217,126,.2);border:1px solid rgba(0,217,126,.35);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#00d97e;flex-shrink:0">1</div>
-            Klik <strong style="color:var(--text);background:rgba(139,92,246,.12);padding:1px 6px;border-radius:4px">+ Log Trade</strong> di atas — isi pair & profit/loss trade kamu
+        <!-- Title -->
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:-.1px;display:flex;align-items:center;gap:6px">
+          <div style="width:20px;height:20px;border-radius:6px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-info" style="font-size:10px;color:var(--accent2)"></i>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
-            <div style="width:20px;height:20px;border-radius:50%;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#a78bfa;flex-shrink:0">2</div>
-            Dashboard otomatis update — lihat grafik dan statistik kamu
+          Getting started
+        </div>
+        <!-- Steps -->
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:13px">
+          <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:var(--text2)">
+            <div style="width:18px;height:18px;border-radius:50%;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#22c55e;flex-shrink:0;font-family:var(--mono)">1</div>
+            Click <strong style="color:var(--text);background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);padding:1px 7px;border-radius:5px;font-size:11px;font-family:var(--mono)">+ Log Trade</strong> above — fill in pair & P/L
           </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
-            <div style="width:20px;height:20px;border-radius:50%;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.35);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#f59e0b;flex-shrink:0">3</div>
-            Setelah 5+ trade, app mulai kasih insight otomatis tentang pola trading kamu
+          <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:var(--text2)">
+            <div style="width:18px;height:18px;border-radius:50%;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.22);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--accent2);flex-shrink:0;font-family:var(--mono)">2</div>
+            Dashboard updates automatically — see charts & stats
+          </div>
+          <div style="display:flex;align-items:center;gap:9px;font-size:11px;color:var(--text2)">
+            <div style="width:18px;height:18px;border-radius:50%;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.22);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--accent2);flex-shrink:0;font-family:var(--mono)">3</div>
+            After 5+ trades, app surfaces pattern insights automatically
           </div>
         </div>
+        <!-- CTA row -->
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.2px">Simpan data ke akun →</button>
-          <span style="font-size:11px;color:var(--text3)">atau coba dulu sampai 10 trade gratis</span>
+          <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.1px;display:flex;align-items:center;gap:5px;transition:all .18s" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='var(--accent)'">
+            <i class="bi bi-person-circle" style="font-size:11px"></i> Save data to account
+          </button>
+          <span style="font-size:11px;color:var(--text3)">or try free up to 10 trades</span>
         </div>
       </div>
     </div>
@@ -3698,86 +3707,85 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- ══ GOALS & STREAK WIDGET ══ -->
-    <div id="goals-widget" style="display:none;background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden;">
-      <!-- Ambient glow -->
-      <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.09),transparent 65%);pointer-events:none"></div>
+    <div id="goals-widget" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 100% 0%,rgba(139,92,246,.06),transparent 55%);pointer-events:none"></div>
 
       <!-- Header row -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Monthly Goals</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;position:relative">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.9px">Monthly Goals</span>
           <!-- Streak badge -->
-          <div id="streak-badge" style="display:none;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);font-size:10px;font-weight:700;color:#f59e0b;font-family:var(--mono);letter-spacing:.3px">
-            <i class="bi bi-fire" style="font-size:10px"></i> <span id="streak-badge-num">0</span> hari streak
+          <div id="streak-badge" style="display:none;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);font-size:10px;font-weight:700;color:#fbbf24;font-family:var(--mono);letter-spacing:.2px">
+            <i class="bi bi-fire" style="font-size:9px"></i> <span id="streak-badge-num">0</span>d streak
           </div>
         </div>
-        <button id="goals-set-btn" style="background:rgba(139,92,246,.1);color:var(--accent2);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:6px 13px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;display:flex;align-items:center;gap:5px;letter-spacing:.3px" onmouseover="this.style.background='rgba(139,92,246,.18)'" onmouseout="this.style.background='rgba(139,92,246,.1)'">
+        <button id="goals-set-btn" style="background:rgba(139,92,246,.08);color:var(--accent2);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;gap:5px" onmouseover="this.style.background='rgba(139,92,246,.15)';this.style.borderColor='rgba(139,92,246,.35)'" onmouseout="this.style.background='rgba(139,92,246,.08)';this.style.borderColor='rgba(139,92,246,.2)'">
           <i class="bi bi-pencil" style="font-size:10px"></i> Set Goals
         </button>
       </div>
 
       <!-- Goals grid — SVG Progress Rings -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px" id="goals-grid">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px;position:relative" id="goals-grid">
 
         <!-- P&L Goal Ring -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(34,197,94,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
-            <circle id="goal-pnl-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(34,197,94,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="74" height="74" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="4.5"/>
+            <circle id="goal-pnl-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-green)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
             <defs><linearGradient id="ring-green" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#4ade80"/></linearGradient></defs>
-            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;font-weight:800;font-family:var(--mono);fill:#22c55e" id="goal-pnl-cur">—</text>
-            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-pnl-target">—</text>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:11px;font-weight:800;font-family:var(--mono);fill:#22c55e" id="goal-pnl-cur">—</text>
+            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:7.5px;fill:rgba(255,255,255,.2);font-family:var(--mono)" id="goal-pnl-target">—</text>
           </svg>
           <div style="text-align:center">
-            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(34,197,94,.6)">Target P&L</div>
+            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(34,197,94,.6)">Target P&L</div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-pnl-pct">—</div>
           </div>
           <input type="hidden" id="goal-pnl-bar">
         </div>
 
         <!-- Win Rate Goal Ring -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
-            <circle id="goal-wr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-purple)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="74" height="74" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="4.5"/>
+            <circle id="goal-wr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-purple)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
             <defs><linearGradient id="ring-purple" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
-            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;font-weight:800;font-family:var(--mono);fill:#a78bfa" id="goal-wr-cur">—</text>
-            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-wr-target">—</text>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:11px;font-weight:800;font-family:var(--mono);fill:#a78bfa" id="goal-wr-cur">—</text>
+            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:7.5px;fill:rgba(255,255,255,.2);font-family:var(--mono)" id="goal-wr-target">—</text>
           </svg>
           <div style="text-align:center">
-            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(139,92,246,.7)">Win Rate</div>
+            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(139,92,246,.7)">Win Rate</div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-wr-pct">—</div>
           </div>
           <input type="hidden" id="goal-wr-bar">
         </div>
 
         <!-- Trades Goal Ring -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(245,158,11,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
-            <circle id="goal-tr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-amber)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(251,191,36,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="74" height="74" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="4.5"/>
+            <circle id="goal-tr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-amber)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
             <defs><linearGradient id="ring-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
-            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:14px;font-weight:800;font-family:var(--mono);fill:#f59e0b" id="goal-tr-cur">—</text>
-            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-tr-target">—</text>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:13px;font-weight:800;font-family:var(--mono);fill:#fbbf24" id="goal-tr-cur">—</text>
+            <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:7.5px;fill:rgba(255,255,255,.2);font-family:var(--mono)" id="goal-tr-target">—</text>
           </svg>
           <div style="text-align:center">
-            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(245,158,11,.7)">Trades</div>
+            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(251,191,36,.65)">Trades</div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-tr-pct">—</div>
           </div>
           <input type="hidden" id="goal-tr-bar">
         </div>
 
         <!-- Journal Streak Ring -->
-        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;transition:border-color .2s" onmouseover="this.style.borderColor='rgba(245,158,11,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
-            <circle id="goal-streak-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-fire)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(251,191,36,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="74" height="74" viewBox="0 0 80 80" style="overflow:visible">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="4.5"/>
+            <circle id="goal-streak-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-fire)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
             <defs><linearGradient id="ring-fire" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fb923c"/></linearGradient></defs>
-            <text x="40" y="34" text-anchor="middle" dominant-baseline="middle" style="font-size:16px;font-weight:800;font-family:var(--mono);fill:#f59e0b" id="goal-streak-cur">0</text>
-            <text x="40" y="50" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.3);font-family:var(--mono)">hari</text>
+            <text x="40" y="34" text-anchor="middle" dominant-baseline="middle" style="font-size:15px;font-weight:800;font-family:var(--mono);fill:#fbbf24" id="goal-streak-cur">0</text>
+            <text x="40" y="50" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)">days</text>
           </svg>
           <div style="text-align:center">
-            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(245,158,11,.7)">Streak</div>
+            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(251,191,36,.65)">Streak</div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-streak-best">Best: 0</div>
           </div>
           <!-- Hidden: keep streak-dots for JS compat -->
@@ -3787,12 +3795,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
 
       <!-- Month progress bar -->
-      <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px;position:relative">
         <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap" id="goals-month-label">—</div>
-        <div style="flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
-          <div id="goals-month-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(139,92,246,.5),rgba(167,139,250,.8));transition:width .8s ease;width:0%"></div>
+        <div style="flex:1;height:2px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden">
+          <div id="goals-month-bar" style="height:100%;border-radius:2px;background:var(--accent);opacity:.5;transition:width .8s ease;width:0%"></div>
         </div>
-        <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap" id="goals-month-pct">0% bulan berlalu</div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap" id="goals-month-pct">0% through month</div>
       </div>
     </div>
 
