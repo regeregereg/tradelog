@@ -668,7 +668,7 @@ tr:hover td{background:rgba(139,92,246,.04);}
 
 /* ── Panel header bar ── */
 .at-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.at-panel-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;}
+.at-panel-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .at-add-btn{display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;box-shadow:0 4px 16px rgba(139,92,246,.3);letter-spacing:.1px;}
 .at-add-btn:hover{background:#7c3aed;box-shadow:0 6px 22px rgba(139,92,246,.45);transform:translateY(-1px);}
 .at-add-btn:active{transform:translateY(0);}
@@ -4201,11 +4201,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- Panel header -->
       <div class="at-panel-header">
-        <div class="at-panel-meta">
+        <div class="at-panel-meta" style="display:flex;align-items:center;gap:8px">
           <span class="at-live-dot"></span>
           Live positions
+          <span id="at-slot-indicator"></span>
         </div>
-        <button class="at-add-btn" onclick="openNewActiveTrade()">
+        <button class="at-add-btn" id="at-new-btn" onclick="openNewActiveTrade()">
           <i class="bi bi-plus-lg" style="font-size:10px"></i> New Trade
         </button>
       </div>
@@ -7882,124 +7883,144 @@ function openAnonLimitModal() {
 // feature: 'trade' | 'playbook' | 'daily' | 'dna' | 'ftmo' | 'reminder'
 function openFeatureGateModal(feature) {
   const el = document.getElementById('md-feature-gate');
-  if (el) el.remove(); // always rebuild fresh for correct counts
+  if (el) el.remove();
 
-  const mo = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  const mo         = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   const tradeCount = getThisMonthCount();
   const dailyCount = getThisMonthDailyCount();
 
   const CONFIGS = {
     trade: {
-      icon: '📊',
-      title: 'Batas Trade Journal Tercapai',
-      desc: `Kamu sudah mencatat <strong style="color:var(--accent2)">${tradeCount} trade</strong> bulan ${mo}. Akun free terbatas <strong style="color:#fff">${FREE_MONTHLY_LIMIT} trade/bulan</strong>.`,
-      blocker: `${tradeCount}/${FREE_MONTHLY_LIMIT} trade digunakan bulan ini`,
-      pct: Math.min(tradeCount / FREE_MONTHLY_LIMIT * 100, 100),
+      icon:    'bi-journal-richtext',
+      title:   'Trade Journal Limit Reached',
+      desc:    `You've logged <strong style="color:#e2e8f0">${tradeCount} trades</strong> in ${mo}. Free accounts are limited to <strong style="color:#e2e8f0">${FREE_MONTHLY_LIMIT} trades/month</strong>.`,
+      blocker: `${tradeCount} / ${FREE_MONTHLY_LIMIT} trades this month`,
+      pct:     Math.min(tradeCount / FREE_MONTHLY_LIMIT * 100, 100),
+      lockd:   false,
     },
     playbook: {
-      icon: '📖',
-      title: 'Batas Playbook Tercapai',
-      desc: `Akun free hanya bisa menyimpan <strong style="color:#fff">${FREE_PLAYBOOK_LIMIT} strategi</strong> di Playbook. Upgrade untuk hingga <strong style="color:var(--accent2)">${PREM_PLAYBOOK_LIMIT} strategi</strong>.`,
-      blocker: `${FREE_PLAYBOOK_LIMIT}/${FREE_PLAYBOOK_LIMIT} playbook slots terpakai`,
-      pct: 100,
+      icon:    'bi-book',
+      title:   'Playbook Limit Reached',
+      desc:    `Free accounts can save up to <strong style="color:#e2e8f0">${FREE_PLAYBOOK_LIMIT} strategies</strong>. Upgrade to store up to <strong style="color:var(--accent2)">${PREM_PLAYBOOK_LIMIT} playbooks</strong>.`,
+      blocker: `${FREE_PLAYBOOK_LIMIT} / ${FREE_PLAYBOOK_LIMIT} playbook slots used`,
+      pct:     100,
+      lockd:   false,
     },
     daily: {
-      icon: '📝',
-      title: 'Batas Daily Journal Tercapai',
-      desc: `Akun free terbatas <strong style="color:#fff">${FREE_DAILY_LIMIT} entri/bulan</strong>. Kamu sudah menyimpan <strong style="color:var(--accent2)">${dailyCount} entri</strong> bulan ${mo}.`,
-      blocker: `${dailyCount}/${FREE_DAILY_LIMIT} daily journal digunakan`,
-      pct: Math.min(dailyCount / FREE_DAILY_LIMIT * 100, 100),
+      icon:    'bi-calendar2-check',
+      title:   'Daily Journal Limit Reached',
+      desc:    `Free accounts are limited to <strong style="color:#e2e8f0">${FREE_DAILY_LIMIT} entries/month</strong>. You've saved <strong style="color:var(--accent2)">${dailyCount} entries</strong> in ${mo}.`,
+      blocker: `${dailyCount} / ${FREE_DAILY_LIMIT} daily entries this month`,
+      pct:     Math.min(dailyCount / FREE_DAILY_LIMIT * 100, 100),
+      lockd:   false,
     },
     dna: {
-      icon: '🧬',
-      title: 'Trader DNA — Fitur Premium',
-      desc: `<strong style="color:var(--accent2)">Trader DNA Radar</strong> menganalisis 6 dimensi trading kamu: Consistency, Discipline, Aggression, Execution, Endurance, Vision. Hanya tersedia untuk pengguna premium.`,
-      blocker: 'DNA Analysis terkunci',
-      pct: 0,
+      icon:    'bi-activity',
+      title:   'Trader DNA — Premium',
+      desc:    `<strong style="color:var(--accent2)">Trader DNA Radar</strong> scores 6 dimensions of your trading: Consistency, Discipline, Aggression, Execution, Endurance, and Vision. Unlock your full performance profile.`,
+      blocker: 'Trader DNA Radar',
+      pct:     0,
+      lockd:   true,
     },
     ftmo: {
-      icon: '🏆',
-      title: 'PropFirm Tracker — Fitur Premium',
-      desc: `Pantau progress <strong style="color:var(--accent2)">FTMO / challenge prop firm</strong> kamu dengan equity curve, drawdown tracker, dan status challenge secara real-time. Upgrade untuk akses penuh.`,
-      blocker: 'PropFirm Tracker terkunci',
-      pct: 0,
+      icon:    'bi-trophy',
+      title:   'PropFirm Tracker — Premium',
+      desc:    `Track your <strong style="color:var(--accent2)">FTMO / prop firm challenge</strong> with real-time equity curve, drawdown tracker, and challenge status — all in one place.`,
+      blocker: 'PropFirm Tracker',
+      pct:     0,
+      lockd:   true,
     },
     reminder: {
-      icon: '🔔',
-      title: 'Daily Reminder — Fitur Premium',
-      desc: `Atur <strong style="color:var(--accent2)">notifikasi harian</strong> yang menampilkan P&L hari ini, win rate mingguan, dan streak journal kamu. Tetap on track dengan pengingat otomatis.`,
-      blocker: 'Daily Reminder terkunci',
-      pct: 0,
+      icon:    'bi-bell',
+      title:   'Daily Reminder — Premium',
+      desc:    `Set up <strong style="color:var(--accent2)">daily notifications</strong> showing today's P&L, weekly win rate, and your journal streak. Stay consistent automatically.`,
+      blocker: 'Daily Reminder',
+      pct:     0,
+      lockd:   true,
     },
   };
 
-  const cfg = CONFIGS[feature] || CONFIGS.trade;
-  const barColor = cfg.pct >= 100 ? '#ff4d4d' : cfg.pct >= 70 ? '#f59e0b' : '#8b5cf6';
+  const cfg      = CONFIGS[feature] || CONFIGS.trade;
+  const pct      = cfg.pct;
+  const barColor = pct >= 100 ? '#f87171' : pct >= 70 ? '#fbbf24' : 'var(--accent2)';
+
+  const benefits = [
+    { icon: 'bi-journal-richtext', label: 'Unlimited trade journal'              },
+    { icon: 'bi-calendar2-check',  label: 'Unlimited daily journal'              },
+    { icon: 'bi-book',             label: `Up to ${PREM_PLAYBOOK_LIMIT} playbooks` },
+    { icon: 'bi-activity',         label: 'Trader DNA Radar'                     },
+    { icon: 'bi-trophy',           label: 'PropFirm Tracker'                     },
+    { icon: 'bi-bell',             label: 'Daily Reminder'                       },
+    { icon: 'bi-patch-check',      label: 'PRO badge on profile'                 },
+    { icon: 'bi-unlock',           label: 'All features unlocked'                },
+  ];
 
   const modal = document.createElement('div');
-  modal.id = 'md-feature-gate';
+  modal.id        = 'md-feature-gate';
   modal.className = 'mo open';
   modal.style.cssText = 'z-index:9999';
-  modal.innerHTML = `
-  <div class="md" style="max-width:460px;text-align:center;padding:0;overflow:hidden;border-radius:20px;border:1px solid rgba(139,92,246,.25);background:linear-gradient(145deg,rgba(15,12,28,.98),rgba(10,9,20,.98))">
 
-    <!-- Header gradient band -->
-    <div style="background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(124,106,247,.06));padding:32px 32px 24px;border-bottom:1px solid rgba(139,92,246,.12);position:relative;overflow:hidden">
-      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.2),transparent 70%);pointer-events:none"></div>
-      <div style="width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;box-shadow:0 0 28px rgba(139,92,246,.18)">${cfg.icon}</div>
-      <div style="font-size:18px;font-weight:800;color:#f4f4f5;letter-spacing:-.4px;margin-bottom:6px;font-family:var(--font)">${cfg.title}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.5);line-height:1.65">${cfg.desc}</div>
+  modal.innerHTML = `
+  <div class="md" style="max-width:420px;padding:0;overflow:hidden;border-radius:18px;border:1px solid rgba(139,92,246,.2);background:var(--bg2)">
+
+    <!-- Header -->
+    <div style="padding:28px 28px 22px;border-bottom:1px solid var(--border);text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.12),transparent 70%);pointer-events:none"></div>
+      <div style="width:52px;height:52px;border-radius:14px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;position:relative">
+        <i class="bi ${cfg.icon}" style="font-size:22px;color:var(--accent2)"></i>
+      </div>
+      <div style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.4px;margin-bottom:7px;font-family:var(--font)">${cfg.title}</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.7;max-width:310px;margin:0 auto">${cfg.desc}</div>
     </div>
 
-    <div style="padding:22px 28px 28px">
-      <!-- Usage bar (shown only for limit-based features) -->
-      ${cfg.pct > 0 ? `
-      <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:12px 16px;margin-bottom:18px;text-align:left">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-          <span style="font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Penggunaan Bulan Ini</span>
-          <span style="font-size:11px;font-family:var(--mono);color:${barColor};font-weight:700">${cfg.blocker}</span>
+    <div style="padding:20px 24px 24px;display:flex;flex-direction:column;gap:14px">
+
+      <!-- Usage bar or locked indicator -->
+      ${!cfg.lockd ? `
+      <div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.12);border-radius:11px;padding:11px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:700">Usage this month</span>
+          <span style="font-size:11px;font-family:var(--mono);color:${barColor};font-weight:800">${cfg.blocker}</span>
         </div>
-        <div style="height:4px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden">
-          <div style="width:${cfg.pct}%;height:100%;background:${barColor};border-radius:3px;transition:width .5s ease"></div>
+        <div style="height:3px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${barColor};border-radius:3px"></div>
         </div>
       </div>` : `
-      <div style="background:rgba(255,77,77,.04);border:1px solid rgba(255,77,77,.12);border-radius:12px;padding:10px 16px;margin-bottom:18px;text-align:left">
-        <div style="font-size:11px;color:rgba(255,120,120,.7);display:flex;align-items:center;gap:6px"><i class="bi bi-lock-fill"></i> ${cfg.blocker}</div>
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.15);border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:9px">
+        <i class="bi bi-lock-fill" style="color:var(--accent2);font-size:13px;flex-shrink:0"></i>
+        <span style="font-size:12px;color:var(--text2);font-weight:600">${cfg.blocker} is a premium feature</span>
       </div>`}
 
-      <!-- Premium benefits -->
-      <div style="background:rgba(0,217,126,.04);border:1px solid rgba(0,217,126,.13);border-radius:12px;padding:14px 16px;margin-bottom:20px;text-align:left">
-        <div style="font-size:10px;font-weight:700;color:#00d97e;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="bi bi-stars"></i> Dengan Premium kamu dapat:</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-          ${[
-            ['📊','Unlimited trade/bulan'],
-            ['📖',`Hingga ${PREM_PLAYBOOK_LIMIT} playbook`],
-            ['📝','Unlimited daily journal'],
-            ['🧬','Trader DNA Radar'],
-            ['🏆','PropFirm Tracker'],
-            ['🔔','Daily Reminder'],
-            ['⭐','Badge PRO di profil'],
-            ['🔓','Semua fitur terbuka'],
-          ].map(([ic,txt]) => `
-          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,.65)">
-            <span style="font-size:13px">${ic}</span>${txt}
+      <!-- Benefits grid -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:14px">
+        <div style="font-size:9px;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:.9px;margin-bottom:11px;display:flex;align-items:center;gap:5px">
+          <i class="bi bi-stars"></i> Premium includes
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${benefits.map(b => `
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:24px;height:24px;border-radius:7px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi ${b.icon}" style="font-size:11px;color:var(--accent2)"></i>
+            </div>
+            <span style="font-size:11px;color:var(--text2);font-weight:500;line-height:1.3">${b.label}</span>
           </div>`).join('')}
         </div>
       </div>
 
       <!-- CTA -->
       <a href="https://lynk.id/riskpertrade/ok7m3y56myz2/checkout" target="_blank" rel="noopener"
-         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border-radius:12px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.4);margin-bottom:11px;font-family:var(--font);letter-spacing:-.2px;transition:all .2s"
-         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 26px rgba(139,92,246,.55)'"
-         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(139,92,246,.4)'">
-        <i class="bi bi-lightning-charge-fill"></i> Upgrade ke Premium →
+         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;font-size:14px;font-weight:700;background:var(--accent);color:#fff;border-radius:11px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.4);font-family:var(--font);letter-spacing:-.1px;transition:all .2s;box-sizing:border-box"
+         onmouseover="this.style.background='#7c3aed';this.style.boxShadow='0 6px 28px rgba(139,92,246,.55)';this.style.transform='translateY(-1px)'"
+         onmouseout="this.style.background='var(--accent)';this.style.boxShadow='0 4px 20px rgba(139,92,246,.4)';this.style.transform='none'">
+        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Upgrade to Premium
       </a>
-      <div style="font-size:10px;color:rgba(255,255,255,.25);margin-bottom:14px">
-        Sudah bayar? Kirim konfirmasi ke <a href="https://www.instagram.com/riskpertrade.me/" target="_blank" style="color:#a78bfa;text-decoration:none">@riskpertrade.me</a> untuk aktivasi
+
+      <div style="text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:10px">Already paid? Send confirmation to <a href="https://www.instagram.com/riskpertrade.me/" target="_blank" style="color:var(--accent2);text-decoration:none;font-weight:600">@riskpertrade.me</a></div>
+        <button id="fg-close-btn" style="background:transparent;border:1px solid var(--border);color:var(--text3);padding:9px 32px;border-radius:9px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s;width:100%" onmouseover="this.style.borderColor='rgba(139,92,246,.3)';this.style.color='var(--text2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">
+          Close
+        </button>
       </div>
-      <button id="fg-close-btn" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.3);padding:9px 28px;border-radius:10px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s;width:100%" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.3)'">
-        Tutup
-      </button>
     </div>
   </div>`;
 
@@ -9727,13 +9748,55 @@ function renderActiveTrades() {
   // Update summary bar
   _updateAtSummary();
 
+  // ── State: not logged in / anonymous ──
+  if (!currentUser || currentUser.isAnonymous) {
+    el.innerHTML = `<div class="at-empty">
+      <div class="at-empty-icon"><i class="bi bi-lock" style="font-size:20px;color:var(--accent2)"></i></div>
+      <div class="at-empty-title">Login to track trades</div>
+      <div class="at-empty-sub">Create a free account to start planning and tracking your live trades. Max 10 trades for free.</div>
+      <button class="at-empty-cta" onclick="openFeatureGateModal('trade')">
+        <i class="bi bi-person-circle" style="font-size:11px"></i> Sign Up Free
+      </button>
+    </div>`;
+    return;
+  }
+
+  const FREE_ACTIVE_LIMIT = 10;
+  const isPrem = _isPremiumCache === true;
+  const slotsUsed = activeTrades.length;
+  const slotsLeft = Math.max(0, FREE_ACTIVE_LIMIT - slotsUsed);
+  const atLimit   = !isPrem && slotsUsed >= FREE_ACTIVE_LIMIT;
+
+  // Update slot indicator in panel header
+  const slotEl  = document.getElementById('at-slot-indicator');
+  const newBtn   = document.getElementById('at-new-btn');
+  if (slotEl) {
+    if (isPrem) {
+      slotEl.innerHTML = `<span style="font-size:10px;color:var(--accent2);background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:20px;padding:2px 9px;font-weight:700;font-family:var(--mono)">∞ Unlimited</span>`;
+    } else {
+      const color = slotsLeft <= 2 ? '#f87171' : slotsLeft <= 5 ? '#fbbf24' : 'var(--accent2)';
+      slotEl.innerHTML = `<span style="font-size:10px;color:${color};background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);border-radius:20px;padding:2px 9px;font-weight:700;font-family:var(--mono)">${slotsUsed}/${FREE_ACTIVE_LIMIT} slots</span>`;
+    }
+  }
+  if (newBtn) {
+    if (atLimit) {
+      newBtn.disabled = false; // still clickable — gate modal will show
+      newBtn.style.opacity = '0.55';
+      newBtn.title = 'Upgrade to Premium for unlimited trades';
+    } else {
+      newBtn.disabled = false;
+      newBtn.style.opacity = '1';
+      newBtn.title = '';
+    }
+  }
+
   if (activeTrades.length === 0) {
     el.innerHTML = `<div class="at-empty">
-      <div class="at-empty-icon">📊</div>
-      <div class="at-empty-title">Belum ada trade aktif</div>
-      <div class="at-empty-sub">Plan trade kamu sebelum eksekusi. Semua level & reasoning tersimpan — tinggal close untuk masuk journal otomatis.</div>
+      <div class="at-empty-icon"><i class="bi bi-activity" style="font-size:20px;color:var(--accent2)"></i></div>
+      <div class="at-empty-title">No active trades</div>
+      <div class="at-empty-sub">Plan your trade before entering. Levels, R:R, and reasoning stay saved — close it when done to log automatically.</div>
       <button class="at-empty-cta" onclick="openNewActiveTrade()">
-        <i class="bi bi-plus-lg" style="font-size:10px"></i> Plan Trade Pertama
+        <i class="bi bi-plus-lg" style="font-size:10px"></i> Plan First Trade
       </button>
     </div>`;
     return;
@@ -9860,6 +9923,22 @@ function _atDuration(openedAt) {
 
 // ── New Active Trade Modal ─────────────────────────────────────
 function openNewActiveTrade() {
+  // ── Gate: must be logged in (non-anon) ──
+  if (!currentUser || currentUser.isAnonymous) {
+    openFeatureGateModal('trade');
+    return;
+  }
+
+  // ── Gate: free users max 10 active trades total ──
+  const FREE_ACTIVE_LIMIT = 10;
+  if (_isPremiumCache === false) {
+    _atLoad();
+    if (activeTrades.length >= FREE_ACTIVE_LIMIT) {
+      openFeatureGateModal('trade');
+      return;
+    }
+  }
+
   ['nat-pair','nat-entry','nat-sl','nat-tp','nat-risk','nat-reason','nat-setup'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -9929,6 +10008,22 @@ function calcNatRR() {
 window.calcNatRR = calcNatRR;
 
 function saveNewActiveTrade() {
+  // Double-guard: cek limit lagi saat save
+  if (!currentUser || currentUser.isAnonymous) {
+    document.getElementById('md-new-active').classList.remove('open');
+    openFeatureGateModal('trade');
+    return;
+  }
+  const FREE_ACTIVE_LIMIT = 10;
+  if (_isPremiumCache === false) {
+    _atLoad();
+    if (activeTrades.length >= FREE_ACTIVE_LIMIT) {
+      document.getElementById('md-new-active').classList.remove('open');
+      openFeatureGateModal('trade');
+      return;
+    }
+  }
+
   const pair = document.getElementById('nat-pair')?.value.trim().toUpperCase();
   if (!pair) { alert('Isi pair dulu!'); return; }
   const entry = parseFloat(document.getElementById('nat-entry')?.value) || 0;
@@ -9977,7 +10072,7 @@ function setAtStatus(id, status) {
 window.setAtStatus = setAtStatus;
 
 function deleteActiveTrade(id) {
-  if (!confirm('Hapus trade aktif ini?')) return;
+  if (!confirm('Delete this trade?')) return;
   _atLoad();
   activeTrades = activeTrades.filter(x => x.id !== id);
   _atSave();
