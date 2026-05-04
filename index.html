@@ -473,7 +473,7 @@ body::before{
 }
 .user-avatar{
   width:34px;height:34px;border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  background:var(--accent);
   display:flex;align-items:center;
   justify-content:center;font-size:13px;font-weight:700;
   flex-shrink:0;overflow:hidden;
@@ -504,7 +504,7 @@ body::before{
 #rpt-splash{position:fixed;inset:0;z-index:9999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .5s ease,visibility .5s ease;}
 #rpt-splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 .splash-logo{display:flex;align-items:center;gap:10px;}
-.splash-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 20px rgba(139,92,246,.5);}
+.splash-logo-icon{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 20px rgba(139,92,246,.5);}
 .splash-logo-text{font-size:17px;font-weight:700;color:#f4f4f5;letter-spacing:-.3px;font-family:var(--font);}
 .splash-logo-text span{color:#8b5cf6;}
 .splash-bars{display:flex;align-items:flex-end;gap:5px;height:44px;}
@@ -612,13 +612,14 @@ tr:hover td{background:rgba(139,92,246,.04);}
 .bbe{background:rgba(255,255,255,.06);color:var(--text2);}
 /* ── BUTTONS ── */
 .btn{
-  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  background:var(--accent);
   color:#fff;border:none;border-radius:10px;padding:8px 16px;
   font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);
-  transition:all .2s;white-space:nowrap;letter-spacing:.3px;
-  box-shadow:0 4px 12px rgba(139,92,246,.3),inset 0 1px 0 rgba(255,255,255,.12);
+  transition:all .18s;white-space:nowrap;letter-spacing:.2px;
+  box-shadow:0 4px 14px rgba(139,92,246,.3);
 }
-.btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,92,246,.4);}
+.btn:hover{background:#7c3aed;transform:translateY(-1px);box-shadow:0 6px 22px rgba(139,92,246,.45);}
+.btn:active{transform:translateY(0);}
 .btng{background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;font-weight:600;}
 .btng:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.07);}
 .bsm{padding:6px 12px;font-size:11px;}
@@ -1144,7 +1145,7 @@ select.fi option{background:var(--bg3);}
 .ob-btn-prev.visible{opacity:1;pointer-events:auto;transform:translateX(0);}
 .ob-btn-prev:hover{color:var(--text);border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.07);}
 .ob-btn-next{
-  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  background:var(--accent);
   color:#fff;border:none;border-radius:10px;padding:8px 18px;
   font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.3px;
   transition:all .2s;box-shadow:0 4px 14px rgba(139,92,246,.35),inset 0 1px 0 rgba(255,255,255,.12);
@@ -1480,7 +1481,7 @@ body.sb-off #sticky-profile-bar { left: 0; }
 }
 .bn-fab-circle{
   width:46px;height:46px;border-radius:14px;
-  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  background:var(--accent);
   display:flex;align-items:center;justify-content:center;
   font-size:22px;line-height:1;
   box-shadow:0 4px 18px rgba(139,92,246,.55),inset 0 1px 0 rgba(255,255,255,.15);
@@ -1954,7 +1955,7 @@ body.sb-off #sticky-profile-bar { left: 0; }
 /* Pro badge chip */
 .dll-pro-badge {
   display:inline-flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#8b5cf6,#6366f1);
+  background:var(--accent);
   color:#fff;font-size:8px;font-weight:800;letter-spacing:.4px;
   border-radius:4px;padding:1px 5px;margin-left:3px;
 }
@@ -3380,7 +3381,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
 
       <!-- Actions -->
-      <button id="try-other-btn" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(139,92,246,.9),rgba(109,40,217,.9));border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);border-radius:12px;box-shadow:0 4px 16px rgba(139,92,246,.3);margin-bottom:10px;transition:all .2s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(139,92,246,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(139,92,246,.3)'">
+      <button id="try-other-btn" style="width:100%;padding:13px;background:var(--accent);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);border-radius:12px;box-shadow:0 4px 16px rgba(139,92,246,.3);margin-bottom:10px;transition:all .18s" onmouseover="this.style.background='#7c3aed';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='var(--accent)';this.style.transform=''">
         Coba Email Lain
       </button>
 
@@ -3510,7 +3511,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <span id="sbf-bal">Balance: —</span>
   </div>
   <div style="padding:10px 12px 0;display:flex;flex-direction:column;gap:6px">
-    <button id="sb-login-btn" style="display:none;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    <button id="sb-login-btn" style="display:none;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='var(--accent)'">
       Masuk / Login
     </button>
     <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
@@ -3619,7 +3620,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <!-- Avatar with ring -->
           <div style="position:relative;flex-shrink:0">
             <div style="position:absolute;inset:-3px;border-radius:17px;background:linear-gradient(135deg,rgba(139,92,246,.6),rgba(124,58,237,.3),transparent);z-index:0"></div>
-            <div id="tc-avatar" style="position:relative;z-index:1;width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;color:#fff;overflow:hidden;font-family:var(--font)"></div>
+            <div id="tc-avatar" style="position:relative;z-index:1;width:54px;height:54px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;color:#fff;overflow:hidden;font-family:var(--font)"></div>
           </div>
 
           <!-- Name + greeting + tagline -->
@@ -3671,7 +3672,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <button id="guest-banner-login" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.2px">Simpan data ke akun →</button>
+          <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.2px">Simpan data ke akun →</button>
           <span style="font-size:11px;color:var(--text3)">atau coba dulu sampai 10 trade gratis</span>
         </div>
       </div>
@@ -4300,9 +4301,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- CTA Button -->
       <button onclick="openTrade()"
-        style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:12px;padding:14px 32px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);box-shadow:0 6px 24px rgba(139,92,246,.45),0 0 0 1px rgba(139,92,246,.2);letter-spacing:.1px;transition:all .2s;display:inline-flex;align-items:center;gap:8px"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(139,92,246,.6),0 0 0 1px rgba(139,92,246,.3)'"
-        onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 24px rgba(139,92,246,.45),0 0 0 1px rgba(139,92,246,.2)'">
+        style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 32px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);box-shadow:0 6px 24px rgba(139,92,246,.45),0 0 0 1px rgba(139,92,246,.2);letter-spacing:.1px;transition:all .2s;display:inline-flex;align-items:center;gap:8px"
+        onmouseover="this.style.background='#7c3aed';this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(139,92,246,.5)'"
+        onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 6px 24px rgba(139,92,246,.4)'">
         <i class="bi bi-plus-circle-fill" style="font-size:15px"></i>
         Log Trade Pertama
       </button>
@@ -4858,7 +4859,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;max-width:340px;margin-left:auto;margin-right:auto">
         Dokumentasikan setiap setup yang kamu trade — kondisi entry, exit, dan lihat win rate per strategi secara otomatis.
       </div>
-      <button onclick="document.getElementById('playbook-add-btn').click()" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 16px rgba(139,92,246,.35);transition:all .2s">+ Tambah Strategi Pertama</button>
+      <button onclick="document.getElementById('playbook-add-btn').click()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 16px rgba(139,92,246,.35);transition:all .2s">+ Tambah Strategi Pertama</button>
     </div>
   </div>
 
@@ -5347,7 +5348,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           Simpan akun sekarang — journal &amp; semua trade kamu tidak akan hilang.
         </div>
       </div>
-      <button id="upgrade-btn" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;transition:all .2s;box-shadow:0 3px 12px rgba(139,92,246,.35);letter-spacing:.1px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      <button id="upgrade-btn" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;transition:all .2s;box-shadow:0 3px 12px rgba(139,92,246,.35);letter-spacing:.1px" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='var(--accent)'">
         Simpan Akun →
       </button>
     </div>
@@ -5369,111 +5370,122 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <!-- ── DESKTOP BUBBLE ── -->
   <div id="fcta-desktop" style="position:fixed;bottom:24px;right:24px;z-index:350;animation:floatIn .4s cubic-bezier(.34,1.56,.64,1) forwards;">
     <button id="float-cta-dismiss"
-      style="position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:#1e1e24;border:1px solid rgba(255,255,255,.12);color:#666;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all .15s"
-      onmouseover="this.style.background='rgba(239,68,68,.2)';this.style.color='#ef4444';this.style.borderColor='rgba(239,68,68,.3)'"
-      onmouseout="this.style.background='#1e1e24';this.style.color='#666';this.style.borderColor='rgba(255,255,255,.12)'"
-      title="Tutup">✕</button>
-    <div style="background:linear-gradient(160deg,#13102a,#0d0d18);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
-      <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 70%);pointer-events:none"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;box-shadow:0 0 0 1px rgba(139,92,246,.4),0 4px 12px rgba(139,92,246,.3)"><i class="bi bi-journal-text" style="color:#fff"></i></div>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#f4f4f5;letter-spacing:-.2px">RiskPerTrade</div>
-          <div style="font-size:10px;color:rgba(167,139,250,.7);font-family:var(--mono)">Trading Journal</div>
+      style="position:absolute;top:-9px;right:-9px;width:24px;height:24px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);color:var(--text3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all .15s"
+      onmouseover="this.style.borderColor='rgba(239,68,68,.3)';this.style.color='#ef4444'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'"
+      title="Close">✕</button>
+    <div style="background:var(--bg2);border:1px solid rgba(139,92,246,.2);border-radius:18px;padding:18px;width:268px;box-shadow:0 16px 48px rgba(0,0,0,.5),0 0 0 1px rgba(139,92,246,.06);position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 100% 0%,rgba(139,92,246,.08),transparent 60%);pointer-events:none"></div>
+      <!-- Brand -->
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px;position:relative">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="bi bi-journal-text" style="color:var(--accent2);font-size:15px"></i>
         </div>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
-          <div style="width:6px;height:6px;border-radius:50%;background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.6)"></div>
-          <span style="font-size:9px;color:#00d97e;font-family:var(--mono);font-weight:600;letter-spacing:.3px">LIVE</span>
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--text);letter-spacing:-.2px">RiskPerTrade</div>
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">Trading Journal</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:4px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:20px;padding:2px 7px">
+          <div style="width:5px;height:5px;border-radius:50%;background:#22c55e;animation:at-pulse 2.4s ease-in-out infinite"></div>
+          <span style="font-size:9px;color:#22c55e;font-family:var(--mono);font-weight:700;letter-spacing:.3px">LIVE</span>
         </div>
       </div>
-      <div style="font-size:13px;font-weight:700;color:#f4f4f5;line-height:1.4;letter-spacing:-.2px;margin-bottom:6px">Tau kenapa trading kamu<br>belum konsisten?</div>
-      <div style="font-size:11px;color:rgba(212,212,216,.65);line-height:1.6;margin-bottom:14px">Bukan soal strategi — tapi karena tidak pernah <strong style="color:#a78bfa">review trade sendiri</strong>.</div>
+      <!-- Copy -->
+      <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.4;letter-spacing:-.2px;margin-bottom:5px;position:relative">Tau kenapa trading kamu<br>belum konsisten?</div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.6;margin-bottom:13px;position:relative">Bukan soal strategi — tapi karena tidak pernah <strong style="color:var(--accent2)">review trade sendiri</strong>.</div>
       <button id="float-cta-btn"
-        style="width:100%;padding:11px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 4px 18px rgba(139,92,246,.45);letter-spacing:.1px"
-        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(139,92,246,.55)'"
-        onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 18px rgba(139,92,246,.45)'">
-        Lihat Apa yang Kamu Dapat →
+        style="width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;box-shadow:0 4px 14px rgba(139,92,246,.3);letter-spacing:.1px;position:relative"
+        onmouseover="this.style.background='#7c3aed';this.style.boxShadow='0 6px 22px rgba(139,92,246,.45)';this.style.transform='translateY(-1px)'"
+        onmouseout="this.style.background='var(--accent)';this.style.boxShadow='0 4px 14px rgba(139,92,246,.3)';this.style.transform='none'">
+        <i class="bi bi-lightning-charge-fill" style="font-size:10px;margin-right:4px"></i>Lihat Apa yang Kamu Dapat
       </button>
-      <div style="text-align:center;margin-top:7px;font-size:10px;color:rgba(255,255,255,.22);font-family:var(--mono)">Bayar sekali · Akses selamanya</div>
+      <div style="text-align:center;margin-top:7px;font-size:10px;color:var(--text3);font-family:var(--mono)">Bayar sekali · Akses selamanya</div>
     </div>
   </div>
 
   <!-- ── MOBILE BOTTOM SHEET ── -->
   <div id="fcta-sheet" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:351;animation:mobileSlideUp .35s cubic-bezier(.34,1.2,.64,1) forwards;padding-bottom:calc(64px + env(safe-area-inset-bottom, 0px));">
-    <div style="background:linear-gradient(170deg,#16112e,#0e0c1c);border-top:1px solid rgba(139,92,246,.3);border-radius:24px 24px 0 0;max-height:85dvh;overflow-y:auto;box-shadow:0 -12px 48px rgba(0,0,0,.7),0 0 0 1px rgba(139,92,246,.1);position:relative;">
-      <!-- Ambient glow -->
-      <div style="position:absolute;top:-60px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);pointer-events:none"></div>
+    <div style="background:var(--bg2);border-top:1px solid rgba(139,92,246,.2);border-radius:20px 20px 0 0;max-height:85dvh;overflow-y:auto;box-shadow:0 -12px 48px rgba(0,0,0,.5);position:relative;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.08),transparent 50%);pointer-events:none;border-radius:20px 20px 0 0"></div>
 
-      <!-- Sticky header: drag handle + close -->
-      <div style="position:sticky;top:0;z-index:5;background:linear-gradient(170deg,#16112e,#16112e);padding:14px 20px 10px;display:flex;align-items:center;justify-content:center;border-radius:24px 24px 0 0;">
-        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.15)"></div>
+      <!-- Drag handle + close -->
+      <div style="position:sticky;top:0;z-index:5;background:var(--bg2);padding:12px 20px 10px;display:flex;align-items:center;justify-content:center;border-radius:20px 20px 0 0;border-bottom:1px solid var(--border)">
+        <div style="width:32px;height:3px;border-radius:2px;background:var(--border2)"></div>
         <button id="float-cta-dismiss-mob"
-          style="position:absolute;right:16px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s"
-          onmouseover="this.style.background='rgba(239,68,68,.15)';this.style.color='#ef4444'"
-          onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(255,255,255,.4)'"
-          title="Tutup">✕</button>
+          style="position:absolute;right:16px;width:28px;height:28px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s"
+          onmouseover="this.style.borderColor='rgba(239,68,68,.3)';this.style.color='#ef4444'"
+          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'"
+          title="Close">✕</button>
       </div>
 
       <!-- Scrollable content -->
-      <div style="padding:4px 20px 0;">
+      <div style="padding:20px 20px 4px;position:relative">
         <!-- Brand row -->
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;box-shadow:0 0 0 1px rgba(139,92,246,.4),0 4px 14px rgba(139,92,246,.35)"><i class="bi bi-journal-text" style="color:#fff"></i></div>
-          <div>
-            <div style="font-size:14px;font-weight:800;color:#f4f4f5;letter-spacing:-.3px">RiskPerTrade</div>
-            <div style="font-size:10px;color:rgba(167,139,250,.65);font-family:var(--mono);margin-top:1px">Trading Journal</div>
+          <div style="width:38px;height:38px;border-radius:11px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-journal-text" style="color:var(--accent2);font-size:16px"></i>
           </div>
-          <div style="margin-left:auto;display:flex;align-items:center;gap:5px;background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.2);border-radius:20px;padding:3px 8px">
-            <div style="width:5px;height:5px;border-radius:50%;background:#00d97e;box-shadow:0 0 5px rgba(0,217,126,.7)"></div>
-            <span style="font-size:9px;color:#00d97e;font-family:var(--mono);font-weight:700;letter-spacing:.4px">LIVE</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.3px">RiskPerTrade</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px">Trading Journal</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:20px;padding:3px 9px">
+            <div style="width:5px;height:5px;border-radius:50%;background:#22c55e;animation:at-pulse 2.4s ease-in-out infinite"></div>
+            <span style="font-size:9px;color:#22c55e;font-family:var(--mono);font-weight:700;letter-spacing:.4px">LIVE</span>
           </div>
         </div>
 
         <!-- Headline -->
-        <div style="margin-bottom:14px">
-          <div style="font-size:21px;font-weight:800;color:#f4f4f5;line-height:1.2;letter-spacing:-.5px;margin-bottom:8px">
-            Tau kenapa trading kamu<br><span style="color:#a78bfa">belum konsisten?</span>
+        <div style="margin-bottom:16px">
+          <div style="font-size:20px;font-weight:800;color:var(--text);line-height:1.25;letter-spacing:-.5px;margin-bottom:8px">
+            Tau kenapa trading kamu<br><span style="color:var(--accent2)">belum konsisten?</span>
           </div>
-          <div style="font-size:13px;color:rgba(212,212,216,.6);line-height:1.65">
-            Kebanyakan trader kalah bukan karena strategi — tapi karena tidak pernah <strong style="color:rgba(212,212,216,.9)">review trade mereka sendiri</strong>.
+          <div style="font-size:13px;color:var(--text3);line-height:1.65">
+            Kebanyakan trader kalah bukan karena strategi — tapi karena tidak pernah <strong style="color:var(--text2)">review trade mereka sendiri</strong>.
           </div>
         </div>
 
-        <!-- 3 benefits -->
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-          <div style="display:flex;align-items:center;gap:12px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:10px 12px">
-            <div style="width:32px;height:32px;border-radius:9px;background:rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#a78bfa;font-size:14px"><i class="bi bi-journal-text"></i></div>
+        <!-- Benefits -->
+        <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:11px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 12px">
+            <div style="width:30px;height:30px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi bi-journal-text" style="color:var(--accent2);font-size:13px"></i>
+            </div>
             <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Journal trade otomatis</div>
-              <div style="font-size:11px;color:rgba(212,212,216,.5)">Catat pair, profit/loss, emosi — 30 detik selesai</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px">Journal trade otomatis</div>
+              <div style="font-size:11px;color:var(--text3)">Catat pair, profit/loss, emosi — 30 detik selesai</div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:10px 12px">
-            <div style="width:32px;height:32px;border-radius:9px;background:rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#a78bfa;font-size:14px"><i class="bi bi-bar-chart-line"></i></div>
+          <div style="display:flex;align-items:center;gap:11px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 12px">
+            <div style="width:30px;height:30px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi bi-bar-chart-line" style="color:var(--accent2);font-size:13px"></i>
+            </div>
             <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Lihat pola trading kamu</div>
-              <div style="font-size:11px;color:rgba(212,212,216,.5)">Win rate, P&amp;L, equity curve — semua otomatis</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px">Lihat pola trading kamu</div>
+              <div style="font-size:11px;color:var(--text3)">Win rate, P&amp;L, equity curve — semua otomatis</div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;background:rgba(0,217,126,.05);border:1px solid rgba(0,217,126,.15);border-radius:12px;padding:10px 12px">
-            <div style="width:32px;height:32px;border-radius:9px;background:rgba(0,217,126,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#00d97e;font-size:14px"><i class="bi bi-graph-up-arrow"></i></div>
+          <div style="display:flex;align-items:center;gap:11px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 12px">
+            <div style="width:30px;height:30px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i class="bi bi-graph-up-arrow" style="color:var(--accent2);font-size:13px"></i>
+            </div>
             <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Berkembang lebih cepat</div>
-              <div style="font-size:11px;color:rgba(212,212,216,.5)">Trader yang rutin journal terbukti lebih konsisten</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px">Berkembang lebih cepat</div>
+              <div style="font-size:11px;color:var(--text3)">Trader yang rutin journal terbukti lebih konsisten</div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Sticky CTA footer -->
-      <div style="position:sticky;bottom:0;background:linear-gradient(to top,#0e0c1c 80%,transparent);padding:16px 20px 20px;">
+      <div style="position:sticky;bottom:0;background:var(--bg2);padding:14px 20px 18px;border-top:1px solid var(--border)">
         <button id="float-cta-btn-mob"
-          style="width:100%;padding:16px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 6px 24px rgba(139,92,246,.5);letter-spacing:.1px"
-          onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 28px rgba(139,92,246,.65)'"
-          onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 24px rgba(139,92,246,.5)'">
-          Upgrade Sekarang →
+          style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .18s;box-shadow:0 4px 20px rgba(139,92,246,.35);letter-spacing:.1px;display:flex;align-items:center;justify-content:center;gap:7px"
+          onmouseover="this.style.background='#7c3aed';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(139,92,246,.45)'"
+          onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(139,92,246,.35)'">
+          <i class="bi bi-lightning-charge-fill" style="font-size:12px"></i> Upgrade Sekarang
         </button>
-        <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(255,255,255,.22);font-family:var(--mono)">Bayar sekali · Akses selamanya · No subscription</div>
+        <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono)">Bayar sekali · Akses selamanya · No subscription</div>
       </div>
 
     </div>
@@ -5485,97 +5497,105 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
      §MODAL-PURCHASE — Purchase / upgrade confirm modal
      ════════════════════════════════════════════════════════════ -->
 <div class="mo" id="md-purchase">
-  <div class="md" style="max-width:420px;padding:0;overflow-y:auto;background:linear-gradient(160deg,#13102a 0%,#0d0b1e 60%,#0a0a14 100%);border:1px solid rgba(139,92,246,.3)">
+  <div class="md" style="max-width:420px;padding:0;overflow:hidden;border-radius:18px;border:1px solid rgba(139,92,246,.2);background:var(--bg2)">
 
-    <!-- Top gradient bar -->
-    <div style="height:3px;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;animation:gradientShift 3s ease infinite;position:sticky;top:0;z-index:1"></div>
+    <!-- Header -->
+    <div style="padding:26px 26px 20px;border-bottom:1px solid var(--border);position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.1),transparent 65%);pointer-events:none"></div>
+      <!-- Full Access badge -->
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.22);border-radius:20px;padding:4px 11px;margin-bottom:13px;position:relative">
+        <div style="width:5px;height:5px;border-radius:50%;background:var(--accent2);animation:at-pulse 2.4s ease-in-out infinite"></div>
+        <span style="font-size:9px;font-weight:700;color:var(--accent2);letter-spacing:.9px;text-transform:uppercase;font-family:var(--mono)">Full Access</span>
+      </div>
+      <div style="font-size:19px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.25;margin-bottom:8px;position:relative">
+        Jadikan trading kamu<br>lebih <span style="color:var(--accent2)">terstruktur.</span>
+      </div>
+      <p style="font-size:12px;color:var(--text3);line-height:1.7;margin:0;position:relative">
+        Trader yang konsisten bukan yang paling pintar — tapi yang paling <strong style="color:var(--text2)">sadar pola trading mereka sendiri</strong>. Journal adalah caranya.
+      </p>
+    </div>
 
-    <div style="padding:28px 28px 24px;position:relative;overflow:visible">
-      <!-- Ambient glow -->
-      <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%);pointer-events:none"></div>
-      <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.08),transparent 70%);pointer-events:none"></div>
+    <div style="padding:18px 24px 22px;overflow-y:auto;max-height:65vh">
 
-      <!-- Header -->
-      <div style="position:relative;margin-bottom:20px">
-        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:20px;padding:5px 12px;margin-bottom:14px">
-          <div style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;box-shadow:0 0 6px rgba(139,92,246,.7)"></div>
-          <span style="font-size:10px;font-weight:700;color:#a78bfa;letter-spacing:.8px;text-transform:uppercase;font-family:var(--mono)">Full Access</span>
+      <!-- Feature list -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="font-size:9px;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:.9px;margin-bottom:12px;display:flex;align-items:center;gap:5px">
+          <i class="bi bi-stars"></i> Yang kamu dapat
         </div>
-        <div style="font-size:20px;font-weight:800;color:#f4f4f5;letter-spacing:-.5px;line-height:1.2;margin-bottom:8px">
-          Jadikan trading kamu<br>lebih <span style="color:#a78bfa">terstruktur.</span>
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <div style="display:flex;align-items:flex-start;gap:11px">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <i class="bi bi-journal-text" style="color:var(--accent2);font-size:12px"></i>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">Trade Journal — Unlimited</div>
+              <div style="font-size:11px;color:var(--text3);line-height:1.5">Catat setiap trade: pair, arah, R:R, setup, catatan psikologi. Tersimpan cloud, aman selamanya.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:11px">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <i class="bi bi-bar-chart-line" style="color:var(--accent2);font-size:12px"></i>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">Analytics &amp; Equity Curve</div>
+              <div style="font-size:11px;color:var(--text3);line-height:1.5">Win rate, profit factor, avg R:R, dan grafik equity curve kamu — lihat performa nyata, bukan asumsi.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:11px">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <i class="bi bi-cpu" style="color:var(--accent2);font-size:12px"></i>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">Daily Journal — Bias &amp; Psikologi</div>
+              <div style="font-size:11px;color:var(--text3);line-height:1.5">Catat market bias harian, kondisi mental sebelum trading, dan review sesi. Kenali pattern emosi kamu.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:11px">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <i class="bi bi-calculator" style="color:var(--accent2);font-size:12px"></i>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">Risk Calculator</div>
+              <div style="font-size:11px;color:var(--text3);line-height:1.5">Hitung lot size dan R:R otomatis sebelum masuk trade. Stop overtrade karena miskalkulas risiko.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:11px;opacity:.65">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+              <i class="bi bi-trophy" style="color:var(--text3);font-size:12px"></i>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:2px">PropFirm Tracker <span style="font-size:9px;font-weight:500;color:var(--text3);font-family:var(--mono)">(bonus)</span></div>
+              <div style="font-size:11px;color:var(--text3);line-height:1.5">Monitor progress challenge akun prop firm dalam satu tempat.</div>
+            </div>
+          </div>
+
+          <div style="padding-top:10px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--text3);line-height:1.5">+ Export CSV/JSON, Share Stats card, cloud sync real-time, akses semua fitur tanpa batas</div>
+          </div>
+
         </div>
-        <p style="font-size:13px;color:rgba(212,212,216,.65);line-height:1.7;margin:0">
-          Trader yang konsisten bukan yang paling pintar — tapi yang paling <strong style="color:rgba(212,212,216,.9)">sadar pola trading mereka sendiri</strong>. Journal adalah caranya.
-        </p>
       </div>
 
-      <!-- Feature list — journal-first -->
-      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(139,92,246,.15);border-radius:14px;padding:16px;margin-bottom:20px;position:relative">
-        <div style="font-size:9px;font-weight:700;color:rgba(167,139,250,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:var(--mono)">Yang kamu dapat</div>
-        <div style="display:flex;flex-direction:column;gap:11px">
-
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;margin-top:1px"><i class="bi bi-journal-text"></i></div>
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Trade Journal — Unlimited</div>
-              <div style="font-size:11px;color:rgba(161,161,170,.7);line-height:1.5">Catat setiap trade: pair, arah, R:R, screenshot setup, catatan psikologi. Semua tersimpan cloud, aman selamanya.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;margin-top:1px"><i class="bi bi-bar-chart-line"></i></div>
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Analytics &amp; Equity Curve</div>
-              <div style="font-size:11px;color:rgba(161,161,170,.7);line-height:1.5">Win rate, profit factor, avg R:R, dan grafik equity curve kamu sendiri — lihat performa nyata, bukan asumsi.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;margin-top:1px"><i class="bi bi-cpu"></i></div>
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Daily Journal — Bias &amp; Psikologi</div>
-              <div style="font-size:11px;color:rgba(161,161,170,.7);line-height:1.5">Catat market bias harian, kondisi mental sebelum trading, dan review sesi. Kenali pattern emosi kamu.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;margin-top:1px"><i class="bi bi-calculator"></i></div>
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#f4f4f5;margin-bottom:2px">Risk Calculator</div>
-              <div style="font-size:11px;color:rgba(161,161,170,.7);line-height:1.5">Hitung lot size dan R:R otomatis sebelum masuk trade. Stop overtrade karena miskalkulas risiko.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;margin-top:1px"><i class="bi bi-trophy"></i></div>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:rgba(212,212,216,.7);margin-bottom:2px">PropFirm Tracker <span style="font-size:9px;font-weight:500;color:rgba(161,161,170,.45);font-family:var(--mono)">(bonus)</span></div>
-              <div style="font-size:11px;color:rgba(161,161,170,.55);line-height:1.5">Monitor progress challenge akun prop firm kamu dalam satu tempat.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:12px;padding-top:4px;border-top:1px solid rgba(255,255,255,.05)">
-            <div style="font-size:11px;color:rgba(161,161,170,.6);line-height:1.5;flex:1">+ Export CSV/JSON, Share Stats card, cloud sync real-time, akses semua fitur tanpa batas</div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Buttons -->
+      <!-- CTAs -->
       <a href="https://lynk.id/riskpertrade/ok7m3y56myz2/checkout" target="_blank"
-        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 20px rgba(139,92,246,.45);transition:all .2s;letter-spacing:.1px;box-sizing:border-box"
-        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 28px rgba(139,92,246,.55)'"
-        onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(139,92,246,.45)'">
-        Dapatkan Akses Sekarang →
+        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:var(--accent);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px;box-shadow:0 4px 18px rgba(139,92,246,.35);transition:all .18s;letter-spacing:.1px;box-sizing:border-box"
+        onmouseover="this.style.background='#7c3aed';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(139,92,246,.45)'"
+        onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 4px 18px rgba(139,92,246,.35)'">
+        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Dapatkan Akses Sekarang
       </a>
       <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
-        style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:rgba(212,212,216,.6);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:10px;transition:all .15s;box-sizing:border-box"
-        onmouseover="this.style.background='rgba(255,255,255,.07)';this.style.color='rgba(212,212,216,.9)'"
-        onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(212,212,216,.6)'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text3);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:8px;transition:all .15s;box-sizing:border-box"
+        onmouseover="this.style.borderColor='rgba(139,92,246,.3)';this.style.color='var(--text2)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
         Ada pertanyaan? — @riskpertrade.me
       </a>
-      <button class="btng" id="purchase-close" style="width:100%;padding:10px;background:transparent;border-color:rgba(255,255,255,.08);color:rgba(161,161,170,.5);font-size:12px">Nanti saja</button>
+      <button class="btng" id="purchase-close" style="width:100%;padding:10px;font-size:12px">Nanti saja</button>
     </div>
   </div>
 </div>
@@ -5647,8 +5667,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 /* Action row */
 .rc-actions{display:flex;gap:10px;flex-wrap:wrap;}
 .rc-act-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;min-width:130px;}
-.rc-act-primary{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;box-shadow:0 4px 20px rgba(139,92,246,.35);}
-.rc-act-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5);}
+.rc-act-primary{background:var(--accent);color:#fff;border:none;box-shadow:0 4px 14px rgba(139,92,246,.3);}
+.rc-act-primary:hover{background:#7c3aed;transform:translateY(-1px);box-shadow:0 6px 22px rgba(139,92,246,.45);}
 .rc-act-secondary{background:rgba(255,255,255,.05);color:#a78bfa;border:1px solid rgba(139,92,246,.3);}
 .rc-act-secondary:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.5);}
 .rc-act-ghost{background:rgba(255,255,255,.03);color:#a1a1aa;border:1px solid rgba(255,255,255,.08);}
@@ -11459,7 +11479,7 @@ function renderDNA(){
         <div style="font-size:30px">🧬</div>
         <div style="font-size:14px;font-weight:700;color:#f4f4f5;letter-spacing:-.3px">Trader DNA — Premium</div>
         <div style="font-size:11px;color:rgba(255,255,255,.4);text-align:center;max-width:220px;line-height:1.5">Analisis 6 dimensi trading kamu. Upgrade untuk unlock DNA Radar.</div>
-        <button onclick="openFeatureGateModal('dna')" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(139,92,246,.35);margin-top:4px">⚡ Upgrade untuk akses</button>`;
+        <button onclick="openFeatureGateModal('dna')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 14px rgba(139,92,246,.35);margin-top:4px">⚡ Upgrade untuk akses</button>`;
       ov.addEventListener('click', e => { if (e.target === ov) openFeatureGateModal('dna'); });
       dnaCard.appendChild(ov);
     }
@@ -12679,7 +12699,7 @@ function renderDailyPage() {
           </div>
         </div>
         ${rem === 0
-          ? `<button onclick="openFeatureGateModal('daily')" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">⚡ Upgrade untuk unlimited →</button>`
+          ? `<button onclick="openFeatureGateModal('daily')" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">⚡ Upgrade untuk unlimited →</button>`
           : `<span style="font-size:10px;color:rgba(255,255,255,.3)">${rem} entri tersisa · <a href="#" onclick="event.preventDefault();openFeatureGateModal('daily')" style="color:#a78bfa;text-decoration:none">Premium: unlimited</a></span>`}
       </div>`;
     banner.style.display = 'block';
@@ -13078,7 +13098,7 @@ function obGoTo(idx) {
       nextBtn.style.boxShadow = '0 4px 14px rgba(0,217,126,.35),inset 0 1px 0 rgba(255,255,255,.12)';
     } else {
       nextBtn.textContent = 'Selanjutnya →';
-      nextBtn.style.background = 'linear-gradient(135deg,var(--accent),#7c3aed)';
+      nextBtn.style.background = 'var(--accent)';
       nextBtn.style.boxShadow = '0 4px 14px rgba(139,92,246,.35),inset 0 1px 0 rgba(255,255,255,.12)';
     }
   }
@@ -15608,7 +15628,7 @@ window.renderPlaybook = function() {
             </div>
           </div>
           ${rem === 0
-            ? `<button onclick="openFeatureGateModal('playbook')" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">⚡ Upgrade ke 15 slot →</button>`
+            ? `<button onclick="openFeatureGateModal('playbook')" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">⚡ Upgrade ke 15 slot →</button>`
             : `<span style="font-size:10px;color:rgba(255,255,255,.3)">${rem} slot tersisa · <a href="#" onclick="event.preventDefault();openFeatureGateModal('playbook')" style="color:#a78bfa;text-decoration:none">Premium: 15 slot</a></span>`}
         </div>`;
       bannerEl.style.display = 'block';
