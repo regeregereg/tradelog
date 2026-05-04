@@ -3599,57 +3599,41 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <!-- Trader Identity Card (shown when logged in) — includes Starting Balance -->
     <!-- ── TRADER CARD (redesigned) ── -->
-    <div id="trader-card" style="display:none;position:relative;border-radius:20px;margin-bottom:16px;overflow:hidden;background:linear-gradient(145deg,#0f0e17,#130f20);border:1px solid rgba(139,92,246,.2);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px rgba(139,92,246,.08)">
-
-      <!-- Ambient glow blobs -->
-      <div style="position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 65%);pointer-events:none"></div>
-      <div style="position:absolute;bottom:-50px;left:10px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1),transparent 65%);pointer-events:none"></div>
-
-      <!-- Subtle dot-grid texture -->
-      <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(167,139,250,.25) 1px,transparent 1px);background-size:22px 22px;opacity:.04;pointer-events:none"></div>
-
-      <!-- Top accent line -->
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.6) 40%,rgba(139,92,246,.4) 70%,transparent);pointer-events:none"></div>
-
+    <div id="trader-card" style="display:none;position:relative;border-radius:14px;margin-bottom:16px;overflow:hidden;background:var(--bg2);border:1px solid var(--border)">
       <!-- Card content -->
-      <div style="position:relative;padding:18px 20px">
-
+      <div style="position:relative;padding:16px 18px">
         <!-- Main row: Avatar | Name+tagline | Balance | Share -->
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
 
-          <!-- Avatar with ring -->
-          <div style="position:relative;flex-shrink:0">
-            <div style="position:absolute;inset:-3px;border-radius:17px;background:linear-gradient(135deg,rgba(139,92,246,.6),rgba(124,58,237,.3),transparent);z-index:0"></div>
-            <div id="tc-avatar" style="position:relative;z-index:1;width:54px;height:54px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;color:#fff;overflow:hidden;font-family:var(--font)"></div>
-          </div>
+          <!-- Avatar -->
+          <div id="tc-avatar" style="width:44px;height:44px;border-radius:12px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent2);overflow:hidden;font-family:var(--font);flex-shrink:0"></div>
 
-          <!-- Name + greeting + tagline -->
-          <div style="flex:1;min-width:120px">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
-              <span id="tc-greeting" style="font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.2px">Selamat datang,</span>
+          <!-- Name + tagline -->
+          <div style="flex:1;min-width:100px">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">
+              <span id="tc-greeting" style="font-size:10px;color:var(--text3);font-weight:500">Welcome,</span>
             </div>
-            <div id="tc-name" style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15;font-family:var(--font)"></div>
-            <div id="tc-tagline" style="margin-top:5px;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);font-size:10px;font-weight:600;color:var(--accent2);font-family:var(--mono);letter-spacing:.3px"><i class="bi bi-graph-up-arrow" style="font-size:9px"></i> Konsisten adalah kunci</div>
+            <div id="tc-name" style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;font-family:var(--font)"></div>
+            <div id="tc-tagline" style="margin-top:4px;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);font-size:10px;font-weight:600;color:var(--accent2);font-family:var(--mono);letter-spacing:.2px"><i class="bi bi-graph-up-arrow" style="font-size:9px"></i> Consistency is key</div>
           </div>
 
-          <!-- Vertical divider (desktop) -->
-          <div style="width:1px;height:48px;background:linear-gradient(180deg,transparent,rgba(139,92,246,.2) 40%,rgba(139,92,246,.2) 60%,transparent);flex-shrink:0;display:none" class="tc-vdiv"></div>
+          <!-- Vertical divider -->
+          <div style="width:1px;height:40px;background:var(--border);flex-shrink:0;display:none" class="tc-vdiv"></div>
 
           <!-- Balance block -->
-          <div id="bbal-wrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700">Starting Balance</div>
-            <div class="bval" id="bal-banner-btn" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent2);background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.22);border-radius:10px;padding:5px 13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px">$<span id="bdisp">—</span><span class="bedit" style="font-size:10px;color:var(--text3);font-weight:500">✎ ubah</span></div>
+          <div id="bbal-wrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Starting Balance</div>
+            <div class="bval" id="bal-banner-btn" style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent2);background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:9px;padding:4px 12px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:7px" onmouseover="this.style.background='rgba(139,92,246,.14)'" onmouseout="this.style.background='rgba(139,92,246,.08)'">$<span id="bdisp">—</span><span class="bedit" style="font-size:10px;color:var(--text3);font-weight:500">✎ edit</span></div>
           </div>
 
           <!-- Share button -->
-          <button id="share-btn" style="background:rgba(255,255,255,.04);color:var(--text2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;flex-shrink:0;letter-spacing:.3px;display:flex;align-items:center;gap:6px;align-self:flex-start" title="Bagikan statistik trading kamu" onmouseover="this.style.background='rgba(139,92,246,.15)';this.style.color='var(--accent2)';this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='var(--text2)';this.style.borderColor='rgba(255,255,255,.08)'">
+          <button id="share-btn" style="background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .18s;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px;align-self:flex-start" title="Share your trading stats" onmouseover="this.style.borderColor='rgba(139,92,246,.3)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">
             <i class="bi bi-share-fill" style="font-size:11px"></i> Share
           </button>
 
         </div>
       </div>
     </div>
-    <!-- ── END TRADER CARD ── -->
 
     <!-- Guest banner -->
     <div id="guest-banner" style="background:var(--bg2);border:1px solid rgba(139,92,246,.18);border-radius:14px;padding:16px 18px;margin-bottom:16px;position:relative;overflow:hidden">
@@ -3856,36 +3840,32 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- Section header -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Profil & Insight Kamu</div>
+        <div style="font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.9px">Profile & Insights</div>
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="pattern-trade-count"></div>
       </div>
 
-      <!-- Trader Type card — full premium treatment -->
-      <div id="trader-type-card" style="background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:18px;padding:18px 20px;margin-bottom:10px;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s"
-        onmouseover="this.style.boxShadow='0 8px 32px rgba(0,0,0,.3)'" onmouseout="this.style.boxShadow=''">
-        <!-- Ambient glow — updated by JS -->
-        <div id="tt-glow" style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 65%);pointer-events:none;transition:background .4s"></div>
-        <!-- Scan line texture -->
-        <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.008) 3px,rgba(255,255,255,.008) 4px);pointer-events:none"></div>
+      <!-- Trader Type card -->
+      <div id="trader-type-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;transition:border-color .18s"
+        onmouseover="this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.borderColor='var(--border)'">
 
-        <div style="display:flex;align-items:center;gap:14px;position:relative">
+        <div style="display:flex;align-items:center;gap:12px">
           <!-- Icon box -->
-          <div id="tt-icon-box" style="width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.2)">
-            <i class="bi bi-lightning-charge" id="tt-icon"></i>
+          <div id="tt-icon-box" style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);transition:all .25s cubic-bezier(.34,1.56,.64,1)">
+            <i class="bi bi-lightning-charge" id="tt-icon" style="color:var(--accent2)"></i>
           </div>
           <!-- Text -->
           <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
-              <div style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.4px" id="tt-type">—</div>
-              <div id="tt-badge" style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.7px;border:1px solid">—</div>
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+              <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.3px" id="tt-type">—</div>
+              <div id="tt-badge" style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.6px;border:1px solid;color:var(--accent2);background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.22)">—</div>
             </div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:6px" id="tt-desc">—</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.45;margin-bottom:4px" id="tt-desc">—</div>
             <div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="tt-meta">—</div>
           </div>
-          <!-- Right: Profile label -->
+          <!-- Right: confidence -->
           <div style="flex-shrink:0;text-align:right;display:none" id="tt-right-col">
-            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px">Trader Profile</div>
-            <div id="tt-conf-bar" style="width:60px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-left:auto">
+            <div style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:4px">Trader Profile</div>
+            <div id="tt-conf-bar" style="width:52px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-left:auto">
               <div id="tt-conf-fill" style="height:100%;border-radius:2px;background:var(--accent);width:0%;transition:width .8s ease"></div>
             </div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:3px" id="tt-conf-label">—</div>
@@ -3893,8 +3873,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
       </div>
 
-      <!-- Pattern Insights grid -->
-      <div id="pattern-insights-list" style="display:flex;flex-direction:column;gap:7px"></div>
+      <!-- Pattern Insights list -->
+      <div id="pattern-insights-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
 
     <!-- Equity Curve (Bybit-style) -->
@@ -8857,9 +8837,9 @@ function _showLossAlert(streak) {
   const old = document.getElementById('consec-loss-alert');
   if (old) old.remove();
   const configs = {
-    3: { title: '3 Loss Berturut-turut', msg: 'Pasar sedang tidak berpihak. Istirahat sejenak sebelum entry berikutnya.', color: '#f59e0b', border: 'rgba(245,158,11,.3)', bg: 'rgba(245,158,11,.06)', icon: '⚠' },
-    4: { title: '4 Loss Beruntun', msg: 'Pertimbangkan untuk berhenti hari ini. Review journal dulu sebelum trade lagi.', color: '#fb923c', border: 'rgba(251,146,60,.35)', bg: 'rgba(251,146,60,.07)', icon: '⚠' },
-    5: { title: `${streak}x Loss — Stop Trading`, msg: 'Lindungi akun kamu. Traders terbaik tahu kapan harus berhenti.', color: '#ff4d4d', border: 'rgba(255,77,77,.4)', bg: 'rgba(255,77,77,.08)', icon: '⛔' },
+    3: { title: '3 Loss Berturut-turut', msg: 'Pasar sedang tidak berpihak. Istirahat sejenak sebelum entry berikutnya.', color: '#fbbf24', border: 'rgba(245,158,11,.3)', bg: 'rgba(245,158,11,.06)', icon: '⚠' },
+    4: { title: '4 Loss Beruntun', msg: 'Pertimbangkan untuk berhenti hari ini. Review journal dulu sebelum trade lagi.', color: '#fbbf24', border: 'rgba(251,146,60,.35)', bg: 'rgba(251,146,60,.07)', icon: '⚠' },
+    5: { title: `${streak}x Loss — Stop Trading`, msg: 'Lindungi akun kamu. Traders terbaik tahu kapan harus berhenti.', color: '#f87171', border: 'rgba(255,77,77,.4)', bg: 'rgba(255,77,77,.08)', icon: '⛔' },
   };
   const cfg = configs[Math.min(streak, 5)] || configs[5];
   const el = document.createElement('div');
@@ -10389,25 +10369,25 @@ function _detectTraderType(tArr) {
 
   // Classify
   if (avgHold !== null && avgHold < 30) {
-    return { label: 'Scalper', icon: '⚡', color: '#f59e0b', desc: 'Hold time sangat singkat, high-frequency execution', meta: `~${Math.round(avgHold)}m avg hold · ${tArr.length} trades` };
+    return { label: 'Scalper', icon: 'bi-lightning-charge', color: 'var(--accent2)', desc: 'Very short hold time, high-frequency execution', meta: `~${Math.round(avgHold)}m avg hold · ${tArr.length} trades` };
   }
   if (avgHold !== null && avgHold > 240) {
-    return { label: 'Swing Trader', icon: '🌊', color: '#38bdf8', desc: 'Hold posisi berjam-jam, sabar menunggu target', meta: `~${Math.round(avgHold/60)}j avg hold · ${tArr.length} trades` };
+    return { label: 'Swing Trader', icon: 'bi-arrow-left-right', color: 'var(--accent2)', desc: 'Holds positions for hours, patient for targets', meta: `~${Math.round(avgHold/60)}h avg hold · ${tArr.length} trades` };
   }
   if (topSesPct >= 0.6 && topSes) {
     const sesName = topSes[0].split(' ')[0];
-    return { label: `${sesName} Trader`, icon: '🕐', color: '#00d97e', desc: `Mayoritas trading di sesi ${topSes[0]}`, meta: `${Math.round(topSesPct*100)}% trades di ${sesName} · ${tArr.length} total` };
+    return { label: `${sesName} Trader`, icon: 'bi-clock', color: 'var(--accent2)', desc: `Most trades in the ${topSes[0]} session`, meta: `${Math.round(topSesPct*100)}% trades in ${sesName} · ${tArr.length} total` };
   }
   if (topPairPct >= 0.6 && topPair) {
-    return { label: 'Specialist', icon: '🎯', color: '#a78bfa', desc: `Fokus pada ${topPair[0]} — edge yang terdefinisi`, meta: `${Math.round(topPairPct*100)}% trades di ${topPair[0]} · ${tArr.length} total` };
+    return { label: 'Specialist', icon: 'bi-bullseye', color: 'var(--accent2)', desc: `Focused on ${topPair[0]} — well-defined edge`, meta: `${Math.round(topPairPct*100)}% trades on ${topPair[0]} · ${tArr.length} total` };
   }
   if (freqPerWeek >= 10) {
-    return { label: 'Active Trader', icon: '📊', color: '#fb923c', desc: 'Frekuensi tinggi, aktif mengambil peluang', meta: `~${freqPerWeek.toFixed(1)} trades/minggu` };
+    return { label: 'Active Trader', icon: 'bi-activity', color: 'var(--accent2)', desc: 'High frequency, actively capturing opportunities', meta: `~${freqPerWeek.toFixed(1)} trades/week` };
   }
   if (freqPerWeek <= 2 && tArr.length >= 5) {
-    return { label: 'Position Trader', icon: '🧘', color: '#818cf8', desc: 'Sabar, selektif — hanya ambil setup terbaik', meta: `~${freqPerWeek.toFixed(1)} trades/minggu · ${tArr.length} total` };
+    return { label: 'Position Trader', icon: 'bi-hourglass-split', color: 'var(--accent2)', desc: 'Patient and selective — only takes top setups', meta: `~${freqPerWeek.toFixed(1)} trades/week · ${tArr.length} total` };
   }
-  return { label: 'Intraday Trader', icon: '📈', color: '#8b5cf6', desc: 'Mix holding time, balanced approach', meta: `${tArr.length} trades logged` };
+  return { label: 'Intraday Trader', icon: 'bi-graph-up', color: 'var(--accent2)', desc: 'Balanced approach, mixed hold times', meta: `${tArr.length} trades logged` };
 }
 
 // ── AUTO PATTERN DETECTOR ─────────────────────────────
@@ -10431,7 +10411,7 @@ function _detectPatterns(tArr) {
   if (bestCombo && bestCombo.wr >= 0.6) {
     const [pair, ses] = bestCombo.k.split('|');
     insights.push({
-      icon: '🎯', color: '#00d97e', priority: 10,
+      icon: 'bi-bullseye', color: '#22c55e', priority: 10,
       title: `${pair} di ${ses} — Edge terkuat kamu`,
       desc: `${Math.round(bestCombo.wr*100)}% WR dari ${bestCombo.n} trade · P&L: ${bestCombo.pnl >= 0 ? '+' : ''}$${bestCombo.pnl.toFixed(0)}`,
     });
@@ -10444,7 +10424,7 @@ function _detectPatterns(tArr) {
   if (worstPair) {
     const [p, d] = worstPair;
     insights.push({
-      icon: '🚫', color: '#ff4d4d', priority: 9,
+      icon: 'bi-slash-circle', color: '#f87171', priority: 9,
       title: `${p} menguras akun kamu`,
       desc: `${d.pnl < 0 ? '' : '+'}$${d.pnl.toFixed(0)} dari ${d.n} trade (${Math.round(d.w/d.n*100)}% WR). Pertimbangkan untuk skip pair ini.`,
     });
@@ -10465,7 +10445,7 @@ function _detectPatterns(tArr) {
   if (worstDay && worstDay[1] < -30) {
     const wr = Math.round((dowW[worstDay[0]]||0) / dowN[worstDay[0]] * 100);
     insights.push({
-      icon: '📛', color: '#f59e0b', priority: 7,
+      icon: 'bi-calendar-x', color: '#fbbf24', priority: 7,
       title: `Jangan trading hari ${dowNames[worstDay[0]]}`,
       desc: `$${parseFloat(worstDay[1]).toFixed(0)} P&L · ${wr}% WR dari ${dowN[worstDay[0]]} trade. Hari paling merugikan kamu.`,
     });
@@ -10473,7 +10453,7 @@ function _detectPatterns(tArr) {
   if (bestDay && bestDay[1] > 30 && bestDay[0] !== worstDay?.[0]) {
     const wr = Math.round((dowW[bestDay[0]]||0) / dowN[bestDay[0]] * 100);
     insights.push({
-      icon: '📅', color: '#a78bfa', priority: 6,
+      icon: 'bi-calendar-check', color: 'var(--accent2)', priority: 6,
       title: `${dowNames[bestDay[0]]} — Hari paling profitable`,
       desc: `+$${parseFloat(bestDay[1]).toFixed(0)} · ${wr}% WR dari ${dowN[bestDay[0]]} trade. Prioritaskan hari ini.`,
     });
@@ -10491,7 +10471,7 @@ function _detectPatterns(tArr) {
   const worstEm = emArr.sort((a,b) => a.wr-b.wr)[0];
   if (bestEm && worstEm && bestEm.em !== worstEm.em && bestEm.wr - worstEm.wr > 0.2) {
     insights.push({
-      icon: '🧠', color: '#38bdf8', priority: 8,
+      icon: 'bi-brain', color: 'var(--accent2)', priority: 8,
       title: `${bestEm.em} = ${Math.round(bestEm.wr*100)}% WR — ${worstEm.em} = ${Math.round(worstEm.wr*100)}% WR`,
       desc: `Emosi sangat mempengaruhi hasil kamu. Trading saat ${bestEm.em} jauh lebih baik (${bestEm.n} trade).`,
     });
@@ -10506,13 +10486,13 @@ function _detectPatterns(tArr) {
     const fmt   = m => m >= 60 ? `${(m/60).toFixed(1)}j` : `${Math.round(m)}m`;
     if (avgLH > avgWH * 1.5) {
       insights.push({
-        icon: '⏱️', color: '#ff4d4d', priority: 8,
+        icon: 'bi-stopwatch', color: '#f87171', priority: 8,
         title: `Hold losers ${(avgLH/avgWH).toFixed(1)}× lebih lama dari winners`,
         desc: `Avg loss hold: ${fmt(avgLH)} vs win: ${fmt(avgWH)}. Tanda revenge holding — cut loss lebih cepat.`,
       });
     } else if (avgWH > avgLH * 1.5) {
       insights.push({
-        icon: '⏱️', color: '#00d97e', priority: 5,
+        icon: 'bi-stopwatch', color: '#22c55e', priority: 5,
         title: `Kamu sudah bisa hold winners`,
         desc: `Avg win hold: ${fmt(avgWH)} vs loss: ${fmt(avgLH)}. Good discipline — winners ditahan lebih lama.`,
       });
@@ -10533,7 +10513,7 @@ function _detectPatterns(tArr) {
     const topSes = sesArr[0], botSes = sesArr[sesArr.length-1];
     if (topSes.wr - botSes.wr > 0.2) {
       insights.push({
-        icon: '🕐', color: '#00d97e', priority: 7,
+        icon: 'bi-clock', color: '#22c55e', priority: 7,
         title: `${topSes.ses.split('-')[0]} (${Math.round(topSes.wr*100)}% WR) jauh lebih baik dari ${botSes.ses.split('-')[0]} (${Math.round(botSes.wr*100)}%)`,
         desc: `Fokus trading di ${topSes.ses.split('-')[0]} — $${topSes.pnl >= 0?'+':''}${topSes.pnl.toFixed(0)} P&L dari ${topSes.n} trade.`,
       });
@@ -10548,7 +10528,7 @@ function _detectPatterns(tArr) {
     const oversize = tArr.filter(t => t.risk > avgRisk * 2 && t.result === 'Loss');
     if (oversize.length >= 2 && maxRisk > avgRisk * 2.5) {
       insights.push({
-        icon: '📐', color: '#fb923c', priority: 8,
+        icon: 'bi-exclamation-triangle', color: '#fbbf24', priority: 8,
         title: `${oversize.length} loss dari oversize position`,
         desc: `Risk normal kamu $${avgRisk.toFixed(0)}, tapi ${oversize.length} trade loss pakai risk $${maxRisk.toFixed(0)}+. Oversize saat loss = danger.`,
       });
@@ -10565,13 +10545,13 @@ function _detectPatterns(tArr) {
   }
   if (curWin >= 4) {
     insights.push({
-      icon: '🔥', color: '#f59e0b', priority: 10,
+      icon: 'bi-fire', color: '#fbbf24', priority: 10,
       title: `${curWin} win streak — Jaga momentum!`,
       desc: `Kamu sedang hot. Tetap disiplin pada size dan setup, jangan overconfident.`,
     });
   } else if (curLoss >= 3 && insights.every(x => !x.title.includes('Loss'))) {
     insights.push({
-      icon: '❄️', color: '#818cf8', priority: 10,
+      icon: 'bi-snow', color: 'var(--accent2)', priority: 10,
       title: `${curLoss} loss beruntun — Review sebelum lanjut`,
       desc: `Istirahat sejenak, review trade terakhir. Jangan buru-buru recovery dengan oversize.`,
     });
@@ -10583,7 +10563,7 @@ function _detectPatterns(tArr) {
     const earlyExit = withMFE.filter(t => Math.abs(t.r||0) < t.plannedRR * 0.7).length;
     if (earlyExit / withMFE.length > 0.4) {
       insights.push({
-        icon: '✂️', color: '#f59e0b', priority: 7,
+        icon: 'bi-scissors', color: '#fbbf24', priority: 7,
         title: `${Math.round(earlyExit/withMFE.length*100)}% trade menang — exit sebelum target`,
         desc: `Kamu sering cut profit terlalu awal. Actual RR lebih rendah dari planned. Coba trailing stop.`,
       });
@@ -10604,7 +10584,7 @@ function _detectPatterns(tArr) {
   if (worstSetup) {
     const [setup, d] = worstSetup;
     insights.push({
-      icon: '⚠️', color: '#ff4d4d', priority: 7,
+      icon: 'bi-exclamation-triangle', color: '#f87171', priority: 7,
       title: `Setup "${setup}" win rate hanya ${Math.round(d.w/d.n*100)}%`,
       desc: `Dari ${d.n} trade dengan setup ini, hanya ${d.w} yang menang. Evaluasi kembali kondisi entry kamu.`,
     });
@@ -10642,24 +10622,24 @@ function _renderPatternWidget() {
     const confLabel = document.getElementById('tt-conf-label');
     const rightCol  = document.getElementById('tt-right-col');
 
-    if (iconEl) iconEl.textContent = tt.icon;
+    if (iconEl) iconEl.className = `bi ${tt.icon}`;
+    if (iconEl) iconEl.style.color = 'var(--accent2)';
     if (iconBox) {
-      iconBox.style.background = tt.color + '18';
-      iconBox.style.borderColor = tt.color + '40';
-      iconBox.style.boxShadow = `0 4px 20px ${tt.color}20`;
+      iconBox.style.background = 'rgba(139,92,246,.08)';
+      iconBox.style.borderColor = 'rgba(139,92,246,.18)';
     }
     if (typeEl) typeEl.textContent = tt.label;
     if (badgeEl) {
       badgeEl.textContent = tt.label;
-      badgeEl.style.color = tt.color;
-      badgeEl.style.background = tt.color + '18';
-      badgeEl.style.borderColor = tt.color + '45';
+      badgeEl.style.color = 'var(--accent2)';
+      badgeEl.style.background = 'rgba(139,92,246,.08)';
+      badgeEl.style.borderColor = 'rgba(139,92,246,.22)';
     }
     if (descEl) descEl.textContent = tt.desc;
     if (metaEl) metaEl.textContent = tt.meta;
-    if (glowEl) glowEl.style.background = `radial-gradient(circle,${tt.color}18,transparent 65%)`;
+    if (glowEl) glowEl.style.display = 'none';
     if (card) {
-      card.style.borderColor = tt.color + '35';
+      card.style.borderColor = 'var(--border)';
     }
     // Confidence bar — based on trade count
     if (confBar && confLabel && rightCol) {
@@ -10686,19 +10666,23 @@ function _renderPatternWidget() {
 
   listEl.innerHTML = patterns.map((p, i) => {
     const animDelay = i * 60;
+    // Neutral accent strip color: use 3-tone system
+    const stripColor = p.color === '#f87171' ? '#f87171' : p.color === '#fbbf24' ? '#fbbf24' : p.color === '#22c55e' ? '#22c55e' : 'rgba(139,92,246,.5)';
     return `
-      <div style="background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:13px;padding:12px 14px;display:flex;align-items:flex-start;gap:11px;transition:all .2s;cursor:default;animation:anaSlideIn .3s ${animDelay}ms ease both"
-        onmouseover="this.style.borderColor='${p.color}45';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.25)'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.transform='';this.style.boxShadow=''">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px;transition:border-color .18s;cursor:default;animation:patternSlideIn .28s ${animDelay}ms ease both"
+        onmouseover="this.style.borderColor='rgba(139,92,246,.25)'"
+        onmouseout="this.style.borderColor='var(--border)'">
         <!-- Icon box -->
-        <div style="width:32px;height:32px;border-radius:10px;background:${p.color}15;border:1px solid ${p.color}30;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)">${p.icon}</div>
+        <div style="width:30px;height:30px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="bi ${p.icon}" style="font-size:13px;color:var(--text2)"></i>
+        </div>
         <!-- Content -->
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-.1px">${p.title}</div>
-          <div style="font-size:11px;color:var(--text3);line-height:1.55">${p.desc}</div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.5">${p.desc}</div>
         </div>
         <!-- Color accent strip -->
-        <div style="width:2px;border-radius:2px;background:${p.color};opacity:.5;align-self:stretch;flex-shrink:0;min-height:32px"></div>
+        <div style="width:2px;border-radius:2px;background:${stripColor};opacity:.6;align-self:stretch;flex-shrink:0;min-height:28px"></div>
       </div>`;
   }).join('');
 }
