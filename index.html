@@ -2668,7 +2668,22 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   .ana-stat-card:hover { transform:translateY(-2px); border-color:rgba(139,92,246,.2); background:rgba(139,92,246,.04); }
   .ana-stat-card.card-win:hover  { border-color:rgba(34,197,94,.22);  background:rgba(34,197,94,.04);  }
   .ana-stat-card.card-loss:hover { border-color:rgba(239,68,68,.18);  background:rgba(239,68,68,.04);  }
-  .ana-stat-card.card-gold:hover { border-color:rgba(245,158,11,.22); background:rgba(245,158,11,.04); }
+  .ana-stat-card.card-gold:hover { border-color:rgba(139,92,246,.22); background:rgba(139,92,246,.04); }
+
+  /* ── premium-card alias → same as ana-premium-card ── */
+  .premium-card {
+    background:linear-gradient(160deg,#0d0d11,#13121a);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:18px; padding:20px 22px; margin-bottom:16px;
+    position:relative; overflow:hidden;
+    transition:border-color .25s, transform .22s;
+  }
+  .premium-card:hover { border-color:rgba(139,92,246,.18); transform:translateY(-1px); }
+  .premium-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.25) 50%,transparent);
+    pointer-events:none;
+  }
 
   .ana-stat-card-icon { font-size:16px; margin-bottom:8px; display:block; line-height:1; color:rgba(255,255,255,.25); }
   .ana-stat-label { font-size:9px; font-weight:700; color:rgba(255,255,255,.25); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-family:var(--font); }
@@ -2801,7 +2816,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   .ana-tag-green  { background:rgba(34,197,94,.08);  color:#22c55e; border:1px solid rgba(34,197,94,.18);  }
   .ana-tag-red    { background:rgba(239,68,68,.08);  color:#ef4444; border:1px solid rgba(239,68,68,.18);  }
   .ana-tag-purple { background:rgba(139,92,246,.08); color:#a78bfa; border:1px solid rgba(139,92,246,.18); }
-  .ana-tag-gold   { background:rgba(245,158,11,.08); color:#f59e0b; border:1px solid rgba(245,158,11,.18); }
+  .ana-tag-gold   { background:rgba(139,92,246,.08); color:#c4b5fd; border:1px solid rgba(139,92,246,.18); }
 
   /* ══ DIVIDER GLOW ══ */
   .ana-divider {
@@ -4277,8 +4292,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.033);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 14px">
-          <div style="width:24px;height:24px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <span style="font-size:11px;font-weight:800;color:#f59e0b">5+</span>
+          <div style="width:24px;height:24px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.28);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="font-size:11px;font-weight:800;color:#c4b5fd">5+</span>
           </div>
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.2px">Insight pola muncul sendiri</div>
@@ -4314,18 +4329,18 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   
 
   <!-- ── PAGE HEADER ── -->
-  <div class="ph" style="margin-bottom:10px">
+  <div class="ph" style="margin-bottom:12px">
     <div>
-      <div class="pt">Analytics</div>
-      <div class="ps" id="ana-ps" style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:rgba(255,255,255,.35)">
-        <span class="ana-live-dot"></span>
-        <span>Performance breakdown · real-time</span>
+      <div class="pt" style="font-size:22px;font-weight:800;letter-spacing:-.6px;color:#f4f4f5">Analytics</div>
+      <div class="ps" id="ana-ps" style="display:flex;align-items:center;gap:7px;margin-top:5px;font-size:11px;color:rgba(255,255,255,.3);font-family:var(--mono)">
+        <span style="width:5px;height:5px;border-radius:50%;background:#a78bfa;display:inline-block;opacity:.8"></span>
+        Performance breakdown · real-time
       </div>
     </div>
   </div>
 
   <!-- ── PERIOD TABS ── -->
-  <div style="margin-bottom:18px">
+  <div style="margin-bottom:16px">
     <div class="period-tabs" id="ana-period-tabs">
       <button class="ptab active" data-aperiod="all">Semua</button>
       <button class="ptab" data-aperiod="7">7 Hari</button>
@@ -4338,7 +4353,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <!-- ══ PERFORMANCE SCORE BANNER ══ -->
   <div class="ana-score-banner" id="ana-score-banner">
     <div class="ana-score-inner">
-      <!-- Animated ring -->
       <div class="ana-ring-wrap">
         <svg viewBox="0 0 72 72">
           <circle class="ana-ring-bg"   cx="36" cy="36" r="30"/>
@@ -4346,23 +4360,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <defs>
             <linearGradient id="anaRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%"   stop-color="#8b5cf6"/>
-              <stop offset="50%"  stop-color="#22c55e"/>
-              <stop offset="100%" stop-color="#f59e0b"/>
+              <stop offset="60%"  stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#c4b5fd"/>
             </linearGradient>
           </defs>
         </svg>
         <div class="ana-ring-label" id="ana-ring-label">—</div>
       </div>
-      <!-- Text -->
       <div class="ana-score-text">
-        <div class="ana-score-heading" id="ana-score-heading" style="background:linear-gradient(135deg,#f4f4f5,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Performance Score</div>
+        <div class="ana-score-heading" id="ana-score-heading" style="background:linear-gradient(135deg,#f4f4f5,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Performance Score</div>
         <div class="ana-score-sub" id="ana-score-sub">Hitung ulang dari semua trade kamu</div>
-        <!-- Quick pills -->
         <div class="ana-score-pills" id="ana-score-pills">
           <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#22c55e"></span><span id="pill-wr" style="color:#22c55e">WR —</span></div>
           <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#a78bfa"></span><span id="pill-pf" style="color:#a78bfa">PF —</span></div>
-          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#f59e0b"></span><span id="pill-rr" style="color:#f59e0b">R:R —</span></div>
-          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#22d3ee"></span><span id="pill-n"  style="color:#22d3ee">0 Trades</span></div>
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:rgba(255,255,255,.55)"></span><span id="pill-rr" style="color:rgba(255,255,255,.7)">R:R —</span></div>
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#c4b5fd"></span><span id="pill-n" style="color:#c4b5fd">0 Trades</span></div>
         </div>
       </div>
     </div>
@@ -4457,10 +4469,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="ana-premium-card">
     <div class="ana-card-header">
       <div class="ana-card-title">
-        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.07))"><i class="bi bi-calendar-week" style="color:#f59e0b"></i></div>
+        <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.2)"><i class="bi bi-calendar-week" style="color:#c4b5fd"></i></div>
         P&amp;L by Day of Week
       </div>
-      <span class="ana-tag ana-tag-gold"><i class="bi bi-lightning-charge"></i> Weekly Pattern</span>
+      <span class="ana-tag ana-tag-purple"><i class="bi bi-lightning-charge"></i> Weekly Pattern</span>
     </div>
     <div id="ana-dow" style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:6px 0 4px;min-height:130px;align-items:end"></div>
   </div>
@@ -4513,24 +4525,24 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <!-- Section Header -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.08));border:1px solid rgba(245,158,11,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <i class="bi bi-cpu" style="color:#f59e0b;font-size:14px"></i>
+      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="bi bi-cpu" style="color:#c4b5fd;font-size:14px"></i>
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px">Advanced Analytics</div>
         <div style="font-size:11px;color:var(--text3)">Metrik yang digunakan trader profesional</div>
       </div>
-      <span style="margin-left:auto;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.22);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.4px">PRO METRICS</span>
+      <span style="margin-left:auto;background:rgba(139,92,246,.12);color:#c4b5fd;border:1px solid rgba(139,92,246,.25);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.4px">PRO METRICS</span>
     </div>
 
     <!-- ── ROW 1: Streak Tracker ── -->
     <div class="ana-premium-card" style="margin-bottom:14px">
       <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.08))"><i class="bi bi-fire" style="color:#f59e0b"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.2)"><i class="bi bi-lightning-charge" style="color:#c4b5fd"></i></div>
           Streak Tracker
         </div>
-        <span class="ana-card-badge" style="background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.22)">Live</span>
+        <span class="ana-card-badge" style="background:rgba(139,92,246,.12);color:#c4b5fd;border:1px solid rgba(139,92,246,.25)">Live</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div class="ana-stat-card" style="border-color:rgba(0,217,126,.2)">
@@ -4566,7 +4578,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
       <!-- Streak visualizer bar -->
       <div>
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:8px">30 Trade Terakhir — Win/Loss Visual</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:8px;font-family:var(--font)">30 Trade Terakhir — Win/Loss Visual</div>
         <div id="adv-streak-vis" style="display:flex;flex-wrap:wrap;gap:4px"></div>
       </div>
     </div>
@@ -4617,14 +4629,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div class="ana-stat-sub">% dari MFE yang dicapture</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:8px">Interpretasi SL Placement</div>
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:8px">Interpretasi SL Placement</div>
         <div id="adv-mae-insight" style="font-size:12px;color:var(--text2);line-height:1.6">
           — Log lebih banyak trade untuk melihat insight —
         </div>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:10px;padding:8px 12px;background:rgba(139,92,246,.04);border-radius:8px;border:1px solid rgba(139,92,246,.1)">
-        <i class="bi bi-lightbulb-fill" style="margin-right:3px;color:#fbbf24"></i> <strong style="color:var(--text2)">Catatan:</strong> MAE/MFE dihitung dari field Entry, SL, dan Exit yang kamu isi. Semakin lengkap data trade kamu, semakin akurat analisis ini.
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.6">
+        <i class="bi bi-lightbulb-fill" style="margin-right:3px;color:#a78bfa"></i> <strong style="color:var(--text2)">Catatan:</strong> MAE/MFE dihitung dari field Entry, SL, dan Exit yang kamu isi. Semakin lengkap data trade kamu, semakin akurat analisis ini.
       </div>
     </div>
 
@@ -4632,15 +4644,15 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="ana-premium-card" style="margin-bottom:14px">
       <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(56,189,248,.08))"><i class="bi bi-stopwatch" style="color:#38bdf8"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.2)"><i class="bi bi-stopwatch" style="color:#c4b5fd"></i></div>
           Holding Time Analysis
         </div>
-        <span class="ana-card-badge" style="background:rgba(56,189,248,.1);color:#7dd3fc;border:1px solid rgba(56,189,248,.22)">Time Edge</span>
+        <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">Time Edge</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div class="ana-stat-card">
           <div class="ana-stat-label">Avg Hold — Semua</div>
-          <div class="ana-stat-val" id="adv-hold-avg" style="color:#38bdf8">—</div>
+          <div class="ana-stat-val" id="adv-hold-avg" style="color:#a78bfa">—</div>
           <div class="ana-stat-sub">menit per trade</div>
         </div>
         <div class="ana-stat-card" style="border-color:rgba(0,217,126,.15)">
@@ -4660,7 +4672,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
         <div class="ana-stat-card">
           <div class="ana-stat-label">Tercepat</div>
-          <div class="ana-stat-val" id="adv-hold-min" style="color:#f59e0b">—</div>
+          <div class="ana-stat-val" id="adv-hold-min" style="color:#a78bfa">—</div>
           <div class="ana-stat-sub">holding tercepat</div>
         </div>
         <div class="ana-stat-card">
@@ -4670,8 +4682,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
       </div>
       <!-- Holding time insight -->
-      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;margin-bottom:6px">Insight</div>
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:12px 14px">
+        <div style="font-size:10px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:6px">Insight</div>
         <div id="adv-hold-insight" style="font-size:12px;color:var(--text2);line-height:1.6">
           — Isi field "Holding Time" saat log trade untuk melihat analisis ini —
         </div>
@@ -4682,10 +4694,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="ana-premium-card" style="margin-bottom:14px">
       <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(0,217,126,.15),rgba(0,217,126,.06))"><i class="bi bi-book-half" style="color:#00d97e"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.2)"><i class="bi bi-book-half" style="color:#c4b5fd"></i></div>
           Win Rate per Playbook
         </div>
-        <span class="ana-card-badge" style="background:rgba(0,217,126,.1);color:#4ade80;border:1px solid rgba(0,217,126,.22)">Strategy Edge</span>
+        <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">Strategy Edge</span>
       </div>
       <div id="adv-playbook-wr-list" style="display:flex;flex-direction:column;gap:8px">
         <div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">— Hubungkan trade ke Playbook untuk melihat win rate per strategi —</div>
@@ -4693,13 +4705,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Mistake Breakdown Card -->
-    <div class="premium-card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(255,77,77,.18),rgba(255,77,77,.06));border:1px solid rgba(255,77,77,.2)"><i class="bi bi-exclamation-triangle-fill" style="color:#ff4d4d"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(239,68,68,.06));border:1px solid rgba(239,68,68,.18)"><i class="bi bi-exclamation-triangle-fill" style="color:#f87171"></i></div>
           Top Penyebab Loss
         </div>
-        <span class="ana-card-badge" style="background:rgba(255,77,77,.1);color:#ff6e6e;border:1px solid rgba(255,77,77,.22)">Mistake Analysis</span>
+        <span class="ana-card-badge" style="background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2)">Mistake Analysis</span>
       </div>
       <div id="mistake-breakdown-container">
         <div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;font-family:var(--mono)">— Tandai penyebab loss saat input trade untuk melihat pola kesalahan kamu —</div>
@@ -4707,13 +4719,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Rating vs Result Card -->
-    <div class="premium-card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.2)"><i class="bi bi-star-fill" style="color:#f59e0b"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.2)"><i class="bi bi-star-fill" style="color:#c4b5fd"></i></div>
           Kualitas Eksekusi vs Hasil
         </div>
-        <span class="ana-card-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.22)">Execution Quality</span>
+        <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">Execution Quality</span>
       </div>
       <div id="rating-insight-container">
         <div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;font-family:var(--mono)">— Isi rating saat input trade untuk melihat korelasi kualitas eksekusi vs profit —</div>
@@ -4721,31 +4733,31 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div>
 
     <!-- Planned RR vs Actual RR Card -->
-    <div class="premium-card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="ana-premium-card" style="margin-bottom:14px">
+      <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.06));border:1px solid rgba(56,189,248,.2)"><i class="bi bi-bullseye" style="color:#38bdf8"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.08));border:1px solid rgba(139,92,246,.2)"><i class="bi bi-bullseye" style="color:#c4b5fd"></i></div>
           Planned RR vs Actual RR
         </div>
-        <span class="ana-card-badge" style="background:rgba(56,189,248,.1);color:#7dd3fc;border:1px solid rgba(56,189,248,.22)">Execution Discipline</span>
+        <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">Execution Discipline</span>
       </div>
       <!-- Summary stats row -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px" id="rr-compare-stats">
-        <div style="text-align:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 6px">
-          <div style="font-size:18px;font-weight:800;color:#38bdf8;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-avg-planned">—</div>
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Avg Planned</div>
+        <div class="ana-stat-card" style="text-align:center">
+          <div style="font-size:18px;font-weight:800;color:#a78bfa;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-avg-planned">—</div>
+          <div class="ana-stat-label" style="margin-bottom:0">Avg Planned</div>
         </div>
-        <div style="text-align:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 6px">
-          <div style="font-size:18px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-avg-actual">—</div>
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Avg Actual</div>
+        <div class="ana-stat-card" style="text-align:center">
+          <div style="font-size:18px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:3px;color:rgba(255,255,255,.8)" id="rrc-avg-actual">—</div>
+          <div class="ana-stat-label" style="margin-bottom:0">Avg Actual</div>
         </div>
-        <div style="text-align:center;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 6px">
-          <div style="font-size:18px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:3px" id="rrc-capture-rate">—</div>
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600">Capture Rate</div>
+        <div class="ana-stat-card" style="text-align:center">
+          <div style="font-size:18px;font-weight:800;font-family:var(--mono);line-height:1;margin-bottom:3px;color:rgba(255,255,255,.8)" id="rrc-capture-rate">—</div>
+          <div class="ana-stat-label" style="margin-bottom:0">Capture Rate</div>
         </div>
       </div>
       <!-- Insight text -->
-      <div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.12);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px" id="rrc-insight">
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px" id="rrc-insight">
         — Isi "Planned RR" saat log trade untuk melihat seberapa sering kamu mencapai target sendiri. —
       </div>
       <!-- Per-trade scatter list -->
