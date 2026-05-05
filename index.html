@@ -3699,7 +3699,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.9px">Monthly Goals</span>
           <!-- Streak badge -->
-          <div id="streak-badge" style="display:none;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);font-size:10px;font-weight:700;color:#fbbf24;font-family:var(--mono);letter-spacing:.2px">
+          <div id="streak-badge" style="display:none;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);font-size:10px;font-weight:700;color:rgba(255,255,255,.75);font-family:var(--mono);letter-spacing:.2px">
             <i class="bi bi-fire" style="font-size:9px"></i> <span id="streak-badge-num">0</span>d streak
           </div>
         </div>
@@ -3744,32 +3744,32 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
 
         <!-- Trades Goal Ring -->
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(251,191,36,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(167,139,250,.3)'" onmouseout="this.style.borderColor='var(--border)'">
           <svg width="74" height="74" viewBox="0 0 80 80" style="overflow:visible">
             <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="4.5"/>
-            <circle id="goal-tr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-amber)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
-            <defs><linearGradient id="ring-amber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
-            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:13px;font-weight:800;font-family:var(--mono);fill:#fbbf24" id="goal-tr-cur">—</text>
+            <circle id="goal-tr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-trades)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+            <defs><linearGradient id="ring-trades" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#e2d9ff"/></linearGradient></defs>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:13px;font-weight:800;font-family:var(--mono);fill:#e2d9ff" id="goal-tr-cur">—</text>
             <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:7.5px;fill:rgba(255,255,255,.2);font-family:var(--mono)" id="goal-tr-target">—</text>
           </svg>
           <div style="text-align:center">
-            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(251,191,36,.65)">Trades</div>
+            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(167,139,250,.75)">Trades</div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-tr-pct">—</div>
           </div>
           <input type="hidden" id="goal-tr-bar">
         </div>
 
         <!-- Journal Streak Ring -->
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(251,191,36,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .18s" onmouseover="this.style.borderColor='rgba(255,255,255,.15)'" onmouseout="this.style.borderColor='var(--border)'">
           <svg width="74" height="74" viewBox="0 0 80 80" style="overflow:visible">
             <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="4.5"/>
-            <circle id="goal-streak-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-fire)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
-            <defs><linearGradient id="ring-fire" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fb923c"/></linearGradient></defs>
-            <text x="40" y="34" text-anchor="middle" dominant-baseline="middle" style="font-size:15px;font-weight:800;font-family:var(--mono);fill:#fbbf24" id="goal-streak-cur">0</text>
+            <circle id="goal-streak-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-white)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+            <defs><linearGradient id="ring-white" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,.5)"/><stop offset="100%" stop-color="rgba(255,255,255,.95)"/></linearGradient></defs>
+            <text x="40" y="34" text-anchor="middle" dominant-baseline="middle" style="font-size:15px;font-weight:800;font-family:var(--mono);fill:rgba(255,255,255,.9)" id="goal-streak-cur">0</text>
             <text x="40" y="50" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)">days</text>
           </svg>
           <div style="text-align:center">
-            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(251,191,36,.65)">Streak</div>
+            <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.45)">Streak</div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px" id="goal-streak-best">Best: 0</div>
           </div>
           <!-- Hidden: keep streak-dots for JS compat -->
@@ -10445,7 +10445,7 @@ function _detectPatterns(tArr) {
   if (worstDay && worstDay[1] < -30) {
     const wr = Math.round((dowW[worstDay[0]]||0) / dowN[worstDay[0]] * 100);
     insights.push({
-      icon: 'bi-calendar-x', color: '#fbbf24', priority: 7,
+      icon: 'bi-calendar-x', color: 'rgba(255,255,255,.65)', priority: 7,
       title: `Jangan trading hari ${dowNames[worstDay[0]]}`,
       desc: `$${parseFloat(worstDay[1]).toFixed(0)} P&L · ${wr}% WR dari ${dowN[worstDay[0]]} trade. Hari paling merugikan kamu.`,
     });
@@ -10563,7 +10563,7 @@ function _detectPatterns(tArr) {
     const earlyExit = withMFE.filter(t => Math.abs(t.r||0) < t.plannedRR * 0.7).length;
     if (earlyExit / withMFE.length > 0.4) {
       insights.push({
-        icon: 'bi-scissors', color: '#fbbf24', priority: 7,
+        icon: 'bi-scissors', color: 'rgba(255,255,255,.65)', priority: 7,
         title: `${Math.round(earlyExit/withMFE.length*100)}% trade menang — exit sebelum target`,
         desc: `Kamu sering cut profit terlalu awal. Actual RR lebih rendah dari planned. Coba trailing stop.`,
       });
@@ -10667,7 +10667,7 @@ function _renderPatternWidget() {
   listEl.innerHTML = patterns.map((p, i) => {
     const animDelay = i * 60;
     // Neutral accent strip color: use 3-tone system
-    const stripColor = p.color === '#f87171' ? '#f87171' : p.color === '#fbbf24' ? '#fbbf24' : p.color === '#22c55e' ? '#22c55e' : 'rgba(139,92,246,.5)';
+    const stripColor = p.color === '#f87171' ? '#f87171' : (p.color === '#fbbf24' || p.color === 'rgba(255,255,255,.65)') ? 'rgba(255,255,255,.45)' : p.color === '#22c55e' ? '#22c55e' : 'rgba(139,92,246,.5)';
     return `
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px;transition:border-color .18s;cursor:default;animation:patternSlideIn .28s ${animDelay}ms ease both"
         onmouseover="this.style.borderColor='rgba(139,92,246,.25)'"
