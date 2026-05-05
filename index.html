@@ -14358,10 +14358,10 @@ function normalizeDir(side) {
 // ── Detect result from pnl ──
 function pnlToResult(pnl) {
   const v = parseFloat(pnl);
-  if (isNaN(v)) return 'loss';
-  if (v > 0) return 'win';
-  if (v < 0) return 'loss';
-  return 'be';
+  if (isNaN(v)) return 'Loss';
+  if (v > 0) return 'Win';
+  if (v < 0) return 'Loss';
+  return 'BE';
 }
 
 // ── PARSER: Bybit Trade History CSV ──────────────────────
@@ -14583,109 +14583,305 @@ function parseExnessCSV(text) {
   return results;
 }
 
-// ── BYBIT API IMPORT ──────────────────────────────────────
-async function fetchBybitTrades(apiKey, apiSecret, days = 30) {
-  // Bybit V5 API: GET /v5/execution/list
-  // Note: API secret signing must be done client-side via HMAC-SHA256
-  // We use Web Crypto API for signing
-  const endTime = Date.now();
-  const startTime = endTime - (days * 86400000);
-  const recvWindow = 5000;
-  const timestamp = Date.now().toString();
+// ══════════════════════════════════════════════════════════════
+//  BYBIT API IMPORT — V5 REST, HMAC-SHA256, multi-proxy fallback
+//  Endpoints: /v5/position/closed-pnl  (closed trades)
+//             /v5/position/list        (open/running positions)
+// ══════════════════════════════════════════════════════════════
 
-  const params = {
-    category: 'linear',
-    startTime: startTime.toString(),
-    endTime: endTime.toString(),
-    limit: '200',
+// ── Low-level: sign & fetch one Bybit V5 endpoint ────────────
+async function _bybitRequest(apiKey, apiSecret, path, queryParams) {
+  const recvWindow = '5000';
+  const timestamp  = Date.now().toString();
+
+  // Sort params, build query string
+  const qs = Object.entries(queryParams)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .map(([k,v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+
+  // Signature = HMAC-SHA256( timestamp + apiKey + recvWindow + qs )
+  const signInput = timestamp + apiKey + recvWindow + qs;
+  const enc       = new TextEncoder();
+  const ck        = await crypto.subtle.importKey(
+    'raw', enc.encode(apiSecret),
+    { name:'HMAC', hash:'SHA-256' }, false, ['sign']
+  );
+  const sigBuf  = await crypto.subtle.sign('HMAC', ck, enc.encode(signInput));
+  const signature = Array.from(new Uint8Array(sigBuf))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+
+  const fullUrl = `https://api.bybit.com${path}?${qs}`;
+
+  // CORS proxy list — try each in order until one works
+  const proxies = [
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://thingproxy.freeboard.io/fetch/${u}`,
+  ];
+
+  const headers = {
+    'X-BAPI-API-KEY'     : apiKey,
+    'X-BAPI-SIGN'        : signature,
+    'X-BAPI-TIMESTAMP'   : timestamp,
+    'X-BAPI-RECV-WINDOW' : recvWindow,
+    'Content-Type'       : 'application/json',
   };
-  const queryString = Object.entries(params).sort().map(([k,v]) => `${k}=${v}`).join('&');
-  const signStr = timestamp + apiKey + recvWindow + queryString;
 
-  // HMAC-SHA256 via Web Crypto
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(apiSecret);
-  const msgData = encoder.encode(signStr);
-  const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sigBuf = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
-  const signature = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
-
-  // Use CORS proxy since Bybit blocks direct browser calls
-  const baseUrl = 'https://api.bybit.com/v5/execution/list';
-  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(baseUrl + '?' + queryString)}`;
-
-  const res = await fetch(proxyUrl, {
-    headers: {
-      'X-BAPI-API-KEY': apiKey,
-      'X-BAPI-SIGN': signature,
-      'X-BAPI-TIMESTAMP': timestamp,
-      'X-BAPI-RECV-WINDOW': recvWindow.toString(),
+  let lastErr;
+  for (const makeProxy of proxies) {
+    try {
+      const res = await fetch(makeProxy(fullUrl), { headers, signal: AbortSignal.timeout(12000) });
+      if (!res.ok) continue;
+      const json = await res.json();
+      // retCode 0 = OK, 10004 = bad signature, 33004 = invalid key, etc.
+      if (json.retCode === 0) return json;
+      if (json.retCode !== undefined) {
+        // Known Bybit error — no point retrying other proxies
+        throw new Error(`Bybit: ${json.retMsg} (code ${json.retCode})`);
+      }
+    } catch(e) {
+      lastErr = e;
+      if (e.message && e.message.startsWith('Bybit:')) throw e; // rethrow API errors
     }
-  });
-  const json = await res.json();
-  if (json.retCode !== 0) throw new Error(`Bybit API error: ${json.retMsg}`);
-
-  const list = json.result?.list || [];
-  return list.map(t => {
-    const pnl = parseFloat(t.closedPnl) || parseFloat(t.execValue) || 0;
-    return {
-      date: formatTradeDate(new Date(parseInt(t.execTime)).toISOString()),
-      pair: normalizePair(t.symbol),
-      dir: normalizeDir(t.side),
-      session: detectSession(new Date(parseInt(t.execTime)).toISOString()),
-      entry: parseFloat(t.execPrice) || 0,
-      exit: parseFloat(t.execPrice) || 0,
-      sl: 0, risk: Math.abs(pnl) || 100,
-      pnl, r: 0,
-      result: pnlToResult(pnl),
-      setup: 'Import Bybit API',
-      emotion: 'neutral',
-      notes: `OrderId: ${t.orderId}. Qty: ${t.execQty}`,
-    };
-  });
+  }
+  throw lastErr || new Error('Semua CORS proxy gagal. Coba lagi nanti atau gunakan import CSV.');
 }
 
-// ── BINANCE API IMPORT ────────────────────────────────────
-async function fetchBinanceTrades(apiKey, apiSecret, days = 30) {
-  // Binance: GET /api/v3/myTrades — requires symbol, so we use recent trades approach
-  // For futures: GET /fapi/v1/userTrades
-  const endTime = Date.now();
-  const startTime = endTime - (days * 86400000);
-  const timestamp = Date.now().toString();
+// ── Fetch ALL pages of an endpoint (cursor-based pagination) ──
+async function _bybitFetchAll(apiKey, apiSecret, path, baseParams, maxPages = 10) {
+  const results = [];
+  let cursor = '';
+  for (let page = 0; page < maxPages; page++) {
+    const params = cursor ? { ...baseParams, cursor } : { ...baseParams };
+    const json   = await _bybitRequest(apiKey, apiSecret, path, params);
+    const list   = json.result?.list || [];
+    results.push(...list);
+    cursor = json.result?.nextPageCursor || '';
+    if (!cursor || !list.length) break; // no more pages
+  }
+  return results;
+}
 
-  const params = `startTime=${startTime}&endTime=${endTime}&limit=1000&timestamp=${timestamp}`;
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(apiSecret);
-  const msgData = encoder.encode(params);
-  const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sigBuf = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
-  const signature = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+// ── Map Bybit closed-pnl record → journal trade object ────────
+function _bybitClosedToTrade(t) {
+  const closeTs  = parseInt(t.updatedTime || t.createdTime || 0);
+  const dateStr  = closeTs ? new Date(closeTs).toISOString() : new Date().toISOString();
+  const pnl      = parseFloat(t.closedPnl) || 0;
+  const entry    = parseFloat(t.avgEntryPrice) || 0;
+  const exit     = parseFloat(t.avgExitPrice)  || 0;
+  const qty      = parseFloat(t.qty) || 0;
+  const leverage = parseFloat(t.leverage) || 1;
 
-  const url = `https://fapi.binance.com/fapi/v1/income?${params}&signature=${signature}&incomeType=REALIZED_PNL`;
-  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+  // Estimated risk: entry × qty / leverage  (position notional / leverage)
+  const risk = entry > 0 && qty > 0 ? parseFloat(((entry * qty) / leverage).toFixed(2)) : Math.abs(pnl) * 2 || 100;
 
-  const res = await fetch(proxyUrl, { headers: { 'X-MBX-APIKEY': apiKey } });
-  const json = await res.json();
-  if (!Array.isArray(json)) throw new Error(`Binance API error: ${json.msg || 'Unknown error'}`);
+  return {
+    date    : formatTradeDate(dateStr),
+    pair    : normalizePair(t.symbol),
+    dir     : normalizeDir(t.side),
+    session : detectSession(dateStr),
+    entry, exit,
+    sl      : 0,
+    risk,
+    pnl,
+    r       : entry > 0 && pnl !== 0 ? parseFloat((pnl / risk).toFixed(2)) : 0,
+    result  : pnlToResult(pnl),
+    setup   : 'Import Bybit API',
+    emotion : 'neutral',
+    notes   : `Bybit ${t.symbol} | orderId: ${t.orderId || '—'} | qty: ${qty} | lev: ${leverage}x`,
+    _bybitOrderId: t.orderId || '',
+  };
+}
 
-  // Group by symbol roughly
-  return json.map(t => {
-    const pnl = parseFloat(t.income) || 0;
-    const dateRaw = new Date(t.time).toISOString();
-    return {
-      date: formatTradeDate(dateRaw),
-      pair: normalizePair(t.symbol || 'UNKNOWN'),
-      dir: pnl >= 0 ? 'Long' : 'Short',
-      session: detectSession(dateRaw),
-      entry: 0, exit: 0, sl: 0,
-      risk: Math.abs(pnl) || 100,
-      pnl, r: 0,
-      result: pnlToResult(pnl),
-      setup: 'Import Binance API',
-      emotion: 'neutral',
-      notes: `TradeId: ${t.tradeId || ''}`,
-    };
+// ── Map Bybit open position → journal trade object ─────────────
+function _bybitOpenToTrade(p) {
+  const updateTs = parseInt(p.updatedTime || p.createdTime || 0);
+  const dateStr  = updateTs ? new Date(updateTs).toISOString() : new Date().toISOString();
+  const unrealPnl = parseFloat(p.unrealisedPnl) || 0;
+  const entry    = parseFloat(p.avgPrice) || 0;
+  const markPrice = parseFloat(p.markPrice) || entry;
+  const qty      = parseFloat(p.size) || 0;
+  const leverage = parseFloat(p.leverage) || 1;
+  const risk     = entry > 0 && qty > 0 ? parseFloat(((entry * qty) / leverage).toFixed(2)) : 100;
+
+  return {
+    date    : formatTradeDate(dateStr),
+    pair    : normalizePair(p.symbol),
+    dir     : normalizeDir(p.side),
+    session : detectSession(dateStr),
+    entry, exit: markPrice,
+    sl      : parseFloat(p.stopLoss) || 0,
+    risk,
+    pnl     : unrealPnl,
+    r       : entry > 0 && unrealPnl !== 0 ? parseFloat((unrealPnl / risk).toFixed(2)) : 0,
+    result  : 'open',   // special tag for running positions
+    setup   : 'Open Position (Bybit)',
+    emotion : 'neutral',
+    notes   : `⚡ OPEN POSITION | ${p.symbol} ${p.size} qty @ ${entry} | Mark: ${markPrice} | Lev: ${leverage}x | uPnL: ${unrealPnl >= 0 ? '+' : ''}$${unrealPnl.toFixed(2)}`,
+    _isOpen : true,
+  };
+}
+
+// ── Main export: fetchBybitTrades ──────────────────────────────
+async function fetchBybitTrades(apiKey, apiSecret, days = 30) {
+  const endTime   = Date.now();
+  const startTime = endTime - days * 86_400_000;
+
+  // ── 1. Closed P&L (completed trades) — Linear + Spot ─────────
+  const closedLinear = await _bybitFetchAll(apiKey, apiSecret, '/v5/position/closed-pnl', {
+    category : 'linear',
+    startTime: startTime.toString(),
+    endTime  : endTime.toString(),
+    limit    : '100',
   });
+
+  // Inverse (coin-margined) — optional, don't fail if not supported
+  let closedInverse = [];
+  try {
+    closedInverse = await _bybitFetchAll(apiKey, apiSecret, '/v5/position/closed-pnl', {
+      category : 'inverse',
+      startTime: startTime.toString(),
+      endTime  : endTime.toString(),
+      limit    : '100',
+    });
+  } catch(_) { /* inverse not enabled on account — skip */ }
+
+  const closedTrades = [...closedLinear, ...closedInverse].map(_bybitClosedToTrade);
+
+  // ── 2. Open / running positions ────────────────────────────────
+  let openTrades = [];
+  try {
+    const openLinear = await _bybitFetchAll(apiKey, apiSecret, '/v5/position/list', {
+      category   : 'linear',
+      settleCoin : 'USDT',
+      limit      : '200',
+    });
+    openTrades = openLinear
+      .filter(p => parseFloat(p.size) > 0)  // only real open positions
+      .map(_bybitOpenToTrade);
+  } catch(_) { /* no open positions or not supported */ }
+
+  const all = [...openTrades, ...closedTrades];
+
+  if (!all.length) {
+    throw new Error('Tidak ada trade ditemukan. Pastikan API Key memiliki izin "Trade" (Read Only) dan periode diperpanjang.');
+  }
+
+  return all;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BINANCE FUTURES API IMPORT — /fapi/v1/income (REALIZED_PNL)
+//  + open positions via /fapi/v2/positionRisk
+// ══════════════════════════════════════════════════════════════
+
+async function _binanceSign(apiSecret, queryString) {
+  const enc = new TextEncoder();
+  const ck  = await crypto.subtle.importKey(
+    'raw', enc.encode(apiSecret),
+    { name:'HMAC', hash:'SHA-256' }, false, ['sign']
+  );
+  const buf = await crypto.subtle.sign('HMAC', ck, enc.encode(queryString));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function _binanceFetch(apiKey, apiSecret, baseUrl, params) {
+  const ts  = Date.now().toString();
+  const qs  = Object.entries({ ...params, timestamp: ts })
+    .map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  const sig = await _binanceSign(apiSecret, qs);
+  const url = `${baseUrl}?${qs}&signature=${sig}`;
+
+  const proxies = [
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  ];
+
+  let lastErr;
+  for (const makeProxy of proxies) {
+    try {
+      const res = await fetch(makeProxy(url), {
+        headers : { 'X-MBX-APIKEY': apiKey },
+        signal  : AbortSignal.timeout(12000),
+      });
+      const json = await res.json();
+      if (json.code && json.code < 0) throw new Error(`Binance: ${json.msg} (${json.code})`);
+      return json;
+    } catch(e) {
+      lastErr = e;
+      if (e.message && e.message.startsWith('Binance:')) throw e;
+    }
+  }
+  throw lastErr || new Error('Semua CORS proxy gagal untuk Binance.');
+}
+
+async function fetchBinanceTrades(apiKey, apiSecret, days = 30) {
+  const endTime   = Date.now();
+  const startTime = endTime - days * 86_400_000;
+
+  // ── 1. Realized P&L (income history) ─────────────────────────
+  const incomeData = await _binanceFetch(
+    apiKey, apiSecret,
+    'https://fapi.binance.com/fapi/v1/income',
+    { incomeType: 'REALIZED_PNL', startTime: startTime.toString(), endTime: endTime.toString(), limit: '1000' }
+  );
+
+  const closedTrades = Array.isArray(incomeData) ? incomeData.map(t => {
+    const pnl    = parseFloat(t.income) || 0;
+    const dateStr= new Date(t.time).toISOString();
+    return {
+      date    : formatTradeDate(dateStr),
+      pair    : normalizePair(t.symbol || 'UNKNOWN'),
+      dir     : pnl >= 0 ? 'Long' : 'Short',
+      session : detectSession(dateStr),
+      entry: 0, exit: 0, sl: 0,
+      risk    : Math.abs(pnl) * 2 || 100,
+      pnl, r: 0,
+      result  : pnlToResult(pnl),
+      setup   : 'Import Binance Futures',
+      emotion : 'neutral',
+      notes   : `Binance income | tradeId: ${t.tradeId || '—'} | ${t.symbol}`,
+    };
+  }) : [];
+
+  // ── 2. Open positions ─────────────────────────────────────────
+  let openTrades = [];
+  try {
+    const positions = await _binanceFetch(
+      apiKey, apiSecret,
+      'https://fapi.binance.com/fapi/v2/positionRisk',
+      {}
+    );
+    openTrades = (Array.isArray(positions) ? positions : [])
+      .filter(p => parseFloat(p.positionAmt) !== 0)
+      .map(p => {
+        const amt      = parseFloat(p.positionAmt) || 0;
+        const entry    = parseFloat(p.entryPrice) || 0;
+        const mark     = parseFloat(p.markPrice) || entry;
+        const unrealPnl= parseFloat(p.unRealizedProfit) || 0;
+        const lev      = parseFloat(p.leverage) || 1;
+        const dateStr  = new Date().toISOString();
+        return {
+          date    : formatTradeDate(dateStr),
+          pair    : normalizePair(p.symbol),
+          dir     : amt > 0 ? 'Long' : 'Short',
+          session : detectSession(dateStr),
+          entry, exit: mark, sl: 0,
+          risk    : parseFloat(((entry * Math.abs(amt)) / lev).toFixed(2)) || 100,
+          pnl     : unrealPnl, r: 0,
+          result  : 'open',
+          setup   : 'Open Position (Binance)',
+          emotion : 'neutral',
+          notes   : `⚡ OPEN | ${p.symbol} ${amt} qty @ ${entry} | Mark: ${mark} | Lev: ${lev}x | uPnL: ${unrealPnl >= 0?'+':''}$${unrealPnl.toFixed(2)}`,
+          _isOpen : true,
+        };
+      });
+  } catch(_) { /* open positions endpoint not accessible */ }
+
+  const all = [...openTrades, ...closedTrades];
+  if (!all.length) throw new Error('Tidak ada trade ditemukan di periode ini. Coba perpanjang periode atau pastikan akun Futures aktif.');
+  return all;
 }
 
 // ── CSV helper utils ──
@@ -14752,6 +14948,16 @@ async function batchSaveImportedTrades(tradeList, onProgress) {
   let saved = 0;
   for (const trade of tradeList) {
     try {
+      // Normalize 'open' result — save as running note, treat like Loss for now
+      if (trade.result === 'open') {
+        trade.result = 'Loss';
+        trade.notes  = (trade.notes || '') + ' [OPEN POSITION saat import]';
+      }
+      // Normalize result casing for Firestore consistency
+      if (trade.result) {
+        const r = trade.result.toLowerCase();
+        trade.result = r === 'win' ? 'Win' : r === 'loss' ? 'Loss' : 'BE';
+      }
       // Recalculate R if risk > 0
       if (trade.risk > 0) trade.r = Math.round(trade.pnl / trade.risk * 100) / 100;
       await saveTradeToCloud(trade);
@@ -14870,21 +15076,38 @@ function showImportModal() {
         </div>
       </div>
 
+      <!-- API guide collapsible -->
+      <div id="imp-api-guide" style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.18);border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);line-height:1.6">
+        <div style="font-weight:700;color:var(--accent2);margin-bottom:5px;display:flex;align-items:center;gap:5px"><i class="bi bi-info-circle"></i> Cara membuat API Key Bybit (Read Only)</div>
+        <ol style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px">
+          <li>Buka <strong>Bybit → Account → API Management</strong></li>
+          <li>Klik <strong>Create New Key</strong> → pilih <strong>System-generated</strong></li>
+          <li>Centang <strong>Read Only</strong> — pastikan <strong>TIDAK</strong> ada izin trading/withdraw</li>
+          <li>Di Permissions, aktifkan: <strong>Unified Trading → Read</strong></li>
+          <li>Copy API Key dan Secret, paste di bawah</li>
+        </ol>
+      </div>
+
       <div class="imp-section">
         <div class="imp-label">API Key</div>
-        <input class="imp-input" type="text" id="imp-api-key" placeholder="Paste API Key di sini..." autocomplete="off" spellcheck="false">
+        <input class="imp-input" type="text" id="imp-api-key" placeholder="Paste API Key di sini..." autocomplete="off" spellcheck="false" style="font-family:var(--mono);font-size:12px;letter-spacing:.3px">
       </div>
       <div class="imp-section">
         <div class="imp-label">API Secret</div>
-        <input class="imp-input" type="password" id="imp-api-secret" placeholder="Paste API Secret di sini..." autocomplete="off">
-        <div class="imp-note"><i class="bi bi-exclamation-triangle-fill" style="margin-right:4px;color:#f59e0b"></i> Gunakan API Key dengan izin <strong>Read Only</strong>. Jangan pernah berikan izin trading/withdraw.</div>
+        <div style="position:relative">
+          <input class="imp-input" type="password" id="imp-api-secret" placeholder="Paste API Secret di sini..." autocomplete="off" style="font-family:var(--mono);font-size:12px;letter-spacing:.3px;padding-right:38px">
+          <button id="imp-secret-toggle" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0;line-height:1" title="Tampilkan/sembunyikan secret"><i class="bi bi-eye" id="imp-secret-eye"></i></button>
+        </div>
+        <div class="imp-note" style="margin-top:6px"><i class="bi bi-exclamation-triangle-fill" style="margin-right:4px;color:#f59e0b"></i> Gunakan API Key dengan izin <strong>Read Only</strong>. Jangan pernah berikan izin trading/withdraw.</div>
       </div>
       <div class="imp-section">
         <div class="imp-label">Periode Import</div>
         <select class="imp-input" id="imp-api-days" style="cursor:pointer">
           <option value="7">7 hari terakhir</option>
           <option value="30" selected>30 hari terakhir</option>
+          <option value="60">60 hari terakhir</option>
           <option value="90">90 hari terakhir</option>
+          <option value="180">180 hari terakhir</option>
         </select>
       </div>
 
@@ -14963,14 +15186,33 @@ function setupImportModalEvents(modal) {
     });
   });
 
-  // API cards
+  // API cards — update guide text on exchange change
+  const apiGuides = {
+    bybit: '<strong style="color:var(--accent2)"><i class="bi bi-info-circle"></i> Cara membuat API Key Bybit (Read Only)</strong><ol style="margin:5px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:3px"><li>Buka <strong>Bybit → Account → API Management</strong></li><li>Klik <strong>Create New Key</strong> → pilih <strong>System-generated</strong></li><li>Centang <strong>Read Only</strong> — TIDAK ada izin trading/withdraw</li><li>Aktifkan: <strong>Unified Trading → Read</strong></li><li>Copy API Key & Secret, paste di bawah</li></ol>',
+    binance: '<strong style="color:var(--accent2)"><i class="bi bi-info-circle"></i> Cara membuat API Key Binance (Read Only)</strong><ol style="margin:5px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:3px"><li>Buka <strong>Binance → Profile → API Management</strong></li><li>Klik <strong>Create API</strong> → pilih <strong>System generated</strong></li><li>Centang hanya <strong>Enable Reading</strong> — TIDAK ada trading/withdraw</li><li>Untuk Futures: aktifkan <strong>Enable Futures</strong></li><li>Copy API Key & Secret, paste di bawah</li></ol>',
+  };
   modal.querySelectorAll('[data-api]').forEach(card => {
     card.addEventListener('click', () => {
       modal.querySelectorAll('[data-api]').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedAPI = card.dataset.api;
+      const guide = document.getElementById('imp-api-guide');
+      if (guide && apiGuides[selectedAPI]) guide.innerHTML = apiGuides[selectedAPI];
+      hideStatus('imp-api-status');
     });
   });
+
+  // Secret show/hide toggle
+  const secretInput = document.getElementById('imp-api-secret');
+  const secretToggle = document.getElementById('imp-secret-toggle');
+  const secretEye = document.getElementById('imp-secret-eye');
+  if (secretToggle) {
+    secretToggle.addEventListener('click', () => {
+      const isHidden = secretInput.type === 'password';
+      secretInput.type = isHidden ? 'text' : 'password';
+      secretEye.className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  }
 
   // File drop zone
   const dropZone = document.getElementById('imp-drop-zone');
@@ -15023,25 +15265,43 @@ function setupImportModalEvents(modal) {
   document.getElementById('imp-api-fetch-btn').addEventListener('click', async () => {
     const key = document.getElementById('imp-api-key').value.trim();
     const secret = document.getElementById('imp-api-secret').value.trim();
-    const days = parseInt(document.getElementById('imp-api-days').value);
-    if (!key || !secret) { showStatus('imp-api-status', 'error', 'Masukkan API Key dan Secret terlebih dahulu.'); return; }
+    const days = parseInt(document.getElementById('imp-api-days').value) || 30;
+    if (!key || !secret) { showStatus('imp-api-status', 'error', '⚠️ Masukkan API Key dan Secret terlebih dahulu.'); return; }
 
-    showStatus('imp-api-status', 'loading', `⏳ Menghubungi ${selectedAPI} API...`);
+    showStatus('imp-api-status', 'loading', `⏳ Menghubungi ${selectedAPI} API — signing request...`);
     document.getElementById('imp-api-fetch-btn').disabled = true;
 
     try {
       let apiTrades = [];
-      if (selectedAPI === 'bybit') apiTrades = await fetchBybitTrades(key, secret, days);
-      else if (selectedAPI === 'binance') apiTrades = await fetchBinanceTrades(key, secret, days);
+      if (selectedAPI === 'bybit') {
+        showStatus('imp-api-status', 'loading', '⏳ Bybit: mengambil closed P&L + open positions...');
+        apiTrades = await fetchBybitTrades(key, secret, days);
+      } else if (selectedAPI === 'binance') {
+        showStatus('imp-api-status', 'loading', '⏳ Binance: mengambil income history + open positions...');
+        apiTrades = await fetchBinanceTrades(key, secret, days);
+      }
 
-      if (!apiTrades.length) { showStatus('imp-api-status', 'info', 'ℹ️ Tidak ada trade dalam periode yang dipilih.'); }
-      else {
+      if (!apiTrades.length) {
+        showStatus('imp-api-status', 'info', 'ℹ️ Tidak ada trade dalam periode yang dipilih.');
+      } else {
         parsedTrades = apiTrades;
-        showStatus('imp-api-status', 'success', `${apiTrades.length} trade berhasil diambil dari ${selectedAPI}`);
+        const openCount   = apiTrades.filter(t => t._isOpen).length;
+        const closedCount = apiTrades.length - openCount;
+        const label = selectedAPI.charAt(0).toUpperCase() + selectedAPI.slice(1);
+        let msg = `✅ ${closedCount} closed trade`;
+        if (openCount) msg += ` + ${openCount} open position`;
+        msg += ` dari ${label} (${days} hari terakhir)`;
+        showStatus('imp-api-status', 'success', msg);
         showPreview(apiTrades, 'imp-api-preview-list', 'imp-api-count', 'imp-api-preview-wrap');
       }
     } catch(err) {
-      showStatus('imp-api-status', 'error', `Gagal: ${err.message}. Pastikan API Key valid dan CORS proxy aktif.`);
+      let errMsg = err.message || 'Unknown error';
+      // Friendly hints
+      if (errMsg.includes('10003') || errMsg.includes('invalid api')) errMsg += ' — Pastikan API Key benar.';
+      if (errMsg.includes('10004') || errMsg.includes('sign')) errMsg += ' — Periksa API Secret, jangan ada spasi.';
+      if (errMsg.includes('33004')) errMsg = 'API Key tidak memiliki izin yang cukup. Aktifkan "Read Only" trade history di Bybit.';
+      if (errMsg.includes('CORS') || errMsg.includes('proxy')) errMsg += ' — Coba disable VPN atau coba lagi nanti.';
+      showStatus('imp-api-status', 'error', `❌ ${errMsg}`);
     } finally {
       document.getElementById('imp-api-fetch-btn').disabled = false;
     }
