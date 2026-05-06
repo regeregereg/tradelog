@@ -841,21 +841,152 @@ tr:hover td{background:rgba(139,92,246,.04);}
 .bias-btn.active{background:rgba(139,92,246,.15)!important;border-color:rgba(139,92,246,.45)!important;color:var(--text)!important;box-shadow:0 0 0 1px rgba(139,92,246,.2);}
 .mood-btn.active{background:rgba(139,92,246,.12)!important;border-color:rgba(139,92,246,.4)!important;color:var(--text)!important;box-shadow:0 0 0 1px rgba(139,92,246,.15);}
 .bias-btn:hover,.mood-btn:hover{border-color:rgba(139,92,246,.3)!important;background:rgba(139,92,246,.06)!important;}
-/* ── TRADE MODAL PREMIUM ── */
-.tm-section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:14px 14px 12px;}
-.tm-section-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
-.tm-section-label i{font-size:11px;}
-.qpair-btn{padding:4px 9px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--mono);transition:all .15s;letter-spacing:.3px;}
-.qpair-btn:hover,.qpair-btn.active{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.4);color:var(--accent2);}
-.dir-toggle-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
-.dir-toggle-btn.active-long{background:rgba(0,217,126,.08)!important;border-color:rgba(0,217,126,.5)!important;color:#00d97e!important;}
-.dir-toggle-btn.active-short{background:rgba(255,77,77,.08)!important;border-color:rgba(255,77,77,.5)!important;color:#ff4d4d!important;}
+/* ═══════════════════════════════════════════════════════════
+   TRADE MODAL — Visual Hierarchy System
+   ─────────────────────────────────────────────────────────
+   Level 1  Section Title  : #c4b5fd  (accent-tinted, paling terlihat)
+   Level 2  Field Label    : #cbd5e1  (abu-abu terang, jelas terbaca)
+   Level 3  Input Value    : #f4f4f5  (putih penuh — user input)
+   Level 4  Placeholder    : #52525b  (redup — petunjuk saja)
+   ─────────────────────────────────────────────────────────
+   Background fields lebih kontras dari panel section agar
+   input "pop" dan mata tidak capek memisahkan elemen.
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Section card ── */
+.tm-section{
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;
+  padding:16px 16px 14px;
+}
+
+/* ── Level 1: Section title ── */
+.tm-section-label{
+  font-size:10px;
+  color:#c4b5fd;            /* accent-lavender — terang, eye-catching */
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:700;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(196,181,253,.1); /* separator tipis */
+}
+.tm-section-label i{font-size:11px;opacity:.9;}
+
+/* ── Level 2: Field label ── */
+/* Override .fl khusus di dalam trade modal */
+#md-trade .fl{
+  font-size:10px;
+  color:#94a3b8;            /* slate-400 — lebih terang dari --text3 asli */
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  font-weight:600;
+  line-height:1;
+}
+
+/* ── Level 3 & 4: Input + placeholder ── */
+#md-trade .fi{
+  background:#1e1e24;       /* sedikit lebih terang dari --bg3 */
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;
+  color:#f1f5f9;            /* slate-100 — jelas terbaca */
+  padding:9px 12px;
+  font-size:13px;
+  font-family:var(--mono);
+  outline:none;
+  width:100%;
+  transition:border-color .15s, box-shadow .15s;
+}
+#md-trade .fi:focus{
+  border-color:rgba(139,92,246,.55);
+  box-shadow:0 0 0 3px rgba(139,92,246,.12);
+}
+#md-trade .fi::placeholder{
+  color:#3f3f4a;            /* Level 4 — cukup redup, tidak mengganggu */
+}
+#md-trade select.fi option{background:#1e1e24;}
+
+/* ── Textarea ── */
+#md-trade .ta{
+  background:#1e1e24;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;
+  color:#f1f5f9;
+  padding:10px 12px;
+  font-size:12.5px;
+  font-family:var(--mono);
+  resize:vertical;
+  min-height:72px;
+  outline:none;
+  width:100%;
+  transition:border-color .15s, box-shadow .15s;
+  line-height:1.55;
+}
+#md-trade .ta:focus{
+  border-color:rgba(139,92,246,.55);
+  box-shadow:0 0 0 3px rgba(139,92,246,.12);
+}
+#md-trade .ta::placeholder{color:#3f3f4a;}
+
+/* ── Quick pair buttons ── */
+.qpair-btn{
+  padding:4px 10px;
+  border-radius:7px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.04);
+  color:#94a3b8;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:var(--mono);
+  transition:all .15s;
+  letter-spacing:.3px;
+}
+.qpair-btn:hover,.qpair-btn.active{
+  background:rgba(139,92,246,.15);
+  border-color:rgba(139,92,246,.45);
+  color:#c4b5fd;
+}
+
+/* ── Direction buttons ── */
+.dir-toggle-btn:hover{
+  border-color:rgba(139,92,246,.3);
+  background:rgba(139,92,246,.06);
+}
+.dir-toggle-btn.active-long{
+  background:rgba(0,217,126,.09)!important;
+  border-color:rgba(0,217,126,.55)!important;
+  color:#00d97e!important;
+}
+.dir-toggle-btn.active-short{
+  background:rgba(255,77,77,.09)!important;
+  border-color:rgba(255,77,77,.55)!important;
+  color:#ff4d4d!important;
+}
+
+/* ── Result buttons ── */
 .result-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
-.result-btn.active-win{background:rgba(0,217,126,.1)!important;border-color:rgba(0,217,126,.5)!important;color:#00d97e!important;}
-.result-btn.active-loss{background:rgba(255,77,77,.1)!important;border-color:rgba(255,77,77,.5)!important;color:#ff4d4d!important;}
-.result-btn.active-be{background:rgba(167,139,250,.1)!important;border-color:rgba(167,139,250,.5)!important;color:#a78bfa!important;}
+.result-btn.active-win{background:rgba(0,217,126,.1)!important;border-color:rgba(0,217,126,.55)!important;color:#00d97e!important;}
+.result-btn.active-loss{background:rgba(255,77,77,.1)!important;border-color:rgba(255,77,77,.55)!important;color:#ff4d4d!important;}
+.result-btn.active-be{background:rgba(167,139,250,.1)!important;border-color:rgba(167,139,250,.55)!important;color:#a78bfa!important;}
+
+/* ── Emotion buttons ── */
 .emotion-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.05);}
-.emotion-btn.active{background:rgba(139,92,246,.12)!important;border-color:rgba(139,92,246,.45)!important;color:var(--accent2)!important;}
+.emotion-btn.active{
+  background:rgba(139,92,246,.14)!important;
+  border-color:rgba(139,92,246,.5)!important;
+  color:#c4b5fd!important;
+}
+
+/* ── Hint / sub-text di dalam modal ── */
+#md-trade [style*="color:var(--text3)"],
+#md-trade [style*="color:var(--text2)"] {
+  /* Dibiarkan inline — hanya field label & section label yang di-override via class */
+}
 #md-trade .md{border-radius:20px;}
 @media(max-width:600px){
   #md-trade-inner{width:100%!important;border-radius:20px 20px 0 0!important;position:fixed!important;bottom:0;left:0;right:0;max-height:92vh!important;}
@@ -892,7 +1023,31 @@ select.fi option{background:var(--bg3);}
 .btr{flex:1;height:3px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;}
 .bfl{height:100%;border-radius:2px;transition:width .6s ease;}
 .bvl{font-size:11px;font-family:var(--mono);width:44px;text-align:right;flex-shrink:0;}
-/* ── DAY LABELS ROW (separate from date grid) ── */
+/* ── Inline suffix labels (price, R, $) ── */
+#md-trade .fi-suffix{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:10px;
+  color:#3d3d4a;            /* sangat redup — petunjuk unit saja */
+  font-family:var(--mono);
+  pointer-events:none;
+}
+/* Holding time display box */
+#f-hold-display{
+  background:#1e1e24!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+  color:#94a3b8!important;
+}
+/* ── Unit suffix & icon hints inside input wrappers ── */
+/* spans: "price", "$", "R" — cukup redup sebagai hint */
+#md-trade .fgg span[style*="position:absolute"]{
+  color:#3a3a47!important;
+}
+#md-trade .fgg i[style*="position:absolute"]{
+  color:#42424f!important;
+}
 .cal-labels{
   display:grid;
   grid-template-columns:repeat(7,1fr);
@@ -6433,7 +6588,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             </div>
           </div>
           <div class="fgg">
-            <label class="fl"><i class="bi bi-shield-exclamation" style="margin-right:3px;color:#ff4d4d"></i>Stop Loss</label>
+            <label class="fl"><i class="bi bi-shield-exclamation" style="margin-right:3px;color:#f87171"></i>Stop Loss</label>
             <div style="position:relative">
               <input class="fi" type="number" id="f-sl" placeholder="0.00000" step="any" oninput="calcRR()">
               <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);font-family:var(--mono)">price</span>
@@ -6442,7 +6597,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <!-- RR Display -->
           <div class="fgg">
             <label class="fl"><i class="bi bi-calculator" style="margin-right:3px"></i>R:R Ratio</label>
-            <div id="rr-display" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:var(--mono);color:var(--text3);display:flex;align-items:center;gap:6px;min-height:38px">
+            <div id="rr-display" style="background:#1e1e24;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px 12px;font-size:13px;font-family:var(--mono);color:#52525b;display:flex;align-items:center;gap:6px;min-height:38px">
               <i class="bi bi-dash-lg" style="font-size:11px"></i>
               <span id="rr-val">Isi entry & SL</span>
             </div>
