@@ -6641,7 +6641,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div id="screenshot-placeholder" style="color:var(--text3);font-size:12px;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px">
             <i class="bi bi-cloud-arrow-up" style="font-size:26px;color:var(--text3)"></i>
             <span>Drop screenshot atau <span style="color:var(--accent)">klik untuk upload</span></span>
-            <span style="font-size:10px;color:var(--text3);opacity:.7">PNG / JPG — maks 3MB</span>
+            <span style="font-size:10px;color:var(--text3);opacity:.7">PNG / JPG — maks 1MB (auto-compress)</span>
           </div>
           <div id="screenshot-preview" style="display:none;position:relative">
             <img id="screenshot-img" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain" alt="chart">
@@ -8055,6 +8055,14 @@ function openFeatureGateModal(feature) {
       pct:     0,
       lockd:   true,
     },
+    screenshot: {
+      icon:    'bi-image',
+      title:   'Chart Screenshot — Premium',
+      desc:    `Lampirkan <strong style="color:var(--accent2)">screenshot chart TradingView</strong> langsung ke setiap trade di journal kamu. Review setup secara visual, bangun arsip chart yang rapi dan konsisten.`,
+      blocker: 'Chart Screenshot Upload',
+      pct:     0,
+      lockd:   true,
+    },
   };
 
   const cfg      = CONFIGS[feature] || CONFIGS.trade;
@@ -9306,6 +9314,10 @@ function _resetTradeModal() {
   const ms = $('mistake-section'); if (ms) ms.style.display = 'none';
   // Reset planned RR
   const prr = $('f-planned-rr'); if (prr) prr.value = '';
+  // ── Screenshot clear + premium gate ──
+  clearScreenshot();
+  // Kecil delay agar DOM sudah settle sebelum overlay dipasang
+  setTimeout(gateScreenshotSection, 40);
 }
 
 function openTrade() {
@@ -9446,6 +9458,8 @@ window.editTrade = (firestoreId) => {
   if (typeof calcRR === 'function') calcRR();
   // Set edit ID
   $('f-edit-id').value = firestoreId;
+  // Load existing screenshot (Cloudinary URL) jika ada — hanya untuk premium
+  if (t.screenshot && _isPremiumCache === true) loadScreenshotFromUrl(t.screenshot);
   // Update modal header to edit mode
   $('trade-modal-title').textContent = 'Edit Trade';
   $('trade-modal-subtitle').textContent = `${t.pair || 'Trade'} · ${t.date || ''}`;
@@ -13316,20 +13330,114 @@ document.addEventListener('keydown', e => {
 })();
 
 // ── ── 📸 SCREENSHOT ATTACH ───────────────────────────── ─────
-window._pendingScreenshot = null;
+// Menyimpan URL Cloudinary (string) — bukan base64
+window._pendingScreenshot = null;   // URL string atau null
+window._screenshotUploading = false;
 
-function handleScreenshotFile(file) {
+// ── Compress image before upload (target ≤ 1MB) ──────────────
+function _compressImg(file, maxBytes, quality) {
+  return new Promise((resolve) => {
+    maxBytes  = maxBytes  || 1 * 1024 * 1024;
+    quality   = quality   || 0.82;
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let w = img.width, h = img.height;
+      // Scale down if wider than 1920px (TradingView default export)
+      const MAX_W = 1920;
+      if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        if (!blob) { resolve(file); return; }
+        if (blob.size <= maxBytes || quality < 0.4) {
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+        } else {
+          // Retry with lower quality
+          canvas.toBlob(blob2 => {
+            resolve(new File([blob2 || blob], file.name, { type: 'image/jpeg' }));
+          }, 'image/jpeg', quality - 0.18);
+        }
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => resolve(file);
+    img.src = url;
+  });
+}
+
+// ── Show uploading state on drop zone ────────────────────────
+function _setScreenshotUploadState(uploading) {
+  window._screenshotUploading = uploading;
+  const dz   = $('screenshot-drop-zone');
+  const ph   = $('screenshot-placeholder');
+  const save = $('trade-save');
+  if (!dz || !ph) return;
+  if (uploading) {
+    ph.innerHTML = `
+      <i class="bi bi-cloud-arrow-up" style="font-size:26px;color:var(--accent);animation:spin 1s linear infinite"></i>
+      <span style="color:var(--text2)">Mengupload chart…</span>
+      <span style="font-size:10px;color:var(--text3)">Mohon tunggu sebentar</span>`;
+    ph.style.display = 'flex';
+    $('screenshot-preview').style.display = 'none';
+    dz.style.borderColor = 'var(--accent)';
+    if (save) { save.disabled = true; $('trade-save-label').textContent = 'Uploading…'; }
+  } else {
+    ph.innerHTML = `
+      <i class="bi bi-cloud-arrow-up" style="font-size:26px;color:var(--text3)"></i>
+      <span>Drop screenshot atau <span style="color:var(--accent)">klik untuk upload</span></span>
+      <span style="font-size:10px;color:var(--text3);opacity:.7">PNG / JPG — maks 1MB (auto-compress)</span>`;
+    if (save) { save.disabled = false; $('trade-save-label').textContent = $('f-edit-id').value ? 'Simpan Perubahan' : 'Simpan Trade'; }
+  }
+}
+
+async function handleScreenshotFile(file) {
   if (!file) return;
-  if (file.size > 3 * 1024 * 1024) { alert('File terlalu besar. Maks 3MB.'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    window._pendingScreenshot = e.target.result;
-    $('screenshot-img').src = e.target.result;
+  // ── Premium gate (second-layer defence) ──
+  if (_isPremiumCache !== true) { openFeatureGateModal('screenshot'); return; }
+  if (!file.type.startsWith('image/')) { alert('Hanya file gambar (PNG/JPG) yang didukung.'); return; }
+
+  // Hard reject jika > 8MB (terlalu besar bahkan sebelum compress)
+  if (file.size > 8 * 1024 * 1024) { alert('File terlalu besar (maks 8MB sebelum compress). Gunakan export dari TradingView.'); return; }
+
+  // Show local preview dulu agar terasa responsif
+  const previewUrl = URL.createObjectURL(file);
+  $('screenshot-img').src = previewUrl;
+  $('screenshot-placeholder').style.display = 'none';
+  $('screenshot-preview').style.display = 'block';
+  $('screenshot-drop-zone').style.borderColor = 'var(--accent)';
+
+  // Upload ke Cloudinary
+  _setScreenshotUploadState(true);
+  try {
+    // Compress ke ≤1MB sebelum upload
+    const compressed = await _compressImg(file, 1 * 1024 * 1024, 0.82);
+
+    // Reuse Cloudinary config dari Playbook module (sudah defined di scope global)
+    const fd = new FormData();
+    fd.append('file', compressed);
+    fd.append('upload_preset', _CDN_PRESET);
+    if (window._currentUser) fd.append('tags', `uid_${window._currentUser.uid},journal`);
+
+    const resp = await fetch(_CDN_UPLOAD_URL, { method: 'POST', body: fd });
+    const res  = await resp.json();
+    if (res.error) throw new Error(res.error.message);
+
+    window._pendingScreenshot = res.secure_url;
+    $('screenshot-img').src = res.secure_url;  // ganti ke URL CDN
+    URL.revokeObjectURL(previewUrl);
     $('screenshot-placeholder').style.display = 'none';
     $('screenshot-preview').style.display = 'block';
     $('screenshot-drop-zone').style.borderColor = 'var(--accent)';
-  };
-  reader.readAsDataURL(file);
+  } catch(err) {
+    // Fallback: kalau upload gagal, reset UI dan beri tahu user
+    URL.revokeObjectURL(previewUrl);
+    clearScreenshot();
+    alert('Upload chart gagal: ' + (err.message || 'Cek koneksi internet.'));
+  }
+  _setScreenshotUploadState(false);
 }
 
 function handleScreenshotDrop(e) {
@@ -13346,9 +13454,87 @@ function clearScreenshot() {
   const ph = $('screenshot-placeholder');
   const pv = $('screenshot-preview');
   const dz = $('screenshot-drop-zone');
-  if (ph) ph.style.display = 'block';
+  const img = $('screenshot-img');
+  if (img) img.src = '';
+  if (ph) {
+    ph.innerHTML = `
+      <i class="bi bi-cloud-arrow-up" style="font-size:26px;color:var(--text3)"></i>
+      <span>Drop screenshot atau <span style="color:var(--accent)">klik untuk upload</span></span>
+      <span style="font-size:10px;color:var(--text3);opacity:.7">PNG / JPG — maks 1MB (auto-compress)</span>`;
+    ph.style.display = 'flex';
+  }
   if (pv) pv.style.display = 'none';
   if (dz) dz.style.borderColor = 'var(--border2)';
+}
+
+// ── Load existing screenshot saat edit trade ────────────────
+function loadScreenshotFromUrl(url) {
+  if (!url) return;
+  window._pendingScreenshot = url;
+  const img = $('screenshot-img');
+  const ph  = $('screenshot-placeholder');
+  const pv  = $('screenshot-preview');
+  const dz  = $('screenshot-drop-zone');
+  if (img) img.src = url;
+  if (ph) ph.style.display = 'none';
+  if (pv) pv.style.display = 'block';
+  if (dz) dz.style.borderColor = 'var(--accent)';
+}
+
+// ── Premium gate untuk section Chart Screenshot ───────────────
+// Dipanggil setiap kali modal trade dibuka.
+// - Premium  → hapus overlay (jika ada), section aktif normal
+// - Free     → pasang overlay lock di atas drop-zone
+function gateScreenshotSection() {
+  const section = $('screenshot-drop-zone');
+  if (!section) return;
+
+  const OVERLAY_ID = 'screenshot-premium-overlay';
+  const existing   = document.getElementById(OVERLAY_ID);
+
+  if (_isPremiumCache === true) {
+    // User premium → pastikan overlay tidak ada
+    if (existing) existing.remove();
+    return;
+  }
+
+  // Free user → pasang overlay jika belum ada
+  if (existing) return; // sudah terpasang
+
+  // Buat overlay lock di atas drop-zone
+  const wrapper = section.parentElement;
+  if (!wrapper) return;
+  wrapper.style.position = 'relative'; // pastikan bisa di-overlay
+
+  const ov = document.createElement('div');
+  ov.id = OVERLAY_ID;
+  ov.style.cssText = `
+    position:absolute;inset:0;border-radius:10px;
+    background:rgba(10,10,15,.72);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;cursor:pointer;z-index:10;
+    border:1.5px solid rgba(139,92,246,.25);
+    transition:background .15s;
+  `;
+  ov.innerHTML = `
+    <div style="width:34px;height:34px;border-radius:50%;background:rgba(139,92,246,.18);
+      border:1.5px solid rgba(139,92,246,.4);display:flex;align-items:center;justify-content:center">
+      <i class="bi bi-lock-fill" style="color:var(--accent2);font-size:14px"></i>
+    </div>
+    <div style="text-align:center;pointer-events:none">
+      <div style="font-size:12px;font-weight:700;color:#e2e8f0;letter-spacing:-.1px">Fitur Premium</div>
+      <div style="font-size:10px;color:rgba(161,161,170,.7);margin-top:2px">Klik untuk upgrade</div>
+    </div>
+  `;
+  ov.addEventListener('mouseenter', () => ov.style.background = 'rgba(10,10,15,.82)');
+  ov.addEventListener('mouseleave', () => ov.style.background = 'rgba(10,10,15,.72)');
+  ov.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openFeatureGateModal('screenshot');
+  });
+
+  wrapper.appendChild(ov);
 }
 
 // ── ── 🤖 AI TRADE REVIEW ─────────────────────────────── ─────
