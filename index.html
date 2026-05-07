@@ -36,8 +36,8 @@
   ║  §CSS-COMPONENTS— Cards, buttons, forms, tables, badges              ║
   ║  §CSS-JOURNAL   — Journal page + trade list items                    ║
   ║  §CSS-DASHBOARD — Dashboard stat cards, equity widget                ║
-  ║  §CSS-ANALYTICS — Analytics page + Trader DNA                        ║
-  ║  §CSS-PREMIUM   — Premium analytics card styles                      ║
+  ║  §CSS-ANALYTICS — Analytics page, Trader DNA & Advanced Stats        ║
+  ║  §CSS-REPORTCARD — Report Card / Share Stats modal               ║
   ║  §CSS-FLOAT-CTA — Floating CTA widget                                ║
   ║  §CSS-IMPORT    — Import modal styles                                 ║
   ║  §CSS-RESPONSIVE— Media queries + mobile layout                      ║
@@ -1347,6 +1347,126 @@ select.fi option{background:var(--bg3);}
   .ob-cta-row{grid-template-columns:1fr;}
 }
 
+
+    /* ── §CSS-JOURNAL: empty state pulse animation ── */
+    @keyframes es-pulse {
+      0%,100%{transform:scale(1);opacity:.6}
+      50%{transform:scale(1.18);opacity:1}
+    }
+
+
+/* ════════════════════════════════════════════════════════════
+   §CSS-REPORTCARD — Report Card / Share Stats Modal
+   ════════════════════════════════════════════════════════════ */
+#md-reportcard{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
+#md-reportcard.open{display:flex;}
+.rc-shell{width:100%;max-width:760px;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
+
+/* Period selector */
+.rc-period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.rc-period-btn{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#a1a1aa;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.4px;transition:all .2s;}
+.rc-period-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.45);color:#a78bfa;}
+.rc-period-label{font-size:10px;color:#71717a;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-right:4px;}
+
+/* THE CARD */
+.rpc-card{
+  width:100%;aspect-ratio:16/8.4;border-radius:22px;position:relative;overflow:hidden;
+  background:#080810;border:1px solid rgba(139,92,246,.18);
+  font-family:'Syne',sans-serif;
+  box-shadow:0 0 0 1px rgba(255,255,255,.03),0 32px 80px rgba(0,0,0,.7);
+}
+/* Ambient glows */
+.rpc-glow-tr{position:absolute;top:-80px;right:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.16) 0%,transparent 65%);pointer-events:none;}
+.rpc-glow-bl{position:absolute;bottom:-100px;left:20px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(109,40,217,.1) 0%,transparent 65%);pointer-events:none;}
+/* Dot-grid texture */
+.rpc-dots{position:absolute;inset:0;pointer-events:none;opacity:.055;background-image:radial-gradient(rgba(139,92,246,.9) 1px,transparent 1px);background-size:28px 28px;}
+/* Bottom gradient bar */
+.rpc-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(139,92,246,.5) 20%,rgba(167,139,250,.9) 50%,rgba(139,92,246,.5) 80%,transparent 100%);}
+
+/* Inner layout */
+.rpc-inner{position:relative;z-index:2;height:100%;display:grid;grid-template-rows:auto 1fr auto;padding:30px 36px 24px;}
+
+/* Top row */
+.rpc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
+.rpc-brand{display:flex;align-items:center;gap:8px;}
+.rpc-brand-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#a78bfa);box-shadow:0 0 8px rgba(139,92,246,.7);}
+.rpc-brand-name{font-size:11px;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:1px;text-transform:uppercase;}
+.rpc-badge{padding:5px 13px;border-radius:20px;background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.28);font-size:10px;font-weight:700;color:#a78bfa;letter-spacing:.6px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+
+/* Trader name row */
+.rpc-trader-row{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
+.rpc-name-col{}
+.rpc-trader-name{font-size:clamp(20px,3.5vw,30px);font-weight:800;color:#f4f4f5;letter-spacing:-.8px;line-height:1;margin-bottom:5px;}
+.rpc-tagline{font-size:11px;color:#a78bfa;font-family:'JetBrains Mono',monospace;letter-spacing:.3px;opacity:.85;}
+
+/* Stats row */
+.rpc-stats{display:flex;gap:0;align-items:flex-end;}
+.rpc-stat{flex:1;padding:0 18px 0 0;border-right:1px solid rgba(255,255,255,.05);}
+.rpc-stat:first-child{padding-left:0;}
+.rpc-stat:last-child{border-right:none;}
+.rpc-stat-lbl{font-size:9px;color:#71717a;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:5px;}
+.rpc-stat-val{font-size:clamp(16px,2.8vw,22px);font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px;line-height:1;}
+.rpc-stat-sub{font-size:9px;color:#71717a;margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.rpc-val-pos{color:#22c55e;}.rpc-val-neg{color:#ef4444;}.rpc-val-pur{color:#a78bfa;}.rpc-val-neu{color:#f4f4f5;}
+
+/* Mini equity bars */
+.rpc-bars{display:flex;align-items:flex-end;gap:3px;height:32px;}
+.rpc-bar-col{width:6px;border-radius:2px 2px 0 0;}
+
+/* Footer */
+.rpc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.04);}
+.rpc-footer-l{font-size:9px;color:#27272a;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
+.rpc-footer-r{font-size:9px;color:#71717a;font-family:'JetBrains Mono',monospace;}
+
+/* Action row */
+.rc-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.rc-act-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;min-width:130px;}
+.rc-act-primary{background:var(--accent);color:#fff;border:none;box-shadow:0 4px 14px rgba(139,92,246,.3);}
+.rc-act-primary:hover{background:#7c3aed;transform:translateY(-1px);box-shadow:0 6px 22px rgba(139,92,246,.45);}
+.rc-act-secondary{background:rgba(255,255,255,.05);color:#a78bfa;border:1px solid rgba(139,92,246,.3);}
+.rc-act-secondary:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.5);}
+.rc-act-ghost{background:rgba(255,255,255,.03);color:#a1a1aa;border:1px solid rgba(255,255,255,.08);}
+.rc-act-ghost:hover{background:rgba(255,255,255,.06);color:#a1a1aa;}
+.rc-copy-toast{font-size:11px;color:#22c55e;font-family:'JetBrains Mono',monospace;display:none;align-items:center;gap:6px;padding:8px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;}
+
+/* Trader type pill on report card */
+#rpc-trader-type {
+  transition: all .3s;
+  backdrop-filter: blur(4px);
+}
+
+/* Pattern widget insight cards entrance */
+@keyframes patternSlideIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+#pattern-insights-list > div {
+  animation: patternSlideIn .28s ease both;
+}
+
+/* Trader type card icon hover pop */
+#tt-icon-box {
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
+}
+#trader-type-card:hover #tt-icon-box {
+  transform: scale(1.08);
+}
+/* ── FREEMIUM / PRO UI ─────────────────────────────── */
+#md-feature-gate .md { animation: fgSlideIn .28s cubic-bezier(.34,1.3,.64,1); }
+@keyframes fgSlideIn {
+  from { opacity:0; transform:scale(.93) translateY(12px); }
+  to   { opacity:1; transform:scale(1)   translateY(0); }
+}
+.prem-lock { display:flex; align-items:center; margin-left:auto; }
+.dna-lock-overlay { animation: dnaFadeIn .3s ease; }
+@keyframes dnaFadeIn { from{opacity:0} to{opacity:1} }
+#pro-avatar-badge { animation: proBadgeIn .4s cubic-bezier(.34,1.56,.64,1); }
+@keyframes proBadgeIn { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
+#free-trade-badge { animation: ftbSlideDown .3s ease; }
+@keyframes ftbSlideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.ni[data-premium-locked] { position:relative; }
+
+
 /* ════════════════════════════════════════════════════════════
    §CSS-RESPONSIVE — Media Queries & Mobile Layout
    ════════════════════════════════════════════════════════════ */
@@ -2239,25 +2359,34 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 }
 
 /* ════════════════════════════════════════════════════════════
-   §CSS-ANALYTICS — Analytics Page & Trader DNA Card (REDESIGN)
+   §CSS-ANALYTICS — Analytics Page, Trader DNA & Advanced Stats
+   ════════════════════════════════════════════════════════════
+
+   DESIGN TOKENS (selaras dengan modal Log New Trade)
+   ─────────────────────────────────────────────────────────────
+   Card bg          : #16161e
+   Card border      : rgba(255,255,255,.09)
+   Section title    : rgba(255,255,255,.52)   UPPERCASE 10px 700
+   Sub-label / hint : rgba(255,255,255,.22)
+   Stat value       : #f0f0f4                 (putih hangat)
+   Stat label       : rgba(255,255,255,.38)   UPPERCASE 9px
+   Stat sub         : rgba(255,255,255,.22)
+   Bar label        : rgba(255,255,255,.5)
+   Bar value        : rgba(255,255,255,.6)
+   Accent primary   : #8b5cf6 / #a78bfa / #c4b5fd
+   Semantic win     : #22c55e
+   Semantic loss    : #ef4444
+   ─────────────────────────────────────────────────────────────
+   Cari sub-section dengan:
+     §DNA    → Trader DNA card
+     §ANA    → Performance score, period tabs, section cards
+     §GRID   → Stat cards grid
+     §DOW    → Day-of-week bars
+     §BREAK  → Breakdown cards
+     §CHART  → Chart cards
+     §ATABS  → Advanced Analytics tabs + panel
+     §TAGS   → Inline tags
    ════════════════════════════════════════════════════════════ */
-
-/*
-  ═══════════════════════════════════════════════════════════════
-  ANALYTICS — VISUAL HIERARCHY SYSTEM (4 LEVEL)
-  ───────────────────────────────────────────────────────────────
-  L1  Section / Card Title   : #c4b5fd  (lavender — paling menonjol)
-  L2  Metric Label / Sub-key : #94a3b8  (slate-400 — jelas terbaca)
-  L3  Metric Value (primary) : #f1f5f9  (putih — konten utama)
-  L4  Hint / Count / Micro   : #52525b  (zinc-600 — sangat redup)
-
-  Data warna semantik (tetap):
-  Profit / Win               : #22c55e  (green-500)
-  Loss / Risk                : #ef4444  (red-500)
-  Neutral / Accent           : #a78bfa  (violet-400)
-  Gold / Best                : #c4b5fd  (lavender)
-  ═══════════════════════════════════════════════════════════════
-*/
 
   /* ── DNA Card ── */
   #trader-dna-card{
@@ -2421,6 +2550,272 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     display:none;padding-top:2px;
   }
 
+
+  #page-analytics { position:relative; }
+
+  /* §ANA: Page header */
+  #page-analytics .pt { font-size:24px; font-weight:800; letter-spacing:-.8px; color:#f0f0f4; }
+  #ana-ps { color:rgba(255,255,255,.22)!important; font-size:11px; }
+
+  /* §ANA: Live dot */
+  .ana-live-dot { width:5px; height:5px; border-radius:50%; background:#22c55e; display:inline-block; opacity:.8; }
+
+  /* §ANA: Period tabs */
+  #ana-period-tabs {
+    display:inline-flex; gap:2px; padding:3px;
+    background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:10px;
+  }
+  #ana-period-tabs .ptab {
+    border-radius:7px; font-size:11px; padding:5px 14px; font-weight:600;
+    transition:all .18s; letter-spacing:.2px; color:rgba(255,255,255,.28);
+    background:transparent; border:none; font-family:var(--font); cursor:pointer;
+  }
+  #ana-period-tabs .ptab:hover { color:rgba(255,255,255,.5); }
+  #ana-period-tabs .ptab.active { background:rgba(139,92,246,.18); color:#c4b5fd; box-shadow:0 0 0 1px rgba(139,92,246,.22); }
+
+  /* §ANA: Performance score banner */
+  .ana-score-banner {
+    position:relative; overflow:hidden; border-radius:14px; margin-bottom:12px;
+    background:#16161e; border:1px solid rgba(255,255,255,.09); padding:18px 20px;
+  }
+  .ana-score-banner::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.35) 45%,transparent);
+    pointer-events:none;
+  }
+  .ana-score-inner { position:relative; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .ana-ring-wrap { position:relative; width:64px; height:64px; flex-shrink:0; }
+  .ana-ring-wrap svg { transform:rotate(-90deg); width:64px; height:64px; }
+  .ana-ring-bg   { fill:none; stroke:rgba(255,255,255,.07); stroke-width:5; }
+  .ana-ring-fill { fill:none; stroke-width:5; stroke-linecap:round;
+    stroke-dasharray:188; stroke-dashoffset:188;
+    transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1),stroke .4s; }
+  .ana-ring-label {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; font-family:var(--mono); color:#c4b5fd;
+  }
+  .ana-score-text { flex:1; min-width:160px; }
+  .ana-score-heading { font-size:17px; font-weight:800; letter-spacing:-.4px; margin-bottom:2px; font-family:var(--font); color:#f0f0f4; }
+  .ana-score-sub { font-size:11px; color:rgba(255,255,255,.22); font-family:var(--mono); }
+  .ana-score-pills { display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; }
+  .ana-kpi-pill {
+    display:flex; align-items:center; gap:5px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    border-radius:20px; padding:3px 10px;
+    font-size:10px; font-family:var(--mono); font-weight:600; color:rgba(255,255,255,.5);
+  }
+  .ana-kpi-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+
+  /* §ANA: Section card */
+  .ana-premium-card, .premium-card {
+    background:#16161e; border:1px solid rgba(255,255,255,.09);
+    border-radius:14px; padding:18px 18px; margin-bottom:12px;
+    position:relative; overflow:hidden; transition:border-color .2s;
+  }
+  .ana-premium-card::before, .premium-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.2) 50%,transparent);
+    pointer-events:none;
+  }
+  .ana-premium-card:hover, .premium-card:hover { border-color:rgba(255,255,255,.13); }
+
+  .ana-card-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px; padding-bottom:11px; border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .ana-card-title {
+    font-size:10px; font-weight:700; color:rgba(255,255,255,.52);
+    text-transform:uppercase; letter-spacing:1px;
+    display:flex; align-items:center; gap:7px; font-family:var(--font);
+  }
+  .ana-card-title-icon {
+    width:26px; height:26px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;
+    background:rgba(139,92,246,.1); border:1px solid rgba(139,92,246,.18);
+  }
+  .ana-card-title-icon i { font-size:12px; color:#a78bfa; }
+  .ana-card-badge {
+    font-size:9px; font-weight:700; padding:2px 9px; border-radius:20px;
+    letter-spacing:.4px; text-transform:uppercase; font-family:var(--mono);
+    background:rgba(139,92,246,.1); color:#a78bfa; border:1px solid rgba(139,92,246,.18);
+  }
+
+  /* §GRID: Stat cards */
+  .ana-deep-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  @media(max-width:960px){ .ana-deep-grid{grid-template-columns:repeat(3,1fr);} }
+  @media(max-width:640px){ .ana-deep-grid{grid-template-columns:repeat(2,1fr);} }
+
+  .ana-stat-card {
+    background:#111117; border:1px solid rgba(255,255,255,.09);
+    border-radius:11px; padding:13px 13px;
+    position:relative; overflow:hidden; cursor:default;
+    transition:border-color .18s, background .18s;
+  }
+  .ana-stat-card:hover               { border-color:rgba(255,255,255,.14); background:#18181f; }
+  .ana-stat-card.card-win:hover      { border-color:rgba(34,197,94,.22);   background:rgba(34,197,94,.04); }
+  .ana-stat-card.card-loss:hover     { border-color:rgba(239,68,68,.2);    background:rgba(239,68,68,.04); }
+  .ana-stat-card.card-gold:hover     { border-color:rgba(167,139,250,.2);  background:rgba(139,92,246,.04); }
+  .ana-stat-card-icon { font-size:14px; margin-bottom:7px; display:block; line-height:1; color:rgba(255,255,255,.2); }
+  .ana-stat-label     { font-size:9px; font-weight:700; color:rgba(255,255,255,.38); text-transform:uppercase; letter-spacing:.9px; margin-bottom:5px; font-family:var(--font); }
+  .ana-stat-val       { font-size:17px; font-weight:700; font-family:var(--mono); letter-spacing:-.4px; line-height:1; margin-bottom:4px; color:#f0f0f4; }
+  .ana-stat-sub       { font-size:9px; color:rgba(255,255,255,.22); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* §ANA: Entry animations */
+  @keyframes anaSlideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
+  @keyframes anaSlideIn   { from{opacity:0;transform:translateY(12px)}  to{opacity:1;transform:none} }
+  @keyframes anaFadeIn    { from{opacity:0} to{opacity:1} }
+  @keyframes anaSonar     { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+
+  #page-analytics.active .ana-score-banner           { animation:anaSlideDown .35s ease both; }
+  #page-analytics.active .ana-premium-card:nth-of-type(1) { animation:anaSlideIn .32s .04s ease both; }
+  #page-analytics.active .ana-premium-card:nth-of-type(2) { animation:anaSlideIn .32s .08s ease both; }
+  #page-analytics.active .ana-premium-card:nth-of-type(3) { animation:anaSlideIn .32s .12s ease both; }
+  #page-analytics.active .ana-breakdown-g3           { animation:anaSlideIn .32s .16s ease both; }
+  #page-analytics.active .ana-chart-g2               { animation:anaSlideIn .32s .20s ease both; }
+  #page-analytics.active .ana-stat-card              { animation:anaSlideIn .28s ease both; }
+  #page-analytics.active .ana-stat-card:nth-child(1) {animation-delay:.05s}
+  #page-analytics.active .ana-stat-card:nth-child(2) {animation-delay:.08s}
+  #page-analytics.active .ana-stat-card:nth-child(3) {animation-delay:.11s}
+  #page-analytics.active .ana-stat-card:nth-child(4) {animation-delay:.14s}
+  #page-analytics.active .ana-stat-card:nth-child(5) {animation-delay:.17s}
+  #page-analytics.active .ana-stat-card:nth-child(6) {animation-delay:.20s}
+  #page-analytics.active .ana-stat-card:nth-child(7) {animation-delay:.23s}
+  #page-analytics.active .ana-stat-card:nth-child(8) {animation-delay:.26s}
+  #page-analytics.active .ana-stat-card:nth-child(9) {animation-delay:.29s}
+  #page-analytics.active .ana-stat-card:nth-child(10){animation-delay:.32s}
+  #page-analytics.active .ana-stat-card:nth-child(11){animation-delay:.35s}
+  #page-analytics.active .ana-stat-card:nth-child(12){animation-delay:.38s}
+
+  /* §DOW: Day-of-week bars */
+  .ana-dow-col { display:flex; flex-direction:column; align-items:center; gap:5px; cursor:default; transition:opacity .15s; }
+  .ana-dow-col:hover { opacity:.8; }
+  .ana-dow-bar-wrap { width:100%; height:80px; position:relative; display:flex; align-items:flex-end; justify-content:center; }
+  .ana-dow-bar { width:65%; border-radius:4px 4px 0 0; min-height:3px; transition:height .7s cubic-bezier(.4,0,.2,1); }
+  .ana-dow-bar.pos { background:rgba(34,197,94,.65); }
+  .ana-dow-bar.neg { background:rgba(239,68,68,.6); }
+  .ana-dow-bar.neu { background:rgba(255,255,255,.07); }
+  .ana-dow-label { font-size:9px; font-weight:700; color:rgba(255,255,255,.28); letter-spacing:.5px; font-family:var(--font); }
+  .ana-dow-val   { font-size:9px; font-family:var(--mono); font-weight:700; line-height:1; }
+  .ana-dow-count { font-size:8px; color:rgba(255,255,255,.18); font-family:var(--mono); }
+  #page-analytics.active .ana-dow-col              { animation:anaSlideIn .32s ease both; }
+  #page-analytics.active .ana-dow-col:nth-child(1) {animation-delay:.05s}
+  #page-analytics.active .ana-dow-col:nth-child(2) {animation-delay:.09s}
+  #page-analytics.active .ana-dow-col:nth-child(3) {animation-delay:.13s}
+  #page-analytics.active .ana-dow-col:nth-child(4) {animation-delay:.17s}
+  #page-analytics.active .ana-dow-col:nth-child(5) {animation-delay:.21s}
+  #page-analytics.active .ana-dow-col:nth-child(6) {animation-delay:.25s}
+  #page-analytics.active .ana-dow-col:nth-child(7) {animation-delay:.29s}
+
+  /* §BREAK: Breakdown cards */
+  .ana-breakdown-g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin-bottom:12px; }
+  @media(max-width:900px){.ana-breakdown-g3{grid-template-columns:1fr 1fr;}}
+  @media(max-width:560px){.ana-breakdown-g3{grid-template-columns:1fr;}}
+  .ana-breakdown-card {
+    background:#16161e; border:1px solid rgba(255,255,255,.09);
+    border-radius:14px; padding:15px 16px; position:relative; overflow:hidden; transition:border-color .2s;
+  }
+  .ana-breakdown-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.15) 50%,transparent); pointer-events:none;
+  }
+  .ana-breakdown-card:hover { border-color:rgba(255,255,255,.13); }
+  .ana-breakdown-title {
+    font-size:10px; font-weight:700; color:rgba(255,255,255,.52);
+    text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;
+    display:flex; align-items:center; gap:6px; font-family:var(--font);
+    padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .ana-breakdown-title i { font-size:11px; color:rgba(255,255,255,.3); }
+  .ana-brow { display:flex; align-items:center; gap:8px; margin-bottom:7px; transition:opacity .15s; }
+  .ana-brow:hover { opacity:.8; }
+  .ana-blbl { font-size:10px; color:rgba(255,255,255,.5); width:66px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+  .ana-btr  { flex:1; height:3px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
+  .ana-bfl  { height:100%; border-radius:2px; transition:width .9s cubic-bezier(.4,0,.2,1); }
+  .ana-bfl.bfl-green  { background:linear-gradient(90deg,#15803d,#22c55e); }
+  .ana-bfl.bfl-red    { background:linear-gradient(90deg,#b91c1c,#ef4444); }
+  .ana-bfl.bfl-purple { background:linear-gradient(90deg,#6d28d9,#8b5cf6); }
+  .ana-bfl.bfl-gold   { background:linear-gradient(90deg,#b45309,#f59e0b); }
+  .ana-bfl.bfl-cyan   { background:linear-gradient(90deg,#0e7490,#22d3ee); }
+  .ana-bvl { font-size:10px; font-family:var(--mono); font-weight:700; width:48px; text-align:right; flex-shrink:0; color:rgba(255,255,255,.6); }
+
+  /* §CHART: Chart cards */
+  .ana-chart-g2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:12px; }
+  @media(max-width:768px){.ana-chart-g2{grid-template-columns:1fr;}}
+  .ana-chart-card {
+    background:#16161e; border:1px solid rgba(255,255,255,.09);
+    border-radius:14px; padding:16px 18px; position:relative; overflow:hidden; transition:border-color .2s;
+  }
+  .ana-chart-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.15) 50%,transparent); pointer-events:none;
+  }
+  .ana-chart-card:hover { border-color:rgba(255,255,255,.13); }
+  .ana-chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .ana-chart-title  {
+    font-size:10px; font-weight:700; color:rgba(255,255,255,.52);
+    text-transform:uppercase; letter-spacing:1px;
+    display:flex; align-items:center; gap:7px; font-family:var(--font);
+  }
+  .ana-chart-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; animation:anaSonar 2.5s ease-in-out infinite; }
+
+  /* §TAGS: Inline tags */
+  .ana-tag {
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.6px;
+    padding:2px 8px; border-radius:20px; font-family:var(--font);
+    background:rgba(255,255,255,.04); color:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.1);
+  }
+  .ana-tag i { font-size:9px; }
+  .ana-tag-green  { background:rgba(34,197,94,.08);  color:#22c55e; border-color:rgba(34,197,94,.18); }
+  .ana-tag-red    { background:rgba(239,68,68,.08);  color:#ef4444; border-color:rgba(239,68,68,.18); }
+  .ana-tag-purple { background:rgba(139,92,246,.09); color:#a78bfa; border-color:rgba(139,92,246,.18); }
+  .ana-tag-gold   { background:rgba(139,92,246,.07); color:#c4b5fd; border-color:rgba(139,92,246,.15); }
+
+  /* §ANA: Divider */
+  .ana-divider { height:1px; margin:4px 0 14px; background:rgba(255,255,255,.06); }
+
+  /* §ATABS: Advanced Analytics tabs + panel */
+
+
+  /* §ATABS: Advanced Analytics tabs + panel */
+  .adv-tab {
+    flex-shrink:0; display:inline-flex; align-items:center; gap:5px;
+    padding:6px 13px; border-radius:20px;
+    border:1px solid rgba(255,255,255,.09);
+    background:rgba(255,255,255,.03); color:rgba(255,255,255,.28);
+    font-size:11px; font-weight:700; font-family:var(--font);
+    cursor:pointer; transition:all .18s; white-space:nowrap; letter-spacing:.1px;
+  }
+  .adv-tab i { font-size:11px; }
+  .adv-tab:hover  { background:rgba(255,255,255,.05); color:rgba(255,255,255,.5); border-color:rgba(255,255,255,.13); }
+  .adv-tab.active { background:rgba(139,92,246,.18); color:#c4b5fd; border-color:rgba(139,92,246,.35); box-shadow:0 0 0 1px rgba(139,92,246,.12); }
+  .adv-panel {
+    flex-shrink:0; width:100%;
+    background:#16161e; border:1px solid rgba(255,255,255,.09);
+    border-radius:14px; padding:18px 18px 20px;
+    box-sizing:border-box; position:relative;
+  }
+  .adv-panel::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,.2) 50%,transparent);
+    border-radius:14px 14px 0 0; pointer-events:none;
+  }
+  .adv-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.1); cursor:pointer; transition:all .22s; display:inline-block; }
+  .adv-dot.active { background:#a78bfa; width:18px; border-radius:3px; }
+  #adv-tabs::-webkit-scrollbar { display:none; }
+
+  /* §ANA: Hierarchy polish overrides */
+  #page-analytics .ana-dow-label  { color:rgba(255,255,255,.28); }
+  #page-analytics .ana-dow-count  { color:rgba(255,255,255,.18); }
+  #page-analytics .adv-panel [style*="color:var(--text3)"] { color:rgba(255,255,255,.22)!important; }
+  #page-analytics .adv-panel [style*="color:var(--text2)"] { color:rgba(255,255,255,.5)!important;  }
+  #page-analytics .adv-panel > div[style*="uppercase"]     { color:rgba(255,255,255,.38)!important; }
+  #page-analytics .ana-bvl { color:rgba(255,255,255,.6); }
+
+  /* Semua sisa inline var(--text3/2) di dalam analytics */
+  #page-analytics [style*="color:var(--text3)"]  { color:rgba(255,255,255,.22)!important; }
+  #page-analytics [style*="color:var(--text2)"]  { color:rgba(255,255,255,.5)!important; }
+
 /* ════════════════════════════════════════════════════════════
    §CSS-NEWS — Economic News Widget
    ════════════════════════════════════════════════════════════ */
@@ -2519,257 +2914,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         transition:all .15s;letter-spacing:.3px;
       }
       .enews-ftab.active{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.35);color:var(--accent2);}
-
-/* ════════════════════════════════════════════════════════════
-   §CSS-ANALYTICS-FINAL — Analytics & Advanced Stats (selaras Log New Trade)
-   ════════════════════════════════════════════════════════════
-
-   DESIGN TOKENS — diambil langsung dari modal Log New Trade
-   ─────────────────────────────────────────────────────────
-   Card bg          : #16161e          (gelap hangat)
-   Card border      : rgba(255,255,255,.09)  (tipis subtle)
-   Section title    : rgba(255,255,255,.52)  UPPERCASE 10px 700
-   Hint / sub-label : rgba(255,255,255,.22)
-   Stat value       : #f0f0f4          (putih hangat — paling menonjol)
-   Stat label       : rgba(255,255,255,.38)  UPPERCASE 9px
-   Stat sub/hint    : rgba(255,255,255,.22)
-   Bar label        : rgba(255,255,255,.5)
-   Bar value        : rgba(255,255,255,.6)
-   Tag (inactive)   : border rgba(255,255,255,.13), text .5
-   Accent primary   : #8b5cf6 / #a78bfa / #c4b5fd
-   Win              : #22c55e
-   Loss             : #ef4444
-   ──────────────────────────────────────────────────────── */
-
-  #page-analytics { position:relative; }
-
-  /* ══ PAGE HEADER ══ */
-  #page-analytics .pt { font-size:24px; font-weight:800; letter-spacing:-.8px; color:#f0f0f4; }
-  #ana-ps { color:rgba(255,255,255,.22)!important; font-size:11px; }
-
-  /* ══ LIVE DOT ══ */
-  .ana-live-dot { width:5px; height:5px; border-radius:50%; background:#22c55e; display:inline-block; opacity:.8; }
-
-  /* ══ PERIOD TABS ══ */
-  #ana-period-tabs {
-    display:inline-flex; gap:2px; padding:3px;
-    background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:10px;
-  }
-  #ana-period-tabs .ptab {
-    border-radius:7px; font-size:11px; padding:5px 14px; font-weight:600;
-    transition:all .18s; letter-spacing:.2px; color:rgba(255,255,255,.28);
-    background:transparent; border:none; font-family:var(--font); cursor:pointer;
-  }
-  #ana-period-tabs .ptab:hover { color:rgba(255,255,255,.5); }
-  #ana-period-tabs .ptab.active { background:rgba(139,92,246,.18); color:#c4b5fd; box-shadow:0 0 0 1px rgba(139,92,246,.22); }
-
-  /* ══ PERFORMANCE SCORE BANNER ══ */
-  .ana-score-banner {
-    position:relative; overflow:hidden; border-radius:14px; margin-bottom:12px;
-    background:#16161e; border:1px solid rgba(255,255,255,.09); padding:18px 20px;
-  }
-  .ana-score-banner::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(139,92,246,.35) 45%,transparent);
-    pointer-events:none;
-  }
-  .ana-score-inner { position:relative; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-  .ana-ring-wrap { position:relative; width:64px; height:64px; flex-shrink:0; }
-  .ana-ring-wrap svg { transform:rotate(-90deg); width:64px; height:64px; }
-  .ana-ring-bg   { fill:none; stroke:rgba(255,255,255,.07); stroke-width:5; }
-  .ana-ring-fill { fill:none; stroke-width:5; stroke-linecap:round;
-    stroke-dasharray:188; stroke-dashoffset:188;
-    transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1),stroke .4s; }
-  .ana-ring-label {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-size:15px; font-weight:800; font-family:var(--mono); color:#c4b5fd;
-  }
-  .ana-score-text { flex:1; min-width:160px; }
-  .ana-score-heading { font-size:17px; font-weight:800; letter-spacing:-.4px; margin-bottom:2px; font-family:var(--font); color:#f0f0f4; }
-  .ana-score-sub { font-size:11px; color:rgba(255,255,255,.22); font-family:var(--mono); }
-  .ana-score-pills { display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; }
-  .ana-kpi-pill {
-    display:flex; align-items:center; gap:5px;
-    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
-    border-radius:20px; padding:3px 10px;
-    font-size:10px; font-family:var(--mono); font-weight:600; color:rgba(255,255,255,.5);
-  }
-  .ana-kpi-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
-
-  /* ══ SECTION CARD ══ */
-  .ana-premium-card, .premium-card {
-    background:#16161e; border:1px solid rgba(255,255,255,.09);
-    border-radius:14px; padding:18px 18px; margin-bottom:12px;
-    position:relative; overflow:hidden; transition:border-color .2s;
-  }
-  .ana-premium-card::before, .premium-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(139,92,246,.2) 50%,transparent);
-    pointer-events:none;
-  }
-  .ana-premium-card:hover, .premium-card:hover { border-color:rgba(255,255,255,.13); }
-
-  .ana-card-header {
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:14px; padding-bottom:11px; border-bottom:1px solid rgba(255,255,255,.07);
-  }
-  .ana-card-title {
-    font-size:10px; font-weight:700; color:rgba(255,255,255,.52);
-    text-transform:uppercase; letter-spacing:1px;
-    display:flex; align-items:center; gap:7px; font-family:var(--font);
-  }
-  .ana-card-title-icon {
-    width:26px; height:26px; border-radius:7px;
-    display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;
-    background:rgba(139,92,246,.1); border:1px solid rgba(139,92,246,.18);
-  }
-  .ana-card-title-icon i { font-size:12px; color:#a78bfa; }
-  .ana-card-badge {
-    font-size:9px; font-weight:700; padding:2px 9px; border-radius:20px;
-    letter-spacing:.4px; text-transform:uppercase; font-family:var(--mono);
-    background:rgba(139,92,246,.1); color:#a78bfa; border:1px solid rgba(139,92,246,.18);
-  }
-
-  /* ══ STAT CARDS GRID ══ */
-  .ana-deep-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
-  @media(max-width:960px){ .ana-deep-grid{grid-template-columns:repeat(3,1fr);} }
-  @media(max-width:640px){ .ana-deep-grid{grid-template-columns:repeat(2,1fr);} }
-
-  .ana-stat-card {
-    background:#111117; border:1px solid rgba(255,255,255,.09);
-    border-radius:11px; padding:13px 13px;
-    position:relative; overflow:hidden; cursor:default;
-    transition:border-color .18s, background .18s;
-  }
-  .ana-stat-card:hover               { border-color:rgba(255,255,255,.14); background:#18181f; }
-  .ana-stat-card.card-win:hover      { border-color:rgba(34,197,94,.22);   background:rgba(34,197,94,.04); }
-  .ana-stat-card.card-loss:hover     { border-color:rgba(239,68,68,.2);    background:rgba(239,68,68,.04); }
-  .ana-stat-card.card-gold:hover     { border-color:rgba(167,139,250,.2);  background:rgba(139,92,246,.04); }
-  .ana-stat-card-icon { font-size:14px; margin-bottom:7px; display:block; line-height:1; color:rgba(255,255,255,.2); }
-  .ana-stat-label     { font-size:9px; font-weight:700; color:rgba(255,255,255,.38); text-transform:uppercase; letter-spacing:.9px; margin-bottom:5px; font-family:var(--font); }
-  .ana-stat-val       { font-size:17px; font-weight:700; font-family:var(--mono); letter-spacing:-.4px; line-height:1; margin-bottom:4px; color:#f0f0f4; }
-  .ana-stat-sub       { font-size:9px; color:rgba(255,255,255,.22); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-  /* ══ ENTRY ANIMATIONS ══ */
-  @keyframes anaSlideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
-  @keyframes anaSlideIn   { from{opacity:0;transform:translateY(12px)}  to{opacity:1;transform:none} }
-  @keyframes anaFadeIn    { from{opacity:0} to{opacity:1} }
-  @keyframes anaSonar     { 0%,100%{opacity:.4;} 50%{opacity:1;} }
-
-  #page-analytics.active .ana-score-banner           { animation:anaSlideDown .35s ease both; }
-  #page-analytics.active .ana-premium-card:nth-of-type(1) { animation:anaSlideIn .32s .04s ease both; }
-  #page-analytics.active .ana-premium-card:nth-of-type(2) { animation:anaSlideIn .32s .08s ease both; }
-  #page-analytics.active .ana-premium-card:nth-of-type(3) { animation:anaSlideIn .32s .12s ease both; }
-  #page-analytics.active .ana-breakdown-g3           { animation:anaSlideIn .32s .16s ease both; }
-  #page-analytics.active .ana-chart-g2               { animation:anaSlideIn .32s .20s ease both; }
-  #page-analytics.active .ana-stat-card              { animation:anaSlideIn .28s ease both; }
-  #page-analytics.active .ana-stat-card:nth-child(1) {animation-delay:.05s}
-  #page-analytics.active .ana-stat-card:nth-child(2) {animation-delay:.08s}
-  #page-analytics.active .ana-stat-card:nth-child(3) {animation-delay:.11s}
-  #page-analytics.active .ana-stat-card:nth-child(4) {animation-delay:.14s}
-  #page-analytics.active .ana-stat-card:nth-child(5) {animation-delay:.17s}
-  #page-analytics.active .ana-stat-card:nth-child(6) {animation-delay:.20s}
-  #page-analytics.active .ana-stat-card:nth-child(7) {animation-delay:.23s}
-  #page-analytics.active .ana-stat-card:nth-child(8) {animation-delay:.26s}
-  #page-analytics.active .ana-stat-card:nth-child(9) {animation-delay:.29s}
-  #page-analytics.active .ana-stat-card:nth-child(10){animation-delay:.32s}
-  #page-analytics.active .ana-stat-card:nth-child(11){animation-delay:.35s}
-  #page-analytics.active .ana-stat-card:nth-child(12){animation-delay:.38s}
-
-  /* ══ DAY OF WEEK BARS ══ */
-  .ana-dow-col { display:flex; flex-direction:column; align-items:center; gap:5px; cursor:default; transition:opacity .15s; }
-  .ana-dow-col:hover { opacity:.8; }
-  .ana-dow-bar-wrap { width:100%; height:80px; position:relative; display:flex; align-items:flex-end; justify-content:center; }
-  .ana-dow-bar { width:65%; border-radius:4px 4px 0 0; min-height:3px; transition:height .7s cubic-bezier(.4,0,.2,1); }
-  .ana-dow-bar.pos { background:rgba(34,197,94,.65); }
-  .ana-dow-bar.neg { background:rgba(239,68,68,.6); }
-  .ana-dow-bar.neu { background:rgba(255,255,255,.07); }
-  .ana-dow-label { font-size:9px; font-weight:700; color:rgba(255,255,255,.28); letter-spacing:.5px; font-family:var(--font); }
-  .ana-dow-val   { font-size:9px; font-family:var(--mono); font-weight:700; line-height:1; }
-  .ana-dow-count { font-size:8px; color:rgba(255,255,255,.18); font-family:var(--mono); }
-  #page-analytics.active .ana-dow-col              { animation:anaSlideIn .32s ease both; }
-  #page-analytics.active .ana-dow-col:nth-child(1) {animation-delay:.05s}
-  #page-analytics.active .ana-dow-col:nth-child(2) {animation-delay:.09s}
-  #page-analytics.active .ana-dow-col:nth-child(3) {animation-delay:.13s}
-  #page-analytics.active .ana-dow-col:nth-child(4) {animation-delay:.17s}
-  #page-analytics.active .ana-dow-col:nth-child(5) {animation-delay:.21s}
-  #page-analytics.active .ana-dow-col:nth-child(6) {animation-delay:.25s}
-  #page-analytics.active .ana-dow-col:nth-child(7) {animation-delay:.29s}
-
-  /* ══ BREAKDOWN CARDS ══ */
-  .ana-breakdown-g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin-bottom:12px; }
-  @media(max-width:900px){.ana-breakdown-g3{grid-template-columns:1fr 1fr;}}
-  @media(max-width:560px){.ana-breakdown-g3{grid-template-columns:1fr;}}
-  .ana-breakdown-card {
-    background:#16161e; border:1px solid rgba(255,255,255,.09);
-    border-radius:14px; padding:15px 16px; position:relative; overflow:hidden; transition:border-color .2s;
-  }
-  .ana-breakdown-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(139,92,246,.15) 50%,transparent); pointer-events:none;
-  }
-  .ana-breakdown-card:hover { border-color:rgba(255,255,255,.13); }
-  .ana-breakdown-title {
-    font-size:10px; font-weight:700; color:rgba(255,255,255,.52);
-    text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;
-    display:flex; align-items:center; gap:6px; font-family:var(--font);
-    padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.07);
-  }
-  .ana-breakdown-title i { font-size:11px; color:rgba(255,255,255,.3); }
-  .ana-brow { display:flex; align-items:center; gap:8px; margin-bottom:7px; transition:opacity .15s; }
-  .ana-brow:hover { opacity:.8; }
-  .ana-blbl { font-size:10px; color:rgba(255,255,255,.5); width:66px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
-  .ana-btr  { flex:1; height:3px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
-  .ana-bfl  { height:100%; border-radius:2px; transition:width .9s cubic-bezier(.4,0,.2,1); }
-  .ana-bfl.bfl-green  { background:linear-gradient(90deg,#15803d,#22c55e); }
-  .ana-bfl.bfl-red    { background:linear-gradient(90deg,#b91c1c,#ef4444); }
-  .ana-bfl.bfl-purple { background:linear-gradient(90deg,#6d28d9,#8b5cf6); }
-  .ana-bfl.bfl-gold   { background:linear-gradient(90deg,#b45309,#f59e0b); }
-  .ana-bfl.bfl-cyan   { background:linear-gradient(90deg,#0e7490,#22d3ee); }
-  .ana-bvl { font-size:10px; font-family:var(--mono); font-weight:700; width:48px; text-align:right; flex-shrink:0; color:rgba(255,255,255,.6); }
-
-  /* ══ CHART CARDS ══ */
-  .ana-chart-g2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:12px; }
-  @media(max-width:768px){.ana-chart-g2{grid-template-columns:1fr;}}
-  .ana-chart-card {
-    background:#16161e; border:1px solid rgba(255,255,255,.09);
-    border-radius:14px; padding:16px 18px; position:relative; overflow:hidden; transition:border-color .2s;
-  }
-  .ana-chart-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(139,92,246,.15) 50%,transparent); pointer-events:none;
-  }
-  .ana-chart-card:hover { border-color:rgba(255,255,255,.13); }
-  .ana-chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .ana-chart-title  {
-    font-size:10px; font-weight:700; color:rgba(255,255,255,.52);
-    text-transform:uppercase; letter-spacing:1px;
-    display:flex; align-items:center; gap:7px; font-family:var(--font);
-  }
-  .ana-chart-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; animation:anaSonar 2.5s ease-in-out infinite; }
-
-  /* ══ INLINE TAGS ══ */
-  .ana-tag {
-    display:inline-flex; align-items:center; gap:4px;
-    font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.6px;
-    padding:2px 8px; border-radius:20px; font-family:var(--font);
-    background:rgba(255,255,255,.04); color:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.1);
-  }
-  .ana-tag i { font-size:9px; }
-  .ana-tag-green  { background:rgba(34,197,94,.08);  color:#22c55e; border-color:rgba(34,197,94,.18); }
-  .ana-tag-red    { background:rgba(239,68,68,.08);  color:#ef4444; border-color:rgba(239,68,68,.18); }
-  .ana-tag-purple { background:rgba(139,92,246,.09); color:#a78bfa; border-color:rgba(139,92,246,.18); }
-  .ana-tag-gold   { background:rgba(139,92,246,.07); color:#c4b5fd; border-color:rgba(139,92,246,.15); }
-
-  /* ══ DIVIDER ══ */
-  .ana-divider { height:1px; margin:4px 0 14px; background:rgba(255,255,255,.06); }
-
-  /* ══ ADVANCED ANALYTICS: adv-tab & adv-panel ══ */
-  /* (inline <style> di dalam #adv-analytics-wrap juga akan dihandle via overrides di bawah) */
-
-  /* Semua sisa inline var(--text3/2) di dalam analytics */
-  #page-analytics [style*="color:var(--text3)"]  { color:rgba(255,255,255,.22)!important; }
-  #page-analytics [style*="color:var(--text2)"]  { color:rgba(255,255,255,.5)!important; }
 
 /* ════════════════════════════════════════════════════════════
    §CSS-FLOAT-CTA — Floating CTA Widget (guest users)
@@ -4259,12 +4403,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </button>
       <div style="margin-top:10px;font-size:11px;color:var(--text3)">Pair + hasil + emosi · Selesai dalam 30 detik</div>
 
-      <style>
-        @keyframes es-pulse {
-          0%,100%{transform:scale(1);opacity:.6}
-          50%{transform:scale(1.18);opacity:1}
-        }
-      </style>
     </div>
     </div>
   </div>
@@ -4272,18 +4410,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <!-- ── §PAGE-ANALYTICS ─────────────────────────────────── -->
   <div class="page" id="page-analytics">
 
-  <!-- ══ HIERARCHY POLISH — catches any remaining var(--text3/2) inside analytics ══ -->
-  <style>
-    /* Semua inline var(--text3/2) di analytics → token Log New Trade */
-    #page-analytics .ana-dow-label  { color:rgba(255,255,255,.28); }
-    #page-analytics .ana-dow-count  { color:rgba(255,255,255,.18); }
-    #page-analytics .adv-panel [style*="color:var(--text3)"] { color:rgba(255,255,255,.22)!important; }
-    #page-analytics .adv-panel [style*="color:var(--text2)"] { color:rgba(255,255,255,.5)!important;  }
-    /* Sub-section labels di dalam panel (uppercase small) */
-    #page-analytics .adv-panel > div[style*="uppercase"]    { color:rgba(255,255,255,.38)!important; }
-    #page-analytics .ana-bvl { color:rgba(255,255,255,.6); }
-  </style>
-  
 
   <!-- ── PAGE HEADER ── -->
   <div class="ph" style="margin-bottom:12px">
@@ -4494,7 +4620,6 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <!-- ── Tab Pills (scrollable) ── -->
     <div id="adv-tabs" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;scrollbar-width:none;-ms-overflow-style:none">
-      <style>#adv-tabs::-webkit-scrollbar{display:none}</style>
       <button class="adv-tab active" data-tab="0" onclick="advSwitchTab(0)"><i class="bi bi-lightning-charge"></i> Streak</button>
       <button class="adv-tab" data-tab="1" onclick="advSwitchTab(1)"><i class="bi bi-arrows-expand"></i> MAE/MFE</button>
       <button class="adv-tab" data-tab="2" onclick="advSwitchTab(2)"><i class="bi bi-stopwatch"></i> Holding</button>
@@ -4737,39 +4862,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   </div><!-- end adv-analytics-wrap -->
 
-  <!-- ── CSS ── -->
-  <style>
-    /* Tab pills — selaras dengan chip/tag di modal Log New Trade */
-    .adv-tab {
-      flex-shrink:0; display:inline-flex; align-items:center; gap:5px;
-      padding:6px 13px; border-radius:20px;
-      border:1px solid rgba(255,255,255,.09);
-      background:rgba(255,255,255,.03); color:rgba(255,255,255,.28);
-      font-size:11px; font-weight:700; font-family:var(--font);
-      cursor:pointer; transition:all .18s; white-space:nowrap; letter-spacing:.1px;
-    }
-    .adv-tab i { font-size:11px; }
-    .adv-tab:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.5); border-color:rgba(255,255,255,.13); }
-    .adv-tab.active { background:rgba(139,92,246,.18); color:#c4b5fd; border-color:rgba(139,92,246,.35); box-shadow:0 0 0 1px rgba(139,92,246,.12); }
-
-    /* Panel wrapper — sama dengan .ana-premium-card */
-    .adv-panel {
-      flex-shrink:0; width:100%;
-      background:#16161e;
-      border:1px solid rgba(255,255,255,.09);
-      border-radius:14px; padding:18px 18px 20px;
-      box-sizing:border-box; position:relative;
-    }
-    .adv-panel::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:1px;
-      background:linear-gradient(90deg,transparent,rgba(139,92,246,.2) 50%,transparent);
-      border-radius:14px 14px 0 0; pointer-events:none;
-    }
-
-    /* Dot indicators */
-    .adv-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.1); cursor:pointer; transition:all .22s; display:inline-block; }
-    .adv-dot.active { background:#a78bfa; width:18px; border-radius:3px; }
-  </style>
+  <!-- ── Advanced Analytics: CSS (.adv-tab/.adv-panel/.adv-dot) ada di §CSS-ANALYTICS ── -->
 
   <!-- ── JS: tab switch + swipe ── -->
   <script>
@@ -5647,118 +5740,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════
-     §MODAL-REPORTCARD CSS — Report Card modal styles
-     ════════════════════════════════════════════════════════════ -->
-<style>
-#md-reportcard{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
-#md-reportcard.open{display:flex;}
-.rc-shell{width:100%;max-width:760px;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
-
-/* Period selector */
-.rc-period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.rc-period-btn{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#a1a1aa;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.4px;transition:all .2s;}
-.rc-period-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.45);color:#a78bfa;}
-.rc-period-label{font-size:10px;color:#71717a;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-right:4px;}
-
-/* THE CARD */
-.rpc-card{
-  width:100%;aspect-ratio:16/8.4;border-radius:22px;position:relative;overflow:hidden;
-  background:#080810;border:1px solid rgba(139,92,246,.18);
-  font-family:'Syne',sans-serif;
-  box-shadow:0 0 0 1px rgba(255,255,255,.03),0 32px 80px rgba(0,0,0,.7);
-}
-/* Ambient glows */
-.rpc-glow-tr{position:absolute;top:-80px;right:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.16) 0%,transparent 65%);pointer-events:none;}
-.rpc-glow-bl{position:absolute;bottom:-100px;left:20px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(109,40,217,.1) 0%,transparent 65%);pointer-events:none;}
-/* Dot-grid texture */
-.rpc-dots{position:absolute;inset:0;pointer-events:none;opacity:.055;background-image:radial-gradient(rgba(139,92,246,.9) 1px,transparent 1px);background-size:28px 28px;}
-/* Bottom gradient bar */
-.rpc-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(139,92,246,.5) 20%,rgba(167,139,250,.9) 50%,rgba(139,92,246,.5) 80%,transparent 100%);}
-
-/* Inner layout */
-.rpc-inner{position:relative;z-index:2;height:100%;display:grid;grid-template-rows:auto 1fr auto;padding:30px 36px 24px;}
-
-/* Top row */
-.rpc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
-.rpc-brand{display:flex;align-items:center;gap:8px;}
-.rpc-brand-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#a78bfa);box-shadow:0 0 8px rgba(139,92,246,.7);}
-.rpc-brand-name{font-size:11px;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:1px;text-transform:uppercase;}
-.rpc-badge{padding:5px 13px;border-radius:20px;background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.28);font-size:10px;font-weight:700;color:#a78bfa;letter-spacing:.6px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
-
-/* Trader name row */
-.rpc-trader-row{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
-.rpc-name-col{}
-.rpc-trader-name{font-size:clamp(20px,3.5vw,30px);font-weight:800;color:#f4f4f5;letter-spacing:-.8px;line-height:1;margin-bottom:5px;}
-.rpc-tagline{font-size:11px;color:#a78bfa;font-family:'JetBrains Mono',monospace;letter-spacing:.3px;opacity:.85;}
-
-/* Stats row */
-.rpc-stats{display:flex;gap:0;align-items:flex-end;}
-.rpc-stat{flex:1;padding:0 18px 0 0;border-right:1px solid rgba(255,255,255,.05);}
-.rpc-stat:first-child{padding-left:0;}
-.rpc-stat:last-child{border-right:none;}
-.rpc-stat-lbl{font-size:9px;color:#71717a;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:5px;}
-.rpc-stat-val{font-size:clamp(16px,2.8vw,22px);font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px;line-height:1;}
-.rpc-stat-sub{font-size:9px;color:#71717a;margin-top:3px;font-family:'JetBrains Mono',monospace;}
-.rpc-val-pos{color:#22c55e;}.rpc-val-neg{color:#ef4444;}.rpc-val-pur{color:#a78bfa;}.rpc-val-neu{color:#f4f4f5;}
-
-/* Mini equity bars */
-.rpc-bars{display:flex;align-items:flex-end;gap:3px;height:32px;}
-.rpc-bar-col{width:6px;border-radius:2px 2px 0 0;}
-
-/* Footer */
-.rpc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.04);}
-.rpc-footer-l{font-size:9px;color:#27272a;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
-.rpc-footer-r{font-size:9px;color:#71717a;font-family:'JetBrains Mono',monospace;}
-
-/* Action row */
-.rc-actions{display:flex;gap:10px;flex-wrap:wrap;}
-.rc-act-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;min-width:130px;}
-.rc-act-primary{background:var(--accent);color:#fff;border:none;box-shadow:0 4px 14px rgba(139,92,246,.3);}
-.rc-act-primary:hover{background:#7c3aed;transform:translateY(-1px);box-shadow:0 6px 22px rgba(139,92,246,.45);}
-.rc-act-secondary{background:rgba(255,255,255,.05);color:#a78bfa;border:1px solid rgba(139,92,246,.3);}
-.rc-act-secondary:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.5);}
-.rc-act-ghost{background:rgba(255,255,255,.03);color:#a1a1aa;border:1px solid rgba(255,255,255,.08);}
-.rc-act-ghost:hover{background:rgba(255,255,255,.06);color:#a1a1aa;}
-.rc-copy-toast{font-size:11px;color:#22c55e;font-family:'JetBrains Mono',monospace;display:none;align-items:center;gap:6px;padding:8px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;}
-
-/* Trader type pill on report card */
-#rpc-trader-type {
-  transition: all .3s;
-  backdrop-filter: blur(4px);
-}
-
-/* Pattern widget insight cards entrance */
-@keyframes patternSlideIn {
-  from { opacity:0; transform:translateY(8px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-#pattern-insights-list > div {
-  animation: patternSlideIn .28s ease both;
-}
-
-/* Trader type card icon hover pop */
-#tt-icon-box {
-  transition: all .25s cubic-bezier(.34,1.56,.64,1);
-}
-#trader-type-card:hover #tt-icon-box {
-  transform: scale(1.08);
-}
-/* ── FREEMIUM / PRO UI ─────────────────────────────── */
-#md-feature-gate .md { animation: fgSlideIn .28s cubic-bezier(.34,1.3,.64,1); }
-@keyframes fgSlideIn {
-  from { opacity:0; transform:scale(.93) translateY(12px); }
-  to   { opacity:1; transform:scale(1)   translateY(0); }
-}
-.prem-lock { display:flex; align-items:center; margin-left:auto; }
-.dna-lock-overlay { animation: dnaFadeIn .3s ease; }
-@keyframes dnaFadeIn { from{opacity:0} to{opacity:1} }
-#pro-avatar-badge { animation: proBadgeIn .4s cubic-bezier(.34,1.56,.64,1); }
-@keyframes proBadgeIn { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
-#free-trade-badge { animation: ftbSlideDown .3s ease; }
-@keyframes ftbSlideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-.ni[data-premium-locked] { position:relative; }
-</style>
+<!-- §MODAL-REPORTCARD: CSS ada di §CSS-REPORTCARD dalam master <style> di <head> -->
 
 <!-- ════════════════════════════════════════════════════════════
      §MODAL-REPORTCARD — Report Card / Share Stats modal
@@ -17591,11 +17573,6 @@ var _rtInt = setInterval(function() {
   _rtTries++;
   if (_patchRenderTable() || _rtTries > 40) clearInterval(_rtInt);
 }, 200);
-
-
-
-
-
 
 
 // ══════════════════════════════════════════════════════════════
