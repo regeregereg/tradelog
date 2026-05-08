@@ -991,8 +991,37 @@ tr:hover td{background:rgba(139,92,246,.04);}
 }
 #md-trade .md{border-radius:20px;}
 @media(max-width:600px){
-  #md-trade-inner{width:100%!important;border-radius:20px 20px 0 0!important;position:fixed!important;bottom:0;left:0;right:0;max-height:92vh!important;}
+  #md-trade-inner{
+    width:100%!important;
+    border-radius:20px 20px 0 0!important;
+    position:fixed!important;
+    bottom:0;left:0;right:0;
+    max-height:88vh!important;   /* sedikit lebih pendek supaya footer tidak terpotong */
+    display:flex!important;
+    flex-direction:column!important;
+  }
   #md-trade{align-items:flex-end!important;}
+
+  /* Quick Log panel: scroll sendiri, jangan dorong footer */
+  #ql-panel{
+    flex:1!important;
+    overflow-y:auto!important;
+    min-height:0!important;        /* kunci flex scroll */
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:8px!important;
+  }
+  /* Full form panel: sama */
+  #full-form-panel{
+    flex:1!important;
+    overflow-y:auto!important;
+    min-height:0!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* Footer: always pinned at bottom, respects iPhone notch */
+  #md-trade-inner > div:last-child {
+    flex-shrink:0!important;
+    padding-bottom:max(14px, env(safe-area-inset-bottom))!important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -6664,7 +6693,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <!-- ══════════════════════════════════════════
          QUICK LOG PANEL
          ══════════════════════════════════════════ -->
-    <div id="ql-panel" style="overflow-y:auto;flex:1;padding:16px 20px">
+    <div id="ql-panel" style="overflow-y:auto;flex:1;min-height:0;padding:16px 20px">
 
       <!-- Pair + Direction row -->
       <div class="ql-section-label" style="margin-bottom:10px">
@@ -6810,7 +6839,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <!-- ══════════════════════════════════════════
          FULL FORM PANEL (existing)
          ══════════════════════════════════════════ -->
-    <div id="full-form-panel" class="hidden" style="overflow-y:auto;flex:1;padding:20px 24px">
+    <div id="full-form-panel" class="hidden" style="overflow-y:auto;flex:1;min-height:0;padding:20px 24px">
 
       <!-- ── STEP 1: Basic Info ── -->
       <div class="tm-section" style="margin-bottom:18px">
