@@ -994,9 +994,138 @@ tr:hover td{background:rgba(139,92,246,.04);}
 }
 
 /* ══════════════════════════════════════════════════════════
-   QUICK LOG MODE — toggle di header modal
+   GUIDED EMPTY STATE — Analytics page
    ══════════════════════════════════════════════════════════ */
+#ana-guided-banner {
+  display: none;
+  background: linear-gradient(135deg, rgba(139,92,246,.07), rgba(139,92,246,.03));
+  border: 1px solid rgba(139,92,246,.18);
+  border-radius: 16px;
+  padding: 20px 20px 16px;
+  margin-bottom: 16px;
+}
+#ana-guided-banner.visible { display: block; }
+
+.agb-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.agb-icon {
+  width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(139,92,246,.2), rgba(139,92,246,.08));
+  border: 1px solid rgba(139,92,246,.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.agb-title { font-size: 14px; font-weight: 800; letter-spacing: -.3px; }
+.agb-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* Progress track */
+.agb-progress-wrap { margin-bottom: 14px; }
+.agb-progress-label {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 6px; font-size: 10px;
+  color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+}
+.agb-progress-label span:last-child { color: var(--accent2); font-family: var(--mono); font-size: 11px; }
+.agb-track {
+  height: 6px; background: rgba(255,255,255,.06);
+  border-radius: 99px; overflow: hidden;
+}
+.agb-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa);
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+  min-width: 4px;
+}
+
+/* Milestone chips */
+.agb-milestones {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.agb-milestone {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.03);
+  color: var(--text3); transition: all .2s;
+}
+.agb-milestone.reached {
+  background: rgba(0,217,126,.08); border-color: rgba(0,217,126,.25); color: #4ade80;
+}
+.agb-milestone.reached i { color: #4ade80; }
+.agb-milestone i { font-size: 11px; color: var(--text3); }
+
+/* Unlock cards */
+.agb-unlock-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.agb-unlock-card {
+  background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.agb-unlock-card.locked { opacity: .45; }
+.agb-unlock-icon {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+.agb-unlock-name  { font-size: 11px; font-weight: 700; color: var(--text); }
+.agb-unlock-req   { font-size: 10px; color: var(--text3); margin-top: 1px; font-family: var(--mono); }
+
+/* ══════════════════════════════════════════════════════════
+   IN-APP REMINDER BANNER — Log trade reminder
+   ══════════════════════════════════════════════════════════ */
+#log-reminder-banner {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  background: linear-gradient(90deg, rgba(139,92,246,.95), rgba(124,106,247,.95));
+  backdrop-filter: blur(10px);
+  padding: 9px 16px;
+  display: none;
+  align-items: center; gap: 10px;
+  box-shadow: 0 2px 16px rgba(139,92,246,.3);
+  animation: _reminderSlideDown .3s cubic-bezier(.34,1.56,.64,1);
+}
+#log-reminder-banner.visible {
+  display: flex;
+}
+@keyframes _reminderSlideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.lrb-icon {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.lrb-text  { flex: 1; font-size: 12px; font-weight: 600; color: #fff; line-height: 1.4; }
+.lrb-text span { opacity: .75; font-weight: 400; }
+.lrb-btn {
+  padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  border: none; background: rgba(255,255,255,.2); color: #fff; cursor: pointer;
+  font-family: var(--font); transition: all .15s; white-space: nowrap;
+  flex-shrink: 0;
+}
+.lrb-btn:hover { background: rgba(255,255,255,.3); }
+.lrb-close {
+  background: none; border: none; color: rgba(255,255,255,.6);
+  cursor: pointer; font-size: 16px; padding: 2px 4px; flex-shrink: 0;
+  transition: color .15s; line-height: 1;
+}
+.lrb-close:hover { color: #fff; }
 /* Mode toggle pill di header */
+/* ══════════════════════════════════════════════════════════
+   PERIOD SYNC — global period badge indicator
+   ══════════════════════════════════════════════════════════ */
+.period-sync-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700;
+  background: rgba(139,92,246,.12); border: 1px solid rgba(139,92,246,.25);
+  color: #a78bfa; font-family: var(--mono); cursor: pointer;
+  transition: all .15s; white-space: nowrap; user-select: none;
+}
+.period-sync-badge:hover { background: rgba(139,92,246,.2); border-color: rgba(139,92,246,.4); }
+.period-sync-badge.synced { background: rgba(0,217,126,.08); border-color: rgba(0,217,126,.22); color: #4ade80; }
+.period-sync-badge i { font-size: 9px; }
+
 .ql-mode-toggle{
   display:flex;align-items:center;gap:0;
   background:rgba(255,255,255,.05);
@@ -3175,6 +3304,20 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 <div id="rpt-sync-bar"></div>
 
 <!-- ════════════════════════════════════════════════════════════
+     §REMINDER-BANNER — In-app "Log your trade" reminder strip
+     ════════════════════════════════════════════════════════════ -->
+<div id="log-reminder-banner">
+  <div class="lrb-icon">⏰</div>
+  <div class="lrb-text">
+    Sudah trading hari ini? <span id="lrb-subtext">Yuk, catat trademu sebelum lupa detail-detailnya.</span>
+  </div>
+  <button class="lrb-btn" onclick="lrbLogNow()">
+    <i class="bi bi-plus-lg" style="margin-right:4px;font-size:10px"></i>Log Trade
+  </button>
+  <button class="lrb-close" onclick="lrbDismiss()" title="Tutup">×</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
      §ONBOARDING — Tour Overlay (5 slides)
      ════════════════════════════════════════════════════════════ -->
 <div id="onboard-overlay">
@@ -4450,11 +4593,16 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <!-- Journal filter bar -->
     <div id="at-history-panel" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       <!-- Period tabs (left) -->
-      <div class="period-tabs" id="journal-period-tabs" style="flex-shrink:0">
-        <button class="ptab active" data-jperiod="all">Semua</button>
-        <button class="ptab" data-jperiod="7">7 Hari</button>
-        <button class="ptab" data-jperiod="30">30 Hari</button>
-        <button class="ptab" data-jperiod="365">1 Tahun</button>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div class="period-tabs" id="journal-period-tabs">
+          <button class="ptab active" data-jperiod="all">Semua</button>
+          <button class="ptab" data-jperiod="7">7 Hari</button>
+          <button class="ptab" data-jperiod="30">30 Hari</button>
+          <button class="ptab" data-jperiod="365">1 Tahun</button>
+        </div>
+        <div class="period-sync-badge" id="journal-sync-badge" onclick="syncPeriodFromPage('journal')" title="Sync dengan Dashboard">
+          <i class="bi bi-arrow-repeat"></i><span id="journal-sync-label">Sync</span>
+        </div>
       </div>
       <!-- Pair & result filter (right) -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -4561,17 +4709,96 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   </div>
 
   <!-- ── PERIOD TABS ── -->
-  <div style="margin-bottom:16px">
-    <div class="period-tabs" id="ana-period-tabs">
+  <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px">
+    <div class="period-tabs" id="ana-period-tabs" style="flex:1">
       <button class="ptab active" data-aperiod="all">Semua</button>
       <button class="ptab" data-aperiod="7">7 Hari</button>
       <button class="ptab" data-aperiod="30">30 Hari</button>
       <button class="ptab" data-aperiod="180">6 Bulan</button>
       <button class="ptab" data-aperiod="365">1 Tahun</button>
     </div>
+    <div class="period-sync-badge" id="ana-sync-badge" onclick="syncPeriodFromPage('analytics')" title="Sync dengan Dashboard">
+      <i class="bi bi-arrow-repeat"></i><span id="ana-sync-label">Sync</span>
+    </div>
   </div>
+  <div id="ana-guided-banner">
+    <div class="agb-header">
+      <div class="agb-icon">
+        <i class="bi bi-bar-chart-steps" style="color:#a78bfa;font-size:17px"></i>
+      </div>
+      <div>
+        <div class="agb-title">Analytics sedang dibangun</div>
+        <div class="agb-sub" id="agb-sub-text">Catat lebih banyak trade untuk membuka insight mendalam</div>
+      </div>
+    </div>
 
-  <!-- ══ PERFORMANCE SCORE BANNER ══ -->
+    <!-- Progress bar -->
+    <div class="agb-progress-wrap">
+      <div class="agb-progress-label">
+        <span>Progress menuju full analytics</span>
+        <span id="agb-count-label">0 / 20 trades</span>
+      </div>
+      <div class="agb-track">
+        <div class="agb-fill" id="agb-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Milestones -->
+    <div class="agb-milestones" id="agb-milestones">
+      <div class="agb-milestone" id="agb-m5">
+        <i class="bi bi-circle"></i> 5 trades
+      </div>
+      <div class="agb-milestone" id="agb-m10">
+        <i class="bi bi-circle"></i> 10 trades
+      </div>
+      <div class="agb-milestone" id="agb-m20">
+        <i class="bi bi-circle"></i> 20 trades
+      </div>
+      <div class="agb-milestone" id="agb-m50">
+        <i class="bi bi-circle"></i> 50 trades
+      </div>
+    </div>
+
+    <!-- Unlock cards -->
+    <div class="agb-unlock-grid" id="agb-unlock-grid">
+      <div class="agb-unlock-card" id="agb-unlock-dna">
+        <div class="agb-unlock-icon" style="background:rgba(139,92,246,.15)">
+          <i class="bi bi-person-vcard" style="color:#a78bfa"></i>
+        </div>
+        <div>
+          <div class="agb-unlock-name">Trader DNA</div>
+          <div class="agb-unlock-req" id="agb-req-dna">Butuh 5 trades</div>
+        </div>
+      </div>
+      <div class="agb-unlock-card" id="agb-unlock-deep">
+        <div class="agb-unlock-icon" style="background:rgba(245,158,11,.12)">
+          <i class="bi bi-bar-chart-line" style="color:#f59e0b"></i>
+        </div>
+        <div>
+          <div class="agb-unlock-name">Deep Stats</div>
+          <div class="agb-unlock-req" id="agb-req-deep">Butuh 10 trades</div>
+        </div>
+      </div>
+      <div class="agb-unlock-card" id="agb-unlock-dd">
+        <div class="agb-unlock-icon" style="background:rgba(239,68,68,.1)">
+          <i class="bi bi-graph-down" style="color:#f87171"></i>
+        </div>
+        <div>
+          <div class="agb-unlock-name">Drawdown Chart</div>
+          <div class="agb-unlock-req" id="agb-req-dd">Butuh 10 trades</div>
+        </div>
+      </div>
+      <div class="agb-unlock-card" id="agb-unlock-adv">
+        <div class="agb-unlock-icon" style="background:rgba(56,189,248,.1)">
+          <i class="bi bi-sliders" style="color:#38bdf8"></i>
+        </div>
+        <div>
+          <div class="agb-unlock-name">MAE/MFE & Holding</div>
+          <div class="agb-unlock-req" id="agb-req-adv">Butuh 20 trades</div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="ana-score-banner" id="ana-score-banner">
     <div class="ana-score-inner">
       <div class="ana-ring-wrap">
@@ -5148,12 +5375,15 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <button class="btng bsm" id="ftmo-set-btn"><i class="bi bi-gear" style="margin-right:4px"></i> Settings</button>
     </div>
     <!-- Period tabs -->
-    <div style="margin-bottom:16px">
-      <div class="period-tabs" id="prop-period-tabs">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <div class="period-tabs" id="prop-period-tabs" style="flex:1">
         <button class="ptab active" data-pperiod="all">Semua</button>
         <button class="ptab" data-pperiod="7">7 Hari</button>
         <button class="ptab" data-pperiod="30">30 Hari</button>
         <button class="ptab" data-pperiod="90">3 Bulan</button>
+      </div>
+      <div class="period-sync-badge" id="prop-sync-badge" onclick="syncPeriodFromPage('prop')" title="Sync dengan Dashboard">
+        <i class="bi bi-arrow-repeat"></i><span id="prop-sync-label">Sync</span>
       </div>
     </div>
     <div class="ftg">
@@ -18250,6 +18480,329 @@ var _rtInt = setInterval(function() {
 })();
 
 })(); // end IIFE
+</script>
+
+<!-- ════════════════════════════════════════════════════════════
+     §SCRIPT-MEDIUM-FIXES
+     Issue 3: Guided Empty State (Analytics)
+     Issue 4: In-App Log Reminder Banner
+     Issue 5: Period Tab Sync across pages
+     ════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+
+// ══════════════════════════════════════════════════════════════
+// ISSUE 3 — GUIDED EMPTY STATE (Analytics)
+// Shows progress toward full analytics based on total trades
+// ══════════════════════════════════════════════════════════════
+
+var ANA_MILESTONES = [
+  { id: 'agb-m5',  n: 5,  label: '5 trades'  },
+  { id: 'agb-m10', n: 10, label: '10 trades' },
+  { id: 'agb-m20', n: 20, label: '20 trades' },
+  { id: 'agb-m50', n: 50, label: '50 trades' },
+];
+
+var ANA_FULL_THRESHOLD = 20; // hide guided banner at or above this
+
+function updateGuidedBanner() {
+  var banner = document.getElementById('ana-guided-banner');
+  if (!banner) return;
+
+  var n = (window.trades || []).length;
+
+  if (n >= ANA_FULL_THRESHOLD) {
+    banner.classList.remove('visible');
+    return;
+  }
+
+  banner.classList.add('visible');
+
+  // Progress fill
+  var pct = Math.min(Math.round(n / ANA_FULL_THRESHOLD * 100), 100);
+  var fill = document.getElementById('agb-fill');
+  if (fill) fill.style.width = pct + '%';
+
+  // Count label
+  var countLbl = document.getElementById('agb-count-label');
+  if (countLbl) countLbl.textContent = n + ' / ' + ANA_FULL_THRESHOLD + ' trades';
+
+  // Sub text
+  var subText = document.getElementById('agb-sub-text');
+  if (subText) {
+    if (n === 0) subText.textContent = 'Catat trade pertamamu untuk mulai';
+    else if (n < 5)  subText.textContent = 'Butuh ' + (5 - n) + ' trade lagi untuk Trader DNA';
+    else if (n < 10) subText.textContent = 'Butuh ' + (10 - n) + ' trade lagi untuk Deep Stats & Drawdown';
+    else             subText.textContent = 'Butuh ' + (ANA_FULL_THRESHOLD - n) + ' trade lagi untuk full analytics';
+  }
+
+  // Milestones
+  ANA_MILESTONES.forEach(function(m) {
+    var el = document.getElementById(m.id);
+    if (!el) return;
+    var reached = n >= m.n;
+    el.classList.toggle('reached', reached);
+    el.innerHTML = reached
+      ? '<i class="bi bi-check-circle-fill"></i> ' + m.label
+      : '<i class="bi bi-circle"></i> ' + m.label;
+  });
+
+  // Unlock cards
+  function setCard(id, reqId, reqText, unlocked) {
+    var card = document.getElementById(id);
+    if (card) card.classList.toggle('locked', !unlocked);
+    var req = document.getElementById(reqId);
+    if (req) req.textContent = unlocked ? '✓ Terbuka' : reqText;
+  }
+  setCard('agb-unlock-dna',  'agb-req-dna',  'Butuh 5 trades',  n >= 5);
+  setCard('agb-unlock-deep', 'agb-req-deep', 'Butuh 10 trades', n >= 10);
+  setCard('agb-unlock-dd',   'agb-req-dd',   'Butuh 10 trades', n >= 10);
+  setCard('agb-unlock-adv',  'agb-req-adv',  'Butuh 20 trades', n >= 20);
+}
+
+// Hook into updateAll so banner refreshes whenever trades change
+var _origUpdateAll = window.updateAll;
+window.updateAll = function() {
+  if (_origUpdateAll) _origUpdateAll.apply(this, arguments);
+  updateGuidedBanner();
+};
+
+// Also refresh when analytics page is rendered
+var _origRenderAna = window.renderAna;
+window.renderAna = function() {
+  if (_origRenderAna) _origRenderAna.apply(this, arguments);
+  updateGuidedBanner();
+};
+
+window.updateGuidedBanner = updateGuidedBanner;
+
+// ══════════════════════════════════════════════════════════════
+// ISSUE 4 — IN-APP LOG REMINDER BANNER
+// Shows a top reminder strip if user hasn't logged today
+// Respects "dismissed" state per session
+// ══════════════════════════════════════════════════════════════
+
+var LRB_KEY        = 'rpt_lrb_dismissed_date'; // localStorage key
+var LRB_DELAY_MS   = 5 * 60 * 1000;            // 5 menit setelah login sebelum muncul
+var _lrbTimer      = null;
+
+function lrbTodayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function lrbHasLoggedToday() {
+  var today = lrbTodayStr();
+  return (window.trades || []).some(function(t) { return t.date === today; });
+}
+
+function lrbWasDismissedToday() {
+  try { return localStorage.getItem(LRB_KEY) === lrbTodayStr(); } catch(e) { return false; }
+}
+
+function lrbShow() {
+  if (lrbWasDismissedToday()) return;
+  if (lrbHasLoggedToday()) return;
+  if (!window.currentUser) return;
+
+  var banner = document.getElementById('log-reminder-banner');
+  if (!banner) return;
+
+  // Personalize sub text
+  var sub = document.getElementById('lrb-subtext');
+  if (sub) {
+    var hour = new Date().getHours();
+    if (hour < 12)      sub.textContent = 'Pagi yang produktif dimulai dari jurnal yang lengkap.';
+    else if (hour < 17) sub.textContent = 'Sesi market berjalan — jangan lupa catat trademu.';
+    else                sub.textContent = 'Sebelum market tutup, catat detail trademu hari ini.';
+  }
+
+  banner.classList.add('visible');
+
+  // Push main content down on desktop
+  var main = document.getElementById('main');
+  if (main) main.style.marginTop = '43px';
+  var topbar = document.getElementById('topbar');
+  if (topbar) topbar.style.top = '43px';
+}
+
+function lrbHide() {
+  var banner = document.getElementById('log-reminder-banner');
+  if (banner) banner.classList.remove('visible');
+  var main = document.getElementById('main');
+  if (main) main.style.marginTop = '';
+  var topbar = document.getElementById('topbar');
+  if (topbar) topbar.style.top = '';
+}
+
+window.lrbDismiss = function() {
+  try { localStorage.setItem(LRB_KEY, lrbTodayStr()); } catch(e) {}
+  lrbHide();
+};
+
+window.lrbLogNow = function() {
+  lrbDismiss();
+  if (typeof openTrade === 'function') openTrade();
+};
+
+// Schedule reminder check after login + delay
+function lrbSchedule() {
+  if (_lrbTimer) clearTimeout(_lrbTimer);
+  _lrbTimer = setTimeout(function() {
+    lrbShow();
+  }, LRB_DELAY_MS);
+}
+
+// Also re-evaluate after every trade save (if they log a trade, hide banner)
+var _origSaveTradeToCloud = window.saveTradeToCloud;
+window.saveTradeToCloud = async function() {
+  var result = _origSaveTradeToCloud ? await _origSaveTradeToCloud.apply(this, arguments) : null;
+  if (lrbHasLoggedToday()) lrbHide();
+  return result;
+};
+
+// Hook into auth state change — start timer on login
+var _origOnAuthStateChanged_lrb = window._lrb_hooked;
+if (!_origOnAuthStateChanged_lrb) {
+  window._lrb_hooked = true;
+  // Poll for currentUser every 3s until logged in, then schedule
+  var _lrbPoll = setInterval(function() {
+    if (window.currentUser && !window.currentUser.isAnonymous) {
+      clearInterval(_lrbPoll);
+      lrbSchedule();
+    }
+  }, 3000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// ISSUE 5 — PERIOD TAB SYNC
+// Sync period filter across Dashboard, Analytics, Journal, PropFirm
+// ══════════════════════════════════════════════════════════════
+
+// Map: page → { periodVar, tabs selector, render fn, badge id }
+var PERIOD_MAP = {
+  dashboard: {
+    getVar:  function() { return window.currentPeriod; },
+    setVar:  function(v) { window.currentPeriod = v; },
+    selector: '[data-period]',
+    attrKey:  'period',
+    render:   function() { if (typeof updateAll === 'function') updateAll(); },
+    badgeId:  null, // dashboard is the master, no badge
+  },
+  analytics: {
+    getVar:  function() { return window.anaPeriod; },
+    setVar:  function(v) { window.anaPeriod = v; },
+    selector: '[data-aperiod]',
+    attrKey:  'aperiod',
+    render:   function() { if (typeof renderAna === 'function') renderAna(); },
+    badgeId:  'ana-sync-badge',
+    labelId:  'ana-sync-label',
+  },
+  journal: {
+    getVar:  function() { return window.journalPeriod; },
+    setVar:  function(v) { window.journalPeriod = v; },
+    selector: '[data-jperiod]',
+    attrKey:  'jperiod',
+    render:   function() {
+      if (typeof updatePairFil === 'function') updatePairFil();
+      if (typeof renderTable   === 'function') renderTable();
+    },
+    badgeId:  'journal-sync-badge',
+    labelId:  'journal-sync-label',
+  },
+  prop: {
+    getVar:  function() { return window.propPeriod; },
+    setVar:  function(v) { window.propPeriod = v; },
+    selector: '[data-pperiod]',
+    attrKey:  'pperiod',
+    render:   function() { if (typeof renderFtmo === 'function') renderFtmo(); },
+    badgeId:  'prop-sync-badge',
+    labelId:  'prop-sync-label',
+  },
+};
+
+var PERIOD_LABELS = { all: 'Overview', '7': '7H', '30': '30H', '180': '180H', '365': '1Y', '90': '90H', '365': '1Y' };
+
+function _activateTab(selector, attrKey, value) {
+  document.querySelectorAll(selector).forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset[attrKey] === value);
+  });
+}
+
+function _updateSyncBadge(page, synced, dashPeriod) {
+  var cfg = PERIOD_MAP[page];
+  if (!cfg || !cfg.badgeId) return;
+  var badge = document.getElementById(cfg.badgeId);
+  var label = document.getElementById(cfg.labelId);
+  if (!badge) return;
+  badge.classList.toggle('synced', synced);
+  if (label) {
+    label.textContent = synced
+      ? '✓ ' + (PERIOD_LABELS[dashPeriod] || dashPeriod)
+      : 'Sync';
+  }
+}
+
+// Called when user clicks a sync badge on any page
+window.syncPeriodFromPage = function(page) {
+  var dashPeriod = window.currentPeriod || 'all';
+  var cfg = PERIOD_MAP[page];
+  if (!cfg) return;
+
+  // If already synced, desync (set back to 'all')
+  var isSynced = document.getElementById(cfg.badgeId)?.classList.contains('synced');
+  var newPeriod = isSynced ? 'all' : dashPeriod;
+
+  cfg.setVar(newPeriod);
+  _activateTab(cfg.selector, cfg.attrKey, newPeriod);
+  _updateSyncBadge(page, !isSynced, dashPeriod);
+  cfg.render();
+};
+
+// When dashboard period changes, update badges to show sync state
+var _origPtabListener = window._ptabSyncHooked;
+if (!_origPtabListener) {
+  window._ptabSyncHooked = true;
+  document.querySelectorAll('.ptab[data-period]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var newPeriod = btn.dataset.period;
+      // Re-evaluate badge state for all synced pages
+      setTimeout(function() {
+        ['analytics','journal','prop'].forEach(function(page) {
+          var cfg = PERIOD_MAP[page];
+          var badge = cfg.badgeId ? document.getElementById(cfg.badgeId) : null;
+          if (!badge) return;
+          var isSynced = badge.classList.contains('synced');
+          if (isSynced) {
+            // Auto-update synced pages too
+            cfg.setVar(newPeriod);
+            _activateTab(cfg.selector, cfg.attrKey, newPeriod);
+            _updateSyncBadge(page, true, newPeriod);
+            cfg.render();
+          }
+          _updateSyncBadge(page, isSynced, newPeriod);
+        });
+      }, 50);
+    });
+  });
+
+  // Also update badge labels when each page's own tabs change
+  ['analytics','journal','prop'].forEach(function(page) {
+    var cfg = PERIOD_MAP[page];
+    document.querySelectorAll(cfg.selector).forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var badge = cfg.badgeId ? document.getElementById(cfg.badgeId) : null;
+        if (badge && badge.classList.contains('synced')) {
+          // They manually changed — desync
+          badge.classList.remove('synced');
+          var lbl = document.getElementById(cfg.labelId);
+          if (lbl) lbl.textContent = 'Sync';
+        }
+      });
+    });
+  });
+}
+
+})();
 </script>
 </body>
 </html>
