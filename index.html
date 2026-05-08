@@ -749,8 +749,10 @@ tr:hover td{background:rgba(139,92,246,.04);}
 .at-emotion-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;border-radius:6px;padding:2px 8px;margin-bottom:10px;margin-left:5px;}
 .at-emotion-calm{background:rgba(34,197,94,.07);color:#22c55e;border:1px solid rgba(34,197,94,.18);}
 .at-emotion-confident{background:rgba(139,92,246,.08);color:#a78bfa;border:1px solid rgba(139,92,246,.18);}
+.at-emotion-overconfident{background:rgba(250,204,21,.08);color:#facc15;border:1px solid rgba(250,204,21,.2);}
 .at-emotion-fomo{background:rgba(245,158,11,.07);color:#f59e0b;border:1px solid rgba(245,158,11,.18);}
 .at-emotion-revenge,.at-emotion-anxious{background:rgba(239,68,68,.06);color:#f87171;border:1px solid rgba(239,68,68,.18);}
+.at-emotion-impatient{background:rgba(251,146,60,.07);color:#fb923c;border:1px solid rgba(251,146,60,.18);}
 
 /* ── Action buttons ── */
 .at-actions{display:flex;gap:6px;padding:10px 16px 12px 20px;border-top:1px solid var(--border);}
@@ -6482,11 +6484,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div class="fgg">
           <label class="fl">Emotion at Entry</label>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:2px">
-            <button type="button" class="emotion-btn" data-em="Calm"      onclick="setNatEmotion('Calm')"      style="padding:6px 13px;border-radius:20px;border:1px solid rgba(34,197,94,.22);background:rgba(34,197,94,.07);color:#4ade80;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Calm</button>
-            <button type="button" class="emotion-btn" data-em="Confident" onclick="setNatEmotion('Confident')" style="padding:6px 13px;border-radius:20px;border:1px solid rgba(139,92,246,.22);background:rgba(139,92,246,.07);color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">💪 Confident</button>
-            <button type="button" class="emotion-btn" data-em="FOMO"      onclick="setNatEmotion('FOMO')"      style="padding:6px 13px;border-radius:20px;border:1px solid rgba(245,158,11,.22);background:rgba(245,158,11,.06);color:#fbbf24;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ FOMO</button>
-            <button type="button" class="emotion-btn" data-em="Revenge"   onclick="setNatEmotion('Revenge')"   style="padding:6px 13px;border-radius:20px;border:1px solid rgba(239,68,68,.22);background:rgba(239,68,68,.06);color:#f87171;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">🔥 Revenge</button>
-            <button type="button" class="emotion-btn" data-em="Anxious"   onclick="setNatEmotion('Anxious')"   style="padding:6px 13px;border-radius:20px;border:1px solid rgba(239,68,68,.18);background:rgba(239,68,68,.04);color:#fca5a5;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Anxious</button>
+            <button type="button" class="emotion-btn" data-em="Calm"          onclick="setNatEmotion('Calm')"          style="padding:6px 13px;border-radius:20px;border:1px solid rgba(34,197,94,.22);background:rgba(34,197,94,.07);color:#4ade80;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😌 Calm</button>
+            <button type="button" class="emotion-btn" data-em="Confident"     onclick="setNatEmotion('Confident')"     style="padding:6px 13px;border-radius:20px;border:1px solid rgba(139,92,246,.22);background:rgba(139,92,246,.07);color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">💪 Confident</button>
+            <button type="button" class="emotion-btn" data-em="Overconfident" onclick="setNatEmotion('Overconfident')" style="padding:6px 13px;border-radius:20px;border:1px solid rgba(250,204,21,.22);background:rgba(250,204,21,.06);color:#facc15;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😆 Overconf.</button>
+            <button type="button" class="emotion-btn" data-em="FOMO"          onclick="setNatEmotion('FOMO')"          style="padding:6px 13px;border-radius:20px;border:1px solid rgba(245,158,11,.22);background:rgba(245,158,11,.06);color:#fbbf24;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">⚡ FOMO</button>
+            <button type="button" class="emotion-btn" data-em="Revenge"       onclick="setNatEmotion('Revenge')"       style="padding:6px 13px;border-radius:20px;border:1px solid rgba(239,68,68,.22);background:rgba(239,68,68,.06);color:#f87171;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">🔥 Revenge</button>
+            <button type="button" class="emotion-btn" data-em="Anxious"       onclick="setNatEmotion('Anxious')"       style="padding:6px 13px;border-radius:20px;border:1px solid rgba(239,68,68,.18);background:rgba(239,68,68,.04);color:#fca5a5;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s">😰 Anxious</button>
           </div>
           <input type="hidden" id="nat-emotion" value="">
         </div>
@@ -6766,12 +6769,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="margin-bottom:12px;margin-top:12px">
           <label class="fl" style="margin-bottom:7px"><i class="bi bi-heart-pulse" style="margin-right:4px"></i>Kondisi Emosi</label>
           <div class="ql-em-row">
-            <button type="button" class="ql-em-btn" data-em="Calm"       onclick="qlSetEmotion('Calm',this)">😌 Calm</button>
-            <button type="button" class="ql-em-btn" data-em="Confident"  onclick="qlSetEmotion('Confident',this)">💪 Confident</button>
-            <button type="button" class="ql-em-btn" data-em="FOMO"       onclick="qlSetEmotion('FOMO',this)">⚡ FOMO</button>
-            <button type="button" class="ql-em-btn" data-em="Anxious"    onclick="qlSetEmotion('Anxious',this)">😰 Anxious</button>
-            <button type="button" class="ql-em-btn" data-em="Impatient"  onclick="qlSetEmotion('Impatient',this)">⏳ Impatient</button>
-            <button type="button" class="ql-em-btn" data-em="Revenge"    onclick="qlSetEmotion('Revenge',this)">🔥 Revenge</button>
+            <button type="button" class="ql-em-btn" data-em="Calm"          onclick="qlSetEmotion('Calm',this)">😌 Calm</button>
+            <button type="button" class="ql-em-btn" data-em="Confident"     onclick="qlSetEmotion('Confident',this)">💪 Confident</button>
+            <button type="button" class="ql-em-btn" data-em="Overconfident" onclick="qlSetEmotion('Overconfident',this)">😆 Overconf.</button>
+            <button type="button" class="ql-em-btn" data-em="FOMO"          onclick="qlSetEmotion('FOMO',this)">⚡ FOMO</button>
+            <button type="button" class="ql-em-btn" data-em="Anxious"       onclick="qlSetEmotion('Anxious',this)">😰 Anxious</button>
+            <button type="button" class="ql-em-btn" data-em="Impatient"     onclick="qlSetEmotion('Impatient',this)">⏳ Impatient</button>
+            <button type="button" class="ql-em-btn" data-em="Revenge"       onclick="qlSetEmotion('Revenge',this)">🔥 Revenge</button>
           </div>
           <input type="hidden" id="ql-em" value="Calm">
         </div>
@@ -7046,7 +7050,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <!-- ── STEP 7: Emotion ── -->
       <div class="tm-section" style="margin-bottom:18px">
         <div class="tm-section-label"><i class="bi bi-heart-pulse"></i> Kondisi Saat Trading</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px" id="emotion-btns">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px" id="emotion-btns">
           <button type="button" class="emotion-btn" data-em="Calm" onclick="setEmotion('Calm')"
             style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
             <i class="bi bi-cloud" style="color:#38bdf8;font-size:13px"></i> Calm
@@ -7054,6 +7058,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <button type="button" class="emotion-btn" data-em="Confident" onclick="setEmotion('Confident')"
             style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
             <i class="bi bi-emoji-sunglasses" style="color:#00d97e;font-size:13px"></i> Confident
+          </button>
+          <button type="button" class="emotion-btn" data-em="Overconfident" onclick="setEmotion('Overconfident')"
+            style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
+            <i class="bi bi-emoji-laughing" style="color:#facc15;font-size:13px"></i> Overconf.
           </button>
           <button type="button" class="emotion-btn" data-em="Anxious" onclick="setEmotion('Anxious')"
             style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
@@ -9486,13 +9494,26 @@ function _showPostTradeInsight(newTrade) {
   }
 
   // Check: emotion pattern
-  if (!msg && newTrade.emotion && ['FOMO','Revenge','Impatient'].includes(newTrade.emotion)) {
+  if (!msg && newTrade.emotion && ['FOMO','Revenge','Impatient','Overconfident'].includes(newTrade.emotion)) {
     const emHist = hist.filter(t => t.emotion === newTrade.emotion);
     if (emHist.length >= 3) {
       const wr = emHist.filter(t=>t.result==='Win').length / emHist.length;
       if (wr <= 0.4) {
-        msg = `Kamu log "${newTrade.emotion}" — histori kamu: ${Math.round(wr*100)}% WR saat emosi ini (${emHist.length} trade). Stay sharp.`;
+        if (newTrade.emotion === 'Overconfident') {
+          msg = `Kamu log "Overconfident" — histori kamu saat merasa begini: ${Math.round(wr*100)}% WR (${emHist.length} trade). Streak win bisa bikin kita lengah. Stay disciplined.`;
+        } else {
+          msg = `Kamu log "${newTrade.emotion}" — histori kamu: ${Math.round(wr*100)}% WR saat emosi ini (${emHist.length} trade). Stay sharp.`;
+        }
         color = '#ff4d4d'; icon = '🧠';
+      }
+    }
+    // Overconfident: warn even without enough history, right after a win streak
+    if (!msg && newTrade.emotion === 'Overconfident') {
+      const recent = hist.slice(-5);
+      const recentWins = recent.filter(t => t.result === 'Win').length;
+      if (recentWins >= 4) {
+        msg = `${recentWins} win dari 5 trade terakhir — bagus! Tapi "Overconfident" adalah sinyal waspada. Jangan naikkan size sekarang.`;
+        color = '#facc15'; icon = '⚠️';
       }
     }
   }
@@ -10588,8 +10609,8 @@ function renderActiveTrades() {
     be:      '<span class="at-status-badge at-status-be">→ Breakeven</span>'
   };
 
-  const emotionEmoji = { Calm:'😌', Confident:'💪', FOMO:'⚡', Revenge:'🔥', Anxious:'😰' };
-  const emotionClass = { Calm:'at-emotion-calm', Confident:'at-emotion-confident', FOMO:'at-emotion-fomo', Revenge:'at-emotion-revenge', Anxious:'at-emotion-anxious' };
+  const emotionEmoji = { Calm:'😌', Confident:'💪', Overconfident:'😆', FOMO:'⚡', Revenge:'🔥', Anxious:'😰', Impatient:'⏳' };
+  const emotionClass = { Calm:'at-emotion-calm', Confident:'at-emotion-confident', Overconfident:'at-emotion-overconfident', FOMO:'at-emotion-fomo', Revenge:'at-emotion-revenge', Anxious:'at-emotion-anxious', Impatient:'at-emotion-impatient' };
 
   el.innerHTML = activeTrades.map((at, idx) => {
     const dur = _atDuration(at.openedAt);
