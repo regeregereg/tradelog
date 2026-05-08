@@ -992,6 +992,144 @@ tr:hover td{background:rgba(139,92,246,.04);}
   #md-trade-inner{width:100%!important;border-radius:20px 20px 0 0!important;position:fixed!important;bottom:0;left:0;right:0;max-height:92vh!important;}
   #md-trade{align-items:flex-end!important;}
 }
+
+/* ══════════════════════════════════════════════════════════
+   QUICK LOG MODE — toggle di header modal
+   ══════════════════════════════════════════════════════════ */
+/* Mode toggle pill di header */
+.ql-mode-toggle{
+  display:flex;align-items:center;gap:0;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:10px;overflow:hidden;flex-shrink:0;
+}
+.ql-mode-btn{
+  padding:6px 13px;font-size:11px;font-weight:700;
+  font-family:var(--font);cursor:pointer;border:none;
+  background:transparent;color:var(--text3);
+  transition:all .18s;white-space:nowrap;letter-spacing:.2px;
+}
+.ql-mode-btn.active{
+  background:var(--accent);color:#fff;
+  box-shadow:0 2px 10px rgba(139,92,246,.35);
+}
+.ql-mode-btn:hover:not(.active){color:var(--text2);background:rgba(255,255,255,.05);}
+
+/* Quick Log form panel */
+#ql-panel{display:none;}
+#ql-panel.visible{display:block;}
+
+/* Full form panel */
+#full-form-panel{display:block;}
+#full-form-panel.hidden{display:none;}
+
+/* Quick Log layout */
+.ql-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px;
+}
+.ql-grid.full-row{grid-template-columns:1fr;}
+
+/* Quick Log result buttons — bigger tap targets */
+.ql-result-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px;margin-bottom:12px;
+}
+.ql-res-btn{
+  padding:14px 8px;border-radius:12px;
+  border:1.5px solid var(--border);background:var(--bg3);
+  cursor:pointer;font-family:var(--font);
+  transition:all .18s;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:4px;
+  font-size:12px;font-weight:700;color:var(--text2);
+}
+.ql-res-btn i{font-size:20px;}
+.ql-res-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
+.ql-res-btn.active-win{background:rgba(0,217,126,.1)!important;border-color:rgba(0,217,126,.55)!important;color:#00d97e!important;}
+.ql-res-btn.active-loss{background:rgba(255,77,77,.1)!important;border-color:rgba(255,77,77,.55)!important;color:#ff4d4d!important;}
+.ql-res-btn.active-be{background:rgba(167,139,250,.1)!important;border-color:rgba(167,139,250,.55)!important;color:#a78bfa!important;}
+
+/* Quick Log direction row */
+.ql-dir-row{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin-bottom:12px;
+}
+.ql-dir-btn{
+  padding:11px 8px;border-radius:12px;
+  border:1.5px solid var(--border);background:var(--bg3);
+  cursor:pointer;font-family:var(--font);
+  transition:all .18s;
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;font-size:13px;font-weight:700;color:var(--text2);
+}
+.ql-dir-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
+.ql-dir-btn.active-long{background:rgba(0,217,126,.09)!important;border-color:rgba(0,217,126,.55)!important;color:#00d97e!important;}
+.ql-dir-btn.active-short{background:rgba(255,77,77,.09)!important;border-color:rgba(255,77,77,.55)!important;color:#ff4d4d!important;}
+
+/* Quick Log pair chips — same as qpair-btn */
+.ql-pair-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+
+/* Quick emotion row */
+.ql-em-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+.ql-em-btn{
+  padding:5px 11px;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg3);
+  color:var(--text3);font-size:11px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all .15s;
+}
+.ql-em-btn:hover{border-color:rgba(139,92,246,.3);color:var(--text2);}
+.ql-em-btn.active{background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.5);color:#c4b5fd;}
+
+/* Input styling inside Quick Log (reuse .fi overrides from #md-trade) */
+#ql-panel .fi{
+  background:#1e1e24;border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;color:#f1f5f9;padding:9px 12px;
+  font-size:13px;font-family:var(--mono);
+  outline:none;width:100%;
+  transition:border-color .15s,box-shadow .15s;
+}
+#ql-panel .fi:focus{border-color:rgba(139,92,246,.55);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+#ql-panel .fi::placeholder{color:#3f3f4a;}
+#ql-panel select.fi option{background:#1e1e24;}
+#ql-panel .fl{
+  font-size:10px;color:#94a3b8;
+  text-transform:uppercase;letter-spacing:.7px;
+  font-weight:600;display:block;margin-bottom:5px;
+}
+#ql-panel .ta{
+  background:#1e1e24;border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;color:#f1f5f9;padding:10px 12px;
+  font-size:12px;font-family:var(--mono);resize:vertical;
+  min-height:60px;outline:none;width:100%;
+  transition:border-color .15s,box-shadow .15s;line-height:1.55;
+}
+#ql-panel .ta:focus{border-color:rgba(139,92,246,.55);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+#ql-panel .ta::placeholder{color:#3f3f4a;}
+
+/* "More fields" expand link */
+.ql-expand-link{
+  display:flex;align-items:center;justify-content:center;
+  gap:5px;font-size:11px;color:var(--text3);
+  cursor:pointer;padding:6px;border-radius:8px;
+  transition:all .15s;margin-top:4px;font-weight:600;
+  border:1px dashed rgba(255,255,255,.07);
+}
+.ql-expand-link:hover{color:var(--accent2);border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.04);}
+
+/* Optional fields accordion */
+#ql-extras{display:none;margin-top:10px;}
+#ql-extras.open{display:block;animation:fi .2s ease;}
+
+/* Quick Log field label */
+.ql-section-label{
+  font-size:10px;color:#c4b5fd;
+  text-transform:uppercase;letter-spacing:1px;font-weight:700;
+  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+  padding-bottom:8px;border-bottom:1px solid rgba(196,181,253,.1);
+}
 .bdel{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
 .bdel:hover{color:var(--red);background:var(--rd);}
 .bedit-row{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:5px;font-family:var(--font);transition:all .15s;}
@@ -6264,25 +6402,181 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="md" id="md-trade-inner" style="width:580px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
 
     <!-- Modal Header -->
-    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(139,92,246,.02))">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <i class="bi bi-pencil-square" id="trade-modal-icon" style="color:var(--accent);font-size:15px"></i>
+    <div style="padding:16px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(139,92,246,.02))">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(139,92,246,.1));border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="bi bi-pencil-square" id="trade-modal-icon" style="color:var(--accent);font-size:14px"></i>
           </div>
-          <div>
-            <div style="font-size:16px;font-weight:700;letter-spacing:-.4px" id="trade-modal-title">Log New Trade</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:1px" id="trade-modal-subtitle">Catat trade baru ke journal kamu</div>
+          <div style="min-width:0">
+            <div style="font-size:15px;font-weight:700;letter-spacing:-.4px" id="trade-modal-title">Log New Trade</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:1px" id="trade-modal-subtitle">Catat trade baru ke journal kamu</div>
           </div>
         </div>
-        <button id="trade-cancel" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)';this.style.color='var(--text)'" onmouseout="this.style.background='rgba(255,255,255,.05)';this.style.color='var(--text3)'">
+        <!-- ── MODE TOGGLE (hidden during edit) ── -->
+        <div class="ql-mode-toggle" id="ql-mode-toggle">
+          <button type="button" class="ql-mode-btn active" id="ql-btn-quick" onclick="setLogMode('quick')">
+            <i class="bi bi-lightning-charge-fill" style="margin-right:3px"></i>Quick
+          </button>
+          <button type="button" class="ql-mode-btn" id="ql-btn-full" onclick="setLogMode('full')">
+            <i class="bi bi-list-check" style="margin-right:3px"></i>Full
+          </button>
+        </div>
+        <button id="trade-cancel" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text3);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(255,255,255,.1)';this.style.color='var(--text)'" onmouseout="this.style.background='rgba(255,255,255,.05)';this.style.color='var(--text3)'">
           <i class="bi bi-x-lg" style="font-size:12px"></i>
         </button>
       </div>
     </div>
 
-    <!-- Scrollable body -->
-    <div style="overflow-y:auto;flex:1;padding:20px 24px">
+    <!-- ══════════════════════════════════════════
+         QUICK LOG PANEL
+         ══════════════════════════════════════════ -->
+    <div id="ql-panel" style="overflow-y:auto;flex:1;padding:16px 20px">
+
+      <!-- Pair + Direction row -->
+      <div class="ql-section-label" style="margin-bottom:10px">
+        <i class="bi bi-lightning-charge-fill" style="color:var(--accent2)"></i> Quick Entry
+        <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px;margin-left:auto">4 field wajib · simpan &lt;10 detik</span>
+      </div>
+
+      <!-- Pair input + chips -->
+      <div style="margin-bottom:12px">
+        <label class="fl">Pair / Instrumen</label>
+        <div style="position:relative">
+          <i class="bi bi-currency-exchange" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none"></i>
+          <input class="fi" type="text" id="ql-pair" placeholder="XAUUSD, EURUSD, BTC..." style="padding-left:32px;text-transform:uppercase;font-size:14px;font-weight:700;letter-spacing:.5px">
+        </div>
+        <div class="ql-pair-chips" id="ql-pair-chips">
+          <button type="button" class="qpair-btn" data-pair="XAUUSD" onclick="qlSetPair('XAUUSD',this)">XAU/USD</button>
+          <button type="button" class="qpair-btn" data-pair="EURUSD" onclick="qlSetPair('EURUSD',this)">EUR/USD</button>
+          <button type="button" class="qpair-btn" data-pair="GBPUSD" onclick="qlSetPair('GBPUSD',this)">GBP/USD</button>
+          <button type="button" class="qpair-btn" data-pair="USDJPY" onclick="qlSetPair('USDJPY',this)">USD/JPY</button>
+          <button type="button" class="qpair-btn" data-pair="BTCUSD" onclick="qlSetPair('BTCUSD',this)">BTC/USD</button>
+          <button type="button" class="qpair-btn" data-pair="NAS100" onclick="qlSetPair('NAS100',this)">NAS100</button>
+          <button type="button" class="qpair-btn" data-pair="US30"   onclick="qlSetPair('US30',this)">US30</button>
+        </div>
+      </div>
+
+      <!-- Direction -->
+      <div style="margin-bottom:12px">
+        <label class="fl">Arah Posisi</label>
+        <div class="ql-dir-row">
+          <button type="button" class="ql-dir-btn active-long" id="ql-dir-long" onclick="qlSetDir('Long')">
+            <i class="bi bi-arrow-up-right-circle-fill" style="font-size:20px;color:#00d97e"></i> LONG / BUY
+          </button>
+          <button type="button" class="ql-dir-btn" id="ql-dir-short" onclick="qlSetDir('Short')">
+            <i class="bi bi-arrow-down-right-circle-fill" style="font-size:20px;color:#ff4d4d"></i> SHORT / SELL
+          </button>
+        </div>
+        <input type="hidden" id="ql-dir" value="Long">
+      </div>
+
+      <!-- Result buttons — prominent -->
+      <div style="margin-bottom:12px">
+        <label class="fl">Hasil Trade</label>
+        <div class="ql-result-row">
+          <button type="button" class="ql-res-btn" id="ql-r-win"  onclick="qlSetResult('Win')">
+            <i class="bi bi-check-circle-fill" style="color:#00d97e"></i> WIN
+          </button>
+          <button type="button" class="ql-res-btn" id="ql-r-loss" onclick="qlSetResult('Loss')">
+            <i class="bi bi-x-circle-fill" style="color:#ff4d4d"></i> LOSS
+          </button>
+          <button type="button" class="ql-res-btn" id="ql-r-be"   onclick="qlSetResult('Breakeven')">
+            <i class="bi bi-dash-circle-fill" style="color:#a78bfa"></i> BE
+          </button>
+        </div>
+        <input type="hidden" id="ql-res" value="">
+      </div>
+
+      <!-- P&L + Risk row -->
+      <div class="ql-grid" style="margin-bottom:12px">
+        <div>
+          <label class="fl"><i class="bi bi-currency-dollar" style="margin-right:3px;color:#00d97e"></i>P&amp;L ($)</label>
+          <div style="position:relative">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
+            <input class="fi" type="number" id="ql-pnl" placeholder="+250 / -100" step="any" style="padding-left:22px;font-family:var(--mono);font-weight:700" oninput="qlAutoResult()">
+          </div>
+        </div>
+        <div>
+          <label class="fl"><i class="bi bi-shield-fill-minus" style="margin-right:3px;color:#f59e0b"></i>Risk ($)</label>
+          <div style="position:relative">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">$</span>
+            <input class="fi" type="number" id="ql-risk" placeholder="100" step="any" style="padding-left:22px;font-family:var(--mono)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Date + Session row -->
+      <div class="ql-grid" style="margin-bottom:12px">
+        <div>
+          <label class="fl"><i class="bi bi-calendar3" style="margin-right:3px"></i>Tanggal</label>
+          <input class="fi" type="date" id="ql-dt">
+        </div>
+        <div>
+          <label class="fl"><i class="bi bi-clock" style="margin-right:3px"></i>Sesi</label>
+          <select class="fi" id="ql-ses">
+            <option value="London">London</option>
+            <option value="New York">New York</option>
+            <option value="Asia">Asia</option>
+            <option value="London-NY Overlap">London-NY Overlap</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Expand optional fields -->
+      <div class="ql-expand-link" id="ql-expand-btn" onclick="qlToggleExtras()">
+        <i class="bi bi-chevron-down" id="ql-expand-icon" style="font-size:11px;transition:transform .2s"></i>
+        <span id="ql-expand-label">Tambah detail (opsional): Emosi · Catatan · Setup Tag</span>
+      </div>
+
+      <!-- Optional extras accordion -->
+      <div id="ql-extras">
+
+        <!-- Emotion -->
+        <div style="margin-bottom:12px;margin-top:12px">
+          <label class="fl" style="margin-bottom:7px"><i class="bi bi-heart-pulse" style="margin-right:4px"></i>Kondisi Emosi</label>
+          <div class="ql-em-row">
+            <button type="button" class="ql-em-btn" data-em="Calm"       onclick="qlSetEmotion('Calm',this)">😌 Calm</button>
+            <button type="button" class="ql-em-btn" data-em="Confident"  onclick="qlSetEmotion('Confident',this)">💪 Confident</button>
+            <button type="button" class="ql-em-btn" data-em="FOMO"       onclick="qlSetEmotion('FOMO',this)">⚡ FOMO</button>
+            <button type="button" class="ql-em-btn" data-em="Anxious"    onclick="qlSetEmotion('Anxious',this)">😰 Anxious</button>
+            <button type="button" class="ql-em-btn" data-em="Impatient"  onclick="qlSetEmotion('Impatient',this)">⏳ Impatient</button>
+            <button type="button" class="ql-em-btn" data-em="Revenge"    onclick="qlSetEmotion('Revenge',this)">🔥 Revenge</button>
+          </div>
+          <input type="hidden" id="ql-em" value="Calm">
+        </div>
+
+        <!-- Setup tag chips -->
+        <div style="margin-bottom:12px">
+          <label class="fl" style="margin-bottom:7px"><i class="bi bi-tags" style="margin-right:4px"></i>Setup Tag</label>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px" id="ql-tag-chips">
+            <button type="button" class="tag-chip" data-tag="BOS"          onclick="qlToggleTag(this)">BOS</button>
+            <button type="button" class="tag-chip" data-tag="OB"           onclick="qlToggleTag(this)">OB</button>
+            <button type="button" class="tag-chip" data-tag="FVG"          onclick="qlToggleTag(this)">FVG</button>
+            <button type="button" class="tag-chip" data-tag="Breakout"     onclick="qlToggleTag(this)">Breakout</button>
+            <button type="button" class="tag-chip" data-tag="Reversal"     onclick="qlToggleTag(this)">Reversal</button>
+            <button type="button" class="tag-chip" data-tag="Trend Follow" onclick="qlToggleTag(this)">Trend Follow</button>
+            <button type="button" class="tag-chip" data-tag="News Play"    onclick="qlToggleTag(this)">News Play</button>
+            <button type="button" class="tag-chip" data-tag="Liquidity Grab" onclick="qlToggleTag(this)">Liq. Grab</button>
+            <button type="button" class="tag-chip" data-tag="Supply/Demand" onclick="qlToggleTag(this)">S&amp;D</button>
+          </div>
+          <input class="fi" type="text" id="ql-su" placeholder="Custom tag... (pisahkan dengan koma)" style="font-size:12px">
+        </div>
+
+        <!-- Notes -->
+        <div style="margin-bottom:4px">
+          <label class="fl" style="margin-bottom:7px"><i class="bi bi-chat-left-text" style="margin-right:4px"></i>Catatan</label>
+          <textarea class="ta" id="ql-nt" placeholder="Setup, alasan entry, lesson learned…" style="min-height:60px;font-size:12px"></textarea>
+        </div>
+
+      </div><!-- /#ql-extras -->
+
+    </div><!-- /#ql-panel -->
+
+    <!-- ══════════════════════════════════════════
+         FULL FORM PANEL (existing)
+         ══════════════════════════════════════════ -->
+    <div id="full-form-panel" class="hidden" style="overflow-y:auto;flex:1;padding:20px 24px">
 
       <!-- ── STEP 1: Basic Info ── -->
       <div class="tm-section" style="margin-bottom:18px">
@@ -6584,10 +6878,11 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
       </div>
 
-    </div><!-- /scrollable body -->
+    </div><!-- /scrollable body (full-form) -->
+    </div><!-- /#full-form-panel -->
 
     <!-- Footer actions -->
-    <div style="padding:14px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:10px;align-items:center;background:var(--bg2)">
+    <div style="padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:10px;align-items:center;background:var(--bg2)">
       <div style="flex:1;font-size:11px;color:var(--text3);font-family:var(--mono)" id="trade-rr-footer"></div>
       <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="padding:9px 18px;font-size:13px">Batal</button>
       <button class="btn" id="trade-save" style="padding:9px 24px;font-size:13px;display:flex;align-items:center;gap:7px">
@@ -9268,18 +9563,199 @@ function openTrade() {
       return;
     }
     clearScreenshot();
-    $('f-dt').value = new Date().toISOString().slice(0,10);
+    _resetQuickLog();
     _resetTradeModal();
+    // Default to Quick Log mode
+    setLogMode('quick');
+    // Show mode toggle (hidden when editing)
+    const tog = $('ql-mode-toggle');
+    if (tog) tog.style.display = '';
     $('md-trade').classList.add('open');
-    const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
-    if (body) body.scrollTop = 0;
-    setTimeout(() => $('f-pair').focus(), 80);
+    const qlPanel = $('ql-panel');
+    if (qlPanel) qlPanel.scrollTop = 0;
+    setTimeout(() => $('ql-pair').focus(), 80);
   });
 }
 
 function closeTradeModal() {
   $('md-trade').classList.remove('open');
 }
+
+// ══════════════════════════════════════════════════════
+// QUICK LOG — mode toggle, field helpers, save handler
+// ══════════════════════════════════════════════════════
+
+// Current log mode: 'quick' | 'full'
+window._logMode = 'quick';
+
+window.setLogMode = function(mode) {
+  window._logMode = mode;
+  const qlPanel   = $('ql-panel');
+  const fullPanel = $('full-form-panel');
+  const btnQuick  = $('ql-btn-quick');
+  const btnFull   = $('ql-btn-full');
+
+  if (mode === 'quick') {
+    qlPanel.classList.add('visible');
+    fullPanel.classList.add('hidden');
+    btnQuick.classList.add('active');
+    btnFull.classList.remove('active');
+    $('trade-modal-subtitle').textContent = '4 field wajib · simpan cepat';
+  } else {
+    qlPanel.classList.remove('visible');
+    fullPanel.classList.remove('hidden');
+    btnFull.classList.add('active');
+    btnQuick.classList.remove('active');
+    $('trade-modal-subtitle').textContent = 'Catat trade lengkap ke journal kamu';
+  }
+};
+
+// Pair
+window.qlSetPair = function(pair, el) {
+  $('ql-pair').value = pair;
+  document.querySelectorAll('#ql-pair-chips .qpair-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+};
+$('ql-pair').addEventListener('input', () => {
+  const v = $('ql-pair').value.toUpperCase();
+  document.querySelectorAll('#ql-pair-chips .qpair-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.pair === v);
+  });
+});
+
+// Direction
+window.qlSetDir = function(dir) {
+  $('ql-dir').value = dir;
+  $('ql-dir-long').classList.toggle('active-long', dir === 'Long');
+  $('ql-dir-long').classList.remove('active-short');
+  $('ql-dir-short').classList.toggle('active-short', dir === 'Short');
+  $('ql-dir-short').classList.remove('active-long');
+};
+
+// Result
+window.qlSetResult = function(res) {
+  $('ql-res').value = res;
+  ['win','loss','be'].forEach(k => {
+    $('ql-r-'+k).classList.remove('active-win','active-loss','active-be');
+  });
+  const map = { Win:'win', Loss:'loss', Breakeven:'be' };
+  $('ql-r-'+map[res]).classList.add('active-'+res.toLowerCase().replace('breakeven','be'));
+};
+
+// Auto result from P&L
+window.qlAutoResult = function() {
+  const pnl = parseFloat($('ql-pnl').value);
+  if (isNaN(pnl)) return;
+  if (pnl > 0) qlSetResult('Win');
+  else if (pnl < 0) qlSetResult('Loss');
+  else qlSetResult('Breakeven');
+};
+
+// Emotion
+window.qlSetEmotion = function(em, el) {
+  $('ql-em').value = em;
+  document.querySelectorAll('.ql-em-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+};
+
+// Tag chips
+window.qlToggleTag = function(el) {
+  el.classList.toggle('active');
+  const active = [...document.querySelectorAll('#ql-tag-chips .tag-chip.active')].map(c => c.dataset.tag);
+  $('ql-su').value = active.join(', ');
+};
+
+// Expand / collapse optional extras
+window.qlToggleExtras = function() {
+  const extras = $('ql-extras');
+  const icon   = $('ql-expand-icon');
+  const label  = $('ql-expand-label');
+  const isOpen = extras.classList.toggle('open');
+  icon.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  label.textContent = isOpen
+    ? 'Sembunyikan detail tambahan'
+    : 'Tambah detail (opsional): Emosi · Catatan · Setup Tag';
+};
+
+// Reset Quick Log fields
+function _resetQuickLog() {
+  $('ql-pair').value  = '';
+  $('ql-pnl').value   = '';
+  $('ql-risk').value  = '';
+  $('ql-res').value   = '';
+  $('ql-em').value    = 'Calm';
+  $('ql-su').value    = '';
+  $('ql-nt').value    = '';
+  $('ql-dir').value   = 'Long';
+  $('ql-dt').value    = new Date().toISOString().slice(0,10);
+  // Reset direction buttons
+  $('ql-dir-long').classList.add('active-long');
+  $('ql-dir-short').classList.remove('active-short');
+  // Reset result buttons
+  ['win','loss','be'].forEach(k => $('ql-r-'+k).classList.remove('active-win','active-loss','active-be'));
+  // Reset pair chips
+  document.querySelectorAll('#ql-pair-chips .qpair-btn').forEach(b => b.classList.remove('active'));
+  // Reset tag chips
+  document.querySelectorAll('#ql-tag-chips .tag-chip.active').forEach(c => c.classList.remove('active'));
+  // Reset emotion buttons
+  document.querySelectorAll('.ql-em-btn').forEach(b => b.classList.remove('active'));
+  // Collapse extras
+  $('ql-extras').classList.remove('open');
+  const icon = $('ql-expand-icon');
+  if (icon) icon.style.transform = 'rotate(0deg)';
+  const label = $('ql-expand-label');
+  if (label) label.textContent = 'Tambah detail (opsional): Emosi · Catatan · Setup Tag';
+  // Restore default ses
+  const qlSes = $('ql-ses'); if (qlSes) qlSes.value = 'London';
+}
+
+// Save Quick Log trade
+window._saveQuickLog = async function() {
+  const pair = $('ql-pair').value.trim().toUpperCase();
+  const res  = $('ql-res').value;
+
+  // Validation: wajib pair + result
+  if (!pair) {
+    $('ql-pair').style.borderColor = '#ff4d4d';
+    $('ql-pair').focus();
+    setTimeout(() => $('ql-pair').style.borderColor = '', 1500);
+    return;
+  }
+  if (!res) {
+    // Highlight result buttons
+    ['win','loss','be'].forEach(k => {
+      const el = $('ql-r-'+k);
+      el.style.borderColor = '#ff4d4d';
+      setTimeout(() => el.style.borderColor = '', 1500);
+    });
+    return;
+  }
+
+  const pnl  = parseFloat($('ql-pnl').value) || 0;
+  const risk = parseFloat($('ql-risk').value) || 100;
+  const trade = {
+    date:    $('ql-dt').value || new Date().toISOString().slice(0,10),
+    pair,
+    dir:     $('ql-dir').value || 'Long',
+    session: $('ql-ses').value || 'London',
+    entry:   0, exit: 0, sl: 0,
+    risk, pnl,
+    r: Math.round(pnl / risk * 100) / 100,
+    result:  res,
+    setup:   $('ql-su').value.trim(),
+    emotion: $('ql-em').value || 'Calm',
+    notes:   $('ql-nt').value.trim(),
+    playbookId: null,
+    holdingMinutes: 0,
+    rating: 0,
+    plannedRR: 0,
+    mistakes: '',
+  };
+
+  // Close modal first for snappy feel
+  closeTradeModal();
+  await saveTradeToCloud(trade);
+};
 
 $('dash-log-btn').addEventListener('click', openTrade);
 $('journal-log-btn').addEventListener('click', openTrade);
@@ -9288,6 +9764,12 @@ $('trade-cancel').addEventListener('click', closeTradeModal);
 $('md-trade').addEventListener('click', e => { if(e.target===$('md-trade')) closeTradeModal(); });
 
 $('trade-save').addEventListener('click', async () => {
+  // Route to Quick Log save if in quick mode
+  if (window._logMode === 'quick') {
+    await window._saveQuickLog();
+    return;
+  }
+  // ── Full form save ──
   const risk = parseFloat($('f-rk').value) || 100;
   const pnl  = parseFloat($('f-pnl').value) || 0;
   const editId = $('f-edit-id').value || '';
@@ -9398,9 +9880,13 @@ window.editTrade = (firestoreId) => {
   $('trade-modal-icon').className = 'bi bi-pencil-fill';
   $('trade-save-label').textContent = 'Simpan Perubahan';
   $('trade-save-icon').className = 'bi bi-check2-circle';
+  // Edit always uses full form — hide mode toggle
+  const tog = $('ql-mode-toggle');
+  if (tog) tog.style.display = 'none';
+  setLogMode('full');
   // Open modal
   $('md-trade').classList.add('open');
-  const body = document.querySelector('#md-trade-inner > div[style*="overflow-y"]');
+  const body = $('full-form-panel');
   if (body) body.scrollTop = 0;
 };
 
