@@ -991,36 +991,33 @@ tr:hover td{background:rgba(139,92,246,.04);}
 }
 #md-trade .md{border-radius:20px;}
 @media(max-width:600px){
+  #md-trade{align-items:flex-end!important;}
   #md-trade-inner{
     width:100%!important;
     border-radius:20px 20px 0 0!important;
     position:fixed!important;
-    bottom:0;left:0;right:0;
-    max-height:88vh!important;   /* sedikit lebih pendek supaya footer tidak terpotong */
+    bottom:0!important;left:0!important;right:0!important;
+    max-height:90vh!important;
     display:flex!important;
     flex-direction:column!important;
+    overflow:hidden!important;
   }
-  #md-trade{align-items:flex-end!important;}
-
-  /* Quick Log panel: scroll sendiri, jangan dorong footer */
   #ql-panel{
-    flex:1!important;
-    overflow-y:auto!important;
-    min-height:0!important;        /* kunci flex scroll */
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:8px!important;
-  }
-  /* Full form panel: sama */
-  #full-form-panel{
-    flex:1!important;
+    flex:1 1 auto!important;
     overflow-y:auto!important;
     min-height:0!important;
     -webkit-overflow-scrolling:touch;
   }
-  /* Footer: always pinned at bottom, respects iPhone notch */
-  #md-trade-inner > div:last-child {
+  #full-form-panel{
+    flex:1 1 auto!important;
+    overflow-y:auto!important;
+    min-height:0!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* Footer selalu terlihat di bawah */
+  #md-trade-inner > div:last-child{
     flex-shrink:0!important;
-    padding-bottom:max(14px, env(safe-area-inset-bottom))!important;
+    padding-bottom:calc(12px + env(safe-area-inset-bottom))!important;
   }
 }
 
@@ -7149,12 +7146,17 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div><!-- /#full-form-panel -->
 
     <!-- Footer actions -->
-    <div style="padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:10px;align-items:center;background:var(--bg2)">
-      <div style="flex:1;font-size:11px;color:var(--text3);font-family:var(--mono)" id="trade-rr-footer"></div>
-      <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="padding:9px 18px;font-size:13px">Batal</button>
-      <button class="btn" id="trade-save" style="padding:9px 24px;font-size:13px;display:flex;align-items:center;gap:7px">
-        <i class="bi bi-cloud-check" style="font-size:14px" id="trade-save-icon"></i> <span id="trade-save-label">Simpan Trade</span>
-      </button>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2)">
+      <!-- RR info row (opsional, hanya muncul kalau ada data) -->
+      <div id="trade-rr-footer" style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;min-height:0;text-align:center"></div>
+      <!-- Button row -->
+      <div style="display:flex;gap:8px">
+        <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="flex:1;padding:11px 0;font-size:13px;text-align:center">Batal</button>
+        <button class="btn" id="trade-save" style="flex:2;padding:11px 0;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px">
+          <i class="bi bi-cloud-check" style="font-size:14px" id="trade-save-icon"></i>
+          <span id="trade-save-label">Simpan Trade</span>
+        </button>
+      </div>
     </div>
 
   </div>
