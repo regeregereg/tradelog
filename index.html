@@ -1018,10 +1018,31 @@ tr:hover td{background:rgba(139,92,246,.04);}
     position:fixed !important;
     bottom:0 !important; left:0 !important; right:0 !important;
     max-height:90vh !important;
+    display:flex !important;
+    flex-direction:column !important;
   }
-  #md-trade-inner > div:last-child {
+  /* Footer tombol Batal & Simpan — selalu visible di mobile, di atas bottom nav */
+  #trade-modal-footer {
     flex-shrink:0 !important;
-    padding-bottom:calc(12px + env(safe-area-inset-bottom)) !important;
+    padding-bottom:calc(12px + 64px + env(safe-area-inset-bottom)) !important;
+  }
+  /* Pastikan tombol mengisi lebar penuh */
+  #trade-modal-footer > div:last-child {
+    display:flex !important;
+    flex-direction:row !important;
+    gap:8px !important;
+    width:100% !important;
+  }
+  #trade-cancel-footer {
+    flex:1 !important;
+    min-width:0 !important;
+    display:block !important;
+    width:100% !important;
+  }
+  #trade-save {
+    flex:2 !important;
+    min-width:0 !important;
+    width:100% !important;
   }
 }
 
@@ -7150,13 +7171,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     </div><!-- /#full-form-panel -->
 
     <!-- Footer actions -->
-    <div style="padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2)">
+    <div id="trade-modal-footer" style="padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg2);position:relative;z-index:1">
       <!-- RR info row (opsional, hanya muncul kalau ada data) -->
-      <div id="trade-rr-footer" style="font-size:11px;color:var(--text3);font-family:var(--mono);text-align:center;display:none"></div>
+      <div id="trade-rr-footer" style="font-size:11px;color:var(--text3);font-family:var(--mono);text-align:center;display:none;margin-bottom:8px"></div>
       <!-- Button row -->
-      <div style="display:flex;gap:8px">
-        <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="flex:1;padding:11px 0;font-size:13px;text-align:center">Batal</button>
-        <button class="btn" id="trade-save" style="flex:2;padding:11px 0;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px">
+      <div style="display:flex;flex-direction:row;gap:8px;width:100%">
+        <button class="btng" id="trade-cancel-footer" onclick="document.getElementById('trade-cancel').click()" style="flex:1;min-width:0;padding:11px 0;font-size:13px;text-align:center;display:block;box-sizing:border-box">Batal</button>
+        <button class="btn" id="trade-save" style="flex:2;min-width:0;padding:11px 0;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px;box-sizing:border-box">
           <i class="bi bi-cloud-check" style="font-size:14px" id="trade-save-icon"></i>
           <span id="trade-save-label">Simpan Trade</span>
         </button>
