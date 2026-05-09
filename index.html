@@ -1136,7 +1136,6 @@ tr:hover td{background:rgba(139,92,246,.04);}
   background: linear-gradient(90deg, rgba(139,92,246,.95), rgba(124,106,247,.95));
   backdrop-filter: blur(10px);
   padding: 9px 16px;
-  display: none;
   align-items: center; gap: 10px;
   box-shadow: 0 2px 16px rgba(139,92,246,.3);
   animation: _reminderSlideDown .3s cubic-bezier(.34,1.56,.64,1);
@@ -9501,7 +9500,7 @@ function _showLossAlert(streak) {
     </div>`;
   el.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(14,14,16,.96);border:1px solid ${cfg.border};border-radius:16px;padding:16px 18px;max-width:400px;width:calc(100% - 40px);box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(12px);animation:_lossAlertIn .35s cubic-bezier(.34,1.56,.64,1)`;
   document.body.appendChild(el);
-  setTimeout(() => { if (el.parentNode) { el.style.transition='opacity .5s,transform .5s'; el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>el.remove(),500); }}, 10000);
+  setTimeout(() => { if (el.parentNode) { el.style.transition='opacity .5s,transform .5s'; el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>el.remove(),500); }}, 30000);
 }
 // Keyframe for alert
 if (!document.getElementById('_lossAlertStyle')) {
@@ -18800,7 +18799,7 @@ var PERIOD_MAP = {
   },
 };
 
-var PERIOD_LABELS = { all: 'Overview', '7': '7H', '30': '30H', '180': '180H', '365': '1Y', '90': '90H', '365': '1Y' };
+var PERIOD_LABELS = { all: 'Overview', '7': '7H', '30': '30H', '90': '90H', '180': '180H', '365': '1Y' };
 
 function _activateTab(selector, attrKey, value) {
   document.querySelectorAll(selector).forEach(function(btn) {
