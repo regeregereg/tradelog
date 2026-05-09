@@ -1136,6 +1136,7 @@ tr:hover td{background:rgba(139,92,246,.04);}
   background: linear-gradient(90deg, rgba(139,92,246,.95), rgba(124,106,247,.95));
   backdrop-filter: blur(10px);
   padding: 9px 16px;
+  display: none;
   align-items: center; gap: 10px;
   box-shadow: 0 2px 16px rgba(139,92,246,.3);
   animation: _reminderSlideDown .3s cubic-bezier(.34,1.56,.64,1);
@@ -5963,7 +5964,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         onmouseout="this.style.background='var(--accent)';this.style.boxShadow='0 4px 14px rgba(139,92,246,.3)';this.style.transform='none'">
         <i class="bi bi-lightning-charge-fill" style="font-size:10px;margin-right:4px"></i>Lihat Apa yang Kamu Dapat
       </button>
-      <div style="text-align:center;margin-top:7px;font-size:10px;color:var(--text3);font-family:var(--mono)">Bayar sekali · Akses selamanya</div>
+      <div style="text-align:center;margin-top:7px;font-size:10px;color:var(--text3);font-family:var(--mono)">Rp99.000/bulan · Early Bird untuk 50 user pertama</div>
     </div>
   </div>
 
@@ -6049,7 +6050,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(139,92,246,.35)'">
           <i class="bi bi-lightning-charge-fill" style="font-size:12px"></i> Upgrade Sekarang
         </button>
-        <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono)">Bayar sekali · Akses selamanya · No subscription</div>
+        <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono)">Rp99.000/bulan · Early Bird untuk 50 user pertama</div>
       </div>
 
     </div>
@@ -6150,7 +6151,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:var(--accent);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px;box-shadow:0 4px 18px rgba(139,92,246,.35);transition:all .18s;letter-spacing:.1px;box-sizing:border-box"
         onmouseover="this.style.background='#7c3aed';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(139,92,246,.45)'"
         onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 4px 18px rgba(139,92,246,.35)'">
-        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Dapatkan Akses Sekarang
+        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Mulai Premium — Rp99.000/bulan
       </a>
       <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text3);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:8px;transition:all .15s;box-sizing:border-box"
@@ -8136,16 +8137,19 @@ const isMob = () => window.innerWidth <= 768;
 //
 // PREMIUM TIER (email di /invites/{email}):
 //   - Unlimited trade journal
-//   - 15 playbook strategies
-//   - Unlimited daily journal
-//   - DNA Radar Analysis
-//   - PropFirm tracker
+//   PREMIUM (Rp99.000/bulan · Early Bird Rp99k untuk 50 user pertama):
+//   - Advanced Analytics (MAE/MFE, Trader DNA, Deep Stats)
+//   - Daily Journal (bias & psikologi) — unlimited
+//   - Active Trade Tracker
+//   - PropFirm / FTMO Tracker
+//   - Playbook (hingga 15 slot)
+//   - Trading Calendar
 //   - Daily Reminder
 //   - Badge PRO di profile
 // ════════════════════════════════════════════════════
-const FREE_MONTHLY_LIMIT   = 10;  // trade journal/bulan
-const FREE_PLAYBOOK_LIMIT  = 3;   // max playbook strategies
-const FREE_DAILY_LIMIT     = 5;   // daily journal entries/bulan
+const FREE_MONTHLY_LIMIT   = 10;  // trade journal/bulan (free)
+const FREE_PLAYBOOK_LIMIT  = 3;   // max playbook strategies (free)
+const FREE_DAILY_LIMIT     = 5;   // daily journal entries/bulan (free)
 const PREM_PLAYBOOK_LIMIT  = 15;  // premium playbook max
 let _isPremiumCache = null;       // cached per session setelah login
 
@@ -8586,6 +8590,22 @@ function openFeatureGateModal(feature) {
       pct:     0,
       lockd:   true,
     },
+    calendar: {
+      icon:    'bi-calendar3',
+      title:   'Trading Calendar — Premium',
+      desc:    `Lihat seluruh histori trading kamu dalam tampilan kalender. Temukan <strong style="color:var(--accent2)">hari terbaik dan terburuk</strong> kamu, kenali pola performa mingguan, dan buat keputusan lebih cerdas.`,
+      blocker: 'Trading Calendar',
+      pct:     0,
+      lockd:   true,
+    },
+    active: {
+      icon:    'bi-activity',
+      title:   'Active Trade Tracker — Premium',
+      desc:    `Track trade yang <strong style="color:var(--accent2)">sedang berjalan</strong> secara real-time. Catat entry plan, monitor R:R live, dan tutup trade langsung ke journal — semua dalam satu alur.`,
+      blocker: 'Active Trade Tracker',
+      pct:     0,
+      lockd:   true,
+    },
   };
 
   const cfg      = CONFIGS[feature] || CONFIGS.trade;
@@ -8595,12 +8615,12 @@ function openFeatureGateModal(feature) {
   const benefits = [
     { icon: 'bi-journal-richtext', label: 'Unlimited trade journal'              },
     { icon: 'bi-calendar2-check',  label: 'Unlimited daily journal'              },
-    { icon: 'bi-book',             label: `Up to ${PREM_PLAYBOOK_LIMIT} playbooks` },
-    { icon: 'bi-activity',         label: 'Trader DNA Radar'                     },
-    { icon: 'bi-trophy',           label: 'PropFirm Tracker'                     },
-    { icon: 'bi-bell',             label: 'Daily Reminder'                       },
-    { icon: 'bi-patch-check',      label: 'PRO badge on profile'                 },
-    { icon: 'bi-unlock',           label: 'All features unlocked'                },
+    { icon: 'bi-calendar3',        label: 'Trading Calendar'                     },
+    { icon: 'bi-activity',         label: 'Active Trade Tracker'                 },
+    { icon: 'bi-book',             label: `Playbook (${PREM_PLAYBOOK_LIMIT} slot)` },
+    { icon: 'bi-bar-chart-line',   label: 'Advanced Analytics & Trader DNA'      },
+    { icon: 'bi-trophy',           label: 'PropFirm / FTMO Tracker'              },
+    { icon: 'bi-patch-check',      label: 'Badge PRO di profil'                  },
   ];
 
   const modal = document.createElement('div');
@@ -8660,7 +8680,7 @@ function openFeatureGateModal(feature) {
          style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;font-size:14px;font-weight:700;background:var(--accent);color:#fff;border-radius:11px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.4);font-family:var(--font);letter-spacing:-.1px;transition:all .2s;box-sizing:border-box"
          onmouseover="this.style.background='#7c3aed';this.style.boxShadow='0 6px 28px rgba(139,92,246,.55)';this.style.transform='translateY(-1px)'"
          onmouseout="this.style.background='var(--accent)';this.style.boxShadow='0 4px 20px rgba(139,92,246,.4)';this.style.transform='none'">
-        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Upgrade to Premium
+        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Upgrade ke Premium — Rp99k/bulan
       </a>
 
       <div style="text-align:center">
@@ -8709,11 +8729,18 @@ function updateFreemiumUI(isPrem) {
     if (emailEl && currentUser?.email) {
       emailEl.innerHTML = currentUser.email + ' <span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:8px;font-weight:900;padding:1px 5px;border-radius:4px;letter-spacing:.3px;font-family:var(--font);vertical-align:middle">PRO</span>';
     }
-    // Show PropFirm and Reminder in nav for premium
-    const ftmoNav = document.getElementById('nav-ftmo');
-    const remNav  = document.getElementById('nav-reminder');
-    if (ftmoNav) { ftmoNav.style.opacity = '1'; ftmoNav.style.pointerEvents = ''; ftmoNav.title = ''; }
-    if (remNav)  { remNav.style.opacity  = '1'; remNav.style.pointerEvents  = ''; remNav.title = ''; }
+    // Show PropFirm, Calendar, and Reminder in nav for premium
+    const ftmoNav     = document.getElementById('nav-ftmo');
+    const remNav      = document.getElementById('nav-reminder');
+    const calNav      = document.getElementById('nav-calendar');
+    const atTab       = document.getElementById('at-tab-active');
+    if (ftmoNav)  { ftmoNav.style.opacity = '1'; ftmoNav.style.pointerEvents = ''; ftmoNav.title = ''; }
+    if (remNav)   { remNav.style.opacity  = '1'; remNav.style.pointerEvents  = ''; remNav.title = ''; }
+    if (calNav)   { calNav.style.opacity  = '1'; calNav.style.pointerEvents  = ''; calNav.title = ''; }
+    // Remove lock icons if present
+    [ftmoNav, remNav, calNav].forEach(n => { if (n) { const l = n.querySelector('.prem-lock'); if (l) l.remove(); } });
+    // Remove lock label from Active tab if present
+    if (atTab) { const l = atTab.querySelector('.prem-lock'); if (l) l.remove(); atTab.title = ''; }
     return;
   }
 
@@ -8756,28 +8783,34 @@ function updateFreemiumUI(isPrem) {
     </div>
     ${rem > 0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)"><a href="#" onclick="event.preventDefault();openFeatureGateModal('trade')" style="font-size:10px;color:rgba(139,92,246,.7);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='rgba(139,92,246,.7)'"><i class="bi bi-lightning-charge-fill" style="margin-right:3px"></i>Lihat benefit premium</a></div>` : ''}`;
 
-  // Lock PropFirm and Reminder nav for free users with visual hint
+  // Lock PropFirm, Calendar, and Reminder nav for free users with visual hint
   const ftmoNav = document.getElementById('nav-ftmo');
   const remNav  = document.getElementById('nav-reminder');
-  if (ftmoNav) {
-    ftmoNav.style.opacity = '0.45';
-    ftmoNav.style.pointerEvents = 'none';
-    ftmoNav.title = 'PropFirm Tracker — Premium only';
-    // Add lock icon if not there
-    if (!ftmoNav.querySelector('.prem-lock')) {
+  const calNav  = document.getElementById('nav-calendar');
+
+  // Helper: apply lock to a nav item
+  function _lockNav(el, gateKey, label) {
+    if (!el) return;
+    el.style.opacity = '0.45';
+    el.style.pointerEvents = 'none';
+    el.title = label + ' — Premium only';
+    if (!el.querySelector('.prem-lock')) {
       const lock = document.createElement('span');
       lock.className = 'prem-lock';
       lock.innerHTML = '<i class="bi bi-lock-fill" style="font-size:9px;margin-left:auto;opacity:.5"></i>';
       lock.style.cssText = 'margin-left:auto;display:flex;align-items:center';
-      ftmoNav.appendChild(lock);
-      // Re-enable click to show gate
-      ftmoNav.style.pointerEvents = '';
-      ftmoNav.style.cursor = 'pointer';
-      ftmoNav.addEventListener('click', (e) => {
-        if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal('ftmo'); }
+      el.appendChild(lock);
+      el.style.pointerEvents = '';
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', (e) => {
+        if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal(gateKey); }
       }, true);
     }
   }
+
+  _lockNav(ftmoNav,  'ftmo',     'PropFirm Tracker');
+  _lockNav(calNav,   'calendar', 'Trading Calendar');
+
   if (remNav) {
     remNav.style.opacity = '0.45';
     if (!remNav.querySelector('.prem-lock')) {
@@ -8791,6 +8824,16 @@ function updateFreemiumUI(isPrem) {
         if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal('reminder'); }
       }, true);
     }
+  }
+
+  // Lock Active Trade Tracker tab with lock label
+  const atTab = document.getElementById('at-tab-active');
+  if (atTab && !atTab.querySelector('.prem-lock')) {
+    const lock = document.createElement('span');
+    lock.className = 'prem-lock';
+    lock.innerHTML = ' <i class="bi bi-lock-fill" style="font-size:9px;opacity:.6"></i>';
+    atTab.appendChild(lock);
+    atTab.title = 'Active Trade Tracker — Premium only';
   }
 }
 window.updateFreemiumUI = updateFreemiumUI;
@@ -9500,7 +9543,7 @@ function _showLossAlert(streak) {
     </div>`;
   el.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(14,14,16,.96);border:1px solid ${cfg.border};border-radius:16px;padding:16px 18px;max-width:400px;width:calc(100% - 40px);box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(12px);animation:_lossAlertIn .35s cubic-bezier(.34,1.56,.64,1)`;
   document.body.appendChild(el);
-  setTimeout(() => { if (el.parentNode) { el.style.transition='opacity .5s,transform .5s'; el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>el.remove(),500); }}, 30000);
+  setTimeout(() => { if (el.parentNode) { el.style.transition='opacity .5s,transform .5s'; el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>el.remove(),500); }}, 10000);
 }
 // Keyframe for alert
 if (!document.getElementById('_lossAlertStyle')) {
@@ -9652,6 +9695,7 @@ function goPage(name) {
   if (_isPremiumCache === false) {
     if (name === 'ftmo')     { openFeatureGateModal('ftmo');     return; }
     if (name === 'reminder') { openFeatureGateModal('reminder'); return; }
+    if (name === 'calendar') { openFeatureGateModal('calendar'); return; }
   }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
@@ -10570,6 +10614,11 @@ function _atSave() {
 
 // ── View switching ─────────────────────────────────────────────
 function switchJournalView(view) {
+  // ── Premium gate: Active Trade Tracker hanya untuk premium ──
+  if (view === 'active' && _isPremiumCache === false) {
+    openFeatureGateModal('active');
+    return;
+  }
   _journalView = view;
   const histPanel = document.getElementById('at-history-panel');
   const summaryEl = document.getElementById('journal-summary');
@@ -18799,7 +18848,7 @@ var PERIOD_MAP = {
   },
 };
 
-var PERIOD_LABELS = { all: 'Overview', '7': '7H', '30': '30H', '90': '90H', '180': '180H', '365': '1Y' };
+var PERIOD_LABELS = { all: 'Overview', '7': '7H', '30': '30H', '180': '180H', '365': '1Y', '90': '90H', '365': '1Y' };
 
 function _activateTab(selector, attrKey, value) {
   document.querySelectorAll(selector).forEach(function(btn) {
