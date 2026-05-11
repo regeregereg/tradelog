@@ -14177,10 +14177,11 @@ async function handleScreenshotFile(file) {
   if (!file) return;
   // ── Premium gate (second-layer defence) ──
   if (_isPremiumCache !== true) { openFeatureGateModal('screenshot'); return; }
-  if (!file.type.startsWith('image/')) { alert('Hanya file gambar (PNG/JPG) yang didukung.'); return; }
 
-  // Hard reject jika > 8MB (terlalu besar bahkan sebelum compress)
-  if (file.size > 8 * 1024 * 1024) { alert('File terlalu besar (maks 8MB sebelum compress). Gunakan export dari TradingView.'); return; }
+  // ── Validasi magic bytes — tolak sebelum preview/upload dimulai ──
+  // Hard cap 8MB sebelum compress (untuk validasi awal yg cepat)
+  const preCheck = await _validateImg(file, 8 * 1024 * 1024, 'chart screenshot');
+  if (!preCheck.ok) { alert(preCheck.error); return; }
 
   // Show local preview dulu agar terasa responsif
   const previewUrl = URL.createObjectURL(file);
@@ -14195,11 +14196,14 @@ async function handleScreenshotFile(file) {
     // Compress ke ≤1MB sebelum upload
     const compressed = await _compressImg(file, 1 * 1024 * 1024, 0.82);
 
-    // Reuse Cloudinary config dari Playbook module (sudah defined di scope global)
+    // Rename ke nama aman — buang nama file asli dari user
+    const uid = window._currentUser?.uid;
+    const safeCompressed = _safeFile(compressed, uid);
+
     const fd = new FormData();
-    fd.append('file', compressed);
+    fd.append('file', safeCompressed);
     fd.append('upload_preset', _CDN_PRESET);
-    if (window._currentUser) fd.append('tags', `uid_${window._currentUser.uid},journal`);
+    if (uid) fd.append('tags', `uid_${uid},journal`);
 
     const resp = await fetch(_CDN_UPLOAD_URL, { method: 'POST', body: fd });
     const res  = await resp.json();
@@ -16647,6 +16651,81 @@ let _pbSelectedColor = '#8b5cf6';
 let _pbDetailId = null;
 
 // ══════════════════════════════════════════════════════
+// ── UPLOAD SECURITY — Magic Bytes Validation
+// ══════════════════════════════════════════════════════
+// Magic bytes signatures untuk format yang diizinkan.
+// Cek header biner file sungguhan — bukan ekstensi atau MIME type
+// dari browser, keduanya trivial untuk dipalsukan.
+const _IMG_SIGNATURES = [
+  // PNG: 8 bytes \x89PNG\r\n\x1a\n
+  { bytes: [0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A] },
+  // JPEG: \xFF\xD8\xFF
+  { bytes: [0xFF,0xD8,0xFF] },
+  // WebP: RIFF (bytes 0-3) + WEBP (bytes 8-11)
+  { bytes: [0x52,0x49,0x46,0x46], extra: { offset:8, bytes:[0x57,0x45,0x42,0x50] } },
+];
+
+// Blok eksplisit SVG & HTML — keduanya bisa mengandung <script> → XSS
+// jika di-serve langsung dari CDN tanpa Content-Disposition.
+const _BLOCKED_PATTERNS = [
+  /^(\s*<\?xml|\s*<svg)/i,
+  /^(\s*<!doctype|\s*<html)/i,
+];
+
+// Baca N bytes pertama file sebagai Uint8Array (tanpa baca seluruh file).
+function _readHeader(file, n) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload  = e => resolve(new Uint8Array(e.target.result));
+    r.onerror = () => reject(new Error('Tidak bisa membaca file'));
+    r.readAsArrayBuffer(file.slice(0, n));
+  });
+}
+
+/**
+ * Validasi file gambar berdasarkan magic bytes.
+ * @param {File}   file     - File yang akan divalidasi
+ * @param {number} maxBytes - Ukuran maksimal (bytes)
+ * @param {string} ctx      - Label konteks untuk pesan error ('chart'|'playbook')
+ * @returns {Promise<{ok:boolean, error?:string}>}
+ */
+async function _validateImg(file, maxBytes, ctx) {
+  if (!file || file.size === 0) return { ok:false, error:'File kosong.' };
+  if (file.size > maxBytes) {
+    const mb = (maxBytes/1024/1024).toFixed(0);
+    return { ok:false, error:`File terlalu besar. Maks ${mb}MB untuk ${ctx}.` };
+  }
+  let hdr;
+  try { hdr = await _readHeader(file, 12); }
+  catch(e) { return { ok:false, error:'Tidak bisa membaca file. Coba lagi.' }; }
+
+  // Cek blocked types (SVG/HTML muncul sebagai teks)
+  const txt = new TextDecoder('utf-8',{fatal:false}).decode(hdr);
+  for (const pat of _BLOCKED_PATTERNS) {
+    if (pat.test(txt)) return { ok:false, error:'Format SVG/HTML tidak diizinkan (risiko keamanan).' };
+  }
+  // Cocokkan magic bytes yang diizinkan
+  for (const sig of _IMG_SIGNATURES) {
+    if (!sig.bytes.every((b,i) => hdr[i] === b)) continue;
+    if (sig.extra && !sig.extra.bytes.every((b,i) => hdr[sig.extra.offset+i] === b)) continue;
+    return { ok:true }; // ✅ valid
+  }
+  return { ok:false, error:'Format tidak didukung. Gunakan PNG, JPG, atau WebP.' };
+}
+
+/**
+ * Buat File baru dengan nama aman — nama asli dari user dibuang.
+ * Format output: {uid}/{timestamp}-{randomId}.{ext}
+ */
+function _safeFile(file, uid) {
+  const extMap = { 'image/png':'png', 'image/jpeg':'jpg', 'image/webp':'webp' };
+  const ext = extMap[file.type] || 'jpg';
+  const safeUid = (uid||'anon').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,28);
+  const name = `${safeUid}/${Date.now()}-${Math.random().toString(36).slice(2,9)}.${ext}`;
+  return new File([file], name, { type: file.type });
+}
+
+// ══════════════════════════════════════════════════════
 // ── CLOUDINARY CONFIG ─────────────────────────────────
 // ══════════════════════════════════════════════════════
 const _CDN_CLOUD  = 'dwkuq5mlt';
@@ -16694,15 +16773,17 @@ function _renderLbSlide() {
 // ── CLOUDINARY UPLOAD ─────────────────────────────────
 // Upload single file via unsigned preset → returns { url, publicId }
 async function _uploadToCloudinary(file, onProgress) {
-  if(file.size > 5 * 1024 * 1024) throw new Error('Ukuran file maks 5MB');
-  if(!file.type.startsWith('image/')) throw new Error('Hanya file gambar yang didukung');
-
+  // Validasi sudah dilakukan di _handlePbFiles sebelum fungsi ini dipanggil.
+  // Fungsi ini hanya menerima file yang sudah lolos magic bytes check.
   return new Promise((resolve, reject) => {
+    // Rename ke nama aman — nama asli user tidak dipakai
+    const uid = window._currentUser?.uid;
+    const safeF = _safeFile(file, uid);
+
     const fd = new FormData();
-    fd.append('file', file);
+    fd.append('file', safeF);
     fd.append('upload_preset', _CDN_PRESET);
-    // Tag with uid so we can find/manage later
-    if(window._currentUser) fd.append('tags', `uid_${window._currentUser.uid}`);
+    if(uid) fd.append('tags', `uid_${uid}`);
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', _CDN_UPLOAD_URL);
@@ -16783,8 +16864,20 @@ async function _handlePbFiles(files) {
   if(!window._currentUser) { alert('Login dulu untuk upload gambar'); return; }
   const remaining = 6 - _pbFormImages.length;
   if(remaining <= 0) { alert('Maksimal 6 gambar per strategi'); return; }
-  files = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, remaining);
+  files = Array.from(files).slice(0, remaining);
   if(!files.length) return;
+
+  // ── Validasi magic bytes untuk semua file SEBELUM upload dimulai ──
+  for (const file of files) {
+    const check = await _validateImg(file, 5 * 1024 * 1024, 'playbook');
+    if (!check.ok) {
+      const label = file.name.length > 28 ? file.name.slice(0,28)+'…' : file.name;
+      alert(`"${label}": ${check.error}`);
+      const inp = document.getElementById('pb-img-input');
+      if(inp) inp.value = '';
+      return;
+    }
+  }
 
   const uploadList = document.getElementById('pb-img-upload-list');
   const saveBtn    = document.getElementById('playbook-save-btn');
