@@ -217,6 +217,55 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 <!-- html2canvas: di-lazy load saat dibutuhkan (tidak di sini) -->
 
 <!-- ════════════════════════════════════════════════════════════
+     §HEAD-SECURITY — XSS Protection Layer
+     sanitizeInput()  → strip HTML sebelum simpan ke Firestore
+     renderSafe()     → render teks ke DOM tanpa XSS (no innerHTML)
+     Harus non-module & sebelum stubs agar tersedia global.
+     ════════════════════════════════════════════════════════════ -->
+<script>
+(function(w){
+  'use strict';
+  // ── §1 sanitizeInput: strip semua HTML, pertahankan newline ──
+  function sanitizeInput(str) {
+    if (typeof str !== 'string') return '';
+    var tmp = document.createElement('div');
+    tmp.textContent = str;
+    return tmp.textContent
+      .replace(/\r\n/g,'\n').replace(/\r/g,'\n')
+      .replace(/\n{4,}/g,'\n\n\n').trim();
+  }
+  // ── §2 renderSafe: textContent + <br> nodes, ZERO innerHTML ──
+  function renderSafe(el, text) {
+    if (!(el instanceof HTMLElement)) return;
+    while (el.firstChild) el.removeChild(el.firstChild);
+    if (typeof text !== 'string' || !text) { el.appendChild(document.createTextNode(text||'')); return; }
+    text.split('\n').forEach(function(line, i, arr) {
+      el.appendChild(document.createTextNode(line));
+      if (i < arr.length - 1) el.appendChild(document.createElement('br'));
+    });
+  }
+  function safeSetText(id, text) { var el=document.getElementById(id); if(el) renderSafe(el,text); }
+  // ── §3 escapeHtml: encode 5 special chars untuk innerHTML templates ──
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return str == null ? '' : String(str);
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  // ── §4 sanitizeTradeData: sanitasi semua free-text field sekaligus ──
+  var TEXT_FIELDS = ['notes','catatan','reasoning','notesLessons','reason',
+                     'desc','entryCondition','exitCondition','rules',
+                     'pairs','preplan','review','lessons','mental','setup'];
+  function sanitizeTradeData(data) {
+    if (!data || typeof data !== 'object') return data;
+    var out = Object.assign({}, data);
+    TEXT_FIELDS.forEach(function(f){ if(typeof out[f]==='string') out[f]=sanitizeInput(out[f]); });
+    return out;
+  }
+  w.Security = { sanitizeInput, renderSafe, safeSetText, escapeHtml, sanitizeTradeData };
+})(window);
+</script>
+
+<!-- ════════════════════════════════════════════════════════════
      §HEAD-STUBS — Global onclick stubs, crosshair plugin, lazy loader
      Harus non-module agar inline onclick= attribute bisa resolve.
      ════════════════════════════════════════════════════════════ -->
@@ -3513,9 +3562,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
             <!-- Slide 4: PropFirm -->
             <div class="ob-slide">
-              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.7);"></div>Fitur Tambahan</div>
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.7);"></div>Fitur Tambahan &nbsp;<span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:8px;font-weight:900;padding:2px 6px;border-radius:4px;letter-spacing:.3px;vertical-align:middle">PREMIUM</span></div>
               <div class="ob-title">Ikut Challenge PropFirm?</div>
-              <div class="ob-subtitle">Ada tracker khusus untuk kamu yang lagi ikut FTMO, MyFundedFx, atau prop firm lainnya. Monitor progress challenge real-time.</div>
+              <div class="ob-subtitle">Ada tracker khusus untuk kamu yang lagi ikut FTMO, MyFundedFx, atau prop firm lainnya. Monitor progress challenge real-time. <strong style="color:#f59e0b">Fitur ini tersedia di paket Premium.</strong></div>
               <div class="ob-features">
                 <div class="ob-feature">
                   <div class="ob-feature-icon" style="background:rgba(239,68,68,.08);color:#ef4444;font-size:18px;"><i class="bi bi-shield-fill-exclamation"></i></div>
@@ -3670,10 +3719,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <!-- Free tier note -->
       <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.1);border-radius:8px;padding:9px 12px;margin-top:12px;text-align:left">
         <div style="font-size:10px;color:rgba(255,255,255,.3);line-height:1.6;margin-bottom:5px">
-          <strong style="color:rgba(255,255,255,.5)">✦ Akun Gratis:</strong> 10 trade · 3 playbook · 5 daily journal per bulan
+          <strong style="color:rgba(255,255,255,.5)">✦ Akun Gratis:</strong> 20 trade · 3 playbook · 5 daily journal per bulan
         </div>
         <div style="font-size:10px;color:rgba(255,255,255,.3);line-height:1.6">
-          <strong style="color:#a78bfa">⚡ Premium:</strong> Unlimited trade, DNA Radar, PropFirm tracker & lebih ·
+          <strong style="color:#a78bfa">⚡ Premium (Rp99k/bulan):</strong> Advanced Analytics, Daily Journal, Active Tracker, PropFirm, Playbook, Calendar & lebih ·
           <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
             style="color:#a78bfa;text-decoration:none;font-weight:600">Lihat benefit →</a>
         </div>
@@ -4110,7 +4159,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.1px;display:flex;align-items:center;gap:5px;transition:all .18s" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='var(--accent)'">
             <i class="bi bi-person-circle" style="font-size:11px"></i> Save data to account
           </button>
-          <span style="font-size:11px;color:var(--text3)">or try free up to 10 trades</span>
+          <span style="font-size:11px;color:var(--text3)">or try free up to 20 trades</span>
         </div>
       </div>
     </div>
@@ -5964,7 +6013,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         onmouseout="this.style.background='var(--accent)';this.style.boxShadow='0 4px 14px rgba(139,92,246,.3)';this.style.transform='none'">
         <i class="bi bi-lightning-charge-fill" style="font-size:10px;margin-right:4px"></i>Lihat Apa yang Kamu Dapat
       </button>
-      <div style="text-align:center;margin-top:7px;font-size:10px;color:var(--text3);font-family:var(--mono)">Rp99.000/bulan · Early Bird untuk 50 user pertama</div>
+      <div style="text-align:center;margin-top:7px;font-size:10px;color:var(--text3);font-family:var(--mono)">Bayar sekali · Akses selamanya</div>
     </div>
   </div>
 
@@ -6050,7 +6099,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(139,92,246,.35)'">
           <i class="bi bi-lightning-charge-fill" style="font-size:12px"></i> Upgrade Sekarang
         </button>
-        <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono)">Rp99.000/bulan · Early Bird untuk 50 user pertama</div>
+        <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3);font-family:var(--mono)">Bayar sekali · Akses selamanya · No subscription</div>
       </div>
 
     </div>
@@ -6151,7 +6200,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:var(--accent);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px;box-shadow:0 4px 18px rgba(139,92,246,.35);transition:all .18s;letter-spacing:.1px;box-sizing:border-box"
         onmouseover="this.style.background='#7c3aed';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(139,92,246,.45)'"
         onmouseout="this.style.background='var(--accent)';this.style.transform='none';this.style.boxShadow='0 4px 18px rgba(139,92,246,.35)'">
-        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Mulai Premium — Rp99.000/bulan
+        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Dapatkan Akses Sekarang
       </a>
       <a href="https://www.instagram.com/riskpertrade.me/" target="_blank"
         style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text3);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:8px;transition:all .15s;box-sizing:border-box"
@@ -8137,19 +8186,16 @@ const isMob = () => window.innerWidth <= 768;
 //
 // PREMIUM TIER (email di /invites/{email}):
 //   - Unlimited trade journal
-//   PREMIUM (Rp99.000/bulan · Early Bird Rp99k untuk 50 user pertama):
-//   - Advanced Analytics (MAE/MFE, Trader DNA, Deep Stats)
-//   - Daily Journal (bias & psikologi) — unlimited
-//   - Active Trade Tracker
-//   - PropFirm / FTMO Tracker
-//   - Playbook (hingga 15 slot)
-//   - Trading Calendar
+//   - 15 playbook strategies
+//   - Unlimited daily journal
+//   - DNA Radar Analysis
+//   - PropFirm tracker
 //   - Daily Reminder
 //   - Badge PRO di profile
 // ════════════════════════════════════════════════════
-const FREE_MONTHLY_LIMIT   = 10;  // trade journal/bulan (free)
-const FREE_PLAYBOOK_LIMIT  = 3;   // max playbook strategies (free)
-const FREE_DAILY_LIMIT     = 5;   // daily journal entries/bulan (free)
+const FREE_MONTHLY_LIMIT   = 20;  // trade journal/bulan (free)
+const FREE_PLAYBOOK_LIMIT  = 3;   // max playbook strategies
+const FREE_DAILY_LIMIT     = 5;   // daily journal entries/bulan
 const PREM_PLAYBOOK_LIMIT  = 15;  // premium playbook max
 let _isPremiumCache = null;       // cached per session setelah login
 
@@ -8590,22 +8636,6 @@ function openFeatureGateModal(feature) {
       pct:     0,
       lockd:   true,
     },
-    calendar: {
-      icon:    'bi-calendar3',
-      title:   'Trading Calendar — Premium',
-      desc:    `Lihat seluruh histori trading kamu dalam tampilan kalender. Temukan <strong style="color:var(--accent2)">hari terbaik dan terburuk</strong> kamu, kenali pola performa mingguan, dan buat keputusan lebih cerdas.`,
-      blocker: 'Trading Calendar',
-      pct:     0,
-      lockd:   true,
-    },
-    active: {
-      icon:    'bi-activity',
-      title:   'Active Trade Tracker — Premium',
-      desc:    `Track trade yang <strong style="color:var(--accent2)">sedang berjalan</strong> secara real-time. Catat entry plan, monitor R:R live, dan tutup trade langsung ke journal — semua dalam satu alur.`,
-      blocker: 'Active Trade Tracker',
-      pct:     0,
-      lockd:   true,
-    },
   };
 
   const cfg      = CONFIGS[feature] || CONFIGS.trade;
@@ -8615,12 +8645,12 @@ function openFeatureGateModal(feature) {
   const benefits = [
     { icon: 'bi-journal-richtext', label: 'Unlimited trade journal'              },
     { icon: 'bi-calendar2-check',  label: 'Unlimited daily journal'              },
-    { icon: 'bi-calendar3',        label: 'Trading Calendar'                     },
-    { icon: 'bi-activity',         label: 'Active Trade Tracker'                 },
-    { icon: 'bi-book',             label: `Playbook (${PREM_PLAYBOOK_LIMIT} slot)` },
-    { icon: 'bi-bar-chart-line',   label: 'Advanced Analytics & Trader DNA'      },
-    { icon: 'bi-trophy',           label: 'PropFirm / FTMO Tracker'              },
-    { icon: 'bi-patch-check',      label: 'Badge PRO di profil'                  },
+    { icon: 'bi-book',             label: `Up to ${PREM_PLAYBOOK_LIMIT} playbooks` },
+    { icon: 'bi-activity',         label: 'Trader DNA Radar'                     },
+    { icon: 'bi-trophy',           label: 'PropFirm Tracker'                     },
+    { icon: 'bi-bell',             label: 'Daily Reminder'                       },
+    { icon: 'bi-patch-check',      label: 'PRO badge on profile'                 },
+    { icon: 'bi-unlock',           label: 'All features unlocked'                },
   ];
 
   const modal = document.createElement('div');
@@ -8680,7 +8710,7 @@ function openFeatureGateModal(feature) {
          style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;font-size:14px;font-weight:700;background:var(--accent);color:#fff;border-radius:11px;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(139,92,246,.4);font-family:var(--font);letter-spacing:-.1px;transition:all .2s;box-sizing:border-box"
          onmouseover="this.style.background='#7c3aed';this.style.boxShadow='0 6px 28px rgba(139,92,246,.55)';this.style.transform='translateY(-1px)'"
          onmouseout="this.style.background='var(--accent)';this.style.boxShadow='0 4px 20px rgba(139,92,246,.4)';this.style.transform='none'">
-        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Upgrade ke Premium — Rp99k/bulan
+        <i class="bi bi-lightning-charge-fill" style="font-size:13px"></i> Upgrade to Premium
       </a>
 
       <div style="text-align:center">
@@ -8729,18 +8759,11 @@ function updateFreemiumUI(isPrem) {
     if (emailEl && currentUser?.email) {
       emailEl.innerHTML = currentUser.email + ' <span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:8px;font-weight:900;padding:1px 5px;border-radius:4px;letter-spacing:.3px;font-family:var(--font);vertical-align:middle">PRO</span>';
     }
-    // Show PropFirm, Calendar, and Reminder in nav for premium
-    const ftmoNav     = document.getElementById('nav-ftmo');
-    const remNav      = document.getElementById('nav-reminder');
-    const calNav      = document.getElementById('nav-calendar');
-    const atTab       = document.getElementById('at-tab-active');
-    if (ftmoNav)  { ftmoNav.style.opacity = '1'; ftmoNav.style.pointerEvents = ''; ftmoNav.title = ''; }
-    if (remNav)   { remNav.style.opacity  = '1'; remNav.style.pointerEvents  = ''; remNav.title = ''; }
-    if (calNav)   { calNav.style.opacity  = '1'; calNav.style.pointerEvents  = ''; calNav.title = ''; }
-    // Remove lock icons if present
-    [ftmoNav, remNav, calNav].forEach(n => { if (n) { const l = n.querySelector('.prem-lock'); if (l) l.remove(); } });
-    // Remove lock label from Active tab if present
-    if (atTab) { const l = atTab.querySelector('.prem-lock'); if (l) l.remove(); atTab.title = ''; }
+    // Show PropFirm and Reminder in nav for premium
+    const ftmoNav = document.getElementById('nav-ftmo');
+    const remNav  = document.getElementById('nav-reminder');
+    if (ftmoNav) { ftmoNav.style.opacity = '1'; ftmoNav.style.pointerEvents = ''; ftmoNav.title = ''; }
+    if (remNav)  { remNav.style.opacity  = '1'; remNav.style.pointerEvents  = ''; remNav.title = ''; }
     return;
   }
 
@@ -8783,34 +8806,28 @@ function updateFreemiumUI(isPrem) {
     </div>
     ${rem > 0 ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)"><a href="#" onclick="event.preventDefault();openFeatureGateModal('trade')" style="font-size:10px;color:rgba(139,92,246,.7);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='rgba(139,92,246,.7)'"><i class="bi bi-lightning-charge-fill" style="margin-right:3px"></i>Lihat benefit premium</a></div>` : ''}`;
 
-  // Lock PropFirm, Calendar, and Reminder nav for free users with visual hint
+  // Lock PropFirm and Reminder nav for free users with visual hint
   const ftmoNav = document.getElementById('nav-ftmo');
   const remNav  = document.getElementById('nav-reminder');
-  const calNav  = document.getElementById('nav-calendar');
-
-  // Helper: apply lock to a nav item
-  function _lockNav(el, gateKey, label) {
-    if (!el) return;
-    el.style.opacity = '0.45';
-    el.style.pointerEvents = 'none';
-    el.title = label + ' — Premium only';
-    if (!el.querySelector('.prem-lock')) {
+  if (ftmoNav) {
+    ftmoNav.style.opacity = '0.45';
+    ftmoNav.style.pointerEvents = 'none';
+    ftmoNav.title = 'PropFirm Tracker — Premium only';
+    // Add lock icon if not there
+    if (!ftmoNav.querySelector('.prem-lock')) {
       const lock = document.createElement('span');
       lock.className = 'prem-lock';
       lock.innerHTML = '<i class="bi bi-lock-fill" style="font-size:9px;margin-left:auto;opacity:.5"></i>';
       lock.style.cssText = 'margin-left:auto;display:flex;align-items:center';
-      el.appendChild(lock);
-      el.style.pointerEvents = '';
-      el.style.cursor = 'pointer';
-      el.addEventListener('click', (e) => {
-        if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal(gateKey); }
+      ftmoNav.appendChild(lock);
+      // Re-enable click to show gate
+      ftmoNav.style.pointerEvents = '';
+      ftmoNav.style.cursor = 'pointer';
+      ftmoNav.addEventListener('click', (e) => {
+        if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal('ftmo'); }
       }, true);
     }
   }
-
-  _lockNav(ftmoNav,  'ftmo',     'PropFirm Tracker');
-  _lockNav(calNav,   'calendar', 'Trading Calendar');
-
   if (remNav) {
     remNav.style.opacity = '0.45';
     if (!remNav.querySelector('.prem-lock')) {
@@ -8824,16 +8841,6 @@ function updateFreemiumUI(isPrem) {
         if (_isPremiumCache === false) { e.stopImmediatePropagation(); openFeatureGateModal('reminder'); }
       }, true);
     }
-  }
-
-  // Lock Active Trade Tracker tab with lock label
-  const atTab = document.getElementById('at-tab-active');
-  if (atTab && !atTab.querySelector('.prem-lock')) {
-    const lock = document.createElement('span');
-    lock.className = 'prem-lock';
-    lock.innerHTML = ' <i class="bi bi-lock-fill" style="font-size:9px;opacity:.6"></i>';
-    atTab.appendChild(lock);
-    atTab.title = 'Active Trade Tracker — Premium only';
   }
 }
 window.updateFreemiumUI = updateFreemiumUI;
@@ -9695,7 +9702,6 @@ function goPage(name) {
   if (_isPremiumCache === false) {
     if (name === 'ftmo')     { openFeatureGateModal('ftmo');     return; }
     if (name === 'reminder') { openFeatureGateModal('reminder'); return; }
-    if (name === 'calendar') { openFeatureGateModal('calendar'); return; }
   }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
@@ -10097,7 +10103,7 @@ window._saveQuickLog = async function() {
     result:  res,
     setup:   $('ql-su').value.trim(),
     emotion: $('ql-em').value || 'Calm',
-    notes:   $('ql-nt').value.trim(),
+    notes:   Security.sanitizeInput($('ql-nt').value),
     playbookId: null,
     holdingMinutes: 0,
     rating: 0,
@@ -10139,7 +10145,7 @@ $('trade-save').addEventListener('click', async () => {
     result:  $('f-res').value,
     setup:   $('f-su').value.trim(),
     emotion: $('f-em').value,
-    notes:   $('f-nt').value.trim(),
+    notes:   Security.sanitizeInput($('f-nt').value),
     playbookId: $('f-playbook').value || null,
     holdingMinutes: parseInt($('f-hold-total').value) || 0,
     rating: parseInt($('f-rating').value) || 0,
@@ -10614,11 +10620,6 @@ function _atSave() {
 
 // ── View switching ─────────────────────────────────────────────
 function switchJournalView(view) {
-  // ── Premium gate: Active Trade Tracker hanya untuk premium ──
-  if (view === 'active' && _isPremiumCache === false) {
-    openFeatureGateModal('active');
-    return;
-  }
   _journalView = view;
   const histPanel = document.getElementById('at-history-panel');
   const summaryEl = document.getElementById('journal-summary');
@@ -10660,7 +10661,7 @@ function renderActiveTrades() {
     el.innerHTML = `<div class="at-empty">
       <div class="at-empty-icon"><i class="bi bi-lock" style="font-size:20px;color:var(--accent2)"></i></div>
       <div class="at-empty-title">Login to track trades</div>
-      <div class="at-empty-sub">Create a free account to start planning and tracking your live trades. Max 10 trades for free.</div>
+      <div class="at-empty-sub">Create a free account to start planning and tracking your live trades. Max 20 trades for free.</div>
       <button class="at-empty-cta" onclick="openFeatureGateModal('trade')">
         <i class="bi bi-person-circle" style="font-size:11px"></i> Sign Up Free
       </button>
@@ -10726,17 +10727,17 @@ function renderActiveTrades() {
     const rrFill = at.plannedRR ? Math.min(100, (at.plannedRR / 5) * 100) : 0;
 
     const emotionTag = at.emotion
-      ? `<span class="at-emotion-tag ${emotionClass[at.emotion]||'at-emotion-calm'}">${emotionEmoji[at.emotion]||''} ${at.emotion}</span>`
+      ? `<span class="at-emotion-tag ${emotionClass[at.emotion]||'at-emotion-calm'}">${emotionEmoji[at.emotion]||''} ${Security.escapeHtml(at.emotion)}</span>`
       : '';
     const setupTag = at.setup
-      ? `<span class="at-setup-tag"><i class="bi bi-tags" style="font-size:9px"></i> ${at.setup}</span>`
+      ? `<span class="at-setup-tag"><i class="bi bi-tags" style="font-size:9px"></i> ${Security.escapeHtml(at.setup)}</span>`
       : '';
 
     return `<div class="at-card ${statusClass[at.status] || 'status-open'}" id="at-card-${at.id}">
       <div class="at-card-inner">
         <div class="at-header" style="margin-bottom:${(at.entryPlan||at.sl||at.tp||at.risk||at.reason||setupTag||emotionTag) ? '12px' : '0'}">
           <div class="at-header-left">
-            <span class="at-pair">${at.pair||'—'}</span>
+            <span class="at-pair">${Security.escapeHtml(at.pair||'—')}</span>
             <span class="at-dir-badge ${dirIsLong ? 'at-dir-long' : 'at-dir-short'}">${dirIsLong ? '▲ Long' : '▼ Short'}</span>
             ${statusBadge[at.status] || statusBadge.open}
           </div>
@@ -10766,7 +10767,7 @@ function renderActiveTrades() {
             ${at.risk ? `<div class="at-cell"><div class="at-cell-label">Risk</div><div class="at-cell-val">$${at.risk}</div></div>` : ''}
             ${at.plannedRR ? `<div class="at-cell"><div class="at-cell-label">R:R</div><div class="at-cell-val" style="color:var(--accent2)">${planRR}</div><div class="at-rr-track" style="margin-top:5px"><div class="at-rr-fill" style="width:${rrFill}%"></div></div></div>` : ''}
           </div>` : ''}
-          ${at.reason ? `<div class="at-plan-box">${at.reason}</div>` : ''}
+          ${at.reason ? `<div class="at-plan-box">${Security.escapeHtml(at.reason)}</div>` : ''}
         </div>
       </div>
 
@@ -10955,7 +10956,7 @@ function saveNewActiveTrade() {
     plannedRR,
     session:  document.getElementById('nat-session')?.value || '',
     setup:    document.getElementById('nat-setup')?.value.trim() || '',
-    reason:   document.getElementById('nat-reason')?.value.trim() || '',
+    reason:   Security.sanitizeInput(document.getElementById('nat-reason')?.value || ''),
     emotion:  document.getElementById('nat-emotion')?.value || '',
     status:   'open',
     openedAt: Date.now(),
@@ -11001,7 +11002,7 @@ function openCloseActiveModal(id) {
     recapGrid.innerHTML = `
       <div class="cat-recap-cell">
         <div class="cat-recap-cell-label">Pair</div>
-        <div class="cat-recap-cell-val" style="color:var(--text);font-size:14px">${at.pair||'—'}</div>
+        <div class="cat-recap-cell-val" style="color:var(--text);font-size:14px">${Security.escapeHtml(at.pair||'—')}</div>
       </div>
       <div class="cat-recap-cell">
         <div class="cat-recap-cell-label">Arah</div>
@@ -11146,7 +11147,7 @@ async function closeActiveTrade() {
   const exit   = parseFloat(document.getElementById('cat-exit')?.value) || 0;
   const entry  = parseFloat(document.getElementById('cat-entry')?.value) || at.entryPlan || 0;
   const rating = parseInt(document.getElementById('cat-rating')?.value) || 0;
-  const notes  = document.getElementById('cat-notes')?.value.trim() || '';
+  const notes  = Security.sanitizeInput(document.getElementById('cat-notes')?.value || '');
   const conform = document.getElementById('cat-conform')?.value || '';
 
   if (!result) { alert('Pilih result dulu (Win / Loss / Breakeven)'); return; }
@@ -11274,11 +11275,12 @@ function _detectTraderType(tArr) {
     return { label: 'Swing Trader', icon: 'bi-arrow-left-right', color: 'var(--accent2)', desc: 'Holds positions for hours, patient for targets', meta: `~${Math.round(avgHold/60)}h avg hold · ${tArr.length} trades` };
   }
   if (topSesPct >= 0.6 && topSes) {
-    const sesName = topSes[0].split(' ')[0];
-    return { label: `${sesName} Trader`, icon: 'bi-clock', color: 'var(--accent2)', desc: `Most trades in the ${topSes[0]} session`, meta: `${Math.round(topSesPct*100)}% trades in ${sesName} · ${tArr.length} total` };
+    const sesName = Security.escapeHtml(topSes[0].split(' ')[0]);
+    return { label: `${sesName} Trader`, icon: 'bi-clock', color: 'var(--accent2)', desc: `Most trades in the ${sesName} session`, meta: `${Math.round(topSesPct*100)}% trades in ${sesName} · ${tArr.length} total` };
   }
   if (topPairPct >= 0.6 && topPair) {
-    return { label: 'Specialist', icon: 'bi-bullseye', color: 'var(--accent2)', desc: `Focused on ${topPair[0]} — well-defined edge`, meta: `${Math.round(topPairPct*100)}% trades on ${topPair[0]} · ${tArr.length} total` };
+    const safePair = Security.escapeHtml(topPair[0]);
+    return { label: 'Specialist', icon: 'bi-bullseye', color: 'var(--accent2)', desc: `Focused on ${safePair} — well-defined edge`, meta: `${Math.round(topPairPct*100)}% trades on ${safePair} · ${tArr.length} total` };
   }
   if (freqPerWeek >= 10) {
     return { label: 'Active Trader', icon: 'bi-activity', color: 'var(--accent2)', desc: 'High frequency, actively capturing opportunities', meta: `~${freqPerWeek.toFixed(1)} trades/week` };
@@ -11311,7 +11313,7 @@ function _detectPatterns(tArr) {
     const [pair, ses] = bestCombo.k.split('|');
     insights.push({
       icon: 'bi-bullseye', color: '#22c55e', priority: 10,
-      title: `${pair} di ${ses} — Edge terkuat kamu`,
+      title: `${Security.escapeHtml(pair)} di ${Security.escapeHtml(ses)} — Edge terkuat kamu`,
       desc: `${Math.round(bestCombo.wr*100)}% WR dari ${bestCombo.n} trade · P&L: ${bestCombo.pnl >= 0 ? '+' : ''}$${bestCombo.pnl.toFixed(0)}`,
     });
   }
@@ -11324,7 +11326,7 @@ function _detectPatterns(tArr) {
     const [p, d] = worstPair;
     insights.push({
       icon: 'bi-slash-circle', color: '#f87171', priority: 9,
-      title: `${p} menguras akun kamu`,
+      title: `${Security.escapeHtml(p)} menguras akun kamu`,
       desc: `${d.pnl < 0 ? '' : '+'}$${d.pnl.toFixed(0)} dari ${d.n} trade (${Math.round(d.w/d.n*100)}% WR). Pertimbangkan untuk skip pair ini.`,
     });
   }
@@ -11371,8 +11373,8 @@ function _detectPatterns(tArr) {
   if (bestEm && worstEm && bestEm.em !== worstEm.em && bestEm.wr - worstEm.wr > 0.2) {
     insights.push({
       icon: 'bi-brain', color: 'var(--accent2)', priority: 8,
-      title: `${bestEm.em} = ${Math.round(bestEm.wr*100)}% WR — ${worstEm.em} = ${Math.round(worstEm.wr*100)}% WR`,
-      desc: `Emosi sangat mempengaruhi hasil kamu. Trading saat ${bestEm.em} jauh lebih baik (${bestEm.n} trade).`,
+      title: `${Security.escapeHtml(bestEm.em)} = ${Math.round(bestEm.wr*100)}% WR — ${Security.escapeHtml(worstEm.em)} = ${Math.round(worstEm.wr*100)}% WR`,
+      desc: `Emosi sangat mempengaruhi hasil kamu. Trading saat ${Security.escapeHtml(bestEm.em)} jauh lebih baik (${bestEm.n} trade).`,
     });
   }
 
@@ -11413,8 +11415,8 @@ function _detectPatterns(tArr) {
     if (topSes.wr - botSes.wr > 0.2) {
       insights.push({
         icon: 'bi-clock', color: '#22c55e', priority: 7,
-        title: `${topSes.ses.split('-')[0]} (${Math.round(topSes.wr*100)}% WR) jauh lebih baik dari ${botSes.ses.split('-')[0]} (${Math.round(botSes.wr*100)}%)`,
-        desc: `Fokus trading di ${topSes.ses.split('-')[0]} — $${topSes.pnl >= 0?'+':''}${topSes.pnl.toFixed(0)} P&L dari ${topSes.n} trade.`,
+        title: `${Security.escapeHtml(topSes.ses.split('-')[0])} (${Math.round(topSes.wr*100)}% WR) jauh lebih baik dari ${Security.escapeHtml(botSes.ses.split('-')[0])} (${Math.round(botSes.wr*100)}%)`,
+        desc: `Fokus trading di ${Security.escapeHtml(topSes.ses.split('-')[0])} — $${topSes.pnl >= 0?'+':''}${topSes.pnl.toFixed(0)} P&L dari ${topSes.n} trade.`,
       });
     }
   }
@@ -11484,7 +11486,7 @@ function _detectPatterns(tArr) {
     const [setup, d] = worstSetup;
     insights.push({
       icon: 'bi-exclamation-triangle', color: '#f87171', priority: 7,
-      title: `Setup "${setup}" win rate hanya ${Math.round(d.w/d.n*100)}%`,
+      title: `Setup "${Security.escapeHtml(setup)}" win rate hanya ${Math.round(d.w/d.n*100)}%`,
       desc: `Dari ${d.n} trade dengan setup ini, hanya ${d.w} yang menang. Evaluasi kembali kondisi entry kamu.`,
     });
   }
@@ -11685,7 +11687,7 @@ function _showWeeklySummary(wTrades) {
     </div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px">
       <div style="width:6px;height:6px;border-radius:50%;background:#00d97e;flex-shrink:0"></div>
-      <div style="font-size:11px;color:var(--text3)">Best: <span style="color:#00d97e;font-weight:700;font-family:var(--mono)">${bestT.pair||'—'}</span> <span style="color:rgba(0,217,126,.7);font-family:var(--mono)">+$${bestT.pnl.toFixed(2)}</span></div>
+      <div style="font-size:11px;color:var(--text3)">Best: <span style="color:#00d97e;font-weight:700;font-family:var(--mono)">${Security.escapeHtml(bestT.pair||'—')}</span> <span style="color:rgba(0,217,126,.7);font-family:var(--mono)">+$${bestT.pnl.toFixed(2)}</span></div>
     </div>`;
   el.style.cssText = 'position:fixed;bottom:28px;right:24px;z-index:9998;background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:18px;width:290px;box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04);backdrop-filter:blur(12px);animation:_lossAlertIn .4s cubic-bezier(.34,1.56,.64,1)';
   document.body.appendChild(el);
@@ -12662,7 +12664,7 @@ function renderTable(){
     // Mistake tag dot
     if (t.mistakes) {
       const mkCount = t.mistakes.split(',').filter(Boolean).length;
-      badges += ` <span title="Mistake: ${t.mistakes}" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,77,77,.2);border:1px solid rgba(255,77,77,.3);font-size:8px;color:#ff4d4d;font-weight:700;font-family:var(--mono)">${mkCount}</span>`;
+      badges += ` <span title="Mistake: ${Security.escapeHtml(t.mistakes)}" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,77,77,.2);border:1px solid rgba(255,77,77,.3);font-size:8px;color:#ff4d4d;font-weight:700;font-family:var(--mono)">${mkCount}</span>`;
     }
     // Emotion indicator
     const emColors={'FOMO':'#a78bfa','Revenge':'#ff4d4d','Impatient':'#fb923c','Anxious':'#f59e0b','Calm':'#00d97e','Confident':'#38bdf8'};
@@ -12672,16 +12674,16 @@ function renderTable(){
 
     return`<tr>
       <td style="color:var(--text3)">${idx}</td><td>${t.date||'—'}</td>
-      <td style="font-weight:500;color:var(--text)">${t.pair||'—'}</td>
+      <td style="font-weight:500;color:var(--text)">${Security.escapeHtml(t.pair||'—')}</td>
       <td><span class="b ${t.dir==='Long'?'bl':'bs'}">${(t.dir||'—').toUpperCase()}</span></td>
-      <td style="color:var(--text2)">${(t.session||'—').split('-')[0]}</td>
+      <td style="color:var(--text2)">${Security.escapeHtml((t.session||'—').split('-')[0])}</td>
       <td>${t.entry||'—'}</td><td>${t.exit||'—'}</td>
       <td>$${(t.risk||0).toFixed(0)}</td>
       <td class="${pc}">${t.pnl>=0?'+':''}$${(t.pnl||0).toFixed(2)}</td>
       <td class="${rc}">${t.r>=0?'+':''}${t.r||0}R</td>
       <td><span class="b ${rb}">${t.result||'—'}</span></td>
-      <td style="color:var(--text2)">${t.setup||'—'}</td>
-      <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${t.notes||''}">${t.notes||'—'}</td>
+      <td style="color:var(--text2)">${Security.escapeHtml(t.setup||'—')}</td>
+      <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${Security.escapeHtml(t.notes||'')}">${Security.escapeHtml(t.notes||'—')}</td>
       <td style="white-space:nowrap">
         ${badges ? `<span style="margin-right:4px">${badges}</span>` : ''}
         <button class="bedit-row" onclick="window.editTrade('${fid}')" title="Edit trade"><i class="bi bi-pencil"></i></button>
@@ -12695,7 +12697,7 @@ function updatePairFil(){
   // Show pairs relevant to current journal period
   const base = getJournalFilteredTrades();
   const p=[...new Set(base.map(t=>t.pair))],s=$('fp'),c=s.value;
-  s.innerHTML='<option value="">All Pairs</option>'+p.map(x=>`<option ${x===c?'selected':''}>${x}</option>`).join('');
+  s.innerHTML='<option value="">All Pairs</option>'+p.map(x=>`<option ${x===c?'selected':''}>${Security.escapeHtml(x)}</option>`).join('');
 }
 
 // ── ANALYTICS ─────────────────────────────────────────
@@ -12723,14 +12725,14 @@ function renderAna(){
   const mkB=(arr,mx)=>arr.map(([lbl,v],i)=>{
     const colorClass=v>=0?'bfl-green':'bfl-red';
     const colors=['bfl-green','bfl-purple','bfl-gold','bfl-cyan','bfl-green','bfl-purple'];
-    return `<div class="ana-brow"><div class="ana-blbl">${lbl}</div><div class="ana-btr"><div class="ana-bfl ${colorClass}" style="width:${Math.abs(v)/mx*100}%"></div></div><div class="ana-bvl ${v>=0?'pos':'neg'}">${v>=0?'+':''}$${Math.abs(v).toFixed(0)}</div></div>`;
+    return `<div class="ana-brow"><div class="ana-blbl">${Security.escapeHtml(lbl)}</div><div class="ana-btr"><div class="ana-bfl ${colorClass}" style="width:${Math.abs(v)/mx*100}%"></div></div><div class="ana-bvl ${v>=0?'pos':'neg'}">${v>=0?'+':''}$${Math.abs(v).toFixed(0)}</div></div>`;
   }).join('');
   const pA=Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,6);
   $('pb').innerHTML=pA.length?mkB(pA,Math.max(...pA.map(p=>Math.abs(p[1])),1)):'<span style="font-size:12px;color:var(--text3)">No data</span>';
   const sA=Object.entries(sm).sort((a,b)=>b[1]-a[1]);
   $('sb2').innerHTML=sA.length?mkB(sA,Math.max(...sA.map(s=>Math.abs(s[1])),1)):'<span style="font-size:12px;color:var(--text3)">No data</span>';
   const stA=Object.entries(stm).sort((a,b)=>b[1]-a[1]).slice(0,6),mSt=Math.max(...stA.map(s=>s[1]),1);
-  $('stb').innerHTML=stA.length?stA.map(([tag,n])=>`<div class="ana-brow"><div class="ana-blbl">${tag}</div><div class="ana-btr"><div class="ana-bfl bfl-purple" style="width:${n/mSt*100}%"></div></div><div class="ana-bvl neu">${n}</div></div>`).join(''):'<span style="font-size:12px;color:var(--text3)">No data</span>';
+  $('stb').innerHTML=stA.length?stA.map(([tag,n])=>`<div class="ana-brow"><div class="ana-blbl">${Security.escapeHtml(tag)}</div><div class="ana-btr"><div class="ana-bfl bfl-purple" style="width:${n/mSt*100}%"></div></div><div class="ana-bvl neu">${n}</div></div>`).join(''):'<span style="font-size:12px;color:var(--text3)">No data</span>';
 
   // Drawdown chart using filtered trades equity
   const allTot=trades.reduce((s,t)=>s+t.pnl,0);
@@ -12935,7 +12937,7 @@ function _renderMistakeBreakdown(ft) {
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <div style="width:24px;height:24px;border-radius:7px;background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.15);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">${icon}</div>
           <div style="flex:1;font-size:12px;font-weight:${isTop ? '700' : '500'};color:${isTop ? 'var(--text)' : 'var(--text2)'}">
-            ${mk}${isTop ? ' <span style="font-size:9px;font-weight:700;color:#ff4d4d;background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.2);border-radius:4px;padding:1px 5px;margin-left:4px">MOST COMMON</span>' : ''}
+            ${Security.escapeHtml(mk)}${isTop ? ' <span style="font-size:9px;font-weight:700;color:#ff4d4d;background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.2);border-radius:4px;padding:1px 5px;margin-left:4px">MOST COMMON</span>' : ''}
           </div>
           <div style="font-size:11px;font-weight:700;color:rgba(255,77,77,.8);font-family:var(--mono)">${n}× <span style="font-weight:400;color:var(--text3)">(${lossPct}%)</span></div>
         </div>
@@ -13049,7 +13051,7 @@ function _renderRRComparison(ft) {
     const barColor = achieved ? '#00d97e' : t.r > 0 ? '#f59e0b' : '#ff4d4d';
     const targetX  = Math.min(95, (t.plannedRR / Math.max(t.plannedRR, t.r) * 100));
     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px">
-      <div style="font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text);min-width:58px">${t.pair || '—'}</div>
+      <div style="font-size:12px;font-weight:700;font-family:var(--mono);color:var(--text);min-width:58px">${Security.escapeHtml(t.pair || '—')}</div>
       <div style="flex:1;position:relative">
         <div style="background:rgba(255,255,255,.05);border-radius:3px;height:6px;overflow:visible;position:relative">
           <div style="height:100%;width:${Math.max(2,pct)}%;background:${barColor};border-radius:3px;transition:width .6s ease;min-width:2px"></div>
@@ -13227,7 +13229,9 @@ function isOwner() {
 
 function updateFinanceNav() {
   $('nav-finance').style.display = isOwner() ? 'flex' : 'none';
-  $('nav-ai-review').style.display = isOwner() ? 'flex' : 'none';
+  // AI Trade Review tersedia untuk semua user yang sudah login (bukan anonymous)
+  const showAI = currentUser && !currentUser.isAnonymous;
+  $('nav-ai-review').style.display = showAI ? 'flex' : 'none';
 }
 
 // ── FORMAT RUPIAH ─────────────────────────────────────
@@ -13377,12 +13381,12 @@ function renderFinance() {
     const fid=t.firestoreId||'';
     return `<tr>
       <td>${t.tanggal||'–'}</td>
-      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="window.openFinModal('${fid}')">${t.nama||'–'}</td>
+      <td style="font-weight:500;color:var(--text);cursor:pointer" onclick="window.openFinModal('${fid}')">${Security.escapeHtml(t.nama||'–')}</td>
       <td><span class="b ${isIn?'bw':'bo'}">${t.jenis||'–'}</span></td>
-      <td style="color:var(--text2)">${t.kategori||'–'}</td>
+      <td style="color:var(--text2)">${Security.escapeHtml(t.kategori||'–')}</td>
       <td class="${isIn?'pos':'neg'}" style="font-family:var(--mono)">${fRp(t.nominal)}</td>
       <td><span class="b ${rb}">${t.status||'–'}</span></td>
-      <td style="color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${t.keterangan||''}">${t.keterangan||'–'}</td>
+      <td style="color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${Security.escapeHtml(t.keterangan||'')}">${Security.escapeHtml(t.keterangan||'–')}</td>
       <td><button class="bdel" onclick="window.delFinTx('${fid}')">✕</button></td>
     </tr>`;
   }).join('');
@@ -13394,7 +13398,7 @@ $('fin-cancel').addEventListener('click', () => $('md-finance').classList.remove
 $('md-finance').addEventListener('click', e => { if(e.target===$('md-finance')) $('md-finance').classList.remove('open'); });
 
 $('fin-save').addEventListener('click', async () => {
-  const nama = $('fin-f-nama').value.trim();
+  const nama = Security.sanitizeInput($('fin-f-nama').value);
   if (!nama) { $('fin-f-nama').style.borderColor='#ff4d4d'; $('fin-f-nama').focus(); return; }
   const data = {
     tanggal:    $('fin-f-tgl').value,
@@ -13403,7 +13407,7 @@ $('fin-save').addEventListener('click', async () => {
     kategori:   $('fin-f-kat').value,
     status:     $('fin-f-status').value,
     nominal:    parseFloat($('fin-f-nominal').value) || 0,
-    keterangan: $('fin-f-ket').value.trim(),
+    keterangan: Security.sanitizeInput($('fin-f-ket').value),
   };
   $('md-finance').classList.remove('open');
   await saveFinTransaction(data);
@@ -13456,11 +13460,11 @@ async function saveDailyEntry() {
   const entry = {
     bias:     document.querySelector('.bias-btn.active')?.dataset.bias || '',
     mood:     document.querySelector('.mood-btn.active')?.dataset.mood || '',
-    pairs:    $('daily-pairs').value.trim(),
-    preplan:  $('daily-preplan').value.trim(),
-    review:   $('daily-review').value.trim(),
-    lessons:  $('daily-lessons').value.trim(),
-    mental:   $('daily-mental').value.trim(),
+    pairs:    Security.sanitizeInput($('daily-pairs').value),
+    preplan:  Security.sanitizeInput($('daily-preplan').value),
+    review:   Security.sanitizeInput($('daily-review').value),
+    lessons:  Security.sanitizeInput($('daily-lessons').value),
+    mental:   Security.sanitizeInput($('daily-mental').value),
     rating:   parseInt($('daily-rating').value),
     checklist: {
       plan:     $('chk-plan').checked,
@@ -13547,13 +13551,13 @@ function renderDailyHistory() {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
         <div style="font-size:13px;font-weight:600;color:var(--text)">${label}</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:12px">${biasIcon} ${e.bias||'—'}</span>
+          <span style="font-size:12px">${biasIcon} ${Security.escapeHtml(e.bias||'—')}</span>
           <span style="font-size:12px">${moodIcon}</span>
           <span style="font-size:12px;font-weight:700;font-family:var(--mono);color:${starColor(e.rating||5)}">${e.rating||5}/10</span>
           <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${chkCount}/4 ✓</span>
         </div>
       </div>
-      ${e.lessons ? `<div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💡 ${e.lessons}</div>` : ''}
+      ${e.lessons ? `<div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💡 ${Security.escapeHtml(e.lessons)}</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -14318,7 +14322,7 @@ let _aiContent = '';
 let _aiTradeId = null;
 
 $('nav-ai-review').addEventListener('click', () => {
-  if (!currentUser || !isOwner()) return;
+  if (!currentUser || currentUser.isAnonymous) return;
   const sel = $('ai-trade-select');
   sel.innerHTML = '<option value="">— Pilih trade —</option>';
   [...trades].sort((a,b) => b.date.localeCompare(a.date)).forEach((t, i) => {
@@ -14624,7 +14628,9 @@ function bnMoreToggle() {
   }
   // Sync owner-only items visibility
   const ownerVisible = typeof isOwner === 'function' && isOwner();
-  ['bmp-ai-review','bmp-finance'].forEach(id => {
+  const bmpAiEl = document.getElementById('bmp-ai-review');
+  if (bmpAiEl) bmpAiEl.style.display = (currentUser && !currentUser.isAnonymous) ? 'flex' : 'none';
+  ['bmp-finance'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = ownerVisible ? 'flex' : 'none';
   });
@@ -16432,7 +16438,7 @@ function setupImportModalEvents(modal) {
       const dirClass = t.dir === 'Long' ? 'dir-long' : 'dir-short';
       const pnlClass = t.pnl >= 0 ? 'imp-pnl-pos' : 'imp-pnl-neg';
       row.innerHTML = `
-        <span class="imp-preview-pair">${t.pair}</span>
+        <span class="imp-preview-pair">${Security.escapeHtml(t.pair)}</span>
         <span class="mock-trade-dir ${dirClass}">${t.dir.toUpperCase()}</span>
         <span style="font-size:10px;color:var(--text3);flex:1">${t.date?.slice(0,10) || ''}</span>
         <span class="${pnlClass}">${t.pnl >= 0 ? '+' : ''}$${parseFloat(t.pnl).toFixed(2)}</span>`;
@@ -17064,8 +17070,8 @@ window.renderPlaybook = function() {
       <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${col};border-radius:2px 0 0 2px"></div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;padding-left:8px">
         <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pb.name}</div>
-          <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pb.desc || 'Belum ada deskripsi'}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${Security.escapeHtml(pb.name)}</div>
+          <div style="font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${Security.escapeHtml(pb.desc || 'Belum ada deskripsi')}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px">
           ${pb.images && pb.images.length ? `<div style="background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:3px"><i class="bi bi-images" style="font-size:9px"></i>${pb.images.length}</div>` : ''}
@@ -17139,7 +17145,8 @@ function openPlaybookDetail(id) {
       wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:zoom-in;border:1px solid var(--border);background:var(--bg3);transition:transform .15s,box-shadow .15s';
       wrap.onmouseenter = () => { wrap.style.transform='scale(1.04)'; wrap.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'; };
       wrap.onmouseleave = () => { wrap.style.transform=''; wrap.style.boxShadow=''; };
-      wrap.innerHTML = `<img src="${img.url}" alt="ref ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.style.opacity='.3'">
+      const safeImgUrl = (img.url||'').startsWith('http') ? img.url : '';
+      wrap.innerHTML = `<img src="${Security.escapeHtml(safeImgUrl)}" alt="ref ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.style.opacity='.3'">
         <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .15s;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s" class="pb-img-overlay">
           <i class="bi bi-zoom-in" style="color:#fff;font-size:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))"></i>
         </div>`;
@@ -17191,7 +17198,7 @@ function openPlaybookDetail(id) {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border-radius:8px;font-size:12px';
       row.innerHTML = `
-        <div style="font-weight:700;font-family:var(--mono);color:var(--text);min-width:70px">${t.pair||'—'}</div>
+        <div style="font-weight:700;font-family:var(--mono);color:var(--text);min-width:70px">${Security.escapeHtml(t.pair||'—')}</div>
         <div style="font-size:10px;color:var(--text3);flex:1">${t.date||''}</div>
         <div style="font-size:10px;color:var(--text3)">${t.result||''}</div>
         <div style="font-weight:700;font-family:var(--mono);color:${pnlCol}">${t.pnl>=0?'+':''}$${parseFloat(t.pnl||0).toFixed(2)}</div>
@@ -17298,11 +17305,11 @@ document.getElementById('playbook-save-btn').addEventListener('click', async () 
   btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat" style="font-size:14px"></i> Menyimpan...';
   const data = {
     name,
-    desc: document.getElementById('pb-desc').value.trim(),
-    entryCondition: document.getElementById('pb-entry-cond').value.trim(),
-    exitCondition: document.getElementById('pb-exit-cond').value.trim(),
-    rules: document.getElementById('pb-rules').value.trim(),
-    notes: document.getElementById('pb-notes').value.trim(),
+    desc: Security.sanitizeInput(document.getElementById('pb-desc').value),
+    entryCondition: Security.sanitizeInput(document.getElementById('pb-entry-cond').value),
+    exitCondition: Security.sanitizeInput(document.getElementById('pb-exit-cond').value),
+    rules: Security.sanitizeInput(document.getElementById('pb-rules').value),
+    notes: Security.sanitizeInput(document.getElementById('pb-notes').value),
     color: _pbSelectedColor,
     images: _pbFormImages.map(({ url, publicId }) => ({ url, publicId })),
   };
@@ -17586,7 +17593,7 @@ window.renderAdvancedAnalytics = function() {
     row.innerHTML = `
       <div style="width:8px;height:8px;border-radius:50%;background:${e.color};flex-shrink:0;box-shadow:0 0 6px ${e.color}"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.name}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${Security.escapeHtml(e.name)}</div>
         <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${e.wins}W ${e.losses}L · ${e.total} trades · Avg ${e.avgR.toFixed(2)}R</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
