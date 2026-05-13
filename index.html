@@ -8168,6 +8168,10 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
+// ── Expose Firestore SDK + db to window IMMEDIATELY (needed by active trade listener) ──
+window._db = db;
+window._fs = { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query, orderBy, onSnapshot };
+
 // ── HELPERS ───────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const f2 = v => v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -9210,6 +9214,7 @@ onAuthStateChanged(auth, async user => {
     setAnonUI(false);
     await loadUserProfile(user);
     listenTrades(user.uid);
+    if (typeof listenActiveTrades === 'function') listenActiveTrades(user.uid);
     updateFinanceNav();
     if (isOwner()) listenFinance();
     listenDaily();
@@ -9242,6 +9247,8 @@ onAuthStateChanged(auth, async user => {
       setTimeout(() => splash.classList.add('hidden'), 300);
     }
     if (unsubTrades) { unsubTrades(); unsubTrades = null; }
+    if (_unsubActiveTrades) { _unsubActiveTrades(); _unsubActiveTrades = null; }
+    activeTrades = [];
     setAuthUI(false);
     setFloatCTA(true); // Guest mode: show upgrade CTA
     if (wasLoggedIn) {
@@ -10558,11 +10565,9 @@ function updateAll() {
   if (!bal) return;
   window._appTrades = trades; // expose for trading calendar widget
   window._trades = trades;    // expose for playbook + advanced analytics modules
-  window._db = db;            // expose db for playbook module
-  window._currentUser = currentUser; // expose currentUser for playbook module
-  // Expose Firestore SDK functions so other modules reuse the SAME version (10.12.0)
-  // This prevents "Expected first argument to collection() to be a CollectionReference" error
-  if (!window._fs) window._fs = { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy };
+  // window._fs already set at init; no override needed here
+  window._db = db;
+  window._currentUser = currentUser;
   window.updateAll = updateAll; // re-expose in case it was overridden
   if (window.tcalRefresh) window.tcalRefresh();
   updateStats(); renderEq(); renderPnl(); renderDonut(); renderDNA(); renderTable(); updatePairFil();
@@ -10605,17 +10610,64 @@ window.updateAll = updateAll; // expose for external modules
 let activeTrades = []; // array of active trade objects
 let _closingActiveId = null; // ID of active trade being closed
 let _journalView = 'history'; // 'history' | 'active'
-const AT_KEY_PREFIX = 'at_'; // localStorage key prefix per user
+let _unsubActiveTrades = null; // Firestore realtime listener unsubscriber
 
-// ── Storage helpers (localStorage, per user) ──────────────────
-function _atKey() {
-  return 'activeTrades_' + (currentUser ? currentUser.uid : 'guest');
+// ── Firestore Active Trades helpers (cloud, per user, realtime) ──
+function _atCol() {
+  // Returns Firestore collection reference for this user's activeTrades
+  if (!window._db || !currentUser) return null;
+  const { collection } = window._fs || {};
+  if (!collection) return null;
+  return collection(window._db, 'users', currentUser.uid, 'activeTrades');
 }
-function _atLoad() {
-  try { activeTrades = JSON.parse(localStorage.getItem(_atKey()) || '[]'); } catch(e) { activeTrades = []; }
+
+// _atLoad is now a no-op: data is kept in sync via listenActiveTrades()
+function _atLoad() { /* data is synced via Firestore realtime listener */ }
+
+// _atSave is now a no-op: all writes go directly to Firestore
+function _atSave() { /* writes go via _atWriteDoc / _atDeleteDoc */ }
+
+async function _atWriteDoc(at) {
+  try {
+    const col = _atCol();
+    if (!col) return;
+    const { doc, setDoc } = window._fs || {};
+    if (!doc || !setDoc) return;
+    await setDoc(doc(window._db, 'users', currentUser.uid, 'activeTrades', at.id), at);
+  } catch(e) { console.error('_atWriteDoc error', e); }
 }
-function _atSave() {
-  try { localStorage.setItem(_atKey(), JSON.stringify(activeTrades)); } catch(e) {}
+
+async function _atDeleteDoc(id) {
+  try {
+    if (!window._db || !currentUser) return;
+    const { doc, deleteDoc } = window._fs || {};
+    if (!doc || !deleteDoc) return;
+    await deleteDoc(doc(window._db, 'users', currentUser.uid, 'activeTrades', id));
+  } catch(e) { console.error('_atDeleteDoc error', e); }
+}
+
+// ── Realtime listener for active trades ──────────────────────
+function listenActiveTrades(uid) {
+  if (_unsubActiveTrades) { _unsubActiveTrades(); _unsubActiveTrades = null; }
+  const { collection, orderBy, query, onSnapshot } = window._fs || {};
+  if (!collection || !window._db) {
+    console.warn('listenActiveTrades: Firestore not ready yet');
+    return;
+  }
+  const q = query(
+    collection(window._db, 'users', uid, 'activeTrades'),
+    orderBy('openedAt', 'desc')
+  );
+  _unsubActiveTrades = onSnapshot(q, snap => {
+    activeTrades = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+    _renderAtIfVisible();
+    _updateAtBadge();
+  }, err => console.error('listenActiveTrades error', err));
+}
+window.listenActiveTrades = listenActiveTrades;
+
+function _renderAtIfVisible() {
+  if (_journalView === 'active') renderActiveTrades();
 }
 
 // ── View switching ─────────────────────────────────────────────
@@ -10645,7 +10697,7 @@ window._switchJournalViewReady = switchJournalView; // bridge for early stub cal
 
 // ── Render active trades list ──────────────────────────────────
 function renderActiveTrades() {
-  _atLoad();
+  // activeTrades is always up-to-date via Firestore realtime listener
   const el = document.getElementById('at-list');
   if (!el) return;
 
@@ -10915,7 +10967,7 @@ function calcNatRR() {
 }
 window.calcNatRR = calcNatRR;
 
-function saveNewActiveTrade() {
+async function saveNewActiveTrade() {
   // Double-guard: cek limit lagi saat save
   if (!currentUser || currentUser.isAnonymous) {
     document.getElementById('md-new-active').classList.remove('open');
@@ -10963,29 +11015,23 @@ function saveNewActiveTrade() {
     date:     new Date().toISOString().slice(0,10)
   };
 
-  _atLoad();
-  activeTrades.unshift(at);
-  _atSave();
   document.getElementById('md-new-active').classList.remove('open');
-  renderActiveTrades();
-  _updateAtBadge();
+  await _atWriteDoc(at);
+  // UI update happens automatically via Firestore realtime listener
 }
 window.saveNewActiveTrade = saveNewActiveTrade;
 
-function setAtStatus(id, status) {
-  _atLoad();
+async function setAtStatus(id, status) {
   const at = activeTrades.find(x => x.id === id);
-  if (at) { at.status = status; _atSave(); renderActiveTrades(); }
+  if (at) { at.status = status; await _atWriteDoc(at); }
+  // UI updates via realtime listener
 }
 window.setAtStatus = setAtStatus;
 
-function deleteActiveTrade(id) {
+async function deleteActiveTrade(id) {
   if (!confirm('Delete this trade?')) return;
-  _atLoad();
-  activeTrades = activeTrades.filter(x => x.id !== id);
-  _atSave();
-  renderActiveTrades();
-  _updateAtBadge();
+  await _atDeleteDoc(id);
+  // UI updates via realtime listener
 }
 window.deleteActiveTrade = deleteActiveTrade;
 
@@ -11192,15 +11238,16 @@ async function closeActiveTrade() {
     holdingMinutes: Math.round((Date.now() - at.openedAt) / 60000)
   };
 
-  // Remove from active list
-  activeTrades = activeTrades.filter(x => x.id !== _closingActiveId);
-  _atSave();
+  // Remove from active list (Firestore)
+  const closingId = _closingActiveId;
+  await _atDeleteDoc(closingId);
 
   // Save to journal (existing pipeline)
   await saveTradeToCloud(trade);
 
   document.getElementById('md-close-active').classList.remove('open');
   _closingActiveId = null;
+  // UI updates via realtime listener, but force re-render for UX:
   renderActiveTrades();
   _updateAtBadge();
 
@@ -11210,7 +11257,6 @@ async function closeActiveTrade() {
 window.closeActiveTrade = closeActiveTrade;
 
 function _updateAtBadge() {
-  _atLoad();
   const badge = document.getElementById('at-active-count');
   if (badge) badge.textContent = activeTrades.length;
 }
@@ -11232,7 +11278,7 @@ function _atToast(msg) {
 
 // ── Init on page load ──────────────────────────────────────────
 (function initActiveTrades() {
-  _atLoad();
+  // _atLoad not needed: data sync handled by listenActiveTrades() called from onAuthStateChanged
   _updateAtBadge();
   // Refresh timer every minute
   setInterval(() => { if (_journalView === 'active') renderActiveTrades(); }, 60000);
